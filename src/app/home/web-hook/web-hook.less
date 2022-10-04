@@ -1,0 +1,50 @@
+:host {
+  background-color: #f0f0f0;
+  display: block;
+  box-sizing: border-box;
+  position: fixed;
+  top: 3.5rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.web-hook-list-container {
+  width: 700px;
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+
+  @media (max-width: 479px) {
+    width: 100%;
+  }
+  @media (min-width: 480px) and (max-width: 767px) {
+    width: 480px;
+  }
+  @media (min-width: 768px) {
+    width: 700px;
+  }
+
+}
+
+
+.web-hook-list {
+  .name {
+    font-size: 1.2rem;
+    padding: 0.4rem 1rem 0.8rem 0;
+    border-bottom: 1px solid #cccccc;
+    margin-bottom: 0.6rem;
+  }
+  .desc {
+    margin-top: 1rem;
+    color: #4c4c4c;
+  }
+  .permission-tags {
+    padding: 0.5rem 0;
+    > .key {
+      font-size: 0.9rem;
+      padding-right: 1rem;
+    }
+  }
+}

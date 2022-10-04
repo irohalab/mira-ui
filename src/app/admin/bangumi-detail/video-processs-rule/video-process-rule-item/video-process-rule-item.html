@@ -1,0 +1,28 @@
+<div class="rule-item-container">
+    <div class="entry">
+        <div class="entry-key">Rule Name:</div>
+        <h4 class="entry-value ui label" [ngClass]="{'basic': !rule.name}">{{rule.name || 'Unnamed'}}</h4>
+    </div>
+    <div class="entry">
+        <div class="entry-key">Condition:</div>
+        <div class="condition entry-value ui label" [ngClass]="{'basic': !rule.condition}">
+            {{rule.condition || "No Condition"}}
+        </div>
+    </div>
+    <div class="entry">
+        <div class="entry-key">Actions:</div>
+        <div class="actions-container entry-value">
+
+        </div>
+    </div>
+    <div class="buttons-wrapper ui mini buttons">
+        <button class="ui primary button" (click)="editRule()">Edit</button>
+        <button class="ui red button"
+                title="Delete Rule"
+                confirmDialog
+                dialogTitle="Are You Sure To DELETE RULE?"
+                [dialogContent]="'YOU ARE GOING TO DELETE RULE ' + rule.name + ', this cannot be undo.'"
+                (onConfirm)="deleteRule()"><i class="remove icon"></i>
+        Delete</button>
+    </div>
+</div>

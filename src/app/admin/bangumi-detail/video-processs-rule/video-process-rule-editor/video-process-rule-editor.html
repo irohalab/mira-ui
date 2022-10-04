@@ -1,0 +1,30 @@
+<div class="rule-editor-modal">
+    <div class="modal-header">
+        <h4>Edit Rule</h4>
+    </div>
+    <section class="ui message">
+        See <a href="https://github.com/irohalab/mira-video-manager/blob/master/docs/rule-guide.md" target="_blank"><i class="external alternative icon"></i>Rule Guide</a> to learn about rule.
+    </section>
+    <section class="condition-section">
+        <form novalidate class="ui form" [formGroup]="basicInfoForm" [ngClass]="{error: !basicInfoForm.valid}">
+            <div class="field">
+                <label>Rule Name</label>
+                <input type="text" formControlName="name" name="name">
+            </div>
+            <div class="field" *ngIf="!videoId" [ngClass]="{error: basicInfoForm.controls['condition'].hasError('condition')}">
+                <label>Condition</label>
+                <input type="text" formControlName="condition" name="condition">
+            </div>
+            <div class="ui error message" *ngIf="basicInfoForm.controls['condition'].hasError('condition')">
+                <div class="header">{{basicInfoForm.controls['condition'].errors['condition'].message}}</div>
+            </div>
+        </form>
+    </section>
+    <section class="action-section">
+        <action-editor [actions]="actions"></action-editor>
+    </section>
+    <div class="footer">
+        <button class="ui button primary" (click)="save()">Save</button>
+        <button class="ui button" (click)="cancel()">Cancel</button>
+    </div>
+</div>

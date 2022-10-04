@@ -1,0 +1,34 @@
+<admin-navbar navTitle="视频管理">
+    <div class="ui icon input action-item search-action">
+        <input type="text" placeholder="Search Download Job" #searchBox>
+        <i class="search icon"></i>
+    </div>
+    <div class="accessory-action ui inline dropdown" uiDropdown="click">
+        <div class="text">{{selectJobStatus}}</div>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <div class="item" (click)="onChangeStatus(eJobStatus.Queueing)">Queueing</div>
+            <div class="item" (click)="onChangeStatus(eJobStatus.Running)">Running</div>
+            <div class="item" (click)="onChangeStatus(eJobStatus.Finished)">Finished</div>
+            <div class="item" (click)="onChangeStatus(eJobStatus.UnrecoverableError)">UnrecoverableError</div>
+            <div class="item" (click)="onChangeStatus(eJobStatus.Pause)">Pause</div>
+            <div class="item" (click)="onChangeStatus(eJobStatus.Canceled)">Canceled</div>
+        </div>
+    </div>
+</admin-navbar>
+<div class="content-area">
+    <div class="table-header">
+        <div class="job-id">Job ID</div>
+        <div class="bangumi-id">Bangumi ID</div>
+        <div class="current-stage">Current Stage</div>
+        <div class="create-time">Create Time</div>
+        <div class="start-time">Start Time</div>
+        <div class="finished-time">Finished Time</div>
+    </div>
+    <div class="job-container" *ngIf="!isLoading && jobList && jobList.length > 0">
+        <infinite-list [rowHeight]="cardHeight">
+            <video-process-job-card  *infiniteFor="let job of jobList" [job]="job">
+            </video-process-job-card>
+        </infinite-list>
+    </div>
+</div>

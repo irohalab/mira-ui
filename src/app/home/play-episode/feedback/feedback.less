@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  box-sizing: border-box;
+  text-align: left;
+  @media(max-width: 639px) and (min-height: 400px) {
+    width: 90%;
+    height: 360px;
+  }
+  @media(min-width: 640px) and (min-height: 400px) {
+    width: 600px;
+    height: 300px;
+  }
+  @media(min-height: 400px) and (min-width: 425px) {
+    height: 300px;
+  }
+  @media(max-height: 399px) {
+    height: 90%;
+  }
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  border-radius: 4px;
+  background-color: #fff;
+  overflow: hidden;
+  -webkit-box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
+}
+
+.ui.form {
+  padding: 1rem 1.5rem;
+
+  .ui.questions.buttons {
+    flex-wrap: wrap;
+  }
+
+  .footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}

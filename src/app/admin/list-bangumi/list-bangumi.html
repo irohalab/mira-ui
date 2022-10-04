@@ -1,0 +1,60 @@
+<admin-navbar navTitle="已保存的新番">
+    <div class="ui icon input action-item search-action">
+        <input type="text" placeholder="按名称过滤" #searchBox [disabled]="isLoading || !bangumiList || bangumiList.length === 0">
+        <i class="search icon"></i>
+    </div>
+    <a class="action-item anchor-button" (click)="addBangumi()">
+        <i class="plus icon"></i>添加番组
+    </a>
+    <a class="sort-button anchor-button accessory-action" (click)="onOrderChange(orderBy, true)" [title]="sort === 'desc' ? '降序': '升序'">
+        <i class="sort content icon" [ngClass]="{ascending: sort === 'asc', descending: sort === 'desc'}"></i>
+    </a>
+    <form class="accessory-action is-movie-toggle">
+        <ui-toggle text="剧场版/OVA" [(ngModel)]="isMovie" name="isMovie"></ui-toggle>
+    </form>
+    <div class="accessory-action ui inline dropdown" uiDropdown="click">
+        <div class="text">{{orderByMenuLabel[orderBy]}}</div>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <div class="item" (click)="onOrderChange('create_time', false)">按创建时间</div>
+            <div class="item" (click)="onOrderChange('update_time', false)">按修改时间</div>
+            <div class="item" (click)="onOrderChange('air_date', false)">按开播日期</div>
+        </div>
+    </div>
+    <div class="accessory-action ui inline dropdown" uiDropdown="click">
+        <div class="text">{{typeMenuLabel[type]}}</div>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <div class="item" (click)="onTypeChange(-1)">全部</div>
+            <div class="item" (click)="onTypeChange(2)">动画</div>
+            <div class="item" (click)="onTypeChange(6)">电视剧</div>
+        </div>
+    </div>
+</admin-navbar>
+<div class="content-area">
+    <div class="all-bangumi-container" *ngIf="!name && !isLoading && bangumiList && bangumiList.length > 0">
+        <ui-timeline-meter [rowHeight]="cardHeight" [timestampList]="timestampList">
+            <infinite-list [rowHeight]="cardHeight" [newScrollPosition]="lastScrollPosition" (scrollPosition)="onScrollPositionChange($event)">
+                <bangumi-card *infiniteFor="let bangumi of bangumiList"
+                              [bangumi]="bangumi"
+                              [showAddedTag]="false"
+                              (click)="editBangumi(bangumi)"></bangumi-card>
+            </infinite-list>
+        </ui-timeline-meter>
+    </div>
+    <div class="search-result-container" *ngIf="!!name && !isLoading && bangumiList && bangumiList.length > 0">
+        <div class="bangumi-list">
+            <bangumi-card *ngFor="let bangumi of bangumiList"
+                          [bangumi]="bangumi"
+                          [showAddedTag]="false"
+                          (click)="editBangumi(bangumi)">
+            </bangumi-card>
+        </div>
+    </div>
+    <div class="no-result-container" *ngIf="!isLoading && bangumiList && bangumiList.length === 0">
+        <div class="no-result-tips"><i class="warning circle icon"></i>没有找到番组</div>
+    </div>
+    <div class="searching-container" *ngIf="isLoading">
+        <div class="ui inverted massive text active loader">Loading...</div>
+    </div>
+</div>

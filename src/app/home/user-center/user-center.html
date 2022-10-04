@@ -1,0 +1,152 @@
+<div class="user-center-container ui container">
+    <div class="ui secondary pointing menu">
+        <a routerLink="/settings/user" class="active item">用户设置</a>
+        <a routerLink="/settings/web-hook" class="item">Web Hook列表</a>
+        <a routerLink="/settings/bangumi" class="item" *ngIf="isBgmEnabled">Bangumi账户</a>
+    </div>
+    <div class="ui segment basic-info">
+        <h4>基本信息</h4>
+        <div class="ui form">
+            <div class="inline field">
+                <label>用户名</label>
+                <span>{{user?.name}}</span>
+            </div>
+            <div class="inline field">
+                <label>Level</label>
+                <span>{{user?.level}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui segment">
+        <form class="ui form" novalidate autocomplete="off" [formGroup]="emailForm" [ngClass]="{error: emailForm.invalid}">
+            <div class="inline field" [ngClass]="{error: emailFormErrors.email.length > 0}">
+                <label>Email</label>
+                <input type="text"
+                       placeholder="example: some@example.com"
+                       formControlName="email"
+                       autocomplete="off"
+                       (blur)="onFormChanged(emailFormErrors, emailValidationMessages, emailForm)">
+                <span class="warning text" *ngIf="user && user.email && !user.email_confirmed">邮箱地址未验证</span>
+                <button *ngIf="user && user.email && !user.email_confirmed"
+                        type="button"
+                        class="ui button"
+                        [disabled]="resendMailTimeLeft > 0"
+                        (click)="resendMail()">
+                    {{resendMailTimeLeft > 0 ? resendMailTimeLeft + '秒后': ''}}重新发送验证邮件
+                </button>
+            </div>
+            <div class="ui error message" *ngIf="emailFormErrors.email.length > 0">
+                <ul class="list">
+                    <li *ngFor="let error of emailFormErrors.email">{{error}}</li>
+                </ul>
+            </div>
+            <!--<div class="inline field" [ngClass]="{error: emailFormErrors.current_pass.length > 0}">-->
+                <!--<label>当前密码</label>-->
+                <!--<input type="password"-->
+                       <!--formControlName="current_pass"-->
+                       <!--autocomplete="new-password"-->
+                       <!--(blur)="onFormChanged(emailFormErrors, emailValidationMessages, emailForm)">-->
+            <!--</div>-->
+            <!--<div class="ui error message" *ngIf="emailFormErrors.current_pass.length > 0">-->
+                <!--<ul class="list">-->
+                    <!--<li *ngFor="let error of emailFormErrors.current_pass">{{error}}</li>-->
+                <!--</ul>-->
+            <!--</div>-->
+            <button type="button" class="ui button" [disabled]="emailForm.invalid || emailForm.pristine" (click)="updateEmail()">保存更改</button>
+        </form>
+    </div>
+    <div class="ui segment">
+        <h4>密码</h4>
+        <form class="ui form" novalidate [formGroup]="passwordForm" [ngClass]="{error: passwordForm.invalid}">
+            <div class="inline field" [ngClass]="{error: passwordFormErrors.password.length > 0}">
+                <label>当前密码</label>
+                <input type="password"
+                       formControlName="password"
+                       (blur)="onFormChanged(passwordFormErrors, passwordValidationMessages, passwordForm)">
+            </div>
+            <div class="ui error message" *ngIf="passwordFormErrors.password.length > 0">
+                <ul class="list">
+                    <li *ngFor="let error of passwordFormErrors.password">{{error}}</li>
+                </ul>
+            </div>
+            <div class="inline field" [ngClass]="{error: passwordFormErrors.new_password.length > 0 || passwordForm.errors && passwordForm.errors['mismatchedPasswords']}">
+                <label>新密码</label>
+                <input type="password"
+                       formControlName="new_password"
+                       (blur)="onFormChanged(passwordFormErrors, passwordValidationMessages, passwordForm)">
+            </div>
+            <div class="ui error message" *ngIf="passwordFormErrors.new_password.length > 0">
+                <ul class="list">
+                    <li *ngFor="let error of passwordFormErrors.new_password">{{error}}</li>
+                </ul>
+            </div>
+            <div class="inline field" [ngClass]="{error: passwordFormErrors.new_password_repeat.length > 0 || passwordForm.errors && passwordForm.errors['mismatchedPasswords']}">
+                <label>重复密码</label>
+                <input type="password"
+                       formControlName="new_password_repeat"
+                       (blur)="onFormChanged(passwordFormErrors, passwordValidationMessages, passwordForm)">
+            </div>
+            <div class="ui error message" *ngIf="passwordFormErrors.new_password_repeat.length > 0">
+                <ul class="list">
+                    <li *ngFor="let error of passwordFormErrors.new_password_repeat">{{error}}</li>
+                </ul>
+            </div>
+            <div class="ui error message" *ngIf="passwordForm.errors && passwordForm.errors['mismatchedPasswords']">
+                <p>密码不一致</p>
+            </div>
+            <button type="button" class="ui button" [disabled]="passwordForm.invalid || passwordForm.pristine" (click)="updatePass()">保存更改</button>
+        </form>
+    </div>
+    <div class="ui segment">
+        <h4>Web Hook</h4>
+        <div class="ui message">
+            当某个特殊事件发生时（如新番的章节下载完成，用户收藏改变等），Webhooks允许外部服务获得事件的通知。
+            当事件发生时，我们将会使用HTTP/HTTPS POST请求访问你所提供的URL并附带相应信息。
+            详细信息请阅读：<a href="https://github.com/lordfriend/Albireo/wiki/Web-Hook-Guide" target="_blank">Web Hook Guide</a>
+        </div>
+        <div class="web-hook-list">
+            <div class="ui segment" *ngFor="let webHook of webHookList">
+                <div class="name">{{webHook.name}}</div>
+                <div class="permission-tags">
+                    <span class="key">权限</span>
+                    <div *ngFor="let perm of webHook.permissions" class="ui tiny label">{{perm}}</div>
+                </div>
+                <button class="right floated ui mini button"
+                        confirmDialog
+                        [dialogTitle]="'确认删除Web Hook吗'"
+                        [dialogContent]="'确认删除Web Hook (' + webHook.name + ') 吗？你可以随时重新关联该Web Hook，删除web hook并不会删除Web Hook服务上所存储的与你相关的数据。'"
+                        (onConfirm)="deleteWebHook(webHook)">删除</button>
+                <div class="desc" [innerHtml]="webHook.description">
+                </div>
+            </div>
+        </div>
+        <div class="action-row">
+            <a class="ui primary button" routerLink="/settings/web-hook">寻找Web Hook</a>
+        </div>
+    </div>
+    <div class="ui segment">
+        <h4>Chrome Extension ID</h4>
+        <div class="ui message">
+            由于Chrome商店的policy，chrome的bangumi扩展一直无法重新上架。请<a href="/video/preview-video/chrome.zip" target="_blank">下载zip包</a>然后解压，
+            然后在Chrome中加载该插件然后解压，之后在chrome://extensions，点击右上角开发者模式的开关，
+            打开开发者模式，然后点击左边的“加载已解压的扩展程序”选择下载的文件夹，找到id之后填入下方然后刷新页面。
+        </div>
+        <form class="ui form" novalidate [formGroup]="chromeExtensionIdForm">
+            <div class="field">
+                <label>Chrome Extension Id</label>
+                <input type="text" formControlName="extId" autocomplete="off">
+            </div>
+            <button class="ui button" type="button" (click)="updateChromeExtensionId()">更新</button>
+        </form>
+    </div>
+    <div class="ui active dimmer" *ngIf="isAddingWebHook">
+        <div class="ui large text loader">
+            正在添加Web Hook
+        </div>
+    </div>
+    <div class="ui active inverted dimmer" *ngIf="isLoading">
+        <div class="ui large text loader">
+            Loading Web hooks
+        </div>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+<div class="ui active inverted dimmer loading-wrapper" *ngIf="!bangumi">
+    <div class="ui medium loader"></div>
+</div>
+<div class="ui container bangumi-default-container" *ngIf="bangumi">
+    <div class="bangumi-info">
+        <div #bangumiCover class="bangumi-cover" *ngIf="bangumi.cover">
+            <responsive-image [src]="bangumi.cover_image.url"
+                              [size]="{
+                                width: '100%',
+                                ratio: bangumi.cover_image.height / bangumi.cover_image.width,
+                                originalWidth: bangumi.cover_image.width,
+                                originalHeight: bangumi.cover_image.height}"
+                              [background]="bangumi.cover_image.dominant_color"></responsive-image>
+            <bangumi-staff-info *ngIf="!!extraInfo && !!extraInfo.staff" [staffList]="extraInfo.staff"></bangumi-staff-info>
+        </div>
+        <div class="bangumi-cover-revealer" [style.height]="coverRevealerHeight" (click)="toggleCover()">
+        </div>
+        <div class="bangumi-base-info">
+            <h2 class="bangumi-title name-cn">
+                {{bangumi.name_cn}}
+                <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgm_id" target="_blank"
+                   title="在bgm.tv页面查看">
+                    <i class="bgm-emo-47 bgm-link-icon"></i>
+                </a>
+                <a *ngIf="user.level >= 2" class="external-link" title="编辑" [routerLink]="['/admin/bangumi/', bangumi.id]">
+                    <i class="edit icon"></i>
+                </a>
+            </h2>
+            <h3 class="bangumi-title name">
+                <span class="tip">日文名:</span><span class="name-text">{{bangumi.name}}</span>
+            </h3>
+            <favorite-chooser [bangumi]="bangumi" [loadBgmInfo]="true" (reloadEpisodes)="reloadEpisodes()"></favorite-chooser>
+            <div class="rating facade-item" *ngIf="isExtraInfoEnabled && !!extraInfo && !!extraInfo.rating">
+                <bangumi-rating [rating]="extraInfo.rating"></bangumi-rating>
+            </div>
+            <div class="summary facade-item">
+                {{bangumi.summary}}
+            </div>
+            <div class="on-air-info facade-item">
+                <span class="key">放送开始：</span>
+                <span class="value">{{bangumi.air_date}}</span>
+                <span class="key">放送星期：</span>
+                <span class="value">{{bangumi.air_weekday | weekday}}</span>
+            </div>
+            <bangumi-character *ngIf="!!extraInfo && !!extraInfo.crt" [bangumi]="bangumi" [characterList]="extraInfo.crt"></bangumi-character>
+        </div>
+    </div>
+    <div class="episode-list">
+        <h4 class="episode-list-heading">各话列表</h4>
+        <div class="ui divider"></div>
+        <div class="ui six doubling cards">
+            <div class="card episode-card" *ngFor="let episode of bangumi.episodes">
+                <div class="image" *ngIf="episode.status!==2">
+                    <div class="image-wrapper">
+                        <div class="image-fallback">
+                            <h4 class="ui icon film icon-holder">
+                                <i class="film icon"></i>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="episode.status!==2" class="content unfinished">
+                    <span>第{{episode.episode_no}}话</span>
+                </div>
+                <a *ngIf="episode.status===2" class="image" [routerLink]="['/play', episode.id]">
+                    <responsive-image [src]="episode.thumbnail_image.url"
+                                      [size]="{
+                                        width: '100%',
+                                        ratio: 0.5625,
+                                        originalWidth: episode.thumbnail_image.width,
+                                        originalHeight: episode.thumbnail_image.height}"
+                                      [background]="episode.thumbnail_image.dominant_color"></responsive-image>
+                </a>
+                <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">
+                    <span>第{{episode.episode_no}}话</span>
+                </a>
+                <div class="ui bottom attached progress"
+                     *ngIf="episode.watch_progress && episode.watch_progress.percentage"
+                     [ngClass]="{
+                     orange: episode.watch_progress.watch_status === 1,
+                     olive: episode.watch_progress.watch_status === 2,
+                     blue: episode.watch_progress.watch_status === 3,
+                     brown: episode.watch_progress.watch_status === 4,
+                     grey: episode.watch_progress.watch_status === 5
+                     }">
+                    <div class="bar" [style.width]="episode.watch_progress.percentage * 100 + '%'"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

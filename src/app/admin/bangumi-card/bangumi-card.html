@@ -1,0 +1,41 @@
+<div class="ui segment">
+    <div class="bangumi-list-item">
+        <responsive-image class="cover-wrapper"
+                          *ngIf="!!bangumi.cover_image"
+                          [src]="imageUrl"
+                          [size]="{
+                            width: '10rem',
+                            height: '100%',
+                            originalWidth: bangumi.cover_image.width,
+                            originalHeight: bangumi.cover_image.height}"
+                          [background]="bangumi.cover_image.dominant_color"
+                          (imageLoad)="onImageLoad()">
+        </responsive-image>
+        <div class="cover-wrapper" *ngIf="!!bangumi.image && !bangumi.cover_image">
+            <img [src]="bangumi.image" alt="image" class="bangumi-image">
+        </div>
+        <div class="list-item-text">
+            <h4 class="bangumi-title">{{bangumi.name_cn || '暂无'}}<span class="ui teal small label" *ngIf="bangumi.id && showAddedTag">已添加</span></h4>
+            <h4 class="entry">
+                <span class="entry-key">日文名</span>
+                <span class="entry-value">{{bangumi.name || '暂无'}}</span>
+            </h4>
+            <p class="entry">
+                <span class="entry-key">简介</span>
+                <span class="entry-value">{{bangumi.summary || '暂无'}}</span>
+            </p>
+            <p class="entry">
+                <span class="entry-key">放送开始</span>
+                <span class="entry-value">{{bangumi.air_date || '未知'}}</span>
+            </p>
+            <p class="entry">
+                <span class="entry-key">放送星期</span>
+                <span class="entry-value">{{bangumi.air_weekday || '未知'}}</span>
+            </p>
+            <p class="entry">
+                <span class="entry-key">话数</span>
+                <span class="entry-value">{{bangumi.eps || '0'}}</span>
+            </p>
+        </div>
+    </div>
+</div>

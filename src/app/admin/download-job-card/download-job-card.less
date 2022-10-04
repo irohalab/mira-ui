@@ -1,0 +1,34 @@
+download-job-card {
+  display: block;
+  box-sizing: border-box;
+  padding: 0.2rem 0;
+  height: 4.5rem;
+  > .ui.segment {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+}
+
+.card-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  > .bangumi-name {
+    margin-left: 1rem;
+    margin-right: 2rem;
+  }
+  > .file-mapping {
+    margin-left: 1rem;
+    display: inline-block;
+  }
+}
+
+.anchor-button {
+  cursor: pointer;
+  color: #9f9f9f;
+  &:hover,
+  &:focus {
+    color: #5f94c5;
+  }
+}

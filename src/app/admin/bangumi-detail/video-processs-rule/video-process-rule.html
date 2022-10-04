@@ -1,0 +1,7 @@
+<div class="rule-list">
+    <video-process-rule-item *ngFor="let videoProcessRule of videoProcessRuleList" [rule]="videoProcessRule" (delete)="refreshList()">
+    </video-process-rule-item>
+</div>
+<div class="add-rule-button">
+    <a class="anchor-button" (click)="onAddRule()"><i class="plus icon"></i>Add Rule</a>
+</div>

@@ -1,0 +1,93 @@
+<div class="video-file-modal">
+    <div class="modal-header">
+        <h4>#{{episode.episode_no}} 的VideoFile</h4>
+        <a class="close-button" (click)="close()"><i class="remove icon"></i></a>
+    </div>
+    <div class="control-bar">
+        <a class="add-button" (click)="addVideoFile()"><i class="plus icon"></i>添加VideoFile</a>
+    </div>
+    <div class="ui segment" *ngFor="let videoFileFormGroup of videoFileList">
+        <form class="ui form" [formGroup]="videoFileFormGroup">
+            <h4 class="ui horizontal divider header">
+                <i class="tag icon"></i>
+                Basic Info for Video file
+            </h4>
+            <div class="field">
+                <label>id</label>
+                <input type="text" formControlName="id" readonly>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>file_name</label>
+                    <input type="text" formControlName="file_name">
+                </div>
+                <div class="field">
+                    <label>label</label>
+                    <input type="text" formControlName="label">
+                </div>
+            </div>
+            <div class="three fields">
+                <div class="field">
+                    <label>resolution_w</label>
+                    <input type="text" formControlName="resolution_w" readonly>
+                </div>
+                <div class="field">
+                    <label>resolution_h</label>
+                    <input type="text" formControlName="resolution_h" readonly>
+                </div>
+                <div class="field">
+                    <label>duration</label>
+                    <input type="text" formControlName="duration" readonly>
+                </div>
+            </div>
+            <div class="field">
+                <label>download_url</label>
+                <input type="text" placeholder="magnet或torrent文件的url" formControlName="download_url">
+            </div>
+            <div class="inline fields">
+                <label>状态</label>
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="status" formControlName="status" [value]="1">
+                        <label>PENDING</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="status" formControlName="status" [value]="2">
+                        <label>DOWNLOADING</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="status" formControlName="status" [value]="3">
+                        <label>DOWNLOADED</label>
+                    </div>
+                </div>
+            </div>
+            <h4 class="ui horizontal divider header">
+                <i class="bar chart icon"></i>
+                Video Process Rule
+            </h4>
+            <section class="video-rule">
+                <div class="section-title"></div>
+                <div class="rule-list">
+                    <video-process-rule-item *ngIf="videoFileFormGroup.value.id && ruleMap[videoFileFormGroup.value.id] && ruleMap[videoFileFormGroup.value.id].rule"
+                                             [rule]="ruleMap[videoFileFormGroup.value.id].rule" (delete)="deleteRule(videoFileFormGroup.value.id)">
+                    </video-process-rule-item>
+                </div>
+                <div class="add-rule-button" *ngIf="videoFileFormGroup.value.id && !ruleMap[videoFileFormGroup.value.id]">
+                    <a class="anchor-button" (click)="onAddRule(videoFileFormGroup)"><i class="plus icon"></i>Add Rule</a>
+                </div>
+            </section>
+            <div class="field">
+                <button class="ui red button" confirmDialog dialogTitle="确定删除吗，该操作无法撤销" (onConfirm)="deleteVideoFile(videoFileFormGroup)">删除</button>
+                <button class="ui primary button" (click)="saveVideoFile(videoFileFormGroup)"
+                        [disabled]="videoFileFormGroup.pristine && (!ruleMap[videoFileFormGroup.value.id] || !ruleMap[videoFileFormGroup.value.id].isDirty)">保存</button>
+            </div>
+        </form>
+    </div>
+    <div class="footer">
+        <p><i class="help circle icon"></i>替换已完成或下载中的VideoFile的方法，先删除要替换的VideoFile在新建VideoFile</p>
+    </div>
+</div>

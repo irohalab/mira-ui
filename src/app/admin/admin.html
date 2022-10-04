@@ -1,0 +1,29 @@
+<div class="admin-container">
+    <aside class="ui left inverted vertical sidebar fixed menu visible">
+        <div class="sidebar-header">
+            <a class="brand" [routerLink]="['/']">{{siteTitle}}</a>
+        </div>
+        <a class="item" [routerLink]="['/admin/bangumi']">
+            新番管理
+        </a>
+        <a class="item" [routerLink]="['/admin/download-manager']">
+            Download Management
+        </a>
+        <a class="item" [routerLink]="['/admin/video-manager']">
+            Video Management
+        </a>
+        <a class="item" [routerLink]="['/admin/user']">
+            用户管理
+        </a>
+        <a class="item" [routerLink]="['/admin/task']">
+            任务管理
+        </a>
+        <a class="item" [routerLink]="['/admin/announce']">
+            公告管理
+        </a>
+        <a class="item" [routerLink]="['/admin/web-hook']" *ngIf="user?.level >= 3">
+            Web Hook管理
+        </a>
+    </aside>
+    <router-outlet></router-outlet>
+</div>

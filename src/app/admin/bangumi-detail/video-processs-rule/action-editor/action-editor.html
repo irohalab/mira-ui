@@ -1,0 +1,149 @@
+<div class="action-editor-container" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:svg="http://www.w3.org/2000/svg">
+    <ngx-graph class="action-graph-container"
+               *ngIf="nodes && edges"
+               [view]="[800, 600]"
+               [showMiniMap]="true"
+               [links]="edges" [nodes]="nodes">
+        <ng-template #defsTemplate>
+            <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4" orient="auto">
+                <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
+            </svg:marker>
+        </ng-template>
+
+        <ng-template #nodeTemplate let-node>
+            <svg:g class="node" width="150" height="100">
+                <svg:foreignObject width="150" height="100">
+                    <xhtml:div class="cardContainer" xmlns="http://www.w3.org/1999/xhtml">
+                        <label class="name">{{ node.label }}</label>
+                        <label>{{ node.data.role }}</label>
+                        <label>{{ node.data.office }}</label>
+                    </xhtml:div>
+                </svg:foreignObject>
+            </svg:g>
+        </ng-template>
+
+        <ng-template #linkTemplate let-link>
+            <svg:g class="edge">
+                <svg:path class="line" stroke-width="2" marker-end="url(#arrow)"></svg:path>
+                <svg:text class="edge-label" text-anchor="middle">
+                    <textPath
+                        class="text-path"
+                        [attr.href]="'#' + link.id"
+                        [style.dominant-baseline]="link.dominantBaseline"
+                        startOffset="50%"
+                    >
+                        {{ link.label }}
+                    </textPath>
+                </svg:text>
+            </svg:g>
+            <svg:g
+                class="linkMidpoint"
+                *ngIf="link.midPoint"
+                [attr.transform]="'translate(' + link.midPoint.x + ',' + link.midPoint.y + ')'"
+            >
+                <ellipse rx="30" ry="10" />
+                <svg:text alignment-baseline="central">{{ link.data.linkText }}</svg:text>
+            </svg:g>
+        </ng-template>
+    </ngx-graph>
+    <div class="node-editor-container">
+        <div class="toolbar">
+            <div class="toolbar-section">
+                <div class="toolbar-section-header">Actions</div>
+                <button class="ui labeled icon button" (click)="addNode(eActionType.Extract)">
+                    <i class="envelope open outline"></i>
+                    Extract
+                </button>
+                <button class="ui labeled icon button" (click)="addNode(eActionType.Convert)">
+                    <i class="cogs"></i>
+                    Convert
+                </button>
+            </div>
+        </div>
+        <div class="property-card ui segment" *ngIf="!selectedActionId && selectedNodeIndex !== -1">
+            <div class="ui header">{{nodes[selectedNodeIndex].label}}</div>
+            <div class="ui form" *ngIf="actions[selectedActionId].type === eActionType.Convert">
+                <div class="field">
+                    <label>profile</label>
+                    <div class="ui selection dropdown" uiDropdown="click">
+                        <i class="dropdown icon"></i>
+                        <div class="text default" *ngIf="!$any(actions[selectedActionId]).profile">Select Profile</div>
+                        <div class="text" *ngIf="$any(actions[selectedActionId]).profile">{{$any(actions[selectedActionId]).profile | ProfileType}}</div>
+                        <div class="menu">
+                            <div class="item" (click)="updateActionProfile(eProfileType.Default)">Default</div>
+                            <div class="item" (click)="updateActionProfile(eProfileType.SoundOnly)">Sound Only</div>
+                            <div class="item" (click)="updateActionProfile(eProfileType.VideoOnly)">Video Only</div>
+                            <div class="item" (click)="updateActionProfile(eProfileType.ContainerOnly)">Container Only</div>
+                            <!--                            <div class="item" (click)="$any(action).profile = eProfileType.Custom">Custom</div>-->
+                        </div>
+                    </div>
+                </div>
+                <div class="field" *ngIf="$any(actions[selectedActionId]).profile === eProfileType.SoundOnly">
+                    <input type="text"
+                           [(ngModel)]="$any(actions[selectedActionId]).profileExtraData"
+                           (ngModelChange)="updateNode()"
+                           [ngModelOptions]="{updateOn: 'blur'}"
+                           name="preferredTrack"
+                           placeholder="Preferred Track"/>
+                </div>
+            </div>
+            <div class="ui form" *ngIf="actions[selectedActionId].type === eActionType.Extract">
+                <div class="field">
+                    <label>extractFrom</label>
+                    <div class="ui selection dropdown" uiDropdown="click">
+                        <i class="dropdown icon"></i>
+                        <div class="text default" *ngIf="!$any(actions[selectedActionId]).extractFrom">Select Source</div>
+                        <div class="text" *ngIf="$any(actions[selectedActionId]).extractFrom"></div>
+                        <div class="menu">
+                            <div class="item" (click)="updateActionExtractSource(eExtractSource.VideoFile)">{{eExtractSource.VideoFile}}</div>
+                            <div class="item" (click)="updateActionExtractSource(eExtractSource.OtherFiles)">{{eExtractSource.OtherFiles}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>extractTarget</label>
+                    <div class="ui selection dropdown" uiDropdown="click">
+                        <i class="dropdown icon"></i>
+                        <div class="text default" *ngIf="!$any(actions[selectedActionId]).extractTarget">Select Target</div>
+                        <div class="text" *ngIf="$any(actions[selectedActionId]).extractTarget"></div>
+                        <div class="menu">
+                            <div class="item" (click)="updateActionExtractTarget(eExtractTarget.KeepContainer)">{{eExtractTarget.KeepContainer}}</div>
+                            <div class="item" (click)="updateActionExtractTarget(eExtractTarget.AudioStream)">{{eExtractTarget.AudioStream}}</div>
+                            <div class="item" (click)="updateActionExtractTarget(eExtractTarget.Subtitle)">{{eExtractTarget.Subtitle}}</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Below is optional -->
+                <div class="field">
+                    <label>outputExtname</label>
+                    <input type="text"
+                           [(ngModel)]="$any(actions[selectedActionId]).outputExtname"
+                           (ngModelChange)="updateNode()"
+                           [ngModelOptions]="{updateOn: 'blur'}"
+                           name="outputExtname"
+                           placeholder="extension name of output"/>
+                </div>
+                <div class="field">
+                    <label>extractRegex</label>
+                    <input type="text"
+                           [(ngModel)]="$any(actions[selectedActionId]).extractRegex"
+                           (ngModelChange)="updateNode()"
+                           [ngModelOptions]="{updateOn: 'blur'}"
+                           name="outputExtname"
+                           placeholder="regex to match file/track"/>
+                </div>
+                <!-- extractId is not supported currently -->
+            </div>
+            <div class="ui form">
+                <div class="field" *ngFor="let actId of actions[selectedActionId].upstreamActionIds">
+                    <label>Upstream Action Id</label>
+                    <input type="text" [value]="actId">
+                </div>
+                <div class="field" *ngFor="let actId of actions[selectedActionId].downstreamIds">
+                    <label>Downstream Action Id</label>
+                    <input type="text" [value]="actId">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

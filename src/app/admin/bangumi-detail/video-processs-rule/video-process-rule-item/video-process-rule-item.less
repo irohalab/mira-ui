@@ -1,0 +1,43 @@
+@fontColor: #212121;
+
+.rule-item-container {
+  margin: 2rem;
+  border: 1px solid #f0f0f0;
+  border-radius: 5px;
+  position: relative;
+  > .entry {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-content: flex-start;
+    margin: 0.8rem 0;
+    > .entry-key {
+      font-size: 0.8rem;
+      color: lighter(@fontColor);
+      width: 8em;
+      text-align: right;
+      line-height: 2.0237rem;
+      height: 2.0237rem;
+      margin-right: 1rem;
+    }
+  }
+}
+
+.actions-container {
+  position: relative;
+  .action-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-content: flex-start;
+    margin-bottom: 0.6rem;
+    position: relative;
+    height: 2.0237rem;
+  }
+}
+
+.buttons-wrapper {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}

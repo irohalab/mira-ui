@@ -1,0 +1,15 @@
+<div class="header">
+    我在看的番組
+</div>
+<div class="menu favorite-list" *ngIf="myBangumiList && myBangumiList.length > 0">
+    <a class="item favorite-item" *ngFor="let bangumi of myBangumiList" [routerLink]="['/bangumi', bangumi.id]">
+        <span class="bangumi-name">
+            {{bangumi.name_cn}}
+        </span>
+        <span *ngIf="bangumi.unwatched_count && bangumi.favorite_check_time < bangumi.eps_update_time" class="ui orange small label">{{bangumi.unwatched_count}}</span>
+        <span *ngIf="bangumi.unwatched_count && bangumi.favorite_check_time >= bangumi.eps_update_time" class="ui small undecorated label">{{bangumi.unwatched_count}}</span>
+    </a>
+</div>
+<div class="empty-placeholder" *ngIf="myBangumiList && myBangumiList.length === 0">
+    还没有{{favoriteLabel[currentStatus]}}的番組
+</div>
