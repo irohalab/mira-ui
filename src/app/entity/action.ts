@@ -1,7 +1,8 @@
 import { ActionType } from './action-type';
+import { nanoid } from 'nanoid';
 
 export class Action {
-    id:string;
+    id = nanoid(4);
     type: ActionType;
     // for serialization
     upstreamActionIds: string[] = [];

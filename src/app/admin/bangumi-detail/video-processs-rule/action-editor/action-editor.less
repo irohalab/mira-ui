@@ -1,0 +1,73 @@
+:host {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: relative;
+}
+.action-editor-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-start;
+  border: 1px #cccccc solid;
+  border-radius: 5px;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: #e6e6e6;
+}
+
+.action-graph-container {
+  flex: auto;
+}
+
+.node-editor-container {
+  width: 20rem;
+  height: 100%;
+  background-color: #f0f0f0;
+  font-size: 0.8rem;
+  padding: 0 0.5rem;
+  .toolbar-section-header {
+    font-weight: bold;
+  }
+}
+
+.node {
+  .action-card {
+    border-radius: 5px;
+    width: 100%;
+    height: 100%;
+    color: #fff;
+    padding: 0.3em 0;
+    &.convert {
+      background-color: #448ccb;
+    }
+    &.extract {
+      background-color: #bd8cbf;
+    }
+    .action-label {
+      font-weight: bold;
+      margin: 0 0.3em;
+    }
+    .action-properties {
+      border-top: 1px solid #fcfcfc;
+      margin: 0 0.3em;
+      .property-name {
+        padding-right: 0.5em;
+      }
+    }
+  }
+}
+
+.edge .line {
+  &.selected {
+    stroke: #e1ad01;
+  }
+}
+
+.link-card {
+  > span {
+    font-size: 0.8rem;
+    padding-right: 0.5em;
+  }
+}

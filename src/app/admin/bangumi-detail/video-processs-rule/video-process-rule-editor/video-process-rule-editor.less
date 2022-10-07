@@ -2,16 +2,16 @@
   display: block;
   box-sizing: border-box;
   text-align: left;
-  @media(max-width: 859px) {
+  @media(max-width: 1279px) {
     width: 90%;
   }
-  @media(min-width: 860px) {
-    width: 850px;
+  @media(min-width: 1280px) {
+    width: 1200px;
   }
-  @media(min-height: 760px) {
-    height: 750px;
+  @media(min-height: 960px) {
+    height: 900px;
   }
-  @media(max-height: 759px) {
+  @media(max-height: 959px) {
     height: 90%;
   }
   margin: auto;
@@ -39,6 +39,8 @@
 }
 
 .rule-editor-modal {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   padding: 3.5rem 1.5rem 2rem 1.5rem;
@@ -62,6 +64,7 @@
 
 .action-section {
   margin: 1.5rem 0;
+  flex-grow: 1;
 }
 
 .action-item {

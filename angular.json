@@ -79,7 +79,9 @@
             },
             "development": {
               "browserTarget": "mira-ui:build:development",
-              "proxyConfig": "./proxy.conf.json"
+              "proxyConfig": "./proxy.conf.json",
+              "host": "0.0.0.0",
+              "port": 3000
             }
           },
           "defaultConfiguration": "development"
