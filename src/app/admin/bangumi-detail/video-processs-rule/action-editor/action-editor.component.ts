@@ -76,7 +76,6 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
                         this.edges.push({
                             source: sourceId,
                             target: action.id,
-                            label: ''
                         });
                 }
                 return this.actionToNode(action);
@@ -373,6 +372,11 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private removeEdge(sourceId: string, targetId: string): void {
-
+        for(let i = 0; i < this.edges.length; i++) {
+            if (this.edges[i].source === sourceId && this.edges[i].target === targetId) {
+                this.edges.splice(i, 1);
+                break;
+            }
+        }
     }
 }
