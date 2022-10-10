@@ -89,10 +89,13 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-    selectNode(nodeId: string): void {
-        console.log(this.nodes);
-        console.log(this.edges);
+    selectNode(event: Event, nodeId: string): void {
+        event.preventDefault();
+        event.stopPropagation();
         if (this.linkMode !== LinkMode.None) {
+            if (nodeId === this.selectedActionId) {
+                return;
+            }
             // link mode code
             if (this.hasCycle(nodeId)) {
                 return;
@@ -107,7 +110,9 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         this.selectedActionId = nodeId;
     }
 
-    selectLink(linkId: string): void {
+    selectLink(event: Event, linkId: string): void {
+        event.preventDefault();
+        event.stopPropagation();
         this.selectedLinkId = linkId;
         for(let i = 0; i < this.edges.length; i++) {
             if (this.edges[i].id === linkId) {
@@ -116,6 +121,15 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             }
         }
         this.selectedLinkIndex = -1;
+    }
+
+    unselectAnything(): void {
+        this.selectedActionId = null;
+        this.selectedNodeIndex = -1;
+        this.selectedLinkIndex = -1;
+        this.selectedLinkId = null;
+        this.linkMode = LinkMode.None;
+        this.updateNodeMeta();
     }
 
     addNode(actionType: string): void {
@@ -139,10 +153,34 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         if (this.selectedNodeIndex === -1 || !this.selectedActionId) {
             return;
         }
+        const action = this.actions[this.selectedActionId];
+        if (action.upstreamActionIds.length > 0) {
+            for (const actId of action.upstreamActionIds) {
+                const upstreamAction = this.actions[actId];
+                const idx = upstreamAction.downstreamIds.indexOf(this.selectedActionId);
+                if (idx !== -1) {
+                    upstreamAction.downstreamIds.splice(idx, 1);
+                }
+                this.removeEdge(upstreamAction.id, this.selectedActionId);
+            }
+        } else if (action.downstreamIds.length > 0) {
+            for (const actId of action.downstreamIds) {
+                const downstreamAction = this.actions[actId];
+                const idx = downstreamAction.upstreamActionIds.indexOf(this.selectedActionId);
+                if (idx !== -1) {
+                    downstreamAction.upstreamActionIds.splice(idx, 1);
+                }
+                this.removeEdge(this.selectedActionId, downstreamAction.id);
+            }
+        }
+        if (action.upstreamActionIds.length > 0 || action.downstreamIds.length > 0) {
+            this.refreshEdges();
+        }
         delete this.actions[this.selectedActionId];
         this.nodes.splice(this.selectedNodeIndex, 1);
         this.selectedNodeIndex = -1;
         this.selectedActionId = null;
+        this.refreshNodes();
     }
 
     removeLink(): void {
@@ -190,7 +228,9 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     /**
      * Enter link mode to select an action as current selected action's upstream
      */
-    addUpstreamAction(): void {
+    addUpstreamAction(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
         if (this.linkMode !== LinkMode.None) {
             return;
         }
@@ -201,7 +241,9 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     /**
      * Enter link mode to select an action as current selected action's downstream
      */
-    addDownstreamAction(): void {
+    addDownstreamAction(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
         if (this.linkMode !== LinkMode.None) {
             return;
         }
@@ -253,6 +295,11 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         return isCyclicGraph(tempActionMap);
     }
 
+    updateNode(): void {
+        this.nodes[this.selectedNodeIndex].data = this.actions[this.selectedActionId];
+        this.refreshNodes();
+    }
+
     private updateNodeMeta(): void {
         this.nodes.forEach((node: Node) => {
             if (!node.meta) {
@@ -268,11 +315,6 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
                 node.meta.disabled = false;
             }
         });
-    }
-
-    updateNode(): void {
-        this.nodes[this.selectedNodeIndex].data = this.actions[this.selectedActionId];
-        this.refreshNodes();
     }
 
     private refreshNodes(): void {
@@ -306,5 +348,9 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.detectDimension();
             }
         }, 100);
+    }
+
+    private removeEdge(sourceId: string, targetId: string): void {
+
     }
 }
