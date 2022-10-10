@@ -14,7 +14,7 @@
         <ng-template #nodeTemplate let-node>
             <svg:g class="node">
                 <svg:foreignObject width="160" [attr.height]="nodeHeightDict[node.data.type]">
-                    <xhtml:div class="action-card" [ngClass]="node.data.type" (click)="selectNode($event, node.id)">
+                    <xhtml:div class="action-card" [ngClass]="node.data.type" (click)="selectNode(node.id, $event, node.meta)">
                         <xhtml:div class="action-label"><xhtml:i class="icon" [ngClass]="nodeIconClassDict[node.data.type]"></xhtml:i>{{node.label}}</xhtml:div>
                         <xhtml:div *ngIf="node.data.type === eActionType.Convert" class="action-properties">
                             <xhtml:div class="convert-profile"><xhtml:span class="property-name">profile:</xhtml:span>{{node.data.profile}}</xhtml:div>
@@ -30,12 +30,47 @@
                 </svg:foreignObject>
                 <svg:rect width="160" [attr.height]="nodeHeightDict[node.data.type]"
                           fill="#ffffff" fill-opacity="0.4" *ngIf="node.meta.disabled"></svg:rect>
-                <svg:rect height="20" width="20" x="160" y="0" fill="pink"
-                          *ngIf="selectedActionId === node.id && linkMode == eLinkMode.None && node.data.type !== eActionType.Extract"
-                          (click)="addUpstreamAction($event)"></svg:rect>
-                <svg:rect height="20" width="20" x="160" y="60" fill="green"
-                          *ngIf="selectedActionId === node.id && linkMode == eLinkMode.None"
-                          (click)="addDownstreamAction($event)"></svg:rect>
+                <g
+                    transform="translate(158, 0)"
+                    *ngIf="selectedActionId === node.id && linkMode == eLinkMode.None && node.meta.allowInput"
+                    (click)="addUpstreamAction($event)">
+                    <ellipse
+                        style="fill:white;fill-opacity:1;stroke:#5178c5;stroke-width:4;stroke-dasharray:none;stroke-opacity:1"
+                        cx="10"
+                        cy="10"
+                        rx="6"
+                        ry="6" ></ellipse>
+                    <path
+                        style="fill:#b87fe1;fill-opacity:1;stroke-width:0"
+                        d="M 10 10 L 20 0 L 20 20 z" ></path>
+                    <rect
+                        style="fill:#b87fe1;fill-opacity:1;stroke-width:0"
+                        width="14"
+                        height="10"
+                        x="16"
+                        y="5" ></rect>
+                </g>
+                <g
+                    transform="translate(158, 60)"
+                    *ngIf="selectedActionId === node.id && linkMode == eLinkMode.None && node.meta.allowOutput"
+                    (click)="addDownstreamAction($event)">
+                    <ellipse
+                        style="fill:white;fill-opacity:1;stroke:#5178c5;stroke-width:4;stroke-dasharray:none;stroke-opacity:1"
+                        cx="10"
+                        cy="10"
+                        rx="6"
+                        ry="6" ></ellipse>
+                    <rect
+                        style="fill:#2fa350;fill-opacity:1;stroke-width:0"
+                        width="14"
+                        height="10"
+                        x="10"
+                        y="5" ></rect>
+                    <path
+                        style="fill:#2fa350;fill-opacity:1;stroke-width:0"
+                        d="M 20 0 L 30 10 L 20 20 z" ></path>
+
+                </g>
             </svg:g>
         </ng-template>
 

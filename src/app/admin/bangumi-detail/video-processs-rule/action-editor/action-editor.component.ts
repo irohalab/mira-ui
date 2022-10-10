@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ViewRef } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Edge, Node } from '@swimlane/ngx-graph';
 import { Action } from '../../../../entity/action';
 import { ActionType } from '../../../../entity/action-type';
@@ -10,7 +10,6 @@ import { ExtractTarget } from '../../../../entity/ExtractTarget';
 import { ActionMap } from '../../../../entity/action-map';
 import { getRemPixel } from '../../../../../helpers/dom';
 import { isCyclicGraph } from './action-graph-utils';
-import { nanoid } from 'nanoid';
 
 enum LinkMode {
     LinkUpstream = 'LinkUpstream',
@@ -80,7 +79,7 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
                             label: ''
                         });
                 }
-                return ActionEditorComponent.ActionToNode(action);
+                return this.actionToNode(action);
             });
         } else {
             this.actions = {};
@@ -89,11 +88,13 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-    selectNode(event: Event, nodeId: string): void {
-        event.preventDefault();
-        event.stopPropagation();
+    selectNode(nodeId: string, event?: Event, nodeMeta?: any): void {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         if (this.linkMode !== LinkMode.None) {
-            if (nodeId === this.selectedActionId) {
+            if (nodeId === this.selectedActionId || (nodeMeta && nodeMeta.disabled)) {
                 return;
             }
             // link mode code
@@ -108,6 +109,11 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         }
         this.selectedNodeIndex = this.nodes.findIndex((node) => node.id === nodeId);
         this.selectedActionId = nodeId;
+        const node = this.nodes[this.selectedNodeIndex];
+        const action = this.actions[nodeId];
+        node.meta = node.meta || {};
+        node.meta.allowInput = action.upstreamActionIds.length < this.getMaxUpstreamByActionType(action.type);
+        node.meta.allowOutput = action.downstreamIds.length < 1; // currently only 1 output per action is allowed;
     }
 
     selectLink(event: Event, linkId: string): void {
@@ -144,9 +150,8 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             // no default
         }
         this.actions[action.id] = action;
-        this.nodes = this.nodes.concat([ActionEditorComponent.ActionToNode(action)]);
-        this.selectedActionId = action.id;
-        this.selectedNodeIndex = this.nodes.length - 1;
+        this.nodes = this.nodes.concat([this.actionToNode(action)]);
+        this.selectNode(action.id)
     }
 
     removeSelectedNode(): void {
@@ -207,6 +212,7 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             this.selectedLinkId = null;
             this.selectedLinkIndex = -1;
             this.refreshEdges();
+            this.updateNodeMeta();
         }
     }
 
@@ -269,6 +275,7 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             source: upstreamActionId,
             target: downstreamActionId
         } as Edge);
+        this.updateNodeMeta();
     }
 
     /**
@@ -305,12 +312,16 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             if (!node.meta) {
                 node.meta = {};
             }
+            node.meta.allowInput = node.data.upstreamActionIds.length < this.getMaxUpstreamByActionType(node.data.type);
+            node.meta.allowOutput = node.data.downstreamIds.length < 1;
             if (this.linkMode === LinkMode.None) {
                 node.meta.disabled = false;
             } else if (node.id === this.selectedActionId) {
                 node.meta.disabled = true;
             } else if (this.linkMode === LinkMode.LinkDownstream) {
-                node.meta.disabled = node.data.type === ActionType.Extract;
+                node.meta.disabled = !node.meta.allowInput;
+            } else if (this.linkMode === LinkMode.LinkUpstream) {
+                node.meta.disabled = !node.meta.allowOutput;
             } else {
                 node.meta.disabled = false;
             }
@@ -325,12 +336,23 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         this.edges = Array.from(this.edges);
     }
 
-    static ActionToNode(action: Action): Node {
+    private actionToNode(action: Action): Node {
         return {
             id: action.id,
             label: `${action.type} #${action.id}`,
             data: action
         } as Node;
+    }
+
+    private getMaxUpstreamByActionType(actionType: ActionType): number {
+        switch (actionType) {
+            case ActionType.Convert:
+                return Number.MAX_VALUE;
+            case ActionType.Extract:
+                return 0;
+            default:
+                throw new Error('Unsupported action type');
+        }
     }
 
     private detectDimension(): void {
