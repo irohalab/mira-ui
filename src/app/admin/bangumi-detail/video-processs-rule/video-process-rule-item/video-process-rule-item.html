@@ -1,19 +1,20 @@
 <div class="rule-item-container">
-    <div class="entry">
-        <div class="entry-key">Rule Name:</div>
-        <h4 class="entry-value ui label" [ngClass]="{'basic': !rule.name}">{{rule.name || 'Unnamed'}}</h4>
-    </div>
-    <div class="entry">
-        <div class="entry-key">Condition:</div>
-        <div class="condition entry-value ui label" [ngClass]="{'basic': !rule.condition}">
-            {{rule.condition || "No Condition"}}
+    <div class="title-bar">
+        <div class="entry">
+            <div class="entry-key">Rule Name:</div>
+            <h4 class="entry-value ui label" [ngClass]="{'basic': !rule.name}">{{rule.name || 'Unnamed'}}</h4>
+        </div>
+        <div class="entry">
+            <div class="entry-key">Condition:</div>
+            <div class="condition entry-value ui label" [ngClass]="{'basic': !rule.condition}">
+                {{rule.condition || "No Condition"}}
+            </div>
         </div>
     </div>
-    <div class="entry">
-        <div class="entry-key">Actions:</div>
-        <div class="actions-container entry-value">
 
-        </div>
+    <h4 class="actions-header">Actions</h4>
+    <div class="actions-container">
+        <action-editor [actions]="rule.actions"></action-editor>
     </div>
     <div class="buttons-wrapper ui mini buttons">
         <button class="ui primary button" (click)="editRule()">Edit</button>

@@ -17,12 +17,14 @@ enum LinkMode {
     None = 'None'
 }
 
+const NODE_EDITOR_WIDTH = 20; //unit rem;
+
 @Component({
     selector: 'action-editor',
     templateUrl: './action-editor.html',
     styleUrls: ['./action-editor.less']
 })
-export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ActionEditorComponent implements OnInit, AfterViewInit {
 
     readonly eActionType = ActionType;
     readonly eProfileType = ProfileType;
@@ -37,6 +39,9 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @Input()
     actions: ActionMap;
+
+    @Input()
+    editMode = false;
 
     selectedActionId: string;
     selectedNodeIndex: number = -1;
@@ -61,9 +66,6 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngAfterViewInit(): void {
         this.detectDimension();
-    }
-
-    ngOnDestroy(): void {
     }
 
     ngOnInit(): void {
@@ -92,6 +94,9 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             event.preventDefault();
             event.stopPropagation();
         }
+        if (!this.editMode) {
+            return;
+        }
         if (this.linkMode !== LinkMode.None) {
             if (nodeId === this.selectedActionId || (nodeMeta && nodeMeta.disabled)) {
                 return;
@@ -118,6 +123,9 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     selectLink(event: Event, linkId: string): void {
         event.preventDefault();
         event.stopPropagation();
+        if (!this.editMode) {
+            return;
+        }
         this.selectedLinkId = linkId;
         for(let i = 0; i < this.edges.length; i++) {
             if (this.edges[i].id === linkId) {
@@ -129,6 +137,9 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     unselectAnything(): void {
+        if (!this.editMode) {
+            return;
+        }
         this.selectedActionId = null;
         this.selectedNodeIndex = -1;
         this.selectedLinkIndex = -1;
@@ -358,7 +369,7 @@ export class ActionEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         this._timerOfDimensionDetect = window.setTimeout(() => {
             const containerEl = this.actionEditorContainer.nativeElement as HTMLElement;
             let {width, height} = containerEl.getBoundingClientRect();
-            const nodeEditorWidth = getRemPixel(20);
+            const nodeEditorWidth = this.editMode ? getRemPixel(NODE_EDITOR_WIDTH) : 0;
             width = width - nodeEditorWidth;
             if (width < 0) {
                 width = containerEl.clientWidth;

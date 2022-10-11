@@ -5,7 +5,12 @@
   border: 1px solid #f0f0f0;
   border-radius: 5px;
   position: relative;
-  > .entry {
+}
+
+.title-bar {
+  display: flex;
+  flex-direction: row;
+  .entry {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -22,18 +27,15 @@
     }
   }
 }
-
+.actions-header {
+  margin: 0.8em 1em 0.42em 1em;
+}
 .actions-container {
   position: relative;
-  .action-item {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-content: flex-start;
-    margin-bottom: 0.6rem;
-    position: relative;
-    height: 2.0237rem;
-  }
+  width: 95%;
+  height: 400px;
+  margin-left: 1em;
+  margin-bottom: 1em;
 }
 
 .buttons-wrapper {

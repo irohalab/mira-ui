@@ -15,13 +15,13 @@
                 <label>Condition</label>
                 <input type="text" formControlName="condition" name="condition">
             </div>
-            <div class="ui error message" *ngIf="basicInfoForm.controls['condition'].hasError('condition')">
+            <div class="ui error message" *ngIf="!videoId && basicInfoForm.controls['condition'].hasError('condition')">
                 <div class="header">{{basicInfoForm.controls['condition'].errors['condition'].message}}</div>
             </div>
         </form>
     </section>
     <section class="action-section">
-        <action-editor [actions]="actions"></action-editor>
+        <action-editor [actions]="actions" [editMode]="true"></action-editor>
     </section>
     <div class="footer">
         <button class="ui button primary" (click)="save()">Save</button>

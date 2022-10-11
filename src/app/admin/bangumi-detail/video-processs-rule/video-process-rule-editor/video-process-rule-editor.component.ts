@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
     AbstractControl,
     AsyncValidatorFn,
@@ -15,6 +15,7 @@ import { Observable, Subscription } from 'rxjs';
 import { VideoProcessRule } from '../../../../entity/VideoProcessRule';
 import { map } from 'rxjs/operators';
 import { ActionMap } from '../../../../entity/action-map';
+import { ActionEditorComponent } from '../action-editor/action-editor.component';
 
 @Component({
     selector: 'video-process-rule-editor',
@@ -44,6 +45,8 @@ export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
     eActionType = ActionType;
 
     eProfileType = ProfileType;
+
+    @ViewChild(ActionEditorComponent) _actionEditor!: ActionEditorComponent;
 
     constructor(private _fb: FormBuilder,
                 private _videoProcessRuleService: VideoProcessRuleService,
@@ -76,9 +79,11 @@ export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
     save(): void {
         let condition: string|null = this.videoId ? null : this.basicInfoForm.value.condition;
         const name = this.basicInfoForm.value.name;
+        const actions = this._actionEditor.actions;
         if (this.rule) {
             this.rule.name = name;
             this.rule.condition = condition;
+            this.rule.actions = actions;
             if (this.saveOnClose) {
                 this._subscription.add(
                     this._videoProcessRuleService
@@ -97,7 +102,7 @@ export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
                 bangumiId: this.bangumiId,
                 videoFileId: this.videoId,
                 condition: condition,
-                actions: this.actions,
+                actions: actions,
                 priority: 0
             } as VideoProcessRule;
             if (this.saveOnClose) {
