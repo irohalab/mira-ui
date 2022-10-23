@@ -73,7 +73,7 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
             this.edges = [];
             this.nodes = Object.keys(this.actions).map(actionId => {
                 const action = this.actions[actionId];
-                if (action.upstreamActionIds && action.upstreamActionIds.length) {
+                if (action.upstreamActionIds && action.upstreamActionIds.length > 0) {
                     for (const sourceId of action.upstreamActionIds)
                         this.edges.push({
                             source: sourceId,

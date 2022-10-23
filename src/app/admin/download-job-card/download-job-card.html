@@ -6,6 +6,7 @@
             <a class="bangumi-link" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
         </div>
         <a *ngIf="!!job.bangumi" class="file-mapping anchor-button" (click)="onViewFileMapping()">View FileMapping</a>
+        <a *ngIf="job.status === mJobStatus.Complete" class="anchor-button" (click)="resendCompleteMessage()">Resend Complete Message</a>
     </div>
     <div class="ui bottom attached progress" [ngClass]="{
         success: job.status === mJobStatus.Complete,

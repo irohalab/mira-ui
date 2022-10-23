@@ -4,8 +4,12 @@ import {UIDialogRef} from '@irohalab/deneb-ui';
     selector: 'confirm-dialog-modal',
     templateUrl: './confirm-dialog-modal.html',
     styles: [`
-        .ui.modal.active {
-            transform: translate3d(0, -50%, 0);
+        :host {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
         }
     `]
 })

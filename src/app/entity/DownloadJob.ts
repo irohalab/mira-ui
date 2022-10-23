@@ -15,7 +15,7 @@
  */
 
 import { DownloaderType } from './DownloaderType';
-import { JobStatus } from './JobStatus';
+import { DownloadJobStatus } from './DownloadJobStatus';
 import { DownloadTaskMessage } from './DownloadTaskMessage';
 import { FileMapping } from './FileMapping';
 import { Bangumi } from './bangumi';
@@ -27,7 +27,7 @@ export class DownloadJob {
 
     public downloader: DownloaderType;
 
-    public status: JobStatus
+    public status: DownloadJobStatus
 
     public torrentUrl: string;
 

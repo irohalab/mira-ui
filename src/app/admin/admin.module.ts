@@ -60,6 +60,8 @@ import { VideoProcessManagerService } from './video-process-manager/video-proces
 import { VideoProcessJobCardComponent } from './video-process-job-card/video-process-job-card.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { ActionEditorComponent } from './bangumi-detail/video-processs-rule/action-editor/action-editor.component';
+import { VideoProcessJobDetailComponent } from './video-process-job-detail/video-process-job-detail.component';
+import { VertexGraphComponent } from './video-process-job-detail/vertex-graph/vertex-graph.component';
 
 
 @NgModule({
@@ -102,7 +104,9 @@ import { ActionEditorComponent } from './bangumi-detail/video-processs-rule/acti
         FileMappingListComponent,
         VideoProcessManagerComponent,
         VideoProcessJobCardComponent,
-        ActionEditorComponent
+        ActionEditorComponent,
+        VideoProcessJobDetailComponent,
+        VertexGraphComponent
     ],
     providers: [
         AdminService,

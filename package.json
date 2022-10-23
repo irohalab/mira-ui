@@ -1,6 +1,6 @@
 {
   "name": "mira-ui",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -34,6 +34,7 @@
     "popper.js": "^1.12.9",
     "reflect-metadata": "^0.1.9",
     "rxjs": "~7.5.0",
+    "socket.io-client": "^4.5.3",
     "tslib": "^2.3.0",
     "url-polyfill": "^1.1.5",
     "web-animations-js": "^2.2.5",

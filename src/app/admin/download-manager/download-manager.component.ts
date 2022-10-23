@@ -1,4 +1,4 @@
-import { JobStatus } from '../../entity/JobStatus';
+import { DownloadJobStatus } from '../../entity/DownloadJobStatus';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DownloadJob } from '../../entity/DownloadJob';
 import { getRemPixel } from '../../../helpers/dom';
@@ -16,9 +16,9 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
     private _updateJobListSubscription = new Subscription();
 
-    mJobStatus = JobStatus
+    mJobStatus = DownloadJobStatus
 
-    selectJobStatus: JobStatus = JobStatus.Downloading;
+    selectJobStatus: DownloadJobStatus = DownloadJobStatus.Downloading;
 
     isLoading: boolean;
     jobList: DownloadJob[];
@@ -40,7 +40,7 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
         this.updateList();
 
     }
-    onChangeStatus(status: JobStatus): void {
+    onChangeStatus(status: DownloadJobStatus): void {
         this.selectJobStatus = status;
         this.updateList();
     }

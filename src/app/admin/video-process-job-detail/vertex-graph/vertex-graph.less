@@ -1,0 +1,57 @@
+.vertex-graph-container {
+  display: block;
+  position: relative;
+  width: 100%;
+  border: 1px #cccccc solid;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #e6e6e6;
+}
+
+.graph-legend {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.legend-item {
+  flex: 0 0 auto;
+  margin: 0 1em;
+}
+
+.vertex {
+  .action-card {
+    border-radius: 5px;
+    width: 100%;
+    height: 100%;
+    color: #000000;
+    padding: 0.3em 0;
+    &.Pending {
+      background-color: #ffffff;
+    }
+    &.Running {
+      background-color: #2185d0;
+    }
+    &.Finished {
+      background-color: #21ba45;
+    }
+    &.Stopped {
+      background-color: #a5673f;
+    }
+    &.Error {
+      background-color: #db2828;
+    }
+    .action-label {
+      font-weight: bold;
+      margin: 0 0.3em;
+    }
+    .action-properties {
+      border-top: 1px solid #fcfcfc;
+      margin: 0 0.3em;
+      .property-name {
+        padding-right: 0.5em;
+      }
+    }
+  }
+}

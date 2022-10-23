@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export enum JobStatus {
+export enum DownloadJobStatus {
     Pending = 'pending',
     Downloading = 'downloading',
     Complete = 'complete',

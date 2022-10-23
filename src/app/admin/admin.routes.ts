@@ -8,6 +8,7 @@ import { AnnounceComponent } from './announce/announce.component';
 import { WebHookComponent } from './web-hook/web-hook.component';
 import { DownloadManagerComponent } from './download-manager/download-manager.component';
 import { VideoProcessManagerComponent } from './video-process-manager/video-process-manager.component';
+import { VideoProcessJobDetailComponent } from './video-process-job-detail/video-process-job-detail.component';
 
 
 export const adminRoutes: Routes = [
@@ -30,6 +31,10 @@ export const adminRoutes: Routes = [
             {
                 path: 'video-manager',
                 component: VideoProcessManagerComponent
+            },
+            {
+                path: 'video-manager/:id',
+                component: VideoProcessJobDetailComponent
             },
             {
                 path: 'user',

@@ -1,19 +1,9 @@
 <div class="ui segment">
-    <div class="card-content">
+    <a class="card-content" [routerLink]="['/admin/video-manager', job.id]">
         <div class="job-id">{{job.id}}</div>
         <div class="bangumi-id">{{job.jobMessage.bangumiId}}</div>
-        <div class="current-stage">Current Stage: {{job.progress}} of {{job.jobMessage.actions.length}}</div>
         <div class="create-time">{{job.createTime}}</div>
         <div class="start-time">{{job.startTime}}</div>
         <div class="finished-time">{{job.finishedTime}}</div>
-    </div>
-    <div class="ui bottom attached progress" [ngClass]="{
-        success: job.status === eJobStatus.Finished,
-        blue: job.status === eJobStatus.Running,
-        teal: job.status === eJobStatus.Queueing,
-        warning: job.status === eJobStatus.Pause,
-        error: job.status === eJobStatus.UnrecoverableError,
-        disabled: job.status === eJobStatus.Canceled}">
-        <div class="bar" [style.width]="job.progress + '%'"></div>
-    </div>
+    </a>
 </div>

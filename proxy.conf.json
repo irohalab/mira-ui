@@ -10,5 +10,10 @@
   "/video/*": {
     "target": "http://localhost:8000",
     "secure": false
+  },
+  "/socket.io/*": {
+    "target": "http://localhost:8083",
+    "secure": false,
+    "ws": true
   }
 }

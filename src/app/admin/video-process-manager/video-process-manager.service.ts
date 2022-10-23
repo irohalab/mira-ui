@@ -1,12 +1,12 @@
 import { BaseService } from '../../../helpers/base.service';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { VideoProcessRule } from '../../entity/VideoProcessRule';
-import { JobStatus } from '../../entity/JobStatus';
 import { VideoProcessJobStatus } from '../../entity/VideoProcessJobStatus';
 import { VideoProcessJob } from '../../entity/VideoProcessJob';
 import { Injectable } from '@angular/core';
+import { io } from 'socket.io-client';
+import { Vertex } from '../../entity/Vertex';
 
 type ReqData = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -20,6 +20,7 @@ export class VideoProcessManagerService extends BaseService {
     private _baseUrl = '/api/video-rule/proxy';
     constructor(private _httpClient: HttpClient) {
         super();
+        this.setUpSocketIOConnection();
     }
 
     private sendRequest<T>(reqData: ReqData): Observable<T> {
@@ -34,17 +35,45 @@ export class VideoProcessManagerService extends BaseService {
             method: 'GET',
             url: '/job',
             params: { status }
-        }
+        };
         return this.sendRequest<{data: VideoProcessJob[]}>(reqData)
             .pipe(
-                map(res => {
-                    const jobs = res.data;
-                    for (const job of jobs) {
-                        job.progress = job.progress + 1;
+                map(res => res.data)
+            );
+    }
+
+    getJob(jobId: string): Observable<VideoProcessJob> {
+        const reqData: ReqData = {
+            method: 'GET',
+            url: `/job/${jobId}`
+        };
+        return this.sendRequest<{data: VideoProcessJob, status: number}>(reqData)
+            .pipe(
+                map(({data, status}) => {
+                    if (status !== 0) {
+                        throw new Error('job not found or something goes wrong');
+                    } else {
+                        return data;
                     }
-                    return jobs;
                 })
             );
+    }
+
+    getVertices(jobId: string): Observable<Vertex[]> {
+        const reqData: ReqData = {
+            method: 'GET',
+            url: `/job/${jobId}/vertex`
+        };
+        return this.sendRequest<{data: Vertex[]}>(reqData)
+            .pipe(
+                map(res => res.data)
+            );
+    }
+
+    setUpSocketIOConnection(): void {
+        console.log('set up socket.io');
+        const socket = io('');
+        socket.emit('chat_message', 'a quick silver fox jumps over a lazy brown dog');
     }
 
 }

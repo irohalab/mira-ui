@@ -1,0 +1,55 @@
+<admin-navbar navTitle="Video Process Job" backLink="/admin/video-manager">
+    <a class="accessory-action anchor-button"
+       title="Cancel"
+       confirmDialog
+       dialogTitle="Do you want to cancel the job"
+       dialogContent="It may take a while when to actually cancel all vertices"
+       (onConfirm)="cancelJob()">
+        <i class="minus circle icon"></i> Cancel Job
+    </a>
+    <a class="accessory-action anchor-button"
+       title="Pause"
+       confirmDialog
+       dialogTitle="Do you want to pause the job"
+       dialogContent="It may take a while to pause the job."
+       (onConfirm)="pauseJob()">
+        <i class="pause circle icon"></i> Pause Job
+    </a>
+</admin-navbar>
+<div class="job-detail-container">
+    <div class="ui segment section-card" *ngIf="job && bangumi">
+        <div class="ui header">Job Info</div>
+        <table class="ui table">
+            <tbody>
+            <tr>
+                <td>Id:</td>
+                <td>{{job.id}}</td>
+                <td>Status: </td>
+                <td>{{job.status}}</td>
+            </tr>
+            <tr>
+                <td>Bangumi:</td>
+                <td><a [routerLink]="['/admin/bangumi', bangumi.id]">{{bangumi.name}}</a></td>
+                <td>Create Time: </td>
+                <td>{{job.createTime}}</td>
+            </tr>
+            <tr>
+                <td>VideoId:</td>
+                <td>{{job.jobMessage.videoId}}</td>
+                <td>Start Time: </td>
+                <td>{{job.startTime || 'N/A'}}</td>
+            </tr>
+            <tr>
+                <td>Episode:</td>
+                <td>{{episode ? episode.episode_no + '(' + episode.id + ')' : 'Loading...'}}</td>
+                <td>Finished Time: </td>
+                <td>{{job.finishedTime || 'N/A'}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="ui segment section-card">
+        <div class="ui header">Vertex Info</div>
+        <vertex-graph *ngIf="vertices" [vertices]="vertices"></vertex-graph>
+    </div>
+</div>

@@ -1,7 +1,7 @@
 import { BaseService } from '../../../helpers/base.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { JobStatus } from '../../entity/JobStatus';
+import { DownloadJobStatus } from '../../entity/DownloadJobStatus';
 import { Observable } from 'rxjs';
 import { DownloadJob } from '../../entity/DownloadJob';
 import { catchError, map } from 'rxjs/operators';
@@ -14,7 +14,7 @@ export class DownloadManagerService extends BaseService {
         super();
     }
 
-    public list_jobs(status: JobStatus): Observable<DownloadJob[]> {
+    public list_jobs(status: DownloadJobStatus): Observable<DownloadJob[]> {
         return this._httpClient.get<{data: DownloadJob[], total: number}>(`${this._baseUrl}/job`, {
             params: new HttpParams().set('status', status)
         })
@@ -34,5 +34,10 @@ export class DownloadManagerService extends BaseService {
         return this._httpClient.post<{data: FileMapping[], total: number}>(`${this._baseUrl}/file-mapping`, fileMapping)
             .pipe(map(res => res.data),
                 catchError(this.handleError));
+    }
+
+    public resendJobCompleteMessage(jobId: string): Observable<number> {
+        return this._httpClient.put<{ status: number }>(`${this._baseUrl}/job/${jobId}/resend-finish-message`, null)
+            .pipe(map(res => res.status), catchError(this.handleError));
     }
 }
