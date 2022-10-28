@@ -1,0 +1,13 @@
+<infinite-list [rowHeight]="lineHeight"
+               [newScrollPosition]="currentScrollPosition"
+               (scrollPosition)="onScrollPositionChange($event)" #listContainer>
+    <div class="line-content" *infiniteFor="let line of logLines">
+        <div class="timestamp">{{line.time}}</div>
+        <div class="msg">{{line.msg}}</div>
+    </div>
+</infinite-list>
+<div class="control-button-container ui vertical buttons" #controlContainer [ngClass]="{visible: showPanel}">
+    <button class="ui mini icon button" [ngClass]="{grey: lockPanel}" (click)="toggleLockPanel()"><i class="thumbtack icon"></i></button>
+    <button class="ui mini icon button" (click)="clearLog()"><i class="trash icon"></i></button>
+    <button class="ui mini icon button" [ngClass]="{grey: scrollMode === 'tail'}" (click)="toggleScrollMode()"><i class="angle double down icon"></i></button>
+</div>

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Edge, Node } from '@swimlane/ngx-graph';
 import { ActionType } from '../../../entity/action-type';
 import { ProfileType } from '../../../entity/ProfileType';
@@ -28,6 +28,11 @@ export class VertexGraphComponent implements AfterViewInit, OnInit {
 
     @Input()
     vertices: Vertex[];
+
+    @Output()
+    nodeSelected = new EventEmitter<string>();
+
+    selectedNodeId: string;
 
     readonly nodeHeightDict: {[key: string]: number} = {
         [ActionType.Convert]: 80,
@@ -68,12 +73,15 @@ export class VertexGraphComponent implements AfterViewInit, OnInit {
     }
 
     unselectAnything(): void {
-
+        this.selectedNodeId = null;
+        this.nodeSelected.emit(null);
     }
 
-    selectNode(nodeId: string, event: Event, nodeMeta: any): void {
+    selectNode(nodeId: string, event: Event): void {
         event.preventDefault();
         event.stopPropagation();
+        this.selectedNodeId = nodeId;
+        this.nodeSelected.emit(nodeId);
     }
 
     private detectDimension(): void {

@@ -1,0 +1,68 @@
+<div class="vertex-info-container">
+    <div class="header-bar">
+        <a class="close-button" (click)="closePanel()">
+            <i class="chevron left icon"></i>
+        </a>
+        <div class="panel-title">Vertex Info</div>
+    </div>
+    <div class="vertex-summary section-container">
+        <table class="ui table">
+            <tbody>
+            <tr>
+                <td>Id</td>
+                <td colspan="3">{{vertex.id}}</td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td>{{vertex.status}}</td>
+                <td style="width: 13em">Action Type</td>
+                <td>{{vertex.actionType}}</td>
+            </tr>
+            <tr>
+                <td>outputPath</td>
+                <td colspan="3">{{vertex.outputPath || 'N/A'}}</td>
+            </tr>
+            <tr>
+                <td>Start Time</td>
+                <td>{{vertex.startTime}}</td>
+                <td>Finished time</td>
+                <td>{{vertex.finishedTime || 'N/A'}}</td>
+            </tr>
+            <tr *ngIf="vertex.actionType === eActionType.Convert">
+                <td>profile</td>
+                <td>{{$any(vertex.action).profile}}</td>
+                <td>profileExtraData</td>
+                <td>{{$any(vertex.action).profileExtraData}}</td>
+            </tr>
+            <tr *ngIf="vertex.actionType === eActionType.Extract">
+                <td>extractFrom</td>
+                <td>{{$any(vertex.action).extractFrom}}</td>
+                <td>extractTarget</td>
+                <td>{{$any(vertex.action).extractTarget}}</td>
+            </tr>
+            <tr *ngIf="vertex.actionType === eActionType.Extract">
+                <td>outputExtname</td>
+                <td>{{$any(vertex.action).outputExtname || 'N/A'}}</td>
+                <td>extractorId</td>
+                <td>{{$any(vertex.action).extractorId}}</td>
+            </tr>
+            <tr *ngIf="vertex.actionType === eActionType.Extract">
+                <td>extractRegex</td>
+                <td colspan="3">{{$any(vertex.action).extractRegex || 'N/A'}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="vertex-log-container section-container">
+        <div class="ui header">Vertex Log</div>
+        <div class="vertex-log-action" *ngIf="!shouldShowVertexLog">
+            <button class="ui button" (click)="showLog()">Show Vertex Log</button>
+        </div>
+        <div class="log-wrapper" #vertexLogWrapper>
+            <stream-log-viewer *ngIf="shouldShowVertexLog" [logLineSource]="vertexLogLines"></stream-log-viewer>
+        </div>
+    </div>
+    <div class="panel-action-container">
+        <button class="ui primary button" (click)="closePanel()">Close</button>
+    </div>
+</div>

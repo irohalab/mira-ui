@@ -48,8 +48,22 @@
             </tbody>
         </table>
     </div>
+    <div class="ui segment section card" *ngIf="job && job.status === eJobStatus.UnrecoverableError ">
+        <div class="ui header">Error Info</div>
+        <div class="error-info"></div>
+    </div>
     <div class="ui segment section-card">
         <div class="ui header">Vertex Info</div>
-        <vertex-graph *ngIf="vertices" [vertices]="vertices"></vertex-graph>
+        <vertex-graph *ngIf="vertices" [vertices]="vertices" (nodeSelected)="openVertexDetail($event)"></vertex-graph>
+    </div>
+    <div class="ui segment section-card">
+        <div class="ui header">Job Log</div>
+        <div class="job-log-action" *ngIf="!shouldShowJobLog">
+            <button class="ui button" (click)="showJobLog()">Show Job Log</button>
+        </div>
+        <div class="job-log-container" #jobLogContainer>
+            <stream-log-viewer class="job-log-viewer" *ngIf="shouldShowJobLog"
+                               [logLineSource]="jobLogLines"></stream-log-viewer>
+        </div>
     </div>
 </div>

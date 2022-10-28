@@ -62,6 +62,8 @@ import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { ActionEditorComponent } from './bangumi-detail/video-processs-rule/action-editor/action-editor.component';
 import { VideoProcessJobDetailComponent } from './video-process-job-detail/video-process-job-detail.component';
 import { VertexGraphComponent } from './video-process-job-detail/vertex-graph/vertex-graph.component';
+import { StreamLogViewerComponent } from './video-process-job-detail/stream-log-viewer/stream-log-viewer.component';
+import { VertexInfoPanelComponent } from './video-process-job-detail/vertex-info-panel/vertex-info-panel.component';
 
 
 @NgModule({
@@ -106,7 +108,9 @@ import { VertexGraphComponent } from './video-process-job-detail/vertex-graph/ve
         VideoProcessJobCardComponent,
         ActionEditorComponent,
         VideoProcessJobDetailComponent,
-        VertexGraphComponent
+        VertexGraphComponent,
+        StreamLogViewerComponent,
+        VertexInfoPanelComponent
     ],
     providers: [
         AdminService,
@@ -148,7 +152,8 @@ import { VertexGraphComponent } from './video-process-job-detail/vertex-graph/ve
         EditBangumiRecommendComponent,
         UniversalBuilderComponent,
         VideoProcessRuleEditorComponent,
-        FileMappingListComponent
+        FileMappingListComponent,
+        VertexInfoPanelComponent
     ]
 })
 export class AdminModule {

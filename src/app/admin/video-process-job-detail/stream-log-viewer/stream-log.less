@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #1f1f1f;
+}
+.line-content {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  color: #ffffff;
+  overflow: hidden;
+  .timestamp {
+    display: inline-block;
+    width: 16em;
+    margin-right: 1rem;
+  }
+  .msg {
+    display: inline-block;
+    margin-right: 1rem;
+  }
+}
+
+.control-button-container {
+  position: absolute;
+  right: 0.2rem;
+  top: 0.2rem;
+  opacity: 0;
+  &.visible {
+    opacity: 1;
+  }
+  transition: opacity 500ms;
+}
