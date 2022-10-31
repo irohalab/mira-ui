@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnInit,
+    Output, SimpleChanges,
+    ViewChild
+} from '@angular/core';
 import { Edge, Node } from '@swimlane/ngx-graph';
 import { ActionType } from '../../../entity/action-type';
 import { ProfileType } from '../../../entity/ProfileType';
@@ -14,7 +24,7 @@ const GRAPH_HEIGHT = getRemPixel(30);
     templateUrl: './vertex-graph.html',
     styleUrls: ['./vertex-graph.less']
 })
-export class VertexGraphComponent implements AfterViewInit, OnInit {
+export class VertexGraphComponent implements AfterViewInit, OnInit, OnChanges {
     readonly eActionType = ActionType;
     readonly eProfileType = ProfileType;
     readonly eExtractSource = ExtractSource;
@@ -46,7 +56,33 @@ export class VertexGraphComponent implements AfterViewInit, OnInit {
 
     @ViewChild('graphContainer') vertexGraphContainer: ElementRef;
 
+    ngOnChanges(changes: SimpleChanges): void {
+        if(!changes['vertices'].isFirstChange()) {
+            this.buildGraph();
+        }
+    }
+
     ngOnInit(): void {
+        this.buildGraph();
+    }
+
+    ngAfterViewInit(): void {
+        this.detectDimension();
+    }
+
+    unselectAnything(): void {
+        this.selectedNodeId = null;
+        this.nodeSelected.emit(null);
+    }
+
+    selectNode(nodeId: string, event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.selectedNodeId = nodeId;
+        this.nodeSelected.emit(nodeId);
+    }
+
+    private buildGraph(): void {
         if (this.vertices) {
             this.edges = [];
             this.nodes = this.vertices.map(vertex => {
@@ -66,22 +102,6 @@ export class VertexGraphComponent implements AfterViewInit, OnInit {
                 return node;
             });
         }
-    }
-
-    ngAfterViewInit(): void {
-        this.detectDimension();
-    }
-
-    unselectAnything(): void {
-        this.selectedNodeId = null;
-        this.nodeSelected.emit(null);
-    }
-
-    selectNode(nodeId: string, event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-        this.selectedNodeId = nodeId;
-        this.nodeSelected.emit(nodeId);
     }
 
     private detectDimension(): void {

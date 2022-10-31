@@ -3,19 +3,17 @@
         <input type="text" placeholder="Search Download Job" #searchBox>
         <i class="search icon"></i>
     </div>
-    <div class="accessory-action ui inline dropdown" uiDropdown="click">
-        <div class="text">{{selectJobStatus}}</div>
-        <i class="dropdown icon"></i>
-        <div class="menu">
-            <div class="item" (click)="onChangeStatus(eJobStatus.Queueing)">Queueing</div>
-            <div class="item" (click)="onChangeStatus(eJobStatus.Running)">Running</div>
-            <div class="item" (click)="onChangeStatus(eJobStatus.Finished)">Finished</div>
-            <div class="item" (click)="onChangeStatus(eJobStatus.UnrecoverableError)">UnrecoverableError</div>
-            <div class="item" (click)="onChangeStatus(eJobStatus.Pause)">Pause</div>
-            <div class="item" (click)="onChangeStatus(eJobStatus.Canceled)">Canceled</div>
-        </div>
-    </div>
 </admin-navbar>
+<div class="sub-menu">
+    <div class="ui secondary vertical pointing menu">
+        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Queueing}" (click)="onChangeStatus(eJobStatus.Queueing)">Queueing</div>
+        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Running}" (click)="onChangeStatus(eJobStatus.Running)">Running</div>
+        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Finished}" (click)="onChangeStatus(eJobStatus.Finished)">Finished</div>
+        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.UnrecoverableError}" (click)="onChangeStatus(eJobStatus.UnrecoverableError)">UnrecoverableError</div>
+        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Pause}" (click)="onChangeStatus(eJobStatus.Pause)">Pause</div>
+        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Canceled}" (click)="onChangeStatus(eJobStatus.Canceled)">Canceled</div>
+    </div>
+</div>
 <div class="content-area">
     <div class="table-header">
         <div class="job-id">Job ID</div>

@@ -1,6 +1,7 @@
 <admin-navbar navTitle="Video Process Job" backLink="/admin/video-manager">
     <a class="accessory-action anchor-button"
        title="Cancel"
+       *ngIf="job && (job.status === eJobStatus.Running || job.status === eJobStatus.Queueing)"
        confirmDialog
        dialogTitle="Do you want to cancel the job"
        dialogContent="It may take a while when to actually cancel all vertices"
@@ -9,11 +10,21 @@
     </a>
     <a class="accessory-action anchor-button"
        title="Pause"
+       *ngIf="job && job.status === eJobStatus.Running"
        confirmDialog
        dialogTitle="Do you want to pause the job"
        dialogContent="It may take a while to pause the job."
        (onConfirm)="pauseJob()">
         <i class="pause circle icon"></i> Pause Job
+    </a>
+    <a class="accessory-action anchor-button"
+       title="Resume"
+       *ngIf="job && job.status === eJobStatus.Pause"
+       confirmDialog
+       dialogTitle="Do you want to resume the job"
+       dialogContent="Job will resume to re-queue"
+       (onConfirm)="resumeJob()">
+        <i class="pause circle icon"></i> Resume Job
     </a>
 </admin-navbar>
 <div class="job-detail-container">
@@ -48,9 +59,11 @@
             </tbody>
         </table>
     </div>
-    <div class="ui segment section card" *ngIf="job && job.status === eJobStatus.UnrecoverableError ">
+    <div class="ui segment section-card" *ngIf="job && job.status === eJobStatus.UnrecoverableError ">
         <div class="ui header">Error Info</div>
-        <div class="error-info"></div>
+        <div class="error-info">
+            <pre>{{errorInfo}}</pre>
+        </div>
     </div>
     <div class="ui segment section-card">
         <div class="ui header">Vertex Info</div>

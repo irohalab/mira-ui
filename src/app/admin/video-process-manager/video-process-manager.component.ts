@@ -17,11 +17,11 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
     private _jobListSub = new Subscription();
     private _sub = new Subscription();
 
-    public cardHeight: number;
-    public isLoading: boolean;
-    public jobList: VideoProcessJob[];
-    public eJobStatus = VideoProcessJobStatus;
-    public selectJobStatus: VideoProcessJobStatus = VideoProcessJobStatus.Running;
+    cardHeight: number;
+    isLoading: boolean;
+    jobList: VideoProcessJob[];
+    eJobStatus = VideoProcessJobStatus;
+    selectJobStatus: VideoProcessJobStatus = VideoProcessJobStatus.Running;
 
     constructor(private _videoProcessManagerService: VideoProcessManagerService) {
         if (window) {
@@ -29,16 +29,16 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
         }
     }
 
-    public ngOnDestroy(): void {
+    ngOnDestroy(): void {
         this._jobListSub.unsubscribe();
         this._sub.unsubscribe();
     }
 
-    public ngOnInit(): void {
+    ngOnInit(): void {
         this.updateJobList();
     }
 
-    public onChangeStatus(status: VideoProcessJobStatus) {
+    onChangeStatus(status: VideoProcessJobStatus) {
         this.selectJobStatus = status;
         this.updateJobList();
     }
@@ -50,7 +50,7 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
             this._videoProcessManagerService.listJobs(this.selectJobStatus).pipe(
                 switchMap((jobs: VideoProcessJob[]) => {
                     this.jobList = jobs;
-                    return interval(5000);
+                    return interval(500000);
                 }),
                 switchMap(() => this._videoProcessManagerService.listJobs(this.selectJobStatus))
             ).subscribe((jobs: VideoProcessJob[]) => {

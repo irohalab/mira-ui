@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { VideoProcessManagerService } from '../video-process-manager/video-process-manager.service';
-import { combineLatestWith, delayWhen, interval, Subject, Subscription } from 'rxjs';
+import { combineLatestWith, delay, interval, Subject, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, takeWhile, tap } from 'rxjs/operators';
 import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { VideoProcessJob } from '../../entity/VideoProcessJob';
 import { Vertex } from '../../entity/Vertex';
@@ -14,8 +14,8 @@ import {
     getMaxCharacterPerLineForContainer,
     processLineForStreamLogViewer
 } from './stream-log-viewer/stream-log-helper';
-import { getRemPixel } from '../../../helpers/dom';
 import { VertexInfoPanelComponent } from './vertex-info-panel/vertex-info-panel.component';
+import { VertexStatus } from '../../entity/VertexStatus';
 
 @Component({
     selector: 'video-process-job-detail',
@@ -38,6 +38,8 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
 
     shouldShowJobLog = false;
     jobLogLines = new Subject<LogType>();
+
+    errorInfo: any;
 
     @ViewChild('jobLogContainer') jobLogContainerRef: ElementRef;
 
@@ -72,6 +74,7 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
                         this.bangumi = bangumi;
                         this.getEpisode();
                         this.getVertices();
+                        this.updateJobAndVertexInfo();
                     },
                     error: (error) => {
                         this._toastRef.show(error.message);
@@ -85,13 +88,59 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
     }
 
     cancelJob(): void {
-        // TODO: implement cancel
-        throw new Error('Not Implemented');
+        this._subscription.add(
+            this._videoProcessManagerService.cancelJob(this.job.id)
+                .subscribe({
+                    next: () => {
+                        this._toastRef.show('Cancel Successfully!');
+                    },
+                    error: (reason) => {
+                        this._toastRef.show(reason);
+                    }
+                })
+        );
     }
 
     pauseJob(): void {
-        // TODO: implement pause
-        throw new Error('Not Implemented');
+        this._subscription.add(
+            this._videoProcessManagerService.pauseJob(this.job.id)
+                .subscribe({
+                    next: () => {
+                        this._toastRef.show('Pause Successfully!');
+                    },
+                    error: (reason) => {
+                        this._toastRef.show(reason);
+                    }
+                })
+        );
+    }
+
+    resumeJob(): void {
+        this._subscription.add(
+            this._videoProcessManagerService.resumeJob(this.job.id)
+                .pipe(
+                    tap(()=> {
+                        this._toastRef.show('Resume Successfully!');
+                    }),
+                    delay(2000),
+                    switchMap(() => {
+                        return this._videoProcessManagerService.getJob(this.job.id);
+                    }),
+                    switchMap((job: VideoProcessJob) => {
+                        this.job = job;
+                        return this._videoProcessManagerService.getVertices(this.job.id)
+                    })
+                )
+                .subscribe({
+                    next: (vertices) => {
+                        this.vertices = vertices;
+                        this.updateJobAndVertexInfo();
+                    },
+                    error: (reason) => {
+                        this._toastRef.show(reason);
+                    }
+                })
+        );
     }
 
     openVertexDetail(vertexId: string): void {
@@ -147,6 +196,29 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
             this._videoProcessManagerService.getVertices(this.job.id)
                 .subscribe((vertices) => {
                     this.vertices = vertices;
+                    for(const vertex of vertices) {
+                        if (vertex.status === VertexStatus.Error) {
+                            this.errorInfo = JSON.stringify(vertex.error);
+                        }
+                    }
+                })
+        );
+    }
+
+    private updateJobAndVertexInfo(): void {
+        this._subscription.add(
+            interval(5000)
+                .pipe(
+                    takeWhile(() => {
+                        return this.job && this.job.status === VideoProcessJobStatus.Queueing || this.job.status === VideoProcessJobStatus.Running;
+                    }),
+                    switchMap(() => {
+                        return this._videoProcessManagerService.getJob(this.job.id)
+                    })
+                )
+                .subscribe((job) => {
+                    this.job = job;
+                    this.getVertices();
                 })
         );
     }

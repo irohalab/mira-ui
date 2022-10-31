@@ -1,17 +1,16 @@
+import { fromEvent, Subscription } from 'rxjs';
 
-import {fromEvent as observableFromEvent, Observable, Subscription} from 'rxjs';
-
-import {distinctUntilChanged, debounceTime} from 'rxjs/operators';
-import {Bangumi} from '../../entity';
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Title} from '@angular/platform-browser';
-import {Router} from '@angular/router';
-import {AdminService} from '../admin.service';
-import {getRemPixel} from '../../../helpers/dom';
-import {UIDialog, UIToast, UIToastComponent, UIToastRef} from '@irohalab/deneb-ui';
-import {BaseError} from '../../../helpers/error/BaseError';
-import {CARD_HEIGHT_REM} from '../bangumi-card/bangumi-card.component';
-import {SearchBangumi} from '../search-bangumi/search-bangumi.component';
+import { debounceTime, filter } from 'rxjs/operators';
+import { Bangumi } from '../../entity';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { AdminService } from '../admin.service';
+import { getRemPixel } from '../../../helpers/dom';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { BaseError } from '../../../helpers/error/BaseError';
+import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
+import { SearchBangumi } from '../search-bangumi/search-bangumi.component';
 import { ListBangumiService } from './list-bangumi.service';
 import { environment } from '../../../environments/environment';
 
@@ -20,7 +19,7 @@ import { environment } from '../../../environments/environment';
     templateUrl: './list-bangumi.html',
     styleUrls: ['./list-bangumi.less']
 })
-export class ListBangumi implements AfterViewInit, OnDestroy, OnInit {
+export class ListBangumi implements OnDestroy, OnInit {
     private _subscription = new Subscription();
 
     private _bangumiList: Bangumi[];
@@ -148,17 +147,10 @@ export class ListBangumi implements AfterViewInit, OnDestroy, OnInit {
         this.loadFromServer();
     }
 
-    ngAfterViewInit(): void {
-        let searchBox = this.searchBox.nativeElement;
-        this._subscription.add(
-            observableFromEvent(searchBox, 'keyup').pipe(
-                debounceTime(500),
-                distinctUntilChanged(),)
-                .subscribe(() => {
-                    this.name = searchBox.value;
-                    this.filterBangumiList();
-                })
-        );
+    onFilterAction(): void {
+        const searchBoxElement = this.searchBox.nativeElement;
+        this.name = searchBoxElement.value;
+        this.filterBangumiList();
     }
 
     ngOnDestroy(): void {
@@ -196,7 +188,7 @@ export class ListBangumi implements AfterViewInit, OnDestroy, OnInit {
         this.router.navigate(['/admin/bangumi', bangumi.id]);
     }
 
-    private filterBangumiList() {
+    filterBangumiList() {
         if (!this._allBangumiList) {
             return;
         }

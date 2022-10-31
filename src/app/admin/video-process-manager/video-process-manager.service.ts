@@ -60,6 +60,33 @@ export class VideoProcessManagerService extends BaseService {
             );
     }
 
+    pauseJob(jobId: string): Observable<any> {
+        const reqData: ReqData = {
+            method: 'PUT',
+            url: `/job/${jobId}/op`,
+            body: {action: 'pause'}
+        };
+        return this.sendRequest<any>(reqData);
+    }
+
+    cancelJob(jobId: string): Observable<any> {
+        const reqData: ReqData = {
+            method: 'PUT',
+            url: `/job/${jobId}/op`,
+            body: {action: 'cancel'}
+        };
+        return this.sendRequest<any>(reqData);
+    }
+
+    resumeJob(jobId: string): Observable<any> {
+        const reqData: ReqData = {
+            method: 'PUT',
+            url: `/job/${jobId}/op`,
+            body: {action: 'resume'}
+        };
+        return this.sendRequest<any>(reqData);
+    }
+
     getVertices(jobId: string): Observable<Vertex[]> {
         const reqData: ReqData = {
             method: 'GET',
@@ -85,17 +112,17 @@ export class VideoProcessManagerService extends BaseService {
     public streamingJobLog(jobId: string): Observable<LogType> {
         return this.streamingLog('/job-log', {
             jobId
-        });
+        }, false);
     }
 
     public streamingVertexLog(jobId: string, vertexId: string): Observable<LogType> {
         return this.streamingLog('/vertex-log', {
             jobId,
             vertexId
-        })
+        }, true)
     }
 
-    private streamingLog(namespace: string, payload: any): Observable<LogType> {
+    private streamingLog(namespace: string, payload: any, disconnectAtLogEnd: boolean): Observable<LogType> {
         let sessionObservable: Observable<string>;
         if (!this._sessionId) {
             sessionObservable = this.createSocketSession()
@@ -128,7 +155,11 @@ export class VideoProcessManagerService extends BaseService {
                     socket.on('log:line', (data) => {
                         try {
                             if (data && data.trim()) {
-                                subscriber.next(JSON.parse(data) as LogType);
+                                const log = JSON.parse(data) as LogType;
+                                if (!disconnectAtLogEnd && log.msg === 'LOG_END') {
+                                    return;
+                                }
+                                subscriber.next(log);
                             }
                         } catch (e) {
                             console.log('error when parsing line: ' + e);
@@ -140,8 +171,10 @@ export class VideoProcessManagerService extends BaseService {
                     });
                     socket.on('log:line_end', () => {
                         console.log('line_end');
-                        isComplete = true;
-                        subscriber.complete();
+                        if (disconnectAtLogEnd) {
+                            isComplete = true;
+                            subscriber.complete();
+                        }
                     });
 
                     socket.on('error', (error) => {

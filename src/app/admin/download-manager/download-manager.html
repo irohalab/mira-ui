@@ -3,18 +3,16 @@
         <input type="text" placeholder="Search Download Job" #searchBox>
         <i class="search icon"></i>
     </div>
-    <div class="accessory-action ui inline dropdown" uiDropdown="click">
-        <div class="text">{{selectJobStatus | titlecase}}</div>
-        <i class="dropdown icon"></i>
-        <div class="menu">
-            <div class="item" (click)="onChangeStatus(mJobStatus.Pending)">Pending</div>
-            <div class="item" (click)="onChangeStatus(mJobStatus.Downloading)">Downloading</div>
-            <div class="item" (click)="onChangeStatus(mJobStatus.Complete)">Complete</div>
-            <div class="item" (click)="onChangeStatus(mJobStatus.Paused)">Paused</div>
-            <div class="item" (click)="onChangeStatus(mJobStatus.Error)">Error</div>
-        </div>
-    </div>
 </admin-navbar>
+<div class="sub-menu">
+    <div class="ui secondary vertical pointing menu">
+        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Pending}" (click)="onChangeStatus(mJobStatus.Pending)">Pending</div>
+        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Downloading}" (click)="onChangeStatus(mJobStatus.Downloading)">Downloading</div>
+        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Complete}" (click)="onChangeStatus(mJobStatus.Complete)">Complete</div>
+        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Paused}" (click)="onChangeStatus(mJobStatus.Paused)">Paused</div>
+        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Error}" (click)="onChangeStatus(mJobStatus.Error)">Error</div>
+    </div>
+</div>
 <div class="content-area">
     <div class="job-container" *ngIf="!isLoading && jobList && jobList.length > 0">
         <infinite-list [rowHeight]="cardHeight">

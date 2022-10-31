@@ -1,7 +1,7 @@
 <admin-navbar navTitle="已保存的新番">
     <div class="ui icon input action-item search-action">
-        <input type="text" placeholder="按名称过滤" #searchBox [disabled]="isLoading || !bangumiList || bangumiList.length === 0">
-        <i class="search icon"></i>
+        <input type="text" placeholder="按名称过滤" [disabled]="isLoading" #searchBox (keyup.enter)="onFilterAction()">
+        <i class="circular search link icon" (click)="onFilterAction()"></i>
     </div>
     <a class="action-item anchor-button" (click)="addBangumi()">
         <i class="plus icon"></i>添加番组

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { DownloadJob } from '../../entity/DownloadJob';
 import { DownloadJobStatus } from '../../entity/DownloadJobStatus';
 import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./download-job-card.less'],
     encapsulation: ViewEncapsulation.None
 })
-export class DownloadJobCardComponent implements OnDestroy {
+export class DownloadJobCardComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
     private _toast: UIToastRef<UIToastComponent>;
 
@@ -20,6 +20,8 @@ export class DownloadJobCardComponent implements OnDestroy {
     job: DownloadJob;
 
     mJobStatus = DownloadJobStatus;
+
+    episodeNoList: string[]
 
     constructor(private _dialog: UIDialog,
                 private downloadManagerService: DownloadManagerService,
@@ -48,5 +50,14 @@ export class DownloadJobCardComponent implements OnDestroy {
 
     ngOnDestroy(): void {
         this._subscription.unsubscribe();
+    }
+
+    ngOnInit(): void {
+        if (this.job.fileMapping) {
+            this.episodeNoList = this.job.fileMapping
+                .map(mapping => mapping.episode)
+                .filter(eps => !!eps)
+                .map(eps => eps.episode_no + '');
+        }
     }
 }

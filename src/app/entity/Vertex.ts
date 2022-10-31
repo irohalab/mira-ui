@@ -13,4 +13,5 @@ export class Vertex {
     public actionType: ActionType;
     public startTime: Date;
     public finishedTime: Date;
+    public error: any;
 }
