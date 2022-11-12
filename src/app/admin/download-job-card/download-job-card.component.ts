@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { DownloadJob } from '../../entity/DownloadJob';
 import { DownloadJobStatus } from '../../entity/DownloadJobStatus';
 import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
@@ -16,8 +16,17 @@ export class DownloadJobCardComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
     private _toast: UIToastRef<UIToastComponent>;
 
+    @Output()
+    selectCard = new EventEmitter<string>();
+
+    @Output()
+    viewDetail = new EventEmitter<DownloadJob>();
+
     @Input()
     job: DownloadJob;
+
+    @Input()
+    debugUtil: boolean;
 
     mJobStatus = DownloadJobStatus;
 
@@ -29,13 +38,15 @@ export class DownloadJobCardComponent implements OnInit, OnDestroy {
         this._toast = toastService.makeText();
     }
 
-    onViewFileMapping() {
+    onViewFileMapping(event: Event) {
+        event.stopPropagation();
         const dialogRef = this._dialog.open(FileMappingListComponent, {stickyDialog: false, backdrop: true})
         dialogRef.componentInstance.fileMapping = this.job.fileMapping;
         dialogRef.componentInstance.jobId = this.job.id;
     }
 
-    resendCompleteMessage() {
+    resendCompleteMessage(event: Event) {
+        event.stopPropagation();
         this._subscription.add(
             this.downloadManagerService.resendJobCompleteMessage(this.job.id)
                 .subscribe((status) => {
@@ -59,5 +70,17 @@ export class DownloadJobCardComponent implements OnInit, OnDestroy {
                 .filter(eps => !!eps)
                 .map(eps => eps.episode_no + '');
         }
+    }
+
+    onClickCard(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.selectCard.emit(this.job.id);
+    }
+
+    onViewDetail(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.viewDetail.emit(this.job);
     }
 }

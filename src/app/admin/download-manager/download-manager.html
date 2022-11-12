@@ -1,7 +1,36 @@
 <admin-navbar navTitle="下载管理">
+    <div class="action-item ui inline dropdown" uiDropdown="click">
+        <div class="text">{{searchType}}</div>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <div class="item" (click)="onChangeSearchType('Job ID')">Job ID</div>
+            <div class="item" (click)="onChangeSearchType('Bangumi ID')">Bangumi ID</div>
+            <div class="item" (click)="onChangeSearchType('Bangumi Name')">Bangumi Name</div>
+        </div>
+    </div>
     <div class="ui icon input action-item search-action">
-        <input type="text" placeholder="Search Download Job" #searchBox>
+        <input type="text" placeholder="Search Download Job" #searchBox (keyup.enter)="filterList()">
         <i class="search icon"></i>
+    </div>
+    <a class="action-item anchor-button ui icon basic button"
+       [ngClass]="{
+       orange: selectedJobStatus === mJobStatus.Downloading || selectedJobStatus === mJobStatus.Pending, blue: selectedJobStatus === mJobStatus.Paused,
+       disabled: !selectedJobStatus || selectedJobStatus === mJobStatus.Error || selectedJobStatus === mJobStatus.Complete || selectedJobStatus === mJobStatus.Removed
+       }"
+       (click)="pauseOrResumeJob($event)">
+        <i class="ui icon" [ngClass]="{
+            play: selectedJobStatus === mJobStatus.Paused,
+            pause: selectedJobStatus !== mJobStatus.Paused || !selectedJobStatus
+        }"></i>
+        {{selectedJobStatus === mJobStatus.Paused ? 'Resume' : 'Pause'}}
+    </a>
+    <a class="action-item anchor-button ui icon basic button"
+       [ngClass]="{disabled: !selectedJobStatus, red: selectedJobStatus}" (click)="deleteJob($event)">
+        <i class="ui minus square icon"></i>
+        Remove Torrent
+    </a>
+    <div class="accessory-action">
+        <ui-toggle text="Debug Utility" [(ngModel)]="isDebugUtilityEnabled" name="isDebugUtilityEnabled"></ui-toggle>
     </div>
 </admin-navbar>
 <div class="sub-menu">
@@ -14,9 +43,25 @@
     </div>
 </div>
 <div class="content-area">
+    <div class="table-header">
+        <div class="job-id">Job ID</div>
+        <div class="progress">Progress</div>
+        <div class="download-speed">DL Speed</div>
+        <div class="size">Size</div>
+        <div class="bangumi-name">Bangumi</div>
+        <div class="torrent-name">Torrent</div>
+        <div class="seeds">Seeds</div>
+        <div class="leechers">Leechers</div>
+        <div class="eta">ETA</div>
+    </div>
     <div class="job-container" *ngIf="!isLoading && jobList && jobList.length > 0">
         <infinite-list [rowHeight]="cardHeight">
-            <download-job-card  *infiniteFor="let job of jobList" [job]="job">
+            <download-job-card  *infiniteFor="let job of jobList"
+                                [job]="job"
+                                [debugUtil] = "isDebugUtilityEnabled"
+                                (selectCard)="onSelectJob($event)"
+                                (viewDetail)="onViewDetail($event)"
+                                [ngClass]="{selected: selectedJobId === job.id}">
             </download-job-card>
         </infinite-list>
     </div>

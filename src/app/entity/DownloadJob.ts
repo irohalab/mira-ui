@@ -22,28 +22,31 @@ import { Bangumi } from './bangumi';
 
 export class DownloadJob {
     public id: string;
-
     public torrentId: string;
-
     public downloader: DownloaderType;
-
     public status: DownloadJobStatus
-
     public torrentUrl: string;
-
     public bangumiId: string;
-
     public downloadTaskMessageId: string;
-
     public downloadTaskMessage: DownloadTaskMessage;
-
     public fileMapping: FileMapping[];
-
     public appliedProcessRuleId: string;
-
     public videoId: string;
-
+    public torrentName: string;
     public progress: number;
+    public downloadSpeed: number;
+    public eta: number;
+    public availability: number;
+    public priority: number;
+    public size: number;
+    public downloaded: number;
+    public amountLeft: number;
+    public activeTime: number;
+    public seeds: number;
+    public leechers: number;
+    public connectedSeeds: number;
+    public connectedLeechers: number;
 
+    // not from database
     public bangumi: Bangumi;
 }

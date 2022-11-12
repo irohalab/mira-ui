@@ -11,10 +11,42 @@
   right: 0;
   overflow: hidden;
   background-color: #f0f0f0;
+  padding-top: 2rem;
 }
 
 .job-container {
   width: 100%;
   height: 100%;
   padding: 0 2rem;
+}
+
+.table-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 0.5rem 3rem;
+  font-size: 1rem;
+  line-height: 1rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  > .job-id {
+    width: 22rem;
+  }
+  > .bangumi-name {
+    width: 18rem;
+  }
+  > .torrent-name {
+    width: 24rem;
+  }
+  > .progress, > .download-speed, > .size {
+    width: 6rem;
+  }
+  > .seeds, > .leechers {
+    width: 7rem;
+  }
+  > .eta {
+    width: 10rem;
+  }
 }

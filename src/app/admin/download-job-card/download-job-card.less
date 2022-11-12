@@ -8,6 +8,12 @@ download-job-card {
     height: 100%;
     margin: 0;
   }
+
+  &.selected {
+    > .ui.segment {
+      background-color: #ecc195;
+    }
+  }
 }
 
 .card-content {
@@ -15,17 +21,26 @@ download-job-card {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  > .progress {
-    margin-left: 1rem;
-    margin-right: 1rem;
+  > .job-id {
+    width: 22rem;
   }
   > .bangumi-name {
-    margin-left: 1rem;
-    margin-right: 2rem;
+    width: 18rem;
   }
-  > .file-mapping {
-    margin-left: 1rem;
-    display: inline-block;
+  > .torrent-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 24rem;
+  }
+  > .progress, > .download-speed, > .size {
+    width: 6rem;
+  }
+  > .seeds, > .leechers {
+    width: 7rem;
+  }
+  > .eta {
+    width: 10rem;
   }
 }
 

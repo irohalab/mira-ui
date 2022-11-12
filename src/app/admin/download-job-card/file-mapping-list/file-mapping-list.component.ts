@@ -11,6 +11,9 @@ import { UIDialogRef } from '@irohalab/deneb-ui';
 })
 export class FileMappingListComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
+
+    fileMappingEnhanced = false;
+
     constructor(private _downloadManagerService: DownloadManagerService,
                 private _dialogRef: UIDialogRef<FileMappingListComponent>) {
     }
@@ -25,6 +28,7 @@ export class FileMappingListComponent implements OnInit, OnDestroy {
         this._subscription.add(
             this._downloadManagerService.enhance_file_mapping(this.fileMapping)
                 .subscribe((newMapping) => {
+                    this.fileMappingEnhanced = true;
                     this.fileMapping = newMapping;
                 })
         );

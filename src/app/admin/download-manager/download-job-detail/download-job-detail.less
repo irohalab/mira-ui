@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  box-sizing: border-box;
+  text-align: left;
+  width: 40rem;
+  height: 100%;
+  margin: auto;
+  top: 0;
+  right: 0;
+  position: absolute;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow: -5px 0 5px #7c7c7c;
+}
+.header-bar {
+  height: 2.5rem;
+  border-bottom: 1px solid #cccccc;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  .panel-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 2.5rem;
+    margin: 0 1rem;
+  }
+  .close-button {
+    display: block;
+    font-size: 1.2rem;
+    align-self: center;
+    padding: 1rem;
+    color: #333333;
+    cursor: pointer;
+    &:hover,
+    &:focus {
+      color: #5f94c5;
+    }
+  }
+}

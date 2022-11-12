@@ -1,17 +1,19 @@
 <div class="ui segment">
-    <div class="card-content">
-        <div class="job-id ui label">JOB ID: {{job.id}}</div>
+    <div class="card-content" (click)="onClickCard($event)">
+        <div class="job-id">{{job.id}}</div>
         <div class="progress">{{job.progress + '%'}}</div>
-        <div class="bangumi-name" *ngIf="!!job.bangumi">
-            Bangumi:
-            <a class="bangumi-link" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
+        <div class="download-speed">{{job.downloadSpeed | readableUnit: 'byte': 1}}/s</div>
+        <div class="size">{{job.size | readableUnit: 'byte': 1}}</div>
+        <div class="bangumi-name">
+            <a class="bangumi-link" *ngIf="job.bangumi" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
         </div>
-        <a *ngIf="!!job.bangumi" class="file-mapping anchor-button" (click)="onViewFileMapping()">View FileMapping</a>
-        <a *ngIf="job.status === mJobStatus.Complete" class="anchor-button" (click)="resendCompleteMessage()">Resend Complete Message</a>
-        <div class="eps-list" *ngIf="episodeNoList && episodeNoList.length > 0">
-            Episode:
-            <span class="ui label" *ngFor="let eps of episodeNoList">{{eps}}</span>
-        </div>
+        <div class="torrent-name">{{job.torrentName}}</div>
+        <div class="seeds">{{job.connectedSeeds}}({{job.seeds}})</div>
+        <div class="leechers">{{job.connectedLeechers}}({{job.leechers}})</div>
+        <div class="eta">{{job.eta | readableUnit: 'second': 1}}</div>
+        <a class="anchor-button" (click)="onViewDetail($event)">View Job Details</a>
+        <a *ngIf="job.bangumi" class="file-mapping anchor-button" (click)="onViewFileMapping($event)">View FileMapping</a>
+        <a *ngIf="job.status === mJobStatus.Complete && debugUtil" class="anchor-button" (click)="resendCompleteMessage($event)">Resend Complete Message</a>
     </div>
     <div class="ui bottom attached progress" [ngClass]="{
         success: job.status === mJobStatus.Complete,

@@ -1,0 +1,82 @@
+<div class="job-detail-container">
+    <div class="header-bar">
+        <a class="close-button" (click)="closePanel()">
+            <i class="chevron left icon"></i>
+        </a>
+        <div class="panel-title">Download Job</div>
+    </div>
+    <div class="job-basic-info">
+        <div class="job-id">JOB ID: {{job.id}}</div>
+        <div class="job-progress">
+            <div class="ui progress" [ngClass]="{
+        success: job.status === mJobStatus.Complete,
+        'blue active': job.status === mJobStatus.Downloading,
+        teal: job.status === mJobStatus.Pending,
+        warning: job.status === mJobStatus.Paused,
+        error: job.status === mJobStatus.Error,
+        disabled: job.status === mJobStatus.Removed}">
+                <div class="bar" [style.width]="job.progress + '%'">
+                    <div class="progress">{{job.progress + '%'}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="bangumi-name" *ngIf="!!job.bangumi">
+            Bangumi:
+            <a class="bangumi-link" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
+        </div>
+    </div>
+    <div class="job-summary">
+        <table class="job-info-table ui table">
+            <tbody>
+            <tr>
+                <td>Download Speed</td>
+                <td>{{job.downloadSpeed}}</td>
+            </tr>
+            <tr>
+                <td>Seeds(Total seeds)</td>
+                <td>{{job.connectedSeeds}}({{job.seeds}})</td>
+            </tr>
+            <tr>
+                <td>Leechers(Total Leechers)</td>
+                <td>{{job.connectedLeechers}}({{job.leechers}})</td>
+            </tr>
+            <tr>
+                <td>Torrent:</td>
+                <td>{{job.torrentUrl}}</td>
+            </tr>
+            <tr>
+                <td>Torrent Hash</td>
+                <td>{{job.torrentId}}</td>
+            </tr>
+            <tr *ngIf="job.videoId">
+                <td>VideoId</td>
+                <td>{{job.videoId}}</td>
+            </tr>
+            <tr>
+                <td>ETA</td>
+                <td>{{job.eta}}</td>
+            </tr>
+            <tr>
+                <td>Availability</td>
+                <td>{{job.availability}}</td>
+            </tr>
+            <tr>
+                <td>Priority</td>
+                <td>{{job.priority}}</td>
+            </tr>
+            <tr>
+                <td>Downloaded</td>
+                <td>{{job.downloaded}}</td>
+            </tr>
+            <tr>
+                <td>AmountLeft</td>
+                <td>{{job.amountLeft}}</td>
+            </tr>
+            <tr>
+                <td>ActiveTime</td>
+                <td>{{job.activeTime}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -12,7 +12,7 @@
                     <span class="header">
                         VideoId:
                         {{entry.videoId}}
-                        (Episode: {{entry.episode.episode_no}})
+                        <span *ngIf="fileMappingEnhanced">(Episode: {{entry.episode.episode_no}})</span>
                     </span>
                     <div class="description">{{entry.filePath}}</div>
                 </div>
