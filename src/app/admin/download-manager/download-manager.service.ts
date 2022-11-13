@@ -2,7 +2,7 @@ import { BaseService } from '../../../helpers/base.service';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DownloadJobStatus } from '../../entity/DownloadJobStatus';
-import { interval, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { DownloadJob } from '../../entity/DownloadJob';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { FileMapping } from '../../entity/FileMapping';
@@ -55,7 +55,7 @@ export class DownloadManagerService extends BaseService {
                     return this.getBangumiFromIds(Object.keys(idsDict))
                         .pipe(map((bangumiList: Bangumi[]) => {
                             jobs.forEach(job => {
-                                job.bangumi = bangumiList.find(bangumi => bangumi.id);
+                                job.bangumi = bangumiList.find(bangumi => bangumi.id === job.bangumiId);
                             });
                             return jobs;
                         }));
@@ -72,7 +72,15 @@ export class DownloadManagerService extends BaseService {
             url: `/download/job/${jobId}`
         };
         return this.sendRequest<{ data: DownloadJob, status: number }>(reqData)
-            .pipe(map(res => res.data));
+            .pipe(switchMap(res => {
+                const job = res.data;
+                job.progress = Math.floor(job.progress * 100 * 10) / 10;
+                return this.getBangumiFromIds([job.bangumiId])
+                    .pipe(map((bangumiList: Bangumi[]) => {
+                        job.bangumi = bangumiList[0];
+                        return job;
+                    }));
+            }));
     }
 
     public jobOperation(jobId: string, operation: 'pause' | 'resume' | 'delete'): Observable<any> {

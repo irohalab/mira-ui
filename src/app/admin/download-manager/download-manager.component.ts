@@ -8,8 +8,10 @@ import { switchMap } from 'rxjs/operators';
 import { AdminService } from '../admin.service';
 import { UIDialog } from '@irohalab/deneb-ui';
 import { DownloadJobDetailComponent } from './download-job-detail/download-job-detail.component';
+import { Title } from '@angular/platform-browser';
+import { environment } from '../../../environments/environment';
 
-const JOB_CARD_HEIGHT_REM = 4.5;
+const JOB_CARD_HEIGHT_REM = 4.2;
 
 type SearchType = 'Job ID' | 'Bangumi ID' | 'Bangumi Name';
 
@@ -54,7 +56,9 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
 
     constructor(private _downloadManagerService: DownloadManagerService,
                 private _adminService: AdminService,
-                private _dialog: UIDialog) {
+                private _dialog: UIDialog,
+                titleService: Title) {
+        titleService.setTitle(`下载管理 - ${environment.siteTitle}`);
         if (window) {
             this.cardHeight = getRemPixel(JOB_CARD_HEIGHT_REM)
         }

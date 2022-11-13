@@ -16,6 +16,8 @@ import {
 } from './stream-log-viewer/stream-log-helper';
 import { VertexInfoPanelComponent } from './vertex-info-panel/vertex-info-panel.component';
 import { VertexStatus } from '../../entity/VertexStatus';
+import { Title } from '@angular/platform-browser';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'video-process-job-detail',
@@ -47,7 +49,8 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
                 private _adminService: AdminService,
                 private _route: ActivatedRoute,
                 private _dialog: UIDialog,
-                toastService: UIToast) {
+                toastService: UIToast,
+                private titleService: Title) {
         this._toastRef = toastService.makeText();
     }
 
@@ -61,6 +64,7 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
             this._route.params.pipe(
                 switchMap(params => {
                     const jobId = params['id'];
+                    this.titleService.setTitle(`Video Job Detail - ${environment.siteTitle}`);
                     return this._videoProcessManagerService.getJob(jobId)
                         .pipe(combineLatestWith(this._videoProcessManagerService.getVertices(jobId)));
                 }),
@@ -198,7 +202,10 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
                     this.vertices = vertices;
                     for(const vertex of vertices) {
                         if (vertex.status === VertexStatus.Error) {
-                            this.errorInfo = JSON.stringify(vertex.error);
+                            this.errorInfo = Object.assign({}, vertex.error);
+                            if (this.errorInfo.stack) {
+                                this.errorInfo.stack = this.errorInfo.stack.replace(/\\n/g, '<br>');
+                            }
                         }
                     }
                 })

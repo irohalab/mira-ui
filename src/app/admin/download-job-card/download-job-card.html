@@ -1,5 +1,5 @@
-<div class="ui segment">
-    <div class="card-content" (click)="onClickCard($event)">
+<div class="ui segment" (click)="onClickCard($event)">
+    <div class="card-content">
         <div class="job-id">{{job.id}}</div>
         <div class="progress">{{job.progress + '%'}}</div>
         <div class="download-speed">{{job.downloadSpeed | readableUnit: 'byte': 1}}/s</div>

@@ -61,8 +61,11 @@
     </div>
     <div class="ui segment section-card" *ngIf="job && job.status === eJobStatus.UnrecoverableError ">
         <div class="ui header">Error Info</div>
-        <div class="error-info">
-            <pre>{{errorInfo}}</pre>
+        <div class="error-info" *ngIf="errorInfo">
+            <div class="error-type ui orange label">{{errorInfo.errorType}}</div>
+            <div class="error-message ui basic label">Message: <div class="detail">{{errorInfo.message}}</div></div>
+            <div class="error-vertex-id ui label">Vertex Id: <div class="detail">{{errorInfo.vertexId}}</div></div>
+            <pre class="error-stack" *ngIf="errorInfo.stack">{{errorInfo.stack}}</pre>
         </div>
     </div>
     <div class="ui segment section-card">

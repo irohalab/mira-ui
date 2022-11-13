@@ -5,6 +5,8 @@ import { VideoProcessJob } from '../../entity/VideoProcessJob';
 import { VideoProcessManagerService } from './video-process-manager.service';
 import { getRemPixel } from '../../../helpers/dom';
 import { switchMap } from 'rxjs/operators';
+import { Title } from '@angular/platform-browser';
+import { environment } from '../../../environments/environment';
 
 const JOB_CARD_HEIGHT_REM = 4.5;
 
@@ -23,7 +25,9 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
     eJobStatus = VideoProcessJobStatus;
     selectJobStatus: VideoProcessJobStatus = VideoProcessJobStatus.Running;
 
-    constructor(private _videoProcessManagerService: VideoProcessManagerService) {
+    constructor(private _videoProcessManagerService: VideoProcessManagerService,
+                titleService: Title) {
+        titleService.setTitle(`视频管理 - ${environment.siteTitle}`);
         if (window) {
             this.cardHeight = getRemPixel(JOB_CARD_HEIGHT_REM)
         }

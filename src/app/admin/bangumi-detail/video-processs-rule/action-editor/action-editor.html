@@ -24,7 +24,7 @@
                             <xhtml:div class="extract-source"><xhtml:span class="property-name">extractFrom:</xhtml:span>{{node.data.extractFrom}}</xhtml:div>
                             <xhtml:div class="extract-target"><xhtml:span class="property-name">extractTarget:</xhtml:span>{{node.data.extractTarget}}</xhtml:div>
                             <xhtml:div class="outputExtname"><xhtml:span class="property-name">outputExtname:</xhtml:span>{{node.data.outputExtname}}</xhtml:div>
-                            <xhtml:div class="outputExtname"><xhtml:span class="property-name">extractRegex:</xhtml:span>{{node.data.outputExtname}}</xhtml:div>
+                            <xhtml:div class="outputExtname"><xhtml:span class="property-name">extractRegex:</xhtml:span>{{node.data.extractRegex}}</xhtml:div>
                         </xhtml:div>
                     </xhtml:div>
                 </svg:foreignObject>
@@ -151,7 +151,7 @@
                 </div>
                 <!-- Below is optional -->
                 <div class="field">
-                    <label>outputExtname</label>
+                    <label>outputExtname (no ".")</label>
                     <input type="text"
                            [(ngModel)]="$any(actions[selectedActionId]).outputExtname"
                            (ngModelChange)="updateNode()"
@@ -165,7 +165,7 @@
                            [(ngModel)]="$any(actions[selectedActionId]).extractRegex"
                            (ngModelChange)="updateNode()"
                            [ngModelOptions]="{updateOn: 'blur'}"
-                           name="outputExtname"
+                           name="extractRegex"
                            placeholder="regex to match file/track"/>
                 </div>
                 <!-- extractorId is not supported currently -->

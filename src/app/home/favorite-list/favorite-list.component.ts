@@ -10,6 +10,8 @@ import { InfiniteList, UIToast, UIToastComponent, UIToastRef } from '@irohalab/d
 import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
 import { getRemPixel } from '../../../helpers/dom';
 import { BaseError } from '../../../helpers/error/BaseError';
+import { Title } from '@angular/platform-browser';
+import { environment } from '../../../environments/environment';
 
 let lastType: number;
 let lastScrollPosition: number = 0;
@@ -59,7 +61,9 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
 
     constructor(private _homeService: HomeService,
                 private _homeComponent: Home,
-                toastService: UIToast) {
+                toastService: UIToast,
+                titleService: Title) {
+        titleService.setTitle(`我的收藏 - ${environment.siteTitle}`);
         if (window) {
             this.cardHeight = getRemPixel(CARD_HEIGHT_REM)
         }

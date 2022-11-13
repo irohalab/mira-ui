@@ -37,6 +37,7 @@ export class VideoProcessRuleItemComponent implements OnInit, OnDestroy {
     editRule() {
         const dialogRef = this._dialogService.open<VideoProcessRuleEditorComponent>(VideoProcessRuleEditorComponent, { backdrop: true, stickyDialog: false});
         dialogRef.componentInstance.rule = this.rule;
+        dialogRef.componentInstance.saveOnClose = true;
         dialogRef.afterClosed()
             .pipe(
                 filter(result => !!result)
