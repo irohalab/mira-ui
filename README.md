@@ -25,3 +25,7 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+Thanks Jetbrains to provide open source license for the project. https://jb.gg/OpenSourceSupport.
+
+![WebStorm logo](https://resources.jetbrains.com/storage/products/company/brand/logos/WebStorm.png)
