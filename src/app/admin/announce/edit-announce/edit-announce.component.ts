@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UIDialogRef } from '@irohalab/deneb-ui';
 import { Announce } from '../../../entity/announce';
 import { Subscription } from 'rxjs';
-import * as moment from 'moment';
+import dayjs from 'dayjs';
 
 export function rangeLimit(group: FormGroup) {
     let start_time = group.get('start_time').value;
@@ -73,8 +73,8 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
         }
         let result = this.announceForm.value;
         result.position = this.position;
-        result.start_time = moment(result.start_time).valueOf();
-        result.end_time = moment(result.end_time).valueOf();
+        result.start_time = dayjs(result.start_time).valueOf();
+        result.end_time = dayjs(result.end_time).valueOf();
         this._dialogRef.close(result);
     }
 
@@ -98,8 +98,8 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
                 sort_order: [this.announce.sort_order, Validators.required],
                 content: [this.announce.content, Validators.required],
                 image_url: [this.announce.image_url, Validators.required],
-                start_time: [moment(this.announce.start_time), Validators.required],
-                end_time: [moment(this.announce.end_time), Validators.required]
+                start_time: [dayjs(this.announce.start_time), Validators.required],
+                end_time: [dayjs(this.announce.end_time), Validators.required]
             }, {validator: rangeLimit});
             this.position = this.announce.position;
         } else {
@@ -107,8 +107,8 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
                 sort_order: [0, Validators.required],
                 content: ['', Validators.required],
                 image_url: ['', Validators.required],
-                start_time: [moment(), Validators.required],
-                end_time: [moment().add(1, 'day'), Validators.required]
+                start_time: [dayjs(), Validators.required],
+                end_time: [dayjs().add(1, 'day'), Validators.required]
             }, {validator: rangeLimit})
         }
 

@@ -1,5 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import * as moment from 'moment';
+import * as duration from 'dayjs/plugin/duration';
+import dayjs from 'dayjs';
+
+dayjs.extend(duration);
 
 const byteUnit = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 const thresh = 1024;
@@ -20,7 +23,7 @@ export class ReadableUnit implements PipeTransform {
                 } while (Math.round(Math.abs(value) * r) / r >= thresh && u < byteUnit.length - 1);
                 return value.toFixed(decimal) + byteUnit[u];
             case 'second':
-                const duration = moment.duration(value, 'seconds');
+                const duration = dayjs.duration(value, 'seconds');
                 return duration.humanize();
             default:
                 console.log(value + ' fall to default in ReadableUnit');

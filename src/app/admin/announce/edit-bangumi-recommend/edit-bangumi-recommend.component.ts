@@ -1,10 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UIDialogRef } from '@irohalab/deneb-ui';
-import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { Bangumi } from '../../../entity';
 import { Announce } from '../../../entity/announce';
+import dayjs from 'dayjs';
 
 export const MAX_DATE_RANGE = 7; // days
 
@@ -72,8 +72,8 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
         let result = this.recommendForm.value;
         result.content = this.bangumi.id;
         result.position = Announce.POSITION_BANGUMI;
-        result.start_time = moment(result.start_time).valueOf();
-        result.end_time = moment(result.end_time).valueOf();
+        result.start_time = dayjs(result.start_time).valueOf();
+        result.end_time = dayjs(result.end_time).valueOf();
         this._dialogRef.close(result);
     }
 
@@ -94,14 +94,14 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.recommendForm = this._fb.group({
             sort_order: [0, Validators.required],
-            start_time: [moment(), Validators.required],
-            end_time: [moment().add(7, 'day'), Validators.required]
+            start_time: [dayjs(), Validators.required],
+            end_time: [dayjs().add(7, 'day'), Validators.required]
         },{validator: rangeLimitWithMaxRange});
         if (this.announce) {
             this.bangumi = this.announce.bangumi;
             this.recommendForm.get('sort_order').patchValue(this.announce.sort_order);
-            this.recommendForm.get('start_time').patchValue(moment(this.announce.start_time));
-            this.recommendForm.get('end_time').patchValue(moment(this.announce.end_time));
+            this.recommendForm.get('start_time').patchValue(dayjs(this.announce.start_time));
+            this.recommendForm.get('end_time').patchValue(dayjs(this.announce.end_time));
         }
 
         this.onFormChanged(this.recommendFormErrors, this.validationMessages, this.recommendForm);
