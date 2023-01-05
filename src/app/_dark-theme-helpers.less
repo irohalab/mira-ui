@@ -1,8 +1,8 @@
 @darkBackground: #1b1c1d;
 @darkForeground: #ffffff;
-@darkBorderColor: #5f5f5f;
+@darkBorderColor: #4b4b4b;
 @darkBoxShadowColor: #3f3f40;
-@darkLinkColor: #f3faff;
+@darkLinkColor: #e1e0e0;
 @darkLinkHoverColor: #e5f4fd;
 
 // apply on input element
@@ -23,6 +23,16 @@
     &:focus,
     &:hover {
       color: @darkLinkHoverColor;
+    }
+  }
+}
+
+.dark-anchor-button() {
+  .anchor-button {
+    color: @darkLinkColor;
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor
     }
   }
 }

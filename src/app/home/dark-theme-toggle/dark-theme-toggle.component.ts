@@ -30,7 +30,11 @@ export class DarkThemeToggleComponent implements OnInit, OnDestroy {
     }
 
     public changeTheme(isDarkTheme: boolean) {
-        console.log(isDarkTheme);
         this._darkThemeService.changeTheme(isDarkTheme ? DARK_THEME : LIGHT_THEME);
+        if (!isDarkTheme) {
+            document.body.classList.remove('dark-theme');
+        } else if (isDarkTheme && !document.body.classList.contains('dark-theme')) {
+            document.body.classList.add('dark-theme');
+        }
     }
 }

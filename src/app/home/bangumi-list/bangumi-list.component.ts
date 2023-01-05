@@ -1,5 +1,5 @@
 
-import {interval as observableInterval,  Subscription ,  Observable } from 'rxjs';
+import { interval as observableInterval, Subscription, Observable, delay } from 'rxjs';
 
 import {map, take} from 'rxjs/operators';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
@@ -7,7 +7,7 @@ import { HomeChild, HomeService } from '../home.service';
 import { Bangumi } from '../../entity/bangumi';
 import { ActivatedRoute } from '@angular/router';
 import { BaseError } from '../../../helpers/error/BaseError';
-import { InfiniteList, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, InfiniteList, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
 import { getRemPixel } from '../../../helpers/dom';
 import { Home } from '../home.component';
@@ -48,6 +48,8 @@ export class BangumiList extends HomeChild implements OnInit, OnDestroy {
 
     lastScrollPosition: number;
 
+    isDarkTheme: boolean;
+
     get isMovie(): boolean {
         if (typeof this._bangumiListService.isMovie !== 'undefined') {
             return this._bangumiListService.isMovie;
@@ -64,6 +66,7 @@ export class BangumiList extends HomeChild implements OnInit, OnDestroy {
     @ViewChild(InfiniteList, {static: true}) infiniteList: InfiniteList;
 
     constructor(homeService: HomeService,
+                private _darkThemeService: DarkThemeService,
                 private _homeComponent: Home,
                 private _route: ActivatedRoute,
                 private _bangumiListService: BangumiListService,
@@ -125,7 +128,7 @@ export class BangumiList extends HomeChild implements OnInit, OnDestroy {
                 order_by: 'air_date',
                 sort: 'desc'
             }).pipe(
-            map((result) => result.data))
+                map((result) => result.data))
             .subscribe(
                 (bangumiList) => {
                     this._allBangumi = bangumiList;
@@ -192,6 +195,10 @@ export class BangumiList extends HomeChild implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._route.params
                 .subscribe((params) => {

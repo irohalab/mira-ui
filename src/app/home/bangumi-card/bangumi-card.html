@@ -1,5 +1,5 @@
 <div class="ui container">
-    <a class="ui segment" [routerLink]="['/bangumi', bangumi.id]">
+    <a class="ui segment" [routerLink]="['/bangumi', bangumi.id]" [ngClass]="{inverted: isDarkTheme}">
         <div class="bangumi-list-item">
             <responsive-image class="cover-wrapper"
                               [src]="imageUrl"

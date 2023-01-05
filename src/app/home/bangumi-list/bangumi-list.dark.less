@@ -1,0 +1,26 @@
+@import "../../_dark-theme-helpers";
+.dark-bangumi-list-container() {
+  .filter-container {
+    background-color: @darkBackground;
+    color: @darkForeground;
+    border-bottom-color: @darkBorderColor;
+  }
+}
+
+.dark-search-result() {
+  background-color: @darkBackground;
+}
+
+.dark-no-search-result() {
+  background-color: @darkBackground;
+  .no-result-tips {
+    color: darken(@darkForeground, 15%);
+  }
+}
+
+.dark-loader() {
+  background-color: @darkBackground;
+  .loader {
+    color: #c5c5c5;
+  }
+}
