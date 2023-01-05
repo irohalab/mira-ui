@@ -6,6 +6,7 @@ import {FAVORITE_LABEL} from '../../entity/constants';
 import { Subscription } from 'rxjs';
 import { Announce } from '../../entity/announce';
 import { PersistStorage } from '../../user-service/persist-storage';
+import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 
 const BANGUMI_TYPE_KEY = 'default_bangumi_type';
 
@@ -28,7 +29,11 @@ export class DefaultComponent extends HomeChild implements OnInit, OnDestroy {
     announce_in_banner: Announce;
     announce_in_bangumi: Announce[];
 
-    constructor(homeService: HomeService, private _persistStorage: PersistStorage) {
+    isDarkTheme: boolean;
+
+    constructor(homeService: HomeService,
+                private _persistStorage: PersistStorage,
+                private _darkThemeService: DarkThemeService) {
         super(homeService);
     }
 
@@ -51,6 +56,10 @@ export class DefaultComponent extends HomeChild implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME })
+        );
         // this.homeService.recentEpisodes()
         //   .subscribe(
         //     (episodeList: Episode[]) => {

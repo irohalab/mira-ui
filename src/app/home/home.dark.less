@@ -1,0 +1,49 @@
+@import "../_dark-theme-helpers";
+
+.navbar-dark() {
+  .navbar {
+    background-color: @darkBackground;
+    border-bottom-color: @darkBorderColor;
+    .sidebar-toggle {
+      color: darken(@darkForeground, 25%);
+      &:focus,
+      &:hover {
+        color: @darkForeground;
+      }
+    }
+    .brand {
+      color: darken(@darkForeground, 5%);
+    }
+    .ui.static-search.input {
+      > input[type="text"] {
+        .dark-input();
+      }
+    }
+
+    .right-area {
+      .search-toggle-button {
+        color: @darkForeground;
+      }
+    }
+    .float-search-frame {
+      background-color: @darkBackground;
+      input[type="text"] {
+        color: @darkForeground;
+      }
+      > .close-button {
+        font-size: 1.5rem;
+        padding: 0 1em;
+        cursor: pointer;
+        color: darken(@darkForeground, 25%);
+      }
+    }
+  }
+}
+
+.page-footer() {
+  #page-footer {
+    background-color: @darkBackground;
+    color: @darkForeground;
+    border-top-color: @darkBorderColor;
+  }
+}

@@ -1,9 +1,16 @@
+@import "../../_dark-theme-helpers";
+
 .on-air-loading-wrapper {
   height: 21rem;
   position: static !important;
 }
 .default-container {
   padding-top: 2rem;
+  &.dark-theme {
+    .bangumi-card {
+      .dark-card();
+    }
+  }
 }
 
 .recommend-header {

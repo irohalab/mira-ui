@@ -1,13 +1,13 @@
 
 import {fromEvent as observableFromEvent, Subscription } from 'rxjs';
-import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { HomeService } from './home.service';
 import { Bangumi, User } from '../entity';
 import { Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { AlertDialog } from '../alert-dialog/alert-dialog.component';
-import { UIDialog } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog } from '@irohalab/deneb-ui';
 import { UserService } from '../user-service';
 import { environment } from '../../environments/environment';
 
@@ -48,7 +48,11 @@ export class Home implements OnInit, OnDestroy {
 
     sidebarToggle = new EventEmitter<string>();
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(titleService: Title,
+                private _darkThemeService: DarkThemeService,
                 private _homeService: HomeService,
                 private _dialogService: UIDialog,
                 private _userService: UserService,
@@ -113,6 +117,12 @@ export class Home implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {
+                    this.isDarkTheme = theme === DARK_THEME;
+                })
+        );
         this._subscription.add(this._userService.userInfo
             .subscribe(
                 (user: User) => {

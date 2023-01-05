@@ -1,0 +1,28 @@
+@darkBackground: #1b1c1d;
+@darkForeground: #ffffff;
+@darkBorderColor: #5f5f5f;
+@darkBoxShadowColor: #3f3f40;
+@darkLinkColor: #f3faff;
+@darkLinkHoverColor: #e5f4fd;
+
+// apply on input element
+.dark-input() {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  background-color: transparent !important;
+  //box-shadow: 0px 0px 0px 2px rgb(255 255 255 / 50%) inset !important;
+  color: @darkForeground;
+}
+
+.dark-card() {
+  background-color: @darkBackground;
+  color: @darkForeground;
+  border-color: @darkBorderColor;
+  box-shadow: 0 1px 3px 0 @darkBoxShadowColor, 0 0 0 1px @darkBoxShadowColor;
+  a[href] {
+    color: @darkLinkColor;
+    &:focus,
+    &:hover {
+      color: @darkLinkHoverColor;
+    }
+  }
+}

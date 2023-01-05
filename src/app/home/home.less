@@ -1,16 +1,27 @@
+@import '../_dark-theme-helpers';
+@import 'home.dark';
+
 @navbarHeight: 3.5rem;
 @footerHeight: 8em;
+
+@defaultBackground: #ffffff;
 
 :host {
   display: block;
   height: 100%;
   padding-top: @navbarHeight;
+  &.dark-theme {
+    color: @darkForeground;
+    background-color: @darkBackground;
+    .navbar-dark();
+    .page-footer();
+  }
 }
 
 .navbar {
   width: 100%;
   height: @navbarHeight;
-  background-color: #fff;
+  background-color: @defaultBackground;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -81,7 +92,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background: #fff;
+    background: @defaultBackground;
     z-index: 202;
     padding: 0 1.5rem 0 0;
     > .close-button {
@@ -134,7 +145,7 @@
   width: 100%;
   margin-top: -@footerHeight;
   height: @footerHeight;
-  background-color: #fff;
+  background-color: @defaultBackground;
   border-top: 1px solid #ccc;
   display: flex;
   flex-direction: column;

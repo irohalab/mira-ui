@@ -47,6 +47,7 @@ import { UserActionPanelComponent } from './user-action/user-action-panel/user-a
 import { BrowserExtensionTipComponent } from './user-action/browser-extension-tip/browser-extension-tip.component';
 import { FeedbackComponent } from './play-episode/feedback/feedback.component';
 import { RevealExtraComponent } from './play-episode/reveal-extra/reveal-extra.component';
+import { DarkThemeToggleComponent } from './dark-theme-toggle/dark-theme-toggle.component';
 
 
 @NgModule({
@@ -78,7 +79,8 @@ import { RevealExtraComponent } from './play-episode/reveal-extra/reveal-extra.c
         UserActionPanelComponent,
         BrowserExtensionTipComponent,
         FeedbackComponent,
-        RevealExtraComponent
+        RevealExtraComponent,
+        DarkThemeToggleComponent
     ],
     providers: [
         HomeService,
