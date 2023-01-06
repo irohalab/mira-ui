@@ -1,12 +1,12 @@
 
-import {interval as observableInterval,  Subscription ,  Observable ,  Subject } from 'rxjs';
+import { interval as observableInterval, Subscription, Subject } from 'rxjs';
 
 import {mergeMap, map, take} from 'rxjs/operators';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HomeService } from '../home.service';
 import { Bangumi } from '../../entity/bangumi';
 import { Home } from '../home.component';
-import { InfiniteList, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, InfiniteList, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
 import { getRemPixel } from '../../../helpers/dom';
 import { BaseError } from '../../../helpers/error/BaseError';
@@ -56,11 +56,13 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
     timestampList: number[];
 
     lastScrollPosition: number;
+    isDarkTheme: boolean;
 
     @ViewChild(InfiniteList, {static: true}) infiniteList: InfiniteList;
 
     constructor(private _homeService: HomeService,
                 private _homeComponent: Home,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast,
                 titleService: Title) {
         titleService.setTitle(`我的收藏 - ${environment.siteTitle}`);
@@ -191,6 +193,10 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._statusSubject.asObservable().pipe(
                 mergeMap((status) => {

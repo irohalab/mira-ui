@@ -1,7 +1,7 @@
-<div class="favorite-list-container">
+<div class="favorite-list-container" [ngClass]="{'dark-theme': isDarkTheme}">
     <div class="filter-container" (click)="onClickFilterContainer()">
         <div class="ui container">
-            <div class="ui secondary pointing menu">
+            <div class="ui secondary pointing menu" [ngClass]="{inverted: isDarkTheme}">
                 <a class="item" [ngClass]="{active: favoriteStatus === 1}" (click)="onStatusChange(1)">想看</a>
                 <a class="item" [ngClass]="{active: favoriteStatus === 3}" (click)="onStatusChange(3)">在看</a>
                 <a class="item" [ngClass]="{active: favoriteStatus === 2}" (click)="onStatusChange(2)">看过</a>

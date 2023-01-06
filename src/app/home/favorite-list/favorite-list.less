@@ -1,3 +1,6 @@
+@import '../../_dark-theme-helpers';
+@import 'favorite-list.dark';
+
 :host {
   position: fixed;
   top: 3.5rem;
@@ -32,6 +35,13 @@
   width: 100%;
   height: 100%;
   background-color: #f0f0f0;
+  &.dark-theme {
+    background-color: transparent;
+    .dark-dropdown();
+    .dark-anchor-button();
+    .dark-loader();
+    .dark-no-search-result();
+  }
   .filter-container {
     position: absolute;
     top: 0;
