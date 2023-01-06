@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ChromeExtensionService, ENABLED_STATUS } from '../../browser-extension/chrome-extension.service';
@@ -22,8 +22,12 @@ export class WebHookComponent implements OnInit, OnDestroy {
 
     isBgmEnabled: boolean;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _http: HttpClient,
                 private _chromeExtensionService: ChromeExtensionService,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast,
                 titleService: Title) {
         titleService.setTitle(`Web Hook列表 - ${environment.siteTitle}`);
@@ -31,6 +35,10 @@ export class WebHookComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._http.get<{data: any[]}>('/api/web-hook/').pipe(
                 map((res) => {

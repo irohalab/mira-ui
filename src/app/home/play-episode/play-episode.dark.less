@@ -1,0 +1,39 @@
+@import '../../_dark-theme-helpers';
+
+.dark-episode-info-container() {
+  .episode-info-container {
+    .episode-title {
+      .episode-name {
+        color: darken(@darkForeground, 25%);
+      }
+    }
+    .episode-list {
+      .episode-link.ui.segment {
+        background: @darkPanelBg;
+        color: @darkLinkColor;
+        &:focus,
+        &:hover {
+          color: @darkLinkHoverColor;
+        }
+      }
+    }
+    .bangumi-info {
+      .bangumi-basic-info {
+        .bangumi-title {
+          &.name {
+            color: darken(@darkForeground, 20%);
+          }
+          .external-link {
+            color: darken(@darkForeground, 25%);
+          }
+        }
+      }
+    }
+  }
+}
+
+.dark-theater-backdrop() {
+  .theater-backdrop {
+    background-color: @darkBackground;
+  }
+}

@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 
 import { filter, mergeMap, switchMap, tap } from 'rxjs/operators';
@@ -38,6 +38,8 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
 
     currentVideoFile: VideoFile;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
     /**
      * determine if the screen is in portrait orientation.
      * consider w/h <= 0.65 is portrait.
@@ -56,6 +58,7 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
                 private _chromeExtensionService: ChromeExtensionService,
                 private _dialogService: UIDialog,
                 private _videoPlayerService: VideoPlayerService,
+                private _darkThemeService: DarkThemeService,
                 toast: UIToast) {
         super(homeService);
         this._toastRef = toast.makeText();
@@ -98,6 +101,10 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._videoPlayerService.onPlayNextEpisode
                 .subscribe(episodeId => {

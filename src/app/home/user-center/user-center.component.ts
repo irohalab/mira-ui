@@ -1,10 +1,10 @@
 
 import {filter, mergeMap} from 'rxjs/operators';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../entity';
 import { PersistStorage, UserService } from '../../user-service';
 import { Subscription } from 'rxjs';
-import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { BaseError } from '../../../helpers/error';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { passwordMatch } from '../../form-utils';
@@ -77,11 +77,15 @@ export class UserCenter implements OnInit, OnDestroy {
 
     webHookList: WebHook[];
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _userSerivce: UserService,
                 private _userCenterService: UserCenterService,
                 private _fb: FormBuilder,
                 private _chromeExtensionService: ChromeExtensionService,
                 private _persistStorage: PersistStorage,
+                private _darkThemeService: DarkThemeService,
                 titleService: Title,
                 toastService: UIToast) {
         titleService.setTitle(`用户设置 - ${environment.siteTitle}`);
@@ -129,6 +133,10 @@ export class UserCenter implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.buildForm();
         const chromeExtId = this._persistStorage.getItem(CHROME_EXT_ID_KEY, null);
         if (chromeExtId) {

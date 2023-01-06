@@ -1,3 +1,6 @@
+@import '../../_dark-theme-helpers';
+@import '../web-hook/web-hook.dark';
+
 :host {
   background-color: #f0f0f0;
   display: block;
@@ -9,6 +12,15 @@
   bottom: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  &.dark-theme {
+    background-color: @darkBackground;
+    input[type="text"],
+    input[type="password"] {
+      .dark-input();
+    }
+    .dark-segment-panel();
+    .dark-web-hook-list();
+  }
 }
 .user-center-container {
   width: 700px;

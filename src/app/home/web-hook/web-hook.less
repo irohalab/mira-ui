@@ -1,3 +1,6 @@
+@import '../../_dark-theme-helpers';
+@import 'web-hook.dark';
+
 :host {
   background-color: #f0f0f0;
   display: block;
@@ -9,6 +12,11 @@
   bottom: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  &.dark-theme {
+    background-color: @darkBackground;
+    .dark-segment-panel();
+    .dark-web-hook-list();
+  }
 }
 
 .web-hook-list-container {
