@@ -2,21 +2,23 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
-    EventEmitter,
+    EventEmitter, HostBinding,
     Input,
-    OnChanges, Output,
+    OnChanges, OnDestroy, OnInit, Output,
     SimpleChanges,
     ViewChild
 } from '@angular/core';
 import { RATING_COLOR, RATING_TEXT } from '../rating.component';
-import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'my-review',
     templateUrl: './my-review.html',
     styleUrls: ['./my-review.less']
 })
-export class MyReviewComponent implements AfterViewInit, OnChanges {
+export class MyReviewComponent implements AfterViewInit, OnChanges, OnInit, OnDestroy {
+    private _subscription = new Subscription();
     private _toastRef: UIToastRef<UIToastComponent>;
     // exclude the first time OnChanges called.
     private _measured = false;
@@ -29,6 +31,9 @@ export class MyReviewComponent implements AfterViewInit, OnChanges {
 
     expanded = false;
     needTrimText = false;
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     @Output()
     editReview = new EventEmitter<any>();
@@ -59,8 +64,19 @@ export class MyReviewComponent implements AfterViewInit, OnChanges {
         return RATING_TEXT[this.rating];
     }
 
-    constructor(toast: UIToast) {
+    constructor(toast: UIToast, private _darkThemeService: DarkThemeService) {
         this._toastRef = toast.makeText();
+    }
+
+    ngOnDestroy(): void {
+        this._subscription.unsubscribe();
+    }
+
+    ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
     }
 
     onClickEditReview() {

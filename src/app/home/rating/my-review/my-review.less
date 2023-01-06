@@ -1,9 +1,16 @@
+@import '../../../_dark-theme-helpers';
+@import 'my-review.dark';
+
 :host {
   display: block;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   position: relative;
+  &.dark-theme {
+    .dark-my-review();
+    .dark-anchor-button();
+  }
 }
 
 .my-review-container {

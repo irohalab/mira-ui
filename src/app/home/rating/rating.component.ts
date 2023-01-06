@@ -1,5 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { Rating } from '../../entity/rating';
+import { Subscription } from 'rxjs';
+import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 
 export const RATING_TEXT = ['无评分', '不忍直视', '很差', '差', '较差', '不过不失', '还行', '推荐', '力荐', '神作', '超神作'];
 export const RATING_COLOR = [
@@ -21,9 +23,14 @@ export const RATING_COLOR = [
     templateUrl: './rating.html',
     styleUrls: ['./rating.less']
 })
-export class RatingComponent {
+export class RatingComponent implements OnInit, OnDestroy {
+    private _subscription = new Subscription();
+
     @Input()
     rating: Rating;
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     get countDist(): {r: number, c: number}[] {
         if (this.rating) {
@@ -67,5 +74,16 @@ export class RatingComponent {
             return RATING_COLOR[0];
         }
         return RATING_COLOR[this.roundedScore];
+    }
+    constructor(private _darkThemeService: DarkThemeService) {
+    }
+    ngOnDestroy(): void {
+        this._subscription.unsubscribe();
+    }
+    ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
     }
 }

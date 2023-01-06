@@ -1,0 +1,39 @@
+@import '../../../_dark-theme-helpers';
+
+@gradientStart: rgba(27,28,29, 0);
+@gradientEnd: rgba(27,28,29, 1);
+
+.dark-my-review() {
+  .my-review-container {
+    .rating-container {
+      .rating-row {
+        .rating-score {
+          color: darken(@darkForeground, 10%);
+        }
+        .rating-text {
+          color: black;
+          font-weight: 600;
+        }
+      }
+      .rating-star {
+        .rating-bar {
+          color: #9d9d9d;
+        }
+      }
+    }
+    .review-comment-container {
+      .review-text {
+        color: darken(@darkForeground, 10%);
+        .paragraph-light {
+          /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,ffffff+100&0+0,1+100 */
+          background: -moz-linear-gradient(top, @gradientStart 0%, @gradientEnd 100%); /* FF3.6-15 */
+          background: -webkit-linear-gradient(top, @gradientStart 0%, @gradientEnd 100%); /* Chrome10-25,Safari5.1-6 */
+          background: linear-gradient(to bottom, @gradientStart 0%, @gradientEnd 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        }
+      }
+      .no-review-hint {
+        color: darken(@darkForeground, 30%);
+      }
+    }
+  }
+}

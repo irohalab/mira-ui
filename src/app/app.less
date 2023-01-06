@@ -1,4 +1,14 @@
+@import '_dark-theme-helpers';
 app {
   display: block;
   height: 100%;
+}
+
+/* global a style in dark mode */
+.dark-theme a {
+  color: #9abbdc;
+  &:focus,
+  &:hover {
+    color: lighten(#9abbdc, 10%);
+  }
 }

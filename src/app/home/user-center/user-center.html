@@ -146,7 +146,7 @@
             正在添加Web Hook
         </div>
     </div>
-    <div class="ui active inverted dimmer" *ngIf="isLoading">
+    <div class="ui active dimmer" *ngIf="isLoading" [ngClass]="{inverted: !isDarkTheme}">
         <div class="ui large text loader">
             Loading Web hooks
         </div>

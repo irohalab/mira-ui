@@ -1,0 +1,42 @@
+@import "../../../_dark-theme-helpers";
+
+.dark-action-bar() {
+  .action-bar {
+    border-bottom-color: @darkBorderColor;
+    background-color: transparent;
+    .back-button {
+      color: darken(@darkForeground, 25%);
+    }
+    .title-text {
+      color: darken(@darkForeground, 10%);
+      .bangumi-name {
+        color: @darkForeground;
+      }
+    }
+  }
+}
+
+.dark-edit-review-container() {
+  .edit-review-container {
+    form.ui.form {
+      textarea[name="comment"] {
+        .dark-input();
+      }
+      .word-left {
+        color: @darkForeground;
+        &.warning {
+          color: lighten(#ff7813, 10%);
+        }
+      }
+      .ui.huge.star.rating .icon {
+        color: #9d9d9d;
+      }
+      .rating-text {
+        color: lighten(#078fdf, 10%);
+      }
+    }
+    .footer {
+      background-color: transparent;
+    }
+  }
+}

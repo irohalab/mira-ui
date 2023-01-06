@@ -1,3 +1,6 @@
+@import '../../../_dark-theme-helpers';
+@import 'edit-review-dialog.dark';
+
 :host {
   display: block;
   box-sizing: border-box;
@@ -24,6 +27,12 @@
   background-color: #fff;
   overflow: hidden;
   padding-top: 4rem;
+  &.dark-theme {
+    color: @darkForeground;
+    background-color: @darkBackground;
+    .dark-action-bar();
+    .dark-edit-review-container();
+  }
 }
 
 .action-bar {
@@ -93,11 +102,7 @@
       }
     }
     .rating-text {
-      font-size: 1rem;
       color: #078fdf;
-      display: inline-flex;
-      margin-left: 1rem;
-      vertical-align: top;
       > .score {
         padding: 0 0.5em;
       }

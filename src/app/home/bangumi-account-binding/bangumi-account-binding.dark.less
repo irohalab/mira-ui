@@ -1,0 +1,17 @@
+@import '../../_dark-theme-helpers';
+
+.dark-bangumi-bound() {
+  .bangumi-bound {
+    .avatar {
+      border-color: @darkBorderColor;
+    }
+    .info {
+      > .nickname {
+        color: darken(@darkForeground, 30%);
+      }
+      > .username {
+        color: darken(@darkForeground, 15%);
+      }
+    }
+  }
+}

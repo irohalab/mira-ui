@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { filter, mergeMap } from 'rxjs/operators';
 import {
@@ -9,6 +9,7 @@ import {
     INITIAL_STATE_VALUE,
     LOGON_STATUS
 } from '../../browser-extension/chrome-extension.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
     selector: 'bangumi-account-binding',
@@ -31,10 +32,16 @@ export class BangumiAccountBindingComponent implements OnInit, OnDestroy {
 
     isLoading = true;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _chromeExtensionService: ChromeExtensionService,
                 private _fb: FormBuilder,
+                private _darkThemeService: DarkThemeService,
+                titleService: Title,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
+        titleService.setTitle('关联Bangumi账户');
     }
 
     login(event: Event) {
@@ -81,6 +88,10 @@ export class BangumiAccountBindingComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME})
+        );
         this.authForm = this._fb.group({
             username: ['', Validators.required],
             password: ['', Validators.required]

@@ -1,6 +1,12 @@
+@import '../../_dark-theme-helpers';
+@import 'rating.dark';
+
 :host {
   display: block;
   box-sizing: border-box;
+  &.dark-theme {
+    .dark-rating();
+  }
 }
 
 .rating-container {

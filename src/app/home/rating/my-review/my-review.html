@@ -7,7 +7,7 @@
         <div class="rating-star">
             <div class="rating-bar">
                 <i class="star icon" *ngFor="let s of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
-                   [ngClass]="{'empty': s > rating, 'half': s > rating && s - rating < 1}"></i>
+                   [ngClass]="{'outline': s > rating, 'half': s > rating && s - rating < 1}"></i>
             </div>
         </div>
     </div>
@@ -18,7 +18,7 @@
         </div>
         <div class="no-review-hint" *ngIf="!comment" [ngClass]="{'no-button': !!comment || !!rating}">
             <div class="hint-text">暂时还没有评论</div>
-            <button type="button" class="ui basic tiny button" (click)="onClickEditReview()">
+            <button type="button" class="ui basic tiny button" [ngClass]="{inverted: isDarkTheme}" (click)="onClickEditReview()">
                 <i class="edit icon"></i> 立即评价
             </button>
         </div>

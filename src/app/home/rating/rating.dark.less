@@ -1,0 +1,23 @@
+@import '../../_dark-theme-helpers';
+
+.dark-rating() {
+  .rating-container {
+    .rating-summary {
+      .rating-row {
+        > .rating-score {
+          color: darken(@darkForeground, 25%);
+        }
+
+        > .text {
+          color: black;
+          font-weight: 600;
+        }
+      }
+      .star-row {
+        .rating-bar {
+          color: #9d9d9d;
+        }
+      }
+    }
+  }
+}

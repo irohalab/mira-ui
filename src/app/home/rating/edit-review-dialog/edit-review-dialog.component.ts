@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Bangumi } from '../../../entity';
 import { RATING_TEXT } from '../rating.component';
@@ -37,8 +37,12 @@ export class EditReviewDialogComponent implements OnInit, OnDestroy {
 
     isSaving = false;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _dialogRef: UIDialogRef<EditReviewDialogComponent>,
                 private _fb: FormBuilder,
+                private _darkThemeService: DarkThemeService,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
     }
@@ -52,7 +56,6 @@ export class EditReviewDialogComponent implements OnInit, OnDestroy {
             this.hoveringText = RATING_TEXT[s];
         }
     }
-
 
     onSelectRating(s: number) {
         this.rating = s;
@@ -96,6 +99,10 @@ export class EditReviewDialogComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.favorite_status = this.bangumi.favorite_status;
         this.reviewForm = this._fb.group({
             comment: ['', Validators.maxLength(200)]
