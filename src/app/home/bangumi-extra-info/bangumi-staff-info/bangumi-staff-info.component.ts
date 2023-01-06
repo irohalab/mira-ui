@@ -1,5 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnInit } from '@angular/core';
 import { Staff } from '../interfaces';
+import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'bangumi-staff-info',
@@ -7,6 +9,8 @@ import { Staff } from '../interfaces';
     styleUrls: ['./bangumi-staff-info.less']
 })
 export class BangumiStaffInfoComponent implements OnInit {
+    private _subscription = new Subscription();
+
     @Input()
     staffList: Staff[];
 
@@ -14,12 +18,23 @@ export class BangumiStaffInfoComponent implements OnInit {
 
     jobs: string[];
 
-    constructor() {
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
+    constructor(private _darkThemeService: DarkThemeService) {
         this.staffMap = {};
         this.jobs = [];
     }
 
+    ngOnDestroy(): void {
+        this._subscription.unsubscribe();
+    }
+
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME;})
+        );
         this.staffList.forEach(staff => {
             staff.jobs.forEach(job => {
                 if (!this.staffMap[job]) {
@@ -30,4 +45,5 @@ export class BangumiStaffInfoComponent implements OnInit {
             });
         });
     }
+
 }

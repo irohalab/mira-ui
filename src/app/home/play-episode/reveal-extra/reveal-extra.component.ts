@@ -1,7 +1,7 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { ChromeExtensionService, ENABLED_STATUS } from '../../../browser-extension/chrome-extension.service';
 import { Subscription } from 'rxjs';
-import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Bangumi } from '../../../entity';
 
 @Component({
@@ -21,8 +21,10 @@ export class RevealExtraComponent implements OnInit, OnDestroy {
 
     isReveal = false;
     isEnabled = false;
+    isDarkTheme: boolean;
 
     constructor(private _chromeExtensionService: ChromeExtensionService,
+                private _darkThemeService: DarkThemeService,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
     }
@@ -49,6 +51,10 @@ export class RevealExtraComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME;})
+        );
         this._subscription.add(
             this._chromeExtensionService.isEnabled
                 .subscribe((isEnabled) => {

@@ -1,8 +1,14 @@
+@import '../bangumi-extra-info.dark';
+
 :host {
   display: block;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+  &.dark-theme {
+    .dark-crt-header();
+    .dark-chara-info();
+  }
 }
 
 .crt-header {

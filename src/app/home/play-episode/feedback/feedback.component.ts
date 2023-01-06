@@ -1,13 +1,15 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { UIDialogRef } from '@irohalab/deneb-ui';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
+import { DARK_THEME, DarkThemeService, UIDialogRef } from '@irohalab/deneb-ui';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'feedback-dialog',
     templateUrl: './feedback.html',
     styleUrls: ['./feedback.less']
 })
-export class FeedbackComponent implements OnInit {
+export class FeedbackComponent implements OnInit, OnDestroy {
+    private _subscription = new Subscription();
 
     feedbackForm: FormGroup;
 
@@ -15,8 +17,16 @@ export class FeedbackComponent implements OnInit {
 
     pickedIndex = -1;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _dialogRef: UIDialogRef<FeedbackComponent>,
+                private _darkThemeService: DarkThemeService,
                 private _fb: FormBuilder) {
+    }
+
+    ngOnDestroy(): void {
+        this._subscription.unsubscribe();
     }
 
     pickIssue(index: number) {
@@ -39,6 +49,10 @@ export class FeedbackComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME;})
+        );
         this.feedbackForm = this._fb.group({
             desc: ['']
         });

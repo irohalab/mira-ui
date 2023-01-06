@@ -1,0 +1,38 @@
+@import "../../_dark-theme-helpers";
+
+.dark-crt-header() {
+  .crt-header, .staff-header {
+    border-bottom-color: lighten(@darkBorderColor, 10%);
+    color: darken(@darkForeground, 20%);
+  }
+}
+
+.dark-chara-info() {
+  .character-wrapper {
+    .chara-avatar {
+      border-color: #606060;
+    }
+    .chara-info {
+      > .main-info {
+        border-bottom-color: lighten(@darkBorderColor, 10%);
+      }
+      > .extra-info {
+        > .name-cn {
+          color: darken(@darkForeground, 15%);
+        }
+      }
+      > .actor-info {
+        .actor-key {
+          color: darken(@darkForeground, 15%);
+        }
+        .actor-name-link {
+          color: darken(@darkForeground, 20%);
+          &:hover,
+          &:focus {
+            color: #5ea5e8;
+          }
+        }
+      }
+    }
+  }
+}

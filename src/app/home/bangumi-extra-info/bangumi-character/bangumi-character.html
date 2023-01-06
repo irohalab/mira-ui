@@ -11,7 +11,7 @@
                     <a [href]="character.url" target="_blank">{{character.name}}</a>
                 </div>
                 <div class="extra-info">
-                    <span class="ui mini basic label chara-role">{{character.role_name}}</span>
+                    <span class="ui mini label chara-role" [ngClass]="{grey: isDarkTheme, basic: !isDarkTheme}">{{character.role_name}}</span>
                     <span class="name-cn">{{character.name_cn}}</span>
                 </div>
                 <div class="actor-info" *ngIf="!!character.actors">
