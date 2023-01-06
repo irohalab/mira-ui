@@ -8,6 +8,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ClientError } from '../../helpers/error/ClientError';
 import { environment } from '../../environments/environment';
+import { removeDarkTheme } from '../../helpers/dark-theme-helper';
 
 
 /**
@@ -41,6 +42,7 @@ export class Register implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        removeDarkTheme();
         let inviteCode;
         if (location.search) {
             let queryMatch = /invite=([0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})/ig.exec(location.search);

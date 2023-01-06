@@ -7,6 +7,7 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { removeDarkTheme } from '../../helpers/dark-theme-helper';
 
 
 @Component({
@@ -46,6 +47,7 @@ export class Login implements OnInit, OnDestroy {
     };
 
     ngOnInit(): void {
+        removeDarkTheme();
         this.title.setTitle(`登录 - ${this.siteTitle}`);
         this.buildForm();
         this._subscription.add(

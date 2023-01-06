@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../user-service';
 import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { BaseError } from '../../helpers/error';
+import { removeDarkTheme } from '../../helpers/dark-theme-helper';
 @Component({
     selector: 'reset-pass',
     templateUrl: './reset-pass.html',
@@ -45,6 +46,7 @@ export class ResetPass implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        removeDarkTheme();
         let searchString = window.location.search;
         if (searchString) {
             let params = new URLSearchParams(searchString.substring(1, searchString.length));

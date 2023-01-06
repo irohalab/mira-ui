@@ -4,6 +4,7 @@ import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { UserService } from '../user-service/user.service';
 import {BaseError} from '../../helpers/error/BaseError';
 import { ClientError } from '../../helpers/error/ClientError';
+import { removeDarkTheme } from '../../helpers/dark-theme-helper';
 
 @Component({
     selector: 'forget-pass',
@@ -21,6 +22,7 @@ export class ForgetPass implements OnDestroy {
 
     constructor(private _userService: UserService,
                 toast: UIToast) {
+        removeDarkTheme();
         this._toastRef = toast.makeText();
     }
 

@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { UserService } from '../user-service/user.service';
 import { EmailConfirmService } from './email-confirm.service';
+import { removeDarkTheme } from '../../helpers/dark-theme-helper';
 
 @Component({
     selector: 'email-confirm',
@@ -24,6 +25,7 @@ export class EmailConfirm implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        removeDarkTheme();
         this.isLoading = true;
         let searchString = window.location.search;
         if (searchString) {
