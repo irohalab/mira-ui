@@ -1,5 +1,5 @@
 
-import {fromEvent as observableFromEvent,  Observable, Subscription } from 'rxjs';
+import { fromEvent as observableFromEvent, Observable, Subscription } from 'rxjs';
 
 import {filter, tap, mergeMap} from 'rxjs/operators';
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { UserService } from '../../user-service';
 import { ChromeExtensionService, ENABLED_STATUS } from '../../browser-extension/chrome-extension.service';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { AuthError } from '../../../helpers/error';
 import { WatchService } from '../watch.service';
 import { environment } from '../../../environments/environment';
@@ -37,8 +37,11 @@ export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
     isExtraInfoEnabled = false;
     extraInfo: any;
 
+    isDarkTheme: boolean;
+
     constructor(homeService: HomeService,
                 userService: UserService,
+                private _darkThemeService: DarkThemeService,
                 private _chromeExtensionService: ChromeExtensionService,
                 private _dialog: UIDialog,
                 private _route: ActivatedRoute,
@@ -76,6 +79,10 @@ export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._route.params.pipe(
                 mergeMap((params) => {

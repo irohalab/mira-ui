@@ -1,5 +1,5 @@
-<div class="user-action-panel-container">
-    <div class="ui secondary vertical compact menu">
+<div class="user-action-panel-container" [ngClass]="{'dark-theme': isDarkTheme}">
+    <div class="ui secondary vertical compact menu" [ngClass]="{inverted: isDarkTheme}">
         <div *ngIf="!!bgmAccountInfo" class="header bgm-account-info">
             <img *ngIf="!!bgmAccountInfo" [src]="bgmAccountInfo.avatar.medium" class="bangumi-avatar" alt="bangumi-avatar">
             <div class="nickname">{{bgmAccountInfo.nickname}}</div>

@@ -2,8 +2,8 @@
 import {fromEvent as observableFromEvent,  Subscription ,  Observable } from 'rxjs';
 
 import {skip} from 'rxjs/operators';
-import { UIPopoverContent, UIPopoverRef } from '@irohalab/deneb-ui';
-import { Component, Input, OnDestroy } from '@angular/core';
+import { DARK_THEME, DarkThemeService, UIPopoverContent, UIPopoverRef } from '@irohalab/deneb-ui';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../../entity';
 
 @Component({
@@ -11,7 +11,7 @@ import { User } from '../../../entity';
     templateUrl: './user-action-panel.html',
     styleUrls: ['./user-action-panel.less']
 })
-export class UserActionPanelComponent extends UIPopoverContent implements OnDestroy {
+export class UserActionPanelComponent extends UIPopoverContent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
 
     @Input()
@@ -29,7 +29,9 @@ export class UserActionPanelComponent extends UIPopoverContent implements OnDest
         url: string
     };
 
-    constructor(popoverRef: UIPopoverRef<UserActionPanelComponent>) {
+    isDarkTheme: boolean;
+
+    constructor(popoverRef: UIPopoverRef<UserActionPanelComponent>, private _darkThemeService: DarkThemeService) {
         super(popoverRef);
     }
 
@@ -52,5 +54,12 @@ export class UserActionPanelComponent extends UIPopoverContent implements OnDest
 
     ngOnDestroy() {
         this._subscription.unsubscribe();
+    }
+
+    ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
     }
 }

@@ -1,0 +1,55 @@
+@import '../../_dark-theme-helpers';
+
+.dark-facade-item() {
+  .facade-item {
+    border-top-color: lighten(@darkBorderColor, 10%);
+    &:before {
+      color: darken(@darkForeground, 20%);
+    }
+  }
+}
+
+.dark-bangumi-title() {
+  > .bangumi-title {
+    &.name-cn {
+      .external-link {
+        color: darken(@darkForeground, 20%);
+      }
+    }
+    &.name {
+      color: darken(@darkForeground, 15%);
+      .tip {
+        color: darken(@darkForeground, 25%);
+      }
+    }
+  }
+  .on-air-info {
+    .key {
+      color: darken(@darkForeground, 25%);
+    }
+  }
+}
+
+.dark-episode-list() {
+  .episode-list {
+    background-color: transparent;
+    .episode-card {
+      background-color: lighten(@darkBackground, 5%);
+      box-shadow: 0px 1px 3px 0px @darkBoxShadowColor, 0px 0px 0px 1px @darkBoxShadowColor;
+      .image-fallback {
+        color: darken(@darkForeground, 25%);
+        background-color: #707070;
+      }
+      .content {
+        color: @darkForeground;
+        &:focus,
+        &:hover {
+          color: @darkLinkHoverColor;
+        }
+      }
+      .content.unfinished {
+        color: darken(@darkLinkColor, 10%);
+      }
+    }
+  }
+}

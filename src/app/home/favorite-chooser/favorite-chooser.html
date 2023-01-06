@@ -1,6 +1,7 @@
 <div class="favorite-wrapper">
     <button *ngIf="!bangumi.favorite_status && !isChoosingFavorite"
             class="small ui basic button"
+            [ngClass]="{inverted: isDarkTheme}"
             [disabled]="isOnSynchronizing && syncEnabled"
             (click)="toggleFavoriteChooser()"><i class="remove bookmark icon"></i> {{toggleButtonText}}
     </button>
@@ -10,12 +11,14 @@
                olive: bangumi.favorite_status === 2,
                blue: bangumi.favorite_status === 3,
                brown: bangumi.favorite_status === 4,
-               grey: bangumi.favorite_status === 5
+               grey: bangumi.favorite_status === 5,
+               inverted: isDarkTheme
                }"
             [disabled]="isOnSynchronizing && syncEnabled"
             (click)="toggleFavoriteChooser()">
         <i class="bookmark icon"></i>我{{FAVORITE_LABEL[bangumi.favorite_status]}}这部{{BANGUMI_TYPE[bangumi.type]}}</button>
     <button class="ui small basic button"
+            [ngClass]="{inverted: isDarkTheme}"
             *ngIf="!!bangumi.favorite_status"
             confirmDialog
             dialogTitle="确定要删除收藏吗？"
@@ -29,24 +32,24 @@
         <i class="icon checkmark"></i> 已与Bangumi同步
     </span>
     <span class="sync-disabled-tip" *ngIf="isExtensionEnabled && !syncEnabled">同步功能不可用，查看bgm.tv登录状态及帐号是否关联</span>
-    <div *ngIf="isChoosingFavorite" class="small ui basic buttons">
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 1}" (click)="chooseFavoriteStatus(1)">
+    <div *ngIf="isChoosingFavorite" class="small ui buttons" [ngClass]="{inverted: isDarkTheme, basic: !isDarkTheme}">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 1, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(1)">
             想看
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 2}" (click)="chooseFavoriteStatus(2)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 2, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(2)">
             看过
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 3}" (click)="chooseFavoriteStatus(3)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 3, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(3)">
             在看
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 4}" (click)="chooseFavoriteStatus(4)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 4, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(4)">
             搁置
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 5}" (click)="chooseFavoriteStatus(5)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 5, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(5)">
             抛弃
         </button>
     </div>
-    <button *ngIf="isChoosingFavorite" class="cancel-button small ui button" (click)="toggleFavoriteChooser()">取消
+    <button *ngIf="isChoosingFavorite" class="cancel-button small ui button" [ngClass]="{inverted: isDarkTheme}" (click)="toggleFavoriteChooser()">取消
     </button>
 </div>
 <div class="my-review facade-item" *ngIf="!!userFavoriteInfo && loadBgmInfo">

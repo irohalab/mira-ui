@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { filter, mergeMap, switchMap, tap } from 'rxjs/operators';
 import {
@@ -53,10 +53,12 @@ export class FavoriteChooser implements OnInit, OnDestroy {
     userFavoriteInfo: any;
 
     isOnSynchronizing: boolean;
+    isDarkTheme: boolean;
 
     constructor(private _dialog: UIDialog,
                 private _chromeExtensionService: ChromeExtensionService,
                 private _favoriteManagerService: FavoriteManagerService,
+                private _darkThemeService: DarkThemeService,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
     }
@@ -136,6 +138,10 @@ export class FavoriteChooser implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.isOnSynchronizing = true;
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._chromeExtensionService.isEnabled.pipe(
                 tap(isEnabled => {

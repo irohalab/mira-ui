@@ -4,6 +4,7 @@
 @darkBoxShadowColor: #3f3f40;
 @darkLinkColor: #e1e0e0;
 @darkLinkHoverColor: #e5f4fd;
+@darkPanelBg: #2f3133;
 
 // apply on input element
 .dark-input() {
@@ -33,6 +34,26 @@
     &:hover,
     &:focus {
       color: @darkLinkHoverColor
+    }
+  }
+}
+
+.dark-dropdown {
+  .ui.dropdown {
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor !important;
+    }
+    .menu {
+      background-color: @darkPanelBg;
+      box-shadow: 0px 2px 3px 0px @darkBoxShadowColor;
+      border-color: @darkBorderColor;
+      > .item {
+        color: @darkForeground;
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.15);
+        }
+      }
     }
   }
 }

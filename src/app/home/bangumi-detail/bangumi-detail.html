@@ -1,7 +1,7 @@
-<div class="ui active inverted dimmer loading-wrapper" *ngIf="!bangumi">
-    <div class="ui medium loader"></div>
+<div class="loading-wrapper" *ngIf="!bangumi">
+    <div class="ui active medium loader"></div>
 </div>
-<div class="ui container bangumi-default-container" *ngIf="bangumi">
+<div class="ui container bangumi-default-container" *ngIf="bangumi" [ngClass]="{'dark-theme': isDarkTheme}">
     <div class="bangumi-info">
         <div #bangumiCover class="bangumi-cover" *ngIf="bangumi.cover">
             <responsive-image [src]="bangumi.cover_image.url"
