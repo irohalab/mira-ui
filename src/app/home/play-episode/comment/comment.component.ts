@@ -1,7 +1,7 @@
 import {
     AfterViewInit,
     Component,
-    ElementRef,
+    ElementRef, HostBinding,
     Input, OnChanges,
     OnDestroy,
     OnInit, SimpleChanges,
@@ -14,6 +14,7 @@ import { filter, mergeMap } from 'rxjs/operators';
 import { ChromeExtensionService, IAuthInfo } from '../../../browser-extension/chrome-extension.service';
 import { ResponsiveService } from '../../../responsive-image/responsive.service';
 import { PersistStorage } from '../../../user-service';
+import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 
 export interface PostUser {
     uid: string;
@@ -84,6 +85,9 @@ export class CommentComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
 
     isLoading = true;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     get isVisible(): Observable<boolean> {
         return this._isVisible.asObservable();
     }
@@ -92,6 +96,7 @@ export class CommentComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
 
     constructor(private _chromeExtensionService: ChromeExtensionService,
                 private _persistStorage: PersistStorage,
+                private _darkThemeService: DarkThemeService,
                 private _responsiveService: ResponsiveService) {
         this.sort = this._persistStorage.getItem(COMMENT_SORT_ORDER, null);
         if (!this.sort) {
@@ -252,6 +257,10 @@ export class CommentComponent implements OnInit, OnDestroy, AfterViewInit, OnCha
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME;})
+        );
         this._subscription.add(
             this.isVisible.pipe(
                 filter(visible => visible),

@@ -5,7 +5,7 @@
             <div class="nickname">{{bgmAccountInfo.nickname}}</div>
             <div class="username">@{{bgmAccountInfo.username}}</div>
             <div class="actions">
-                <a class="ui tiny basic button" routerLink="/settings/bangumi">管理Bangumi关联</a>
+                <a class="ui tiny basic button" [ngClass]="{inverted: isDarkTheme}" routerLink="/settings/bangumi">管理Bangumi关联</a>
             </div>
         </div>
         <div *ngIf="!!bgmAccountInfo" class="ui divider"></div>

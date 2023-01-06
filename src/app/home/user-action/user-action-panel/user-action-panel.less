@@ -1,3 +1,4 @@
+@import '../../../_dark-theme-helpers';
 @arrowOffset: 0.30714286em;
 
 @arrowStroke: 1px;
@@ -43,6 +44,18 @@
     &:before {
       background-color: @invertedBg;
       box-shadow: @invertedBottomArrowBoxShadow;
+    }
+    .bgm-account-info {
+      .nickname {
+        color: @darkForeground;
+      }
+      .username {
+        color: darken(@darkForeground, 20%);
+      }
+      .actions {
+        margin-top: 1em;
+        min-width: 16em;
+      }
     }
   }
   &:before {

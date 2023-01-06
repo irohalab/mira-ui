@@ -1,0 +1,53 @@
+@import "../../../_dark-theme-helpers";
+
+.dark-comments() {
+  .comment-container.ui.comments {
+    .header-container {
+      > .ui.header {
+        color: @darkForeground;
+      }
+      > .sort-button {
+        color: @darkLinkColor;
+        &:hover,
+        &:focus {
+          color: @darkLinkHoverColor
+        }
+      }
+    }
+    .fake-comment-form {
+      > .fake-textarea {
+        border-color: rgba(255, 255, 255, 0.5);
+        color: darken(@darkForeground, 25%);
+        background-color: transparent;
+      }
+    }
+    .comment-post {
+      .content {
+        .author {
+          color: darken(@darkForeground, 13%);
+        }
+        .metadata .date {
+          color: darken(@darkForeground, 40%);
+        }
+        .text {
+          color: darken(@darkForeground, 13%);
+        }
+        .actions a {
+          color: darken(@darkForeground, 40%);
+        }
+        .quote {
+          > q {
+            > strong {
+              color: darken(@darkForeground, 20%);
+            }
+            color: darken(@darkForeground, 25%);
+            &:before,
+            &:after {
+              color: darken(@darkForeground, 16%);
+            }
+          }
+        }
+      }
+    }
+  }
+}

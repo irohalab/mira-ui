@@ -1,8 +1,14 @@
+@import '../../../_dark-theme-helpers';
+@import 'comment.dark';
+
 bangumi-comment {
   display: block;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+  &.dark-theme {
+    .dark-comments();
+  }
   .comment-loading-container {
     display: block;
     position: relative;

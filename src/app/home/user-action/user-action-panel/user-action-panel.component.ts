@@ -31,7 +31,8 @@ export class UserActionPanelComponent extends UIPopoverContent implements OnInit
 
     isDarkTheme: boolean;
 
-    constructor(popoverRef: UIPopoverRef<UserActionPanelComponent>, private _darkThemeService: DarkThemeService) {
+    constructor(popoverRef: UIPopoverRef<UserActionPanelComponent>,
+                private _darkThemeService: DarkThemeService) {
         super(popoverRef);
     }
 

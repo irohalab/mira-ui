@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChromeExtensionService } from '../../../../browser-extension/chrome-extension.service';
 import { Post } from '../comment.component';
 import { Subscription } from 'rxjs';
+import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 
 @Component({
     selector: 'bangumi-comment-form',
@@ -39,9 +40,12 @@ export class CommentFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
     newCommentForm: FormGroup;
 
+    isDarkTheme: boolean;
+
     @ViewChild('textarea', {static: false}) textareaRef: ElementRef;
 
     constructor(private _fb: FormBuilder,
+                private _darkThemeService: DarkThemeService,
                 private _chromeExtensionService: ChromeExtensionService) {
     }
 
@@ -100,6 +104,10 @@ export class CommentFormComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME;})
+        );
         this.newCommentForm = this._fb.group({
             content: ['', Validators.required]
         });

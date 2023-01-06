@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ChromeExtensionService } from '../../../../browser-extension/chrome-extension.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -31,8 +31,10 @@ export class EditCommentComponent implements OnInit, OnDestroy {
 
     isLoading = true;
     editCommentForm: FormGroup;
+    isDarkTheme: boolean;
 
     constructor(private _chromeExtensionService: ChromeExtensionService,
+                private _darkThemeService: DarkThemeService,
                 private _fb: FormBuilder,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
@@ -61,6 +63,10 @@ export class EditCommentComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME;})
+        );
         this.editCommentForm = this._fb.group({
             content: ['', Validators.required]
         });

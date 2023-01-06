@@ -1,3 +1,4 @@
+@import '../../../../_dark-theme-helpers';
 :host {
   width: 100%;
   display: flex;
@@ -20,6 +21,11 @@
 }
 .ui.form {
   flex: 1 1 auto;
+  &.inverted {
+    textarea {
+      .dark-input();
+    }
+  }
   textarea {
     height: 8em;
   }
