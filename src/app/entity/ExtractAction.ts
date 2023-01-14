@@ -18,4 +18,5 @@ export class ExtractAction extends Action {
     public outputExtname: string;
     public extractRegex: string;
     public extractorId = 'Default';
+    public extraData: any = {};
 }

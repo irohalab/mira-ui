@@ -43,6 +43,8 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
     @Input()
     editMode = false;
 
+    allowZoom = false;
+
     selectedActionId: string;
     selectedNodeIndex: number = -1;
     selectedLinkId: string;
@@ -58,6 +60,8 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
         [ActionType.Extract]: 'envelope outline open'
     }
 
+    readonly extractorIdList: string[] = ['Default', 'File', 'Subtitle', 'Audio'];
+
     linkMode = LinkMode.None;
 
     @ViewChild('actionEditorContainer') actionEditorContainer: ElementRef;
@@ -69,6 +73,9 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
+        if (this.editMode) {
+            this.allowZoom = true;
+        }
         if (this.actions) {
             this.edges = [];
             this.nodes = Object.keys(this.actions).map(actionId => {
@@ -224,6 +231,11 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
             this.refreshEdges();
             this.updateNodeMeta();
         }
+    }
+
+    updateActionExtractorId(extractorId: string): void {
+        (this.actions[this.selectedActionId] as ExtractAction).extractorId = extractorId;
+        this.updateNode();
     }
 
     updateActionProfile(profile: string): void {
