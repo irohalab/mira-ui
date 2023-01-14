@@ -133,7 +133,7 @@ export class DownloadManagerService extends BaseService {
                     res.data.forEach(bgm => {
                         this.bangumiDict[bgm.id] = bgm;
                     });
-                    return ids.map(id => this.bangumiDict[id]);
+                    return ids.map(id => this.bangumiDict[id]).filter(bgm => !!bgm);
                 }));
         } else {
             return of(ids.filter(id => {
