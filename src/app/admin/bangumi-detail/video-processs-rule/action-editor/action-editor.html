@@ -13,7 +13,7 @@
 
         <ng-template #nodeTemplate let-node>
             <svg:g class="node">
-                <svg:foreignObject width="160" [attr.height]="nodeHeightDict[node.data.type]">
+                <svg:foreignObject width="200" [attr.height]="nodeHeightDict[node.data.type]">
                     <xhtml:div class="action-card" [ngClass]="node.data.type" (click)="selectNode(node.id, $event, node.meta)">
                         <xhtml:div class="action-label"><xhtml:i class="icon" [ngClass]="nodeIconClassDict[node.data.type]"></xhtml:i>{{node.label}}</xhtml:div>
                         <xhtml:div *ngIf="node.data.type === eActionType.Convert" class="action-properties">
@@ -21,17 +21,24 @@
                             <xhtml:div class="profile-extra"><xhtml:span class="property-name">profileExtraData:</xhtml:span>{{node.data.profileExtraData}}</xhtml:div>
                         </xhtml:div>
                         <xhtml:div *ngIf="node.data.type === eActionType.Extract" class="action-properties">
-                            <xhtml:div class="extract-source"><xhtml:span class="property-name">extractFrom:</xhtml:span>{{node.data.extractFrom}}</xhtml:div>
-                            <xhtml:div class="extract-target"><xhtml:span class="property-name">extractTarget:</xhtml:span>{{node.data.extractTarget}}</xhtml:div>
-                            <xhtml:div class="outputExtname"><xhtml:span class="property-name">outputExtname:</xhtml:span>{{node.data.outputExtname}}</xhtml:div>
-                            <xhtml:div class="outputExtname"><xhtml:span class="property-name">extractRegex:</xhtml:span>{{node.data.extractRegex}}</xhtml:div>
+                            <xhtml:div class="extractor-id"><xhtml:span class="property-name">extractorId:</xhtml:span>{{node.data.extractorId}}</xhtml:div>
+                            <xhtml:div class="extract-source" *ngIf="!!node.data.extractFrom"><xhtml:span class="property-name">extractFrom:</xhtml:span>{{node.data.extractFrom}}</xhtml:div>
+                            <xhtml:div class="extract-target" *ngIf="!!node.data.extractTarget"><xhtml:span class="property-name">extractTarget:</xhtml:span>{{node.data.extractTarget}}</xhtml:div>
+                            <xhtml:div class="outputExtname" *ngIf="!!node.data.outputExtname"><xhtml:span class="property-name">outputExtname:</xhtml:span>{{node.data.outputExtname}}</xhtml:div>
+                            <xhtml:div class="extractRegex" *ngIf="!!node.data.extractRegex"><xhtml:span class="property-name">extractRegex:</xhtml:span>{{node.data.extractRegex}}</xhtml:div>
+                            <xhtml:div class="extraData" *ngIf="!!node.data.extraData && !!node.data.extraData.propertyName">
+                                <xhtml:span class="property-name">extraData.propertyName:</xhtml:span>{{node.data.extraData.propertyName}}</xhtml:div>
+                            <xhtml:div class="extraData" *ngIf="!!node.data.extraData && !!node.data.extraData.propertyValueRegex">
+                                <xhtml:span class="property-name">extraData.propertyValueRegex:</xhtml:span>{{node.data.extraData.propertyValueRegex}}</xhtml:div>
+                            <xhtml:div class="extraData" *ngIf="!!node.data.extraData && node.data.extractorId === 'Audio'">
+                                <xhtml:span class="property-name">extraData.selectDefault:</xhtml:span>{{node.data.extraData.selectDefault}}</xhtml:div>
                         </xhtml:div>
                     </xhtml:div>
                 </svg:foreignObject>
-                <svg:rect width="160" [attr.height]="nodeHeightDict[node.data.type]"
+                <svg:rect width="200" [attr.height]="nodeHeightDict[node.data.type]"
                           fill="#ffffff" fill-opacity="0.4" *ngIf="node.meta.disabled"></svg:rect>
                 <g
-                    transform="translate(158, 0)"
+                    transform="translate(198, 0)"
                     *ngIf="selectedActionId === node.id && linkMode == eLinkMode.None && node.meta.allowInput"
                     (click)="addUpstreamAction($event)">
                     <ellipse
@@ -51,7 +58,7 @@
                         y="5" ></rect>
                 </g>
                 <g
-                    transform="translate(158, 60)"
+                    transform="translate(198, 60)"
                     *ngIf="selectedActionId === node.id && linkMode == eLinkMode.None && node.meta.allowOutput"
                     (click)="addDownstreamAction($event)">
                     <ellipse
@@ -125,6 +132,17 @@
             </div>
             <div class="ui mini form" *ngIf="actions[selectedActionId].type === eActionType.Extract">
                 <div class="field">
+                    <label>extractorId</label>
+                    <div class="ui selection dropdown" uiDropdown="click">
+                        <i class="dropdown icon"></i>
+                        <div class="text default" *ngIf="!$any(actions[selectedActionId]).extractorId">Select ExtractorId</div>
+                        <div class="text" *ngIf="$any(actions[selectedActionId]).extractorId">{{$any(actions[selectedActionId]).extractorId}}</div>
+                        <div class="menu">
+                            <div class="item" *ngFor="let extractorId of extractorIdList" (click)="updateActionExtractorId(extractorId)">{{extractorId}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Default' || $any(actions[selectedActionId]).extractorId === 'File'">
                     <label>extractFrom</label>
                     <div class="ui selection dropdown" uiDropdown="click">
                         <i class="dropdown icon"></i>
@@ -136,7 +154,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="field">
+                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Default' || $any(actions[selectedActionId]).extractorId === 'File'">
                     <label>extractTarget</label>
                     <div class="ui selection dropdown" uiDropdown="click">
                         <i class="dropdown icon"></i>
@@ -159,7 +177,7 @@
                            name="outputExtname"
                            placeholder="extension name of output"/>
                 </div>
-                <div class="field">
+                <div class="field"  *ngIf="$any(actions[selectedActionId]).extractorId === 'Default'">
                     <label>extractRegex</label>
                     <input type="text"
                            [(ngModel)]="$any(actions[selectedActionId]).extractRegex"
@@ -167,6 +185,33 @@
                            [ngModelOptions]="{updateOn: 'blur'}"
                            name="extractRegex"
                            placeholder="regex to match file/track"/>
+                </div>
+                <div class="field"  *ngIf="$any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio'">
+                    <label>extraData.propertyName</label>
+                    <input type="text"
+                           [(ngModel)]="$any(actions[selectedActionId]).extraData.propertyName"
+                           (ngModelChange)="updateNode()"
+                           [ngModelOptions]="{updateOn: 'blur'}"
+                           name="propertyName"
+                           placeholder="property name of the stream info to match"/>
+                </div>
+                <div class="field"  *ngIf="$any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio'">
+                    <label>extraData.propertyValueRegex</label>
+                    <input type="text"
+                           [(ngModel)]="$any(actions[selectedActionId]).extraData.propertyValueRegex"
+                           (ngModelChange)="updateNode()"
+                           [ngModelOptions]="{updateOn: 'blur'}"
+                           name="propertyValueRegex"
+                           placeholder="regular expression of the property of stream info"/>
+                </div>
+                <div class="field"  *ngIf="$any(actions[selectedActionId]).extractorId === 'Audio'">
+                    <label>extraData.selectDefault</label>
+                    <input type="text"
+                           [(ngModel)]="$any(actions[selectedActionId]).extraData.selectDefault"
+                           (ngModelChange)="updateNode()"
+                           [ngModelOptions]="{updateOn: 'blur'}"
+                           name="selectDefault"
+                           placeholder="if select the default stream"/>
                 </div>
                 <!-- extractorId is not supported currently -->
                 <button class="ui icon button" (click)="removeSelectedNode()"><i class="trash alternate icon"></i></button>

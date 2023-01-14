@@ -38,10 +38,16 @@
                             <xhtml:div class="profile-extra"><xhtml:span class="property-name">profileExtraData:</xhtml:span>{{node.data.action.profileExtraData}}</xhtml:div>
                         </xhtml:div>
                         <xhtml:div *ngIf="node.data.actionType === eActionType.Extract" class="action-properties">
-                            <xhtml:div class="extract-source"><xhtml:span class="property-name">extractFrom:</xhtml:span>{{node.data.action.extractFrom}}</xhtml:div>
-                            <xhtml:div class="extract-target"><xhtml:span class="property-name">extractTarget:</xhtml:span>{{node.data.action.extractTarget}}</xhtml:div>
-                            <xhtml:div class="outputExtname"><xhtml:span class="property-name">outputExtname:</xhtml:span>{{node.data.action.outputExtname}}</xhtml:div>
-                            <xhtml:div class="outputExtname"><xhtml:span class="property-name">extractRegex:</xhtml:span>{{node.data.action.extractRegex}}</xhtml:div>
+                            <xhtml:div class="extract-source" *ngIf="!!node.data.action.extractFrom"><xhtml:span class="property-name">extractFrom:</xhtml:span>{{node.data.action.extractFrom}}</xhtml:div>
+                            <xhtml:div class="extract-target" *ngIf="!!node.data.action.extractTarget"><xhtml:span class="property-name">extractTarget:</xhtml:span>{{node.data.action.extractTarget}}</xhtml:div>
+                            <xhtml:div class="outputExtname" *ngIf="!!node.data.action.outputExtname"><xhtml:span class="property-name">outputExtname:</xhtml:span>{{node.data.action.outputExtname}}</xhtml:div>
+                            <xhtml:div class="extractRegex" *ngIf="!!node.data.action.extractRegex"><xhtml:span class="property-name">extractRegex:</xhtml:span>{{node.data.action.extractRegex}}</xhtml:div>
+                            <xhtml:div class="extraData" *ngIf="!!node.data.action.extraData && !!node.data.action.extraData.propertyName">
+                                <xhtml:span class="property-name">extraData.propertyName:</xhtml:span>{{node.data.action.extraData.propertyName}}</xhtml:div>
+                            <xhtml:div class="extraData" *ngIf="!!node.data.action.extraData && !!node.data.action.extraData.propertyValueRegex">
+                                <xhtml:span class="property-name">extraData.propertyValueRegex:</xhtml:span>{{node.data.action.extraData.propertyValueRegex}}</xhtml:div>
+                            <xhtml:div class="extraData" *ngIf="!!node.data.action.extraData && node.data.action.extractorId === 'Audio'">
+                                <xhtml:span class="property-name">extraData.selectDefault:</xhtml:span>{{node.data.action.extraData.selectDefault}}</xhtml:div>
                         </xhtml:div>
                     </xhtml:div>
                 </svg:foreignObject>
