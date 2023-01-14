@@ -1,8 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import * as duration from 'dayjs/plugin/duration';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import dayjs from 'dayjs';
 
 dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 const byteUnit = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 const thresh = 1024;
