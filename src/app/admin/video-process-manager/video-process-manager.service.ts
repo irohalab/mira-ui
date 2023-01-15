@@ -137,7 +137,9 @@ export class VideoProcessManagerService extends BaseService {
                 console.log(sessionId);
                 payload.sessionId = sessionId;
                 return new Observable<LogType>(function subscribe(subscriber) {
-                    const socket = io(namespace);
+                    const socket = io(namespace,{
+                        path: '/rt-log/'
+                    });
                     let isComplete = false;
                     socket.on('connect', () => {
                         socket.emit('log_stream', payload);
