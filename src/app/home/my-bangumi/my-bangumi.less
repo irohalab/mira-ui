@@ -1,6 +1,31 @@
+@headerColor: #2185d0;
+@itemColor: #696969;
+@emptyPlaceHolderColor: #4c4c4c;
+@labelUndecoratedColor: #999999;
+
 :host {
   display: block;
   box-sizing: border-box;
+  &.dark-theme {
+    .header {
+      color: lighten(@headerColor, 20%);
+    }
+    .menu.favorite-list {
+      > .item.favorite-item {
+        > .bangumi-name {
+          color: lighten(@itemColor, 35%);
+        }
+      }
+      > .ui.label {
+        &.undecorated {
+          color: lighten(@labelUndecoratedColor, 20%);
+        }
+      }
+    }
+    .empty-placeholder {
+      color: lighten(@emptyPlaceHolderColor, 40%);
+    }
+  }
 }
 
 .status-picker {
@@ -14,7 +39,7 @@
   font-size: 0.9rem;
   font-weight: 700;
   line-height: 2;
-  color: #2185d0;
+  color: @headerColor;
 }
 
 .menu.favorite-list {
@@ -27,7 +52,7 @@
     > .bangumi-name {
       display: inline-block;
       width: 9em;
-      color: #696969;
+      color: @itemColor;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

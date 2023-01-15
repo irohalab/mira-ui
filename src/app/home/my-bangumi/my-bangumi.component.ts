@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject, merge, Subscription } from 'rxjs';
 import { filter, mergeMap } from 'rxjs/operators';
 import { closest } from '../../../helpers/dom';
@@ -8,6 +8,7 @@ import { WatchProgress } from '../../entity/watch-progress';
 import { VideoPlayerService } from '../../video-player/video-player.service';
 import { FavoriteManagerService } from '../favorite-manager.service';
 import { HomeService } from '../home.service';
+import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 
 @Component({
     selector: 'my-bangumi',
@@ -22,12 +23,16 @@ export class MyBangumiComponent implements OnInit, OnDestroy {
 
     favoriteLabel = FAVORITE_LABEL;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     get currentStatus(): number {
         return this._statusSubject.getValue();
     }
 
     constructor(private _homeService: HomeService,
                 private _favoriteManager: FavoriteManagerService,
+                private _darkThemeService: DarkThemeService,
                 private _videoPlayerService: VideoPlayerService) {
         this.myBangumiList = [];
     }
@@ -46,6 +51,10 @@ export class MyBangumiComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME;})
+        );
         this._subscription.add(
             this._videoPlayerService.onWatchStatusChanges
                 .pipe(filter(episode => {
