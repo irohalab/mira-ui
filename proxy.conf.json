@@ -11,8 +11,8 @@
     "target": "http://localhost:8000",
     "secure": false
   },
-  "/socket.io": {
-    "target": "http://localhost:8083/socket.io/",
+  "/rt-log": {
+    "target": "http://localhost:8083/rt-log/",
     "secure": false,
     "changeOrigin": true,
     "ws": true
