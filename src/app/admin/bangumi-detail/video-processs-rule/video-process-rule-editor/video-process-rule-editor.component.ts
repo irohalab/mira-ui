@@ -45,6 +45,7 @@ export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
     eActionType = ActionType;
 
     eProfileType = ProfileType;
+    fontList: string[];
 
     @ViewChild(ActionEditorComponent) _actionEditor!: ActionEditorComponent;
 
@@ -60,6 +61,10 @@ export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._videoProcessRuleService.listFonts()
+                .subscribe(fonts => this.fontList = fonts)
+        );
         if (this.rule) {
             this.basicInfoForm = this._fb.group({
                 name: [this.rule.name],

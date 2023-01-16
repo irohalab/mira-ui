@@ -31,7 +31,7 @@ export class VideoProcessRuleService extends BaseService {
             method: 'POST',
             url: '/rule',
             body: rule
-        }
+        };
         return this.sendRequest<{data: VideoProcessRule}>(reqData)
             .pipe(
                 map(res => res.data)
@@ -54,7 +54,7 @@ export class VideoProcessRuleService extends BaseService {
             method: 'PUT',
             url: `/rule/${rule.id}`,
             body: rule
-        }
+        };
         return this.sendRequest<{data: VideoProcessRule}>(reqData)
             .pipe(
                 map(res => res.data)
@@ -65,7 +65,7 @@ export class VideoProcessRuleService extends BaseService {
         const reqData: ReqData = {
             method: 'DELETE',
             url: `/rule/${ruleId}`
-        }
+        };
         return this.sendRequest<any>(reqData);
     }
 
@@ -74,7 +74,15 @@ export class VideoProcessRuleService extends BaseService {
             method: 'POST',
             url: '/rule/condition',
             body: {condition: condition}
-        }
+        };
         return this.sendRequest<any>(reqData);
+    }
+
+    public listFonts(): Observable<string[]> {
+        const reqData: ReqData = {
+            method: 'GET',
+            url: '/rule/font'
+        };
+        return this.sendRequest<{data: string[]}>(reqData).pipe(map(res => res.data));
     }
 }
