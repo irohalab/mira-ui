@@ -5,6 +5,7 @@ export class ConvertAction extends Action {
     profile: string;
     profileExtraData: any;
     type = ActionType.Convert;
+    forceFontName: string;
     // below properties will not be serialized.
     videoFilePath?: string;
     audioFilePath?: string;

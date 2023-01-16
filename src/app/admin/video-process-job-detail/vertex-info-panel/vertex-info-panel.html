@@ -34,7 +34,11 @@
                 <td>profileExtraData</td>
                 <td>{{$any(vertex.action).profileExtraData}}</td>
             </tr>
-            <tr *ngIf="vertex.actionType === eActionType.Extract">
+            <tr *ngIf="vertex.actionType === eActionType.Convert">
+                <td>forceFontName</td>
+                <td colspan="3">{{$any(vertex.action).forceFontName}}</td>
+            </tr>
+            <tr *ngIf="vertex.actionType === eActionType.Extract && ($any(vertex.action).extractorId==='Default' || $any(vertex.action).extractorId==='File')">
                 <td>extractFrom</td>
                 <td>{{$any(vertex.action).extractFrom}}</td>
                 <td>extractTarget</td>
@@ -46,9 +50,19 @@
                 <td>extractorId</td>
                 <td>{{$any(vertex.action).extractorId}}</td>
             </tr>
-            <tr *ngIf="vertex.actionType === eActionType.Extract">
+            <tr *ngIf="vertex.actionType === eActionType.Extract && $any(vertex.action).extractorId==='Default'">
                 <td>extractRegex</td>
                 <td colspan="3">{{$any(vertex.action).extractRegex || 'N/A'}}</td>
+            </tr>
+            <tr *ngIf="vertex.actionType === eActionType.Extract && ($any(vertex.action).extractorId==='Subtitle' || $any(vertex.action).extractorId==='Audio')">
+                <td>extraData.propertyName</td>
+                <td>{{$any(vertex.action).extraData.propertyName}}</td>
+                <td>extraData.propertyValueRegex</td>
+                <td>{{$any(vertex.action).extraData.propertyValueRegex}}</td>
+            </tr>
+            <tr *ngIf="vertex.actionType === eActionType.Extract && $any(vertex.action).extractorId==='Audio'">
+                <td>extraData.selectDefault</td>
+                <td colspan="3">{{$any(vertex.action).extraData.selectDefault}}</td>
             </tr>
             </tbody>
         </table>

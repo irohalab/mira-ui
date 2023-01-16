@@ -43,6 +43,9 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
     @Input()
     editMode = false;
 
+    @Input()
+    fontList: string[] = [];
+
     allowZoom = false;
 
     selectedActionId: string;
@@ -51,7 +54,7 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
     selectedLinkIndex: number = -1;
 
     readonly nodeHeightDict: {[key: string]: number} = {
-        [ActionType.Convert]: 80,
+        [ActionType.Convert]: 120,
         [ActionType.Extract]: 120
     }
 
@@ -126,7 +129,10 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
         node.meta.allowInput = action.upstreamActionIds.length < this.getMaxUpstreamByActionType(action.type);
         node.meta.allowOutput = action.downstreamIds.length < 1; // currently only 1 output per action is allowed;
     }
-
+    updateFontName(fontName: string) {
+        (this.actions[this.selectedActionId] as ConvertAction).forceFontName = fontName;
+        this.updateNode();
+    }
     selectLink(event: Event, linkId: string): void {
         event.preventDefault();
         event.stopPropagation();
