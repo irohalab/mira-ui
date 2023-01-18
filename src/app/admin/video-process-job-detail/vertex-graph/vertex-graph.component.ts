@@ -45,7 +45,7 @@ export class VertexGraphComponent implements AfterViewInit, OnInit, OnChanges {
     selectedNodeId: string;
 
     readonly nodeHeightDict: {[key: string]: number} = {
-        [ActionType.Convert]: 80,
+        [ActionType.Convert]: 100,
         [ActionType.Extract]: 120
     }
 

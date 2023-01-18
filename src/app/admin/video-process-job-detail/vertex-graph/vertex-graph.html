@@ -35,16 +35,18 @@
                         <xhtml:div class="action-label"><xhtml:i class="icon" [ngClass]="nodeIconClassDict[node.data.actionType]"></xhtml:i>{{node.label}}</xhtml:div>
                         <xhtml:div *ngIf="node.data.actionType === eActionType.Convert" class="action-properties">
                             <xhtml:div class="convert-profile"><xhtml:span class="property-name">profile:</xhtml:span>{{node.data.action.profile}}</xhtml:div>
+                            <xhtml:div class="font"><xhtml:span class="property-name">forceFontName:</xhtml:span>{{node.data.action.forceFontName}}</xhtml:div>
                             <xhtml:div class="profile-extra"><xhtml:span class="property-name">profileExtraData:</xhtml:span>{{node.data.action.profileExtraData}}</xhtml:div>
                         </xhtml:div>
                         <xhtml:div *ngIf="node.data.actionType === eActionType.Extract" class="action-properties">
+                            <xhtml:div class="extract-Id"><xhtml:span class="property-name">extractorId:</xhtml:span>{{node.data.action.extractorId}}</xhtml:div>
                             <xhtml:div class="extract-source" *ngIf="!!node.data.action.extractFrom"><xhtml:span class="property-name">extractFrom:</xhtml:span>{{node.data.action.extractFrom}}</xhtml:div>
                             <xhtml:div class="extract-target" *ngIf="!!node.data.action.extractTarget"><xhtml:span class="property-name">extractTarget:</xhtml:span>{{node.data.action.extractTarget}}</xhtml:div>
                             <xhtml:div class="outputExtname" *ngIf="!!node.data.action.outputExtname"><xhtml:span class="property-name">outputExtname:</xhtml:span>{{node.data.action.outputExtname}}</xhtml:div>
                             <xhtml:div class="extractRegex" *ngIf="!!node.data.action.extractRegex"><xhtml:span class="property-name">extractRegex:</xhtml:span>{{node.data.action.extractRegex}}</xhtml:div>
-                            <xhtml:div class="extraData" *ngIf="!!node.data.action.extraData && !!node.data.action.extraData.propertyName">
+                            <xhtml:div class="extraData" *ngIf="!!node.data.action.extraData && node.data.action.extractorId !== 'Default' && node.data.action.extractorId !== 'File'">
                                 <xhtml:span class="property-name">extraData.propertyName:</xhtml:span>{{node.data.action.extraData.propertyName}}</xhtml:div>
-                            <xhtml:div class="extraData" *ngIf="!!node.data.action.extraData && !!node.data.action.extraData.propertyValueRegex">
+                            <xhtml:div class="extraData" *ngIf="!!node.data.action.extraData && node.data.action.extractorId !== 'Default' && node.data.action.extractorId !== 'File'">
                                 <xhtml:span class="property-name">extraData.propertyValueRegex:</xhtml:span>{{node.data.action.extraData.propertyValueRegex}}</xhtml:div>
                             <xhtml:div class="extraData" *ngIf="!!node.data.action.extraData && node.data.action.extractorId === 'Audio'">
                                 <xhtml:span class="property-name">extraData.selectDefault:</xhtml:span>{{node.data.action.extraData.selectDefault}}</xhtml:div>

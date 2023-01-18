@@ -63,7 +63,7 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
         [ActionType.Extract]: 'envelope outline open'
     }
 
-    readonly extractorIdList: string[] = ['Default', 'File', 'Subtitle', 'Audio'];
+    readonly extractorIdList: string[] = ['File', 'Subtitle', 'Audio'];
 
     linkMode = LinkMode.None;
 
