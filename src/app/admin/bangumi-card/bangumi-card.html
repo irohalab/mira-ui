@@ -1,4 +1,4 @@
-<div class="ui segment">
+<div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
     <div class="bangumi-list-item">
         <responsive-image class="cover-wrapper"
                           *ngIf="!!bangumi.cover_image"

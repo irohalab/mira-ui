@@ -1,3 +1,5 @@
+@import "admin-navbar.dark";
+
 .nav-admin {
   position: fixed;
   top: 0;
@@ -10,6 +12,9 @@
   background-color: #ffffff;
   border-bottom: 1px solid #cccccc;
   z-index: 1000;
+  &.dark-theme {
+    .dark-nav-admin();
+  }
   .back-button {
     display: block;
     font-size: 1.2rem;

@@ -1,9 +1,9 @@
 import {
-    Component, Input, OnChanges, OnDestroy, OnInit, Optional, SimpleChanges,
+    Component, HostBinding, Input, OnChanges, OnDestroy, OnInit, Optional, SimpleChanges,
     ViewEncapsulation
 } from '@angular/core';
 import {Bangumi} from '../../entity/bangumi';
-import { InfiniteList, SCROLL_STATE } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, InfiniteList, SCROLL_STATE } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { ImageLoadingStrategy } from '../../home/bangumi-card/image-loading-strategy.service';
 
@@ -34,7 +34,10 @@ export class BangumiCard implements OnInit, OnChanges, OnDestroy{
 
     imageUrl: string;
 
+    isDarkTheme: boolean;
+
     constructor(@Optional() private _infiniteList: InfiniteList,
+                private _darkThemeService: DarkThemeService,
                 private _imageLoadingStrategy: ImageLoadingStrategy) {
         this.lazy = !!_infiniteList;
     }
@@ -49,6 +52,10 @@ export class BangumiCard implements OnInit, OnChanges, OnDestroy{
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME;})
+        );
         if (this.lazy) {
             this._subscription.add(
                 this._infiniteList.scrollStateChange

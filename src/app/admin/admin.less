@@ -1,10 +1,14 @@
+@import "../_dark-theme-helpers";
 @import "./bangumi-detail/bangumi-detail.less";
 
 .admin-container {
   display: block;
-  .sidebar-header {
-    height: 10rem;
-    border-bottom: 1px solid rgba(225, 225, 225, 0.08);
+  .ui.sidebar {
+    border-right: 1px solid @darkBorderColor;
+    .sidebar-header {
+      height: 10rem;
+      border-bottom: 1px solid rgba(225, 225, 225, 0.08);
+    }
   }
   .brand {
     font-size: 2.2rem;
