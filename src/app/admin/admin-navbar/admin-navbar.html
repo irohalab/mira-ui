@@ -1,4 +1,4 @@
-<nav class="nav-admin">
+<nav class="nav-admin" [ngClass]="{'dark-theme': isDarkTheme}">
     <a class="back-button" [routerLink]="backLink" *ngIf="backLink">
         <i class="chevron left icon"></i>
     </a>

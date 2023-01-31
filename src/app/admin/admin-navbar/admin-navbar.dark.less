@@ -1,0 +1,29 @@
+@import "../../_dark-theme-helpers";
+
+.dark-nav-admin() {
+  background-color: @darkBackground;
+  border-bottom-color: @darkBorderColor;
+  color: @darkForeground;
+  .back-button {
+    color: darken(@darkForeground, 20%);
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
+  }
+  .title {
+    color: darken(@darkForeground, 20%);
+  }
+
+  .ui.input {
+    color: @darkForeground;
+    > input {
+      .dark-input();
+    }
+    i.circular.icon {
+      box-shadow: 0 0 0 0.1em rgba(255, 255, 255, 0.2) inset;
+    }
+  }
+  .dark-anchor-button();
+  .dark-dropdown();
+}

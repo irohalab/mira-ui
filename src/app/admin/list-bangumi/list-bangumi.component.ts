@@ -2,12 +2,12 @@ import { fromEvent, Subscription } from 'rxjs';
 
 import { debounceTime, filter } from 'rxjs/operators';
 import { Bangumi } from '../../entity';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { AdminService } from '../admin.service';
 import { getRemPixel } from '../../../helpers/dom';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { BaseError } from '../../../helpers/error/BaseError';
 import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
 import { SearchBangumi } from '../search-bangumi/search-bangumi.component';
@@ -68,6 +68,9 @@ export class ListBangumi implements OnDestroy, OnInit {
 
     lastScrollPosition: number;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     get isMovie(): boolean {
         if (typeof this._listBangumiService.isMovie !== 'undefined') {
             return this._listBangumiService.isMovie;
@@ -85,6 +88,7 @@ export class ListBangumi implements OnDestroy, OnInit {
                 private router: Router,
                 private _dialog: UIDialog,
                 private _listBangumiService: ListBangumiService,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast,
                 titleService: Title) {
         titleService.setTitle('新番管理 - ' + environment.siteTitle);
@@ -144,6 +148,10 @@ export class ListBangumi implements OnDestroy, OnInit {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME})
+        );
         this.loadFromServer();
     }
 

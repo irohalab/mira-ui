@@ -1,3 +1,4 @@
+@import "bangumi-card.dark";
 @image-width: 10rem;
 
 bangumi-card {
@@ -9,6 +10,9 @@ bangumi-card {
     width: 100%;
     height: 100%;
     margin: 0;
+    &.inverted {
+      .dark-bangumi-card();
+    }
   }
 }
 
