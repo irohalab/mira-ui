@@ -3,7 +3,8 @@
                *ngIf="nodes && edges && graphViewDimension"
                [view]="graphViewDimension"
                [showMiniMap]="true"
-               [links]="edges" [nodes]="nodes"
+               [links]="edges"
+               [nodes]="nodes"
                (click)="unselectAnything()">
         <ng-template #defsTemplate>
             <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4" orient="auto">
@@ -141,6 +142,7 @@
                            name="preferredTrack"
                            placeholder="Preferred Track"/>
                 </div>
+                <button class="ui icon button" (click)="removeSelectedNode()"><i class="trash alternate icon"></i></button>
             </div>
             <div class="ui mini form" *ngIf="actions[selectedActionId].type === eActionType.Extract">
                 <div class="field">
@@ -248,4 +250,8 @@
             <button class="ui mini icon button" (click)="removeLink()"><i class="trash alternate icon"></i></button>
         </div>
     </div>
+    <div class="interaction-lock-overlay"
+         title="Click to interact"
+         (click)="unlockInteraction()"
+         *ngIf="interactionLocked && graphViewDimension" [style.width]="graphViewDimension[0] + 'px'" [style.height]="graphViewDimension[1] + 'px'"></div>
 </div>

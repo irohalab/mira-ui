@@ -27,6 +27,8 @@ export class VideoFileModal implements OnInit, OnDestroy {
     videoFileList: FormGroup[];
     ruleMap: {[videoId: string]: { isDirty: boolean, rule: VideoProcessRule }};
 
+    handlingConvert = false;
+
     constructor(private _dialogRef: UIDialogRef<VideoFileModal>,
                 private _adminService: AdminService,
                 private _fb: FormBuilder,
@@ -197,6 +199,30 @@ export class VideoFileModal implements OnInit, OnDestroy {
             .subscribe((rule: VideoProcessRule) => {
                 this.ruleMap[rule.videoFileId] = { isDirty: true, rule };
             });
+    }
+
+    convertVideoFile(videoFileGroup: FormGroup): void {
+        this.handlingConvert = true;
+        const videoFileId = videoFileGroup.value.id;
+        if (this.ruleMap[videoFileId] && !this.ruleMap[videoFileId].isDirty) {
+            this._subscription.add(
+                this._adminService.getEpisodeVideoFiles(this.episode.id)
+                    .pipe(switchMap((videoFileList) => {
+                        const videoFile = videoFileList.find(v => v.id === videoFileId);
+                        return this._videoProcessRuleService.createJobFromVideoFile(videoFile);
+                    }))
+                    .subscribe({
+                        next: () => {
+                            this.handlingConvert = false;
+                            this._toastRef.show('Convert operation started successfully!');
+                        },
+                        error: (error) => {
+                            this.handlingConvert = false;
+                            this._toastRef.show('Error when handling convert operation: ' + error?.message);
+                        }
+                    })
+            );
+        }
     }
 
     private static isTempVideoId(videoId: string): boolean {

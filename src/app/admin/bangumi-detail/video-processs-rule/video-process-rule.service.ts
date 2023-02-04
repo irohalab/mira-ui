@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { VideoProcessRule } from '../../../entity/VideoProcessRule';
 import { catchError, map } from 'rxjs/operators';
 import { BaseService } from '../../../../helpers/base.service';
+import { VideoFile } from '../../../entity/video-file';
 
 type ReqData = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -78,11 +79,28 @@ export class VideoProcessRuleService extends BaseService {
         return this.sendRequest<any>(reqData);
     }
 
-    public listFonts(): Observable<string[]> {
+    listFonts(): Observable<string[]> {
         const reqData: ReqData = {
             method: 'GET',
             url: '/rule/font'
         };
         return this.sendRequest<{data: string[]}>(reqData).pipe(map(res => res.data));
+    }
+
+    createJobFromVideoFile(videoFile: VideoFile): Observable<any> {
+        console.log(videoFile.url);
+        const urlObj = new URL(videoFile.url, location.protocol + '//' + location.host);
+        videoFile.url = urlObj.toString();
+        const reqData: ReqData = {
+            method: 'POST',
+            url: '/rule/video-file',
+            body: {
+                bangumiId: videoFile.bangumi_id,
+                videoFileId: videoFile.id,
+                fileUrl: videoFile.url,
+                filename: videoFile.file_path.substring(videoFile.file_path.lastIndexOf('/') + 1)
+            }
+        };
+        return this.sendRequest<any>(reqData);
     }
 }
