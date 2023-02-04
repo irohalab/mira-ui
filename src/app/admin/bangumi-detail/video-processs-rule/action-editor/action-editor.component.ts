@@ -46,7 +46,7 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
     @Input()
     fontList: string[] = [];
 
-    allowZoom = false;
+    interactionLocked = false;
 
     selectedActionId: string;
     selectedNodeIndex: number = -1;
@@ -76,9 +76,7 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        if (this.editMode) {
-            this.allowZoom = true;
-        }
+        this.interactionLocked = !this.editMode;
         if (this.actions) {
             this.edges = [];
             this.nodes = Object.keys(this.actions).map(actionId => {
@@ -97,6 +95,10 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
             this.nodes = [];
             this.edges = [];
         }
+    }
+
+    unlockInteraction(): void {
+        this.interactionLocked = false;
     }
 
     selectNode(nodeId: string, event?: Event, nodeMeta?: any): void {

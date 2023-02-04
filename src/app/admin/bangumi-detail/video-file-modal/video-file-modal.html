@@ -84,6 +84,12 @@
                 <button class="ui red button" confirmDialog dialogTitle="确定删除吗，该操作无法撤销" (onConfirm)="deleteVideoFile(videoFileFormGroup)">删除</button>
                 <button class="ui primary button" (click)="saveVideoFile(videoFileFormGroup)"
                         [disabled]="videoFileFormGroup.pristine && (!ruleMap[videoFileFormGroup.value.id] || !ruleMap[videoFileFormGroup.value.id].isDirty)">保存</button>
+                <a class="anchor-button right-align" *ngIf="videoFileFormGroup.value.id && ruleMap[videoFileFormGroup.value.id] && !ruleMap[videoFileFormGroup.value.id].isDirty && !handlingConvert"
+                   title="Re-process All Episodes"
+                   confirmDialog
+                   dialogTitle="Re-process this VideoFile"
+                   dialogContent="Do you want to reprocess this videoFile?"
+                   (onConfirm)="convertVideoFile(videoFileFormGroup)"><i class="redo icon"></i>Re-process VideoFile</a>
             </div>
         </form>
     </div>
