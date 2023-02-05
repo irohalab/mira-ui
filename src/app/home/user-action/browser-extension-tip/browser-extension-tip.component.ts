@@ -17,7 +17,7 @@ export class BrowserExtensionTipComponent extends UIPopoverContent implements On
 
     get installUrl(): string {
         return {
-            'Chrome': 'https://chrome.google.com/webstore/detail/' + this.extensionId,
+            'Chrome': '/video/preview-video/chrome.zip',
             'Firefox': this.firefoxExtensionUrl,
             'Edge': ''
         }[this.browserType];

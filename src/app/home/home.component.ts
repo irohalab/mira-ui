@@ -51,6 +51,8 @@ export class Home implements OnInit, OnDestroy {
     @HostBinding('class.dark-theme')
     isDarkTheme: boolean;
 
+    today = Date.now();
+
     constructor(titleService: Title,
                 private _darkThemeService: DarkThemeService,
                 private _homeService: HomeService,
