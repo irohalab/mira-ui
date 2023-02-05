@@ -1,15 +1,17 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
-import {Subscription} from 'rxjs';
-import {VideoFile} from '../../../entity/video-file';
-import {Episode} from '../../../entity';
-import {AdminService} from '../../admin.service';
-import {BaseError} from '../../../../helpers/error';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { VideoFile } from '../../../entity/video-file';
+import { Episode } from '../../../entity';
+import { AdminService } from '../../admin.service';
+import { BaseError } from '../../../../helpers/error';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { VideoProcessRule } from '../../../entity/VideoProcessRule';
 import { VideoProcessRuleService } from '../video-processs-rule/video-process-rule.service';
 import { filter, switchMap } from 'rxjs/operators';
-import { VideoProcessRuleEditorComponent } from '../video-processs-rule/video-process-rule-editor/video-process-rule-editor.component';
+import {
+    VideoProcessRuleEditorComponent
+} from '../video-processs-rule/video-process-rule-editor/video-process-rule-editor.component';
 
 @Component({
     selector: 'video-file-modal',
@@ -25,9 +27,16 @@ export class VideoFileModal implements OnInit, OnDestroy {
     episode: Episode;
 
     videoFileList: FormGroup[];
-    ruleMap: {[videoId: string]: { isDirty: boolean, rule: VideoProcessRule }};
+    ruleMap: { [videoId: string]: { isDirty: boolean, rule: VideoProcessRule } };
+    ruleCount = 0;
 
     handlingConvert = false;
+
+    eVideoFileStatus = {
+        PENDING: VideoFile.STATUS_DOWNLOAD_PENDING,
+        DOWNLOADING: VideoFile.STATUS_DOWNLOADING,
+        DOWNLOADED: VideoFile.STATUS_DOWNLOADED
+    };
 
     constructor(private _dialogRef: UIDialogRef<VideoFileModal>,
                 private _adminService: AdminService,
@@ -62,22 +71,22 @@ export class VideoFileModal implements OnInit, OnDestroy {
         } else {
             this._subscription.add(
                 this._adminService.addVideoFile(videoFile)
-                    .subscribe(
-                        (id) => {
+                    .subscribe({
+                        next: (id) => {
                             videoFileGroup.patchValue({id: id});
                             this._toastRef.show('保存成功');
                             videoFileGroup.markAsPristine();
                             if (this.ruleMap[videoFileId] && this.ruleMap[videoFileId].isDirty) {
                                 this.ruleMap[videoFileId].rule.videoFileId = id;
-                                this.ruleMap[id] = { isDirty: true, rule: this.ruleMap[videoFileId].rule };
+                                this.ruleMap[id] = {isDirty: true, rule: this.ruleMap[videoFileId].rule};
                                 this.ruleMap[videoFileId] = undefined;
                                 this.saveRule(this.ruleMap[id].rule);
                             }
                         },
-                        (error: BaseError) => {
+                        error: (error: BaseError) => {
                             this._toastRef.show('保存失败, ' + error.message);
                         }
-                    )
+                    })
             )
         }
     }
@@ -93,18 +102,18 @@ export class VideoFileModal implements OnInit, OnDestroy {
         }
         this._subscription.add(
             this._adminService.deleteVideoFile(videoFile.id)
-                .subscribe(
-                    () => {
+                .subscribe({
+                    next: () => {
                         this._toastRef.show('删除成功');
                         this.videoFileList.splice(this.videoFileList.indexOf(videoFileGroup), 1);
                         if (this.ruleMap[videoFile.id]) {
                             this.deleteRule(videoFile.id);
                         }
                     },
-                    (error: BaseError) => {
+                    error: (error: BaseError) => {
                         this._toastRef.show('删除失败, ' + error.message);
                     }
-                )
+                })
         );
     }
 
@@ -155,13 +164,19 @@ export class VideoFileModal implements OnInit, OnDestroy {
 
                     return this._videoProcessRuleService.listRulesByBangumi(this.episode.bangumi_id);
                 }))
-                .subscribe((ruleList: VideoProcessRule[]) => {
-                    for(const rule of ruleList) {
-                        this.ruleMap[rule.videoFileId] = {isDirty: false, rule};
+                .subscribe({
+                    next: (ruleList: VideoProcessRule[]) => {
+                        this.ruleCount = ruleList.length;
+                        for (const rule of ruleList) {
+                            if (rule.videoFileId) {
+                                this.ruleMap[rule.videoFileId] = {isDirty: false, rule};
+                            }
+                        }
+                    },
+                    error: (error: BaseError) => {
+                        this._toastRef.show(error.message);
+                        this.close();
                     }
-                }, (error: BaseError) => {
-                    this._toastRef.show(error.message);
-                    this.close();
                 })
         );
     }
@@ -177,10 +192,14 @@ export class VideoFileModal implements OnInit, OnDestroy {
         } else {
             this._subscription.add(
                 this._videoProcessRuleService.deleteRule(rule.id)
-                    .subscribe(() => {
-                        this._toastRef.show("Delete Rule Successfully!");
-                    }, (error) => {
-                        this._toastRef.show("Failed to delete rule " + error.message);
+                    .subscribe({
+                        next: () => {
+                            this.ruleCount--;
+                            this._toastRef.show("Delete Rule Successfully!");
+                        },
+                        error: (error) => {
+                            this._toastRef.show("Failed to delete rule " + error.message);
+                        }
                     })
             );
         }
@@ -197,7 +216,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
         editRuleDialogRef.afterClosed()
             .pipe(filter(result => !!result))
             .subscribe((rule: VideoProcessRule) => {
-                this.ruleMap[rule.videoFileId] = { isDirty: true, rule };
+                this.ruleMap[rule.videoFileId] = {isDirty: true, rule};
             });
     }
 
@@ -234,14 +253,15 @@ export class VideoFileModal implements OnInit, OnDestroy {
             this._subscription.add(
                 this._videoProcessRuleService.addRule(rule)
                     .subscribe((ruleCreated: VideoProcessRule) => {
-                        this.ruleMap[ruleCreated.videoFileId] = { isDirty: false, rule: ruleCreated };
+                        this.ruleCount++;
+                        this.ruleMap[ruleCreated.videoFileId] = {isDirty: false, rule: ruleCreated};
                     })
             );
         } else {
             this._subscription.add(
                 this._videoProcessRuleService.editRule(rule)
                     .subscribe((ruleUpdated: VideoProcessRule) => {
-                        this.ruleMap[ruleUpdated.videoFileId] = { isDirty: false, rule: ruleUpdated };
+                        this.ruleMap[ruleUpdated.videoFileId] = {isDirty: false, rule: ruleUpdated};
                     })
             );
         }
