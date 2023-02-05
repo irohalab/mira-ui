@@ -1,3 +1,4 @@
+@import "../../_dark-theme-helpers";
 @break-point: 426px;
 
 :host {
@@ -6,6 +7,12 @@
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+  &.dark-theme {
+    color: @darkForeground;
+    .ui.header {
+      color: @darkForeground;
+    }
+  }
 }
 
 .app-section {

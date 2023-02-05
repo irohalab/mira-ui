@@ -1,7 +1,7 @@
 <div class="apps-guide">
     <div class="android-apps">
         <h2 class="ui header">Android移动客户端</h2>
-        <div class="ui segment app-section" [ngClass]="{expand: expanded1}">
+        <div class="ui segment app-section" [ngClass]="{expand: expanded1, inverted: isDarkTheme}">
             <a class="ui header app-link" href="https://play.google.com/store/apps/details?id=com.sqrtf.megumin&utm_source=deneb-web">
                 <img src="/assets/img/megumin-logo.webp" alt="logo">
                 <span class="header-text">Megumin</span>
@@ -27,7 +27,7 @@
                 <button class="ui tiny button" (click)="expand1()">查看详细</button>
             </div>
         </div>
-        <div class="ui segment app-section" [ngClass]="{expand: expanded2}">
+        <div class="ui segment app-section" [ngClass]="{expand: expanded2, inverted: isDarkTheme}">
             <a class="ui header app-link" href="https://play.google.com/store/apps/details?id=me.sunzheng.mana&utm_source=deneb-web">
                 <img src="/assets/img/mana-logo.webp" alt="logo">
                 <span class="header-text">Mana</span>
@@ -62,6 +62,7 @@
             Chrome扩展用来增强Web版的信息显示与社交功能，使用之后您可以在{{siteTitle}}绑定您的Bangumi帐号，
             之后{{siteTitle}}就会变成一个Bangumi客户端。您可以自动同步收藏，观看进度，查看和发表评论。
         </p>
-        <p><a [href]="'https://chrome.google.com/webstore/detail/' + chromeExtensionId">前往Chrome商店</a></p>
+        <p>请下载后解压zip并选择手动加载扩展，然后在用户设置里输入扩展的ID</p>
+        <p><a href="/video/preview-video/chrome.zip">点击下载</a></p>
     </div>
 </div>

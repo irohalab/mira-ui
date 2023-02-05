@@ -1,0 +1,22 @@
+@import "../_dark-theme-helpers";
+
+.dark-navbar() {
+  .navbar {
+    background-color: @darkBackground;
+    color: @darkForeground;
+    .brand {
+      color: @darkForeground;
+    }
+  }
+}
+
+.parent-dark-theme() {
+  :host-context(.dark-theme)  {
+    p {
+      color: @darkForeground;
+    }
+    .ui.header {
+      color: @darkForeground;
+    }
+  }
+}

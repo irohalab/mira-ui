@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
+import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 
 @Component({
     selector: 'apps-guide',
@@ -14,19 +15,24 @@ export class AppsComponent implements OnInit, OnDestroy {
 
     siteTitle = environment.siteTitle;
     chromeExtensionId = environment.chromeExtensionId;
-
     showAndroid: boolean;
-
     expanded1 = false;
-
     expanded2 = false;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _route: ActivatedRoute,
+                private _darkThemeService: DarkThemeService,
                 titleService: Title) {
         titleService.setTitle(`Apps - ${environment.siteTitle}`);
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => {this.isDarkTheme = theme === DARK_THEME;})
+        );
         this._subscription.add(
             this._route.params
                 .subscribe(params => {
