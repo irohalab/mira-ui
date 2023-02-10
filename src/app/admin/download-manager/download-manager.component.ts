@@ -4,12 +4,13 @@ import { DownloadJob } from '../../entity/DownloadJob';
 import { getRemPixel } from '../../../helpers/dom';
 import { interval, Subscription } from 'rxjs';
 import { DownloadManagerService } from './download-manager.service';
-import { switchMap } from 'rxjs/operators';
+import { filter, switchMap } from 'rxjs/operators';
 import { AdminService } from '../admin.service';
 import { UIDialog } from '@irohalab/deneb-ui';
 import { DownloadJobDetailComponent } from './download-job-detail/download-job-detail.component';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
+import { ActivatedRoute } from '@angular/router';
 
 const JOB_CARD_HEIGHT_REM = 4.2;
 
@@ -57,6 +58,7 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
     constructor(private _downloadManagerService: DownloadManagerService,
                 private _adminService: AdminService,
                 private _dialog: UIDialog,
+                private _route: ActivatedRoute,
                 titleService: Title) {
         titleService.setTitle(`下载管理 - ${environment.siteTitle}`);
         if (window) {
@@ -70,7 +72,17 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.updateList();
+        this._subscription.add(
+            this._route.queryParams
+                .pipe(
+                    filter((params) => {
+                        return params['status'];
+                    }))
+                .subscribe((params) => {
+                    this.selectJobStatus = params['status'] as DownloadJobStatus;
+                    this.updateList();
+                })
+        );
     }
 
     pauseOrResumeJob(event: Event): void {

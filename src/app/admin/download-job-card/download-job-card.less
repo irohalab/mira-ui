@@ -22,7 +22,11 @@ download-job-card {
   justify-content: flex-start;
   align-items: center;
   > .job-id {
-    width: 22rem;
+    width: 8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 0.5rem;
   }
   > .bangumi-name {
     overflow: hidden;
@@ -39,8 +43,8 @@ download-job-card {
   > .progress, > .download-speed, > .size {
     width: 6rem;
   }
-  > .seeds, > .leechers {
-    width: 7rem;
+  > .create-time, > .end-time {
+    width: 15rem;
   }
   > .eta {
     width: 10rem;

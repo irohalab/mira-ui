@@ -35,11 +35,11 @@
 </admin-navbar>
 <div class="sub-menu">
     <div class="ui secondary vertical pointing menu">
-        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Pending}" (click)="onChangeStatus(mJobStatus.Pending)">Pending</div>
-        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Downloading}" (click)="onChangeStatus(mJobStatus.Downloading)">Downloading</div>
-        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Complete}" (click)="onChangeStatus(mJobStatus.Complete)">Complete</div>
-        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Paused}" (click)="onChangeStatus(mJobStatus.Paused)">Paused</div>
-        <div class="item" [ngClass]="{active: selectJobStatus === mJobStatus.Error}" (click)="onChangeStatus(mJobStatus.Error)">Error</div>
+        <a class="item" routerLinkActive="active" [routerLink]="['/admin/download-manager']" [queryParams]="{status: mJobStatus.Pending }">Pending</a>
+        <a class="item" routerLinkActive="active" [routerLink]="['/admin/download-manager']" [queryParams]="{status: mJobStatus.Downloading }" >Downloading</a>
+        <a class="item" routerLinkActive="active" [routerLink]="['/admin/download-manager']" [queryParams]="{status: mJobStatus.Complete }">Complete</a>
+        <a class="item" routerLinkActive="active" [routerLink]="['/admin/download-manager']" [queryParams]="{status: mJobStatus.Paused }">Paused</a>
+        <a class="item" routerLinkActive="active" [routerLink]="['/admin/download-manager']" [queryParams]="{status: mJobStatus.Error }">Error</a>
     </div>
 </div>
 <div class="content-area">
@@ -50,8 +50,8 @@
         <div class="size">Size</div>
         <div class="bangumi-name">Bangumi</div>
         <div class="torrent-name">Torrent</div>
-        <div class="seeds">Seeds</div>
-        <div class="leechers">Leechers</div>
+        <div class="create-time">Create Time</div>
+        <div class="end-time">End Time</div>
         <div class="eta">ETA</div>
     </div>
     <div class="job-container" *ngIf="!isLoading && jobList && jobList.length > 0">

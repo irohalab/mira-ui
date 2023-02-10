@@ -3,23 +3,10 @@
         <a class="close-button" (click)="closePanel()">
             <i class="chevron left icon"></i>
         </a>
-        <div class="panel-title">Download Job</div>
+        <div class="panel-title">Download Job {{job.progress + '%'}}</div>
     </div>
     <div class="job-basic-info">
-        <div class="job-id">JOB ID: {{job.id}}</div>
-        <div class="job-progress">
-            <div class="ui progress" [ngClass]="{
-        success: job.status === mJobStatus.Complete,
-        'blue active': job.status === mJobStatus.Downloading,
-        teal: job.status === mJobStatus.Pending,
-        warning: job.status === mJobStatus.Paused,
-        error: job.status === mJobStatus.Error,
-        disabled: job.status === mJobStatus.Removed}">
-                <div class="bar" [style.width]="job.progress + '%'">
-                    <div class="progress">{{job.progress + '%'}}</div>
-                </div>
-            </div>
-        </div>
+        <div class="job-id">Job Id: {{job.id}}</div>
         <div class="bangumi-name" *ngIf="!!job.bangumi">
             Bangumi:
             <a class="bangumi-link" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
@@ -28,6 +15,14 @@
     <div class="job-summary">
         <table class="job-info-table ui table">
             <tbody>
+            <tr>
+                <td style="width: 15em;">Create Time</td>
+                <td>{{job.createTime}}</td>
+            </tr>
+            <tr>
+                <td>End Time</td>
+                <td>{{job.endTime}}</td>
+            </tr>
             <tr>
                 <td>Download Speed</td>
                 <td>{{job.downloadSpeed}}</td>
@@ -41,7 +36,11 @@
                 <td>{{job.connectedLeechers}}({{job.leechers}})</td>
             </tr>
             <tr>
-                <td>Torrent:</td>
+                <td>Torrent Name</td>
+                <td>{{job.torrentName}}</td>
+            </tr>
+            <tr>
+                <td>Torrent URL</td>
                 <td>{{job.torrentUrl}}</td>
             </tr>
             <tr>
@@ -78,5 +77,12 @@
             </tr>
             </tbody>
         </table>
+    </div>
+    <div class="job-error" *ngIf="job.errorInfo">
+        <div class="section-header">Error Info</div>
+        <div class="ui message" *ngIf="job.errorInfo.message">{{job.errorInfo.message}}</div>
+        <div class="error-stack" *ngIf="job.errorInfo.stack">
+            <pre>{{job.errorInfo.stack}}</pre>
+        </div>
     </div>
 </div>
