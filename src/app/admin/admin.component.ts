@@ -3,6 +3,7 @@ import { UserService } from '../user-service/user.service';
 import { User } from '../entity/user';
 import { Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { DownloadJobStatus } from '../entity/DownloadJobStatus';
 
 @Component({
     selector: 'admin',
@@ -15,6 +16,8 @@ export class Admin implements OnDestroy {
     siteTitle = environment.siteTitle;
 
     user: User;
+
+    eDownloadJobStatus = DownloadJobStatus;
 
     constructor(private _userService: UserService) {
         this._subscription.add(

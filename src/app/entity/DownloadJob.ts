@@ -46,6 +46,9 @@ export class DownloadJob {
     public leechers: number;
     public connectedSeeds: number;
     public connectedLeechers: number;
+    public createTime: string;
+    public endTime: string;
+    public errorInfo: { message?: string, stack?: string };
 
     // not from database
     public bangumi: Bangumi;

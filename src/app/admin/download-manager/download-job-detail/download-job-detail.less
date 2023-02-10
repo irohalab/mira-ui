@@ -2,7 +2,7 @@
   display: block;
   box-sizing: border-box;
   text-align: left;
-  width: 40rem;
+  width: 80rem;
   height: 100%;
   margin: auto;
   top: 0;
@@ -35,5 +35,25 @@
     &:focus {
       color: #5f94c5;
     }
+  }
+}
+
+.job-basic-info, .job-summary {
+  margin: 0.5rem 1rem;
+}
+
+.job-info-table {
+  table-layout: fixed;
+  tbody td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+.job-error {
+  margin: 1rem;
+  .section-header {
+    font-size: 1.2em;
+    font-weight: 600;
   }
 }

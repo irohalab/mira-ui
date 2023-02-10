@@ -8,8 +8,8 @@
             <a class="bangumi-link" *ngIf="job.bangumi" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
         </div>
         <div class="torrent-name">{{job.torrentName}}</div>
-        <div class="seeds">{{job.connectedSeeds}}({{job.seeds}})</div>
-        <div class="leechers">{{job.connectedLeechers}}({{job.leechers}})</div>
+        <div class="create-time">{{job.createTime}}</div>
+        <div class="end-time">{{job.endTime}}</div>
         <div class="eta">{{job.eta | readableUnit: 'second': 1}}</div>
         <a class="anchor-button" (click)="onViewDetail($event)">View Job Details</a>
         <a *ngIf="job.bangumi" class="file-mapping anchor-button" (click)="onViewFileMapping($event)">View FileMapping</a>
