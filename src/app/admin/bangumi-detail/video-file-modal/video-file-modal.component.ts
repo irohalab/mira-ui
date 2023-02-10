@@ -223,7 +223,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
     convertVideoFile(videoFileGroup: FormGroup): void {
         this.handlingConvert = true;
         const videoFileId = videoFileGroup.value.id;
-        if (this.ruleMap[videoFileId] && !this.ruleMap[videoFileId].isDirty) {
+        if (this.ruleCount > 0 && videoFileGroup.value.status === VideoFile.STATUS_DOWNLOADED) {
             this._subscription.add(
                 this._adminService.getEpisodeVideoFiles(this.episode.id)
                     .pipe(switchMap((videoFileList) => {
