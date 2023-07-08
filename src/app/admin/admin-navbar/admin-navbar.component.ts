@@ -1,6 +1,8 @@
 import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
+import { NavigationService } from '../../navigation.service';
 
 @Component({
     selector: 'admin-navbar',
@@ -19,7 +21,9 @@ export class AdminNavbar implements OnInit, OnDestroy {
 
     isDarkTheme: boolean;
 
-    constructor(private _darkThemeService: DarkThemeService) {
+    constructor(private _darkThemeService: DarkThemeService,
+                private _navigationService: NavigationService,
+                private _router: Router) {
     }
 
     ngOnDestroy(): void {
@@ -35,5 +39,9 @@ export class AdminNavbar implements OnInit, OnDestroy {
                     this.isDarkTheme = theme === DARK_THEME;
                 })
         );
+    }
+
+    back(): void {
+        this._navigationService.goBack(this.backLink);
     }
 }

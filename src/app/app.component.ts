@@ -6,6 +6,7 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { AnalyticsService } from './analytics.service';
 import { Router, NavigationEnd, NavigationStart } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { NavigationService } from './navigation.service';
 
 /*
  * App Component
@@ -35,7 +36,7 @@ export class App {
         }
     }
 
-    constructor(analyticsSerivce: AnalyticsService, router: Router) {
+    constructor(analyticsSerivce: AnalyticsService, router: Router, navigationService: NavigationService) {
         this.routeEventsSubscription = router.events
             .subscribe(
                 (event) => {
@@ -43,7 +44,9 @@ export class App {
                         this.removePreLoader();
                     }
                 }
-            )
+            );
+
+        navigationService.startSaveHistory();
     }
 }
 

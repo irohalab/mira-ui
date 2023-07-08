@@ -1,5 +1,5 @@
 <nav class="nav-admin" [ngClass]="{'dark-theme': isDarkTheme}">
-    <a class="back-button" [routerLink]="backLink" *ngIf="backLink">
+    <a class="back-button" (click)="back()" *ngIf="backLink">
         <i class="chevron left icon"></i>
     </a>
     <div class="title">{{navTitle}}</div>

@@ -8,6 +8,7 @@ import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { FileMapping } from '../../entity/FileMapping';
 import { Bangumi } from '../../entity';
 import { AdminService } from '../admin.service';
+import { TorrentFile } from '../../entity/TorrentFile';
 
 type ReqData = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -108,6 +109,15 @@ export class DownloadManagerService extends BaseService {
         }
         return this.sendRequest<{ status: number }>(reqData)
             .pipe(map(res => res.status), catchError(this.handleError));
+    }
+
+    public getJobContent(jobId: string): Observable<TorrentFile[]> {
+        const reqData: ReqData = {
+            method: 'GET',
+            url: `/download/job/${jobId}/content`
+        };
+        return this.sendRequest<{data: TorrentFile[], status: number}>(reqData)
+            .pipe(map(res => res.data), catchError(this.handleError));
     }
 
     public getBangumi(id: string): Observable<Bangumi> {

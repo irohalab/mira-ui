@@ -1,4 +1,4 @@
-<admin-navbar navTitle="Video Process Job" backLink="/admin/video-manager">
+<admin-navbar navTitle="Video Process Job" backLink="/admin/video-manager?status=Running">
     <a class="accessory-action anchor-button"
        title="Cancel"
        *ngIf="job && (job.status === eJobStatus.Running || job.status === eJobStatus.Queueing)"

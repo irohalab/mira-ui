@@ -17,6 +17,6 @@ export class ExtractAction extends Action {
     // be by default .vtt, this may cause an issue.
     public outputExtname: string;
     public extractRegex: string;
-    public extractorId = 'Default';
+    public extractorId = 'File';
     public extraData: any = {};
 }
