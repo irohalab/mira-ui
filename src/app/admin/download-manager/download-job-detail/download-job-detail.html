@@ -85,4 +85,23 @@
             <pre>{{job.errorInfo.stack}}</pre>
         </div>
     </div>
+    <div class="job-content">
+        <div class="section-header">Content</div>
+        <table class="file-list-table ui table">
+            <thead>
+            <tr>
+                <th>Path</th>
+                <th>Size</th>
+                <th>Progress</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let torrentFile of jobContent">
+                <td>{{torrentFile.name}}</td>
+                <td>{{torrentFile.size | readableUnit:'byte':1}}</td>
+                <td>{{torrentFile.progress | percent}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

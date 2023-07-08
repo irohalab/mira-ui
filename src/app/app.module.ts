@@ -17,6 +17,7 @@ import { ResetPassModule } from './reset-pass/reset-pass.module';
 import { UserServiceModule } from './user-service/index';
 import { StaticContentModule } from './static-content/static-content.module';
 import { RefreshSameRouteStrategy } from './RefreshSameRouteStrategy';
+import { NavigationService } from './navigation.service';
 
 @NgModule({
     declarations: [
@@ -27,6 +28,7 @@ import { RefreshSameRouteStrategy } from './RefreshSameRouteStrategy';
     ],
     providers: [
         AnalyticsService,
+        NavigationService,
         TaskService,
         {
             provide: RouteReuseStrategy,

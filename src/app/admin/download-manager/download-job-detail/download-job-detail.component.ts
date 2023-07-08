@@ -5,6 +5,7 @@ import { interval, Subscription } from 'rxjs';
 import { DownloadManagerService } from '../download-manager.service';
 import { switchMap, takeWhile } from 'rxjs/operators';
 import { DownloadJobStatus } from '../../../entity/DownloadJobStatus';
+import { TorrentFile } from '../../../entity/TorrentFile';
 
 @Component({
     selector: 'download-job-detail',
@@ -20,6 +21,8 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     @Input()
     job: DownloadJob;
 
+    jobContent: TorrentFile[];
+
     constructor(private _dialogRef: UIDialogRef<DownloadJobDetailComponent>,
                 private _downloadManagerService: DownloadManagerService,
                 toast: UIToast) {
@@ -34,25 +37,43 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this._subscription.add(
-            interval(5000)
-                .pipe(
-                    takeWhile(() => {
-                        return this.job.status === DownloadJobStatus.Downloading
-                            || this.job.status === DownloadJobStatus.Pending
-                            || this.job.status === DownloadJobStatus.Paused;
-                    }),
-                    switchMap(() => {
-                        return this._downloadManagerService.getJob(this.job.id);
-                    }))
-                .subscribe({
-                    next: (job) => {
-                        this.job = job;
-                    },
-                    error: (error) => {
-                        this._toastRef.show(error.message || error);
-                    }
-                })
-        );
+        if (this.job.status === DownloadJobStatus.Complete) {
+            this._subscription.add(
+                this._downloadManagerService.getJobContent(this.job.id)
+                    .subscribe({
+                        next: (content) => {
+                            this.jobContent = content;
+                        },
+                        error: (error) => {
+                            this._toastRef.show(error.message || error);
+                        }
+                    })
+            );
+        } else {
+            this._subscription.add(
+                interval(5000)
+                    .pipe(
+                        takeWhile(() => {
+                            return this.job.status === DownloadJobStatus.Downloading
+                                || this.job.status === DownloadJobStatus.Pending
+                                || this.job.status === DownloadJobStatus.Paused;
+                        }),
+                        switchMap(() => {
+                            return this._downloadManagerService.getJob(this.job.id);
+                        }),
+                        switchMap((job) => {
+                            this.job = job;
+                            return this._downloadManagerService.getJobContent(job.id);
+                        }))
+                    .subscribe({
+                        next: (content) => {
+                            this.jobContent = content;
+                        },
+                        error: (error) => {
+                            this._toastRef.show(error.message || error);
+                        }
+                    })
+            );
+        }
     }
 }

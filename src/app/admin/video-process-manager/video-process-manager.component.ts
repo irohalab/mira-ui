@@ -4,9 +4,10 @@ import { VideoProcessJobStatus } from '../../entity/VideoProcessJobStatus';
 import { VideoProcessJob } from '../../entity/VideoProcessJob';
 import { VideoProcessManagerService } from './video-process-manager.service';
 import { getRemPixel } from '../../../helpers/dom';
-import { switchMap } from 'rxjs/operators';
+import { filter, switchMap } from 'rxjs/operators';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
+import { ActivatedRoute } from '@angular/router';
 
 const JOB_CARD_HEIGHT_REM = 4.5;
 
@@ -26,6 +27,7 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
     selectJobStatus: VideoProcessJobStatus = VideoProcessJobStatus.Running;
 
     constructor(private _videoProcessManagerService: VideoProcessManagerService,
+                private _route: ActivatedRoute,
                 titleService: Title) {
         titleService.setTitle(`视频管理 - ${environment.siteTitle}`);
         if (window) {
@@ -39,11 +41,18 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.updateJobList();
-    }
-
-    onChangeStatus(status: VideoProcessJobStatus) {
-        this.selectJobStatus = status;
+        this._sub.add(
+            this._route.queryParams
+                .pipe(
+                    filter((params) => {
+                        return params['status'];
+                    })
+                )
+                .subscribe((params) => {
+                    this.selectJobStatus = params['status'] as VideoProcessJobStatus;
+                    this.updateJobList();
+                })
+        );
         this.updateJobList();
     }
 

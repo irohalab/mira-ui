@@ -164,6 +164,7 @@
                         <div class="text" *ngIf="$any(actions[selectedActionId]).extractFrom">{{$any(actions[selectedActionId]).extractFrom}}</div>
                         <div class="menu">
                             <div class="item" (click)="updateActionExtractSource(eExtractSource.VideoFile)">{{eExtractSource.VideoFile}}</div>
+                            <div class="item" (click)="updateActionExtractSource(eExtractSource.Archive)">{{eExtractSource.Archive}}</div>
                             <div class="item" (click)="updateActionExtractSource(eExtractSource.OtherFiles)">{{eExtractSource.OtherFiles}}</div>
                         </div>
                     </div>
@@ -191,7 +192,7 @@
                            name="outputExtname"
                            placeholder="extension name of output"/>
                 </div>
-                <div class="field"  *ngIf="$any(actions[selectedActionId]).extractorId === 'Default'">
+                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Default'">
                     <label>extractRegex</label>
                     <input type="text"
                            [(ngModel)]="$any(actions[selectedActionId]).extractRegex"
@@ -200,7 +201,7 @@
                            name="extractRegex"
                            placeholder="regex to match file/track"/>
                 </div>
-                <div class="field"  *ngIf="$any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio'">
+                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio'">
                     <label>extraData.propertyName</label>
                     <input type="text"
                            [(ngModel)]="$any(actions[selectedActionId]).extraData.propertyName"
@@ -209,7 +210,7 @@
                            name="propertyName"
                            placeholder="property name of the stream info to match"/>
                 </div>
-                <div class="field"  *ngIf="$any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio'">
+                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio'">
                     <label>extraData.propertyValueRegex</label>
                     <input type="text"
                            [(ngModel)]="$any(actions[selectedActionId]).extraData.propertyValueRegex"
@@ -218,7 +219,7 @@
                            name="propertyValueRegex"
                            placeholder="regular expression of the property of stream info"/>
                 </div>
-                <div class="field"  *ngIf="$any(actions[selectedActionId]).extractorId === 'Audio'">
+                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Audio'">
                     <label>extraData.selectDefault</label>
                     <input type="text"
                            [(ngModel)]="$any(actions[selectedActionId]).extraData.selectDefault"
@@ -227,20 +228,39 @@
                            name="selectDefault"
                            placeholder="if select the default stream"/>
                 </div>
+                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'File' && $any(actions[selectedActionId]).extractTarget === eExtractTarget.Subtitle">
+                    <label>extraData.fileNameHint (case-insensitive)</label>
+                    <input type="text"
+                           [(ngModel)]="$any(actions[selectedActionId]).extraData.fileNameHint"
+                           (ngModelChange)="updateNode()"
+                           [ngModelOptions]="{updateOn: 'blur'}"
+                           name="fileNameHint"
+                           placeholder="Regex to match filename (optional)">
+                    <small>Use EPS_NO as named capture to capture episode number</small>
+                </div>
+                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'File' && $any(actions[selectedActionId]).extractFrom === eExtractSource.Archive">
+                    <label>extraData.archiveFileNameHint (case-insensitive)</label>
+                    <input type="text"
+                           [(ngModel)]="$any(actions[selectedActionId]).extraData.archiveFileNameHint"
+                           (ngModelChange)="updateNode()"
+                           [ngModelOptions]="{updateOn: 'blur'}"
+                           name="archiveFileNameHint"
+                           placeholder="Regex to match archive filename">
+                </div>
                 <!-- extractorId is not supported currently -->
                 <button class="ui icon button" (click)="removeSelectedNode()"><i class="trash alternate icon"></i></button>
             </div>
             <!-- for debug only, hide in production -->
-            <div class="ui mini form">
-                <div class="field" *ngFor="let actId of actions[selectedActionId].upstreamActionIds">
-                    <label>Upstream Action Id</label>
-                    <input type="text" [value]="actId" readonly>
-                </div>
-                <div class="field" *ngFor="let actId of actions[selectedActionId].downstreamIds">
-                    <label>Downstream Action Id</label>
-                    <input type="text" [value]="actId" readonly>
-                </div>
-            </div>
+<!--            <div class="ui mini form">-->
+<!--                <div class="field" *ngFor="let actId of actions[selectedActionId].upstreamActionIds">-->
+<!--                    <label>Upstream Action Id</label>-->
+<!--                    <input type="text" [value]="actId" readonly>-->
+<!--                </div>-->
+<!--                <div class="field" *ngFor="let actId of actions[selectedActionId].downstreamIds">-->
+<!--                    <label>Downstream Action Id</label>-->
+<!--                    <input type="text" [value]="actId" readonly>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
         <div class="link-card ui segment" *ngIf="selectedLinkId && selectedLinkIndex !== -1">
             <span>Link: </span>

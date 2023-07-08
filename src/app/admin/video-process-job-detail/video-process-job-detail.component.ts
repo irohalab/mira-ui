@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { VideoProcessManagerService } from '../video-process-manager/video-process-manager.service';
 import { combineLatestWith, delay, interval, Subject, Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap, takeWhile, tap } from 'rxjs/operators';
 import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { VideoProcessJob } from '../../entity/VideoProcessJob';
@@ -48,6 +48,7 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
     constructor(private _videoProcessManagerService: VideoProcessManagerService,
                 private _adminService: AdminService,
                 private _route: ActivatedRoute,
+                private _router: Router,
                 private _dialog: UIDialog,
                 toastService: UIToast,
                 private titleService: Title) {

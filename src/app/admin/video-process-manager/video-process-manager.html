@@ -6,12 +6,12 @@
 </admin-navbar>
 <div class="sub-menu">
     <div class="ui secondary vertical pointing menu">
-        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Queueing}" (click)="onChangeStatus(eJobStatus.Queueing)">Queueing</div>
-        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Running}" (click)="onChangeStatus(eJobStatus.Running)">Running</div>
-        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Finished}" (click)="onChangeStatus(eJobStatus.Finished)">Finished</div>
-        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.UnrecoverableError}" (click)="onChangeStatus(eJobStatus.UnrecoverableError)">UnrecoverableError</div>
-        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Pause}" (click)="onChangeStatus(eJobStatus.Pause)">Pause</div>
-        <div class="item" [ngClass]="{active: selectJobStatus === eJobStatus.Canceled}" (click)="onChangeStatus(eJobStatus.Canceled)">Canceled</div>
+        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Queueing}">Queueing</div>
+        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Running}">Running</div>
+        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Finished}">Finished</div>
+        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.UnrecoverableError}">UnrecoverableError</div>
+        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Pause}">Pause</div>
+        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Canceled}">Canceled</div>
     </div>
 </div>
 <div class="content-area">
