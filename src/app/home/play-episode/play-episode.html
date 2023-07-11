@@ -28,7 +28,7 @@
 <div class="ui container episode-info-container" *ngIf="!!episode">
     <h3 class=episode-title>
         <span class="bangumi-name">{{episode.bangumi.name_cn}}</span>
-        <span class="episode-no">{{episode.episode_no}}</span>
+        <span class="episode-no" type="padding-left:6px">{{episode.episode_no}}</span>
         <span class="episode-name" *ngIf="!!episode.name_cn || !!episode.name">{{episode.name_cn || episode.name}}</span>
     </h3>
     <button class="feedback-button ui small basic button" [ngClass]="{inverted: isDarkTheme}" (click)="feedback()" title="报告错误"><i class="icon flag"></i>报告错误</button>
