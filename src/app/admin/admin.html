@@ -6,10 +6,10 @@
         <a class="item" [routerLink]="['/admin/bangumi']">
             新番管理
         </a>
-        <a class="item" [routerLink]="['/admin/download-manager']" [queryParams]="{ status: eDownloadJobStatus.Downloading }">
+        <a class="item" [routerLink]="['/admin/download-manager']" [queryParams]="{ status: 'all' }">
             下载管理
         </a>
-        <a class="item" [routerLink]="['/admin/video-manager']">
+        <a class="item" [routerLink]="['/admin/video-manager']" [queryParams]="{ status: 'all' }">
             视频管理
         </a>
         <a class="item" [routerLink]="['/admin/user']">

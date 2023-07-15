@@ -34,7 +34,7 @@ export class DownloadManagerService extends BaseService {
             );
     }
 
-    public list_jobs(status: DownloadJobStatus): Observable<DownloadJob[]> {
+    public list_jobs(status: DownloadJobStatus | 'all'): Observable<DownloadJob[]> {
         const reqData: ReqData = {
             method: 'GET',
             url: '/download/job',

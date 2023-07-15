@@ -3,9 +3,12 @@
         <input type="text" placeholder="Search Download Job" #searchBox>
         <i class="search icon"></i>
     </div>
+    <ui-toggle class="action-item show-meta-jobs-toggle" text="Show Meta Jobs"
+               [(ngModel)]="isShowMetaJobs" name="isShowMetaJobs" (ngModelChange)="filterJob()"></ui-toggle>
 </admin-navbar>
 <div class="sub-menu">
     <div class="ui secondary vertical pointing menu">
+        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: 'all'}">Recent Jobs</div>
         <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Queueing}">Queueing</div>
         <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Running}">Running</div>
         <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Finished}">Finished</div>

@@ -35,6 +35,7 @@
 </admin-navbar>
 <div class="sub-menu">
     <div class="ui secondary vertical pointing menu">
+        <a class="item" routerLinkActive="active" [routerLink]="['/admin/download-manager']" [queryParams]="{status: 'all' }">Recent Jobs</a>
         <a class="item" routerLinkActive="active" [routerLink]="['/admin/download-manager']" [queryParams]="{status: mJobStatus.Pending }">Pending</a>
         <a class="item" routerLinkActive="active" [routerLink]="['/admin/download-manager']" [queryParams]="{status: mJobStatus.Downloading }" >Downloading</a>
         <a class="item" routerLinkActive="active" [routerLink]="['/admin/download-manager']" [queryParams]="{status: mJobStatus.Complete }">Complete</a>

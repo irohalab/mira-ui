@@ -3,5 +3,6 @@ export enum ActionType {
     Copy = 'copy',
     Fragment = 'fragment',
     Merge = 'merge',
-    Extract = 'extract'
+    Extract = 'extract',
+    Validate = 'validate'
 }

@@ -8,6 +8,7 @@ import { filter, switchMap } from 'rxjs/operators';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
 import { ActivatedRoute } from '@angular/router';
+import { JobType } from '../../entity/JobType';
 
 const JOB_CARD_HEIGHT_REM = 4.5;
 
@@ -19,12 +20,14 @@ const JOB_CARD_HEIGHT_REM = 4.5;
 export class VideoProcessManagerComponent implements OnInit, OnDestroy {
     private _jobListSub = new Subscription();
     private _sub = new Subscription();
+    private _jobList: VideoProcessJob[];
 
     cardHeight: number;
     isLoading: boolean;
     jobList: VideoProcessJob[];
     eJobStatus = VideoProcessJobStatus;
-    selectJobStatus: VideoProcessJobStatus = VideoProcessJobStatus.Running;
+    selectJobStatus: VideoProcessJobStatus | 'all' = VideoProcessJobStatus.Running;
+    isShowMetaJobs: boolean = true;
 
     constructor(private _videoProcessManagerService: VideoProcessManagerService,
                 private _route: ActivatedRoute,
@@ -49,7 +52,7 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
                     })
                 )
                 .subscribe((params) => {
-                    this.selectJobStatus = params['status'] as VideoProcessJobStatus;
+                    this.selectJobStatus = params['status'] as VideoProcessJobStatus | 'all';
                     this.updateJobList();
                 })
         );
@@ -62,14 +65,22 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
         this._jobListSub.add(
             this._videoProcessManagerService.listJobs(this.selectJobStatus).pipe(
                 switchMap((jobs: VideoProcessJob[]) => {
-                    this.jobList = jobs;
+                    this._jobList = jobs;
+                    this.filterJob();
                     return interval(500000);
                 }),
                 switchMap(() => this._videoProcessManagerService.listJobs(this.selectJobStatus))
             ).subscribe((jobs: VideoProcessJob[]) => {
-                this.jobList = jobs;
+                this._jobList = jobs;
+                this.filterJob();
             })
         );
+    }
+
+    public filterJob() {
+        this.jobList = this._jobList.filter((job) => {
+            return this.isShowMetaJobs ? true : job.jobMessage.jobType !== JobType.META_JOB;
+        });
     }
 
 }

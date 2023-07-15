@@ -46,12 +46,14 @@ export class VertexGraphComponent implements AfterViewInit, OnInit, OnChanges {
 
     readonly nodeHeightDict: {[key: string]: number} = {
         [ActionType.Convert]: 100,
-        [ActionType.Extract]: 120
+        [ActionType.Extract]: 120,
+        [ActionType.Validate]: 80,
     }
 
     readonly nodeIconClassDict: {[key: string]: string} = {
         [ActionType.Convert]: 'cogs',
-        [ActionType.Extract]: 'envelope outline open'
+        [ActionType.Extract]: 'envelope outline open',
+        [ActionType.Validate]: 'flag checkered'
     }
 
     @ViewChild('graphContainer') vertexGraphContainer: ElementRef;
