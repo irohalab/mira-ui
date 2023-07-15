@@ -6,4 +6,14 @@
         <div class="start-time">{{job.startTime}}</div>
         <div class="finished-time">{{job.finishedTime}}</div>
     </div>
+    <div class="ui top left attached mini grey label" *ngIf="job.jobMessage.jobType === eJobType.META_JOB">META</div>
+    <div class="ui bottom attached progress" [ngClass]="{
+        success: job.status === eJobStatus.Finished,
+        'blue active': job.status === eJobStatus.Running,
+        teal: job.status === eJobStatus.Queueing,
+        warning: job.status === eJobStatus.Pause,
+        error: job.status === eJobStatus.UnrecoverableError,
+        disabled: job.status === eJobStatus.Canceled}">
+        <div class="bar" [style.width]="job.status === eJobStatus.Finished ? '100%' : '50%'"></div>
+    </div>
 </a>

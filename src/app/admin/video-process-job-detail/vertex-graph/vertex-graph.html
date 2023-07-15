@@ -51,6 +51,8 @@
                             <xhtml:div class="extraData" *ngIf="!!node.data.action.extraData && node.data.action.extractorId === 'Audio'">
                                 <xhtml:span class="property-name">extraData.selectDefault:</xhtml:span>{{node.data.action.extraData.selectDefault}}</xhtml:div>
                         </xhtml:div>
+                        <xhtml:div *ngIf="node.data.actionType === eActionType.Validate" class="action-properties">
+                        </xhtml:div>
                     </xhtml:div>
                 </svg:foreignObject>
                 <svg:rect width="240"

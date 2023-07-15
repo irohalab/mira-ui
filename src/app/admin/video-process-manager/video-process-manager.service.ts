@@ -31,7 +31,7 @@ export class VideoProcessManagerService extends BaseService {
             );
     }
 
-    listJobs(status: VideoProcessJobStatus): Observable<VideoProcessJob[]> {
+    listJobs(status: VideoProcessJobStatus | 'all'): Observable<VideoProcessJob[]> {
         const reqData: ReqData = {
             method: 'GET',
             url: '/job',

@@ -34,8 +34,6 @@ export class AdminNavbar implements OnInit, OnDestroy {
         this._subscription.add(
             this._darkThemeService.themeChange
                 .subscribe(theme => {
-                    console.log('pushed theme: ', theme);
-                    console.log('stored theme: ' , window.localStorage.getItem('theme_for_deneb'));
                     this.isDarkTheme = theme === DARK_THEME;
                 })
         );
