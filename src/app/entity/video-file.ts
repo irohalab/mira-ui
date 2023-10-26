@@ -15,6 +15,11 @@ export class VideoFile {
     // optional, only available at end-user api
     url: string;
 
+    kf_tile_size?: number;
+    kf_frame_width?: number;
+    kf_frame_height?: number;
+    kf_image_path_list?: string;
+
 
     static STATUS_DOWNLOAD_PENDING = 1;
     static STATUS_DOWNLOADING = 2;
