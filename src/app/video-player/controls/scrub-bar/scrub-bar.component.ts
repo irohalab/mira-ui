@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { VideoPlayerHelpers } from '../../core/helpers';
 import { VideoPlayer } from '../../video-player.component';
+import { getRemPixel } from '../../../../helpers/dom';
 
 @Component({
     selector: 'video-player-scrub-bar',
@@ -28,14 +29,23 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
 
     duration = Number.NaN;
 
-    @HostBinding('class.not-mobile-device')
     notMobileDevice = !VideoPlayerHelpers.isMobileDevice();
+
+    previewKeyframeWidth: number;
+    previewKeyframeHeight: number;
+    previewBgPosX: number;
+    previewBgPosY: number;
+    previewBgImageUrl: string;
+
+    get previewOffset(): number {
+        return -(getRemPixel(1.7 + 1 + 0.8) + this.previewKeyframeHeight ?? 0);
+    }
 
     @Input()
     set showControls(s: boolean) {
         this._controlVisibleState = s;
         if (!s) {
-            this.pointOpacity = 0;
+            this.hideToolTip();
         }
     }
 
@@ -48,9 +58,10 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
 
     pointPosition: string;
     pointTransform: string;
-    pointOpacity: number;
+    visibility: string;
 
     @ViewChild('tip', {static: false}) tipRef: ElementRef;
+    @ViewChild('scrubBarWrapper', {static: false}) scrubBarWrapper: ElementRef;
 
     get playProgressPercentage(): number {
         if (this._isDragging) {
@@ -68,10 +79,14 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
         return Math.round(this.buffered / this.duration * 1000) / 10;
     }
 
-    constructor(@Self() private _hostRef: ElementRef, private _videoPlayer: VideoPlayer) {
+    constructor(private _videoPlayer: VideoPlayer) {
     }
 
     ngOnInit(): void {
+        const videoFile= this._videoPlayer.videoFile;
+        this.previewKeyframeWidth = videoFile.kf_frame_width;
+        this.previewKeyframeHeight = videoFile.kf_frame_height;
+        this.previewBgImageUrl = videoFile.kf_image_path_list[0];
         this._subscription.add(
             this._videoPlayer.currentTime.subscribe(time => this.currentTime = time)
         );
@@ -90,38 +105,38 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        let hostElement = this._hostRef.nativeElement as HTMLElement;
+        let interactiveAreaElement = this.scrubBarWrapper.nativeElement as HTMLElement;
         let tipElement = this.tipRef.nativeElement as HTMLElement;
         if (this.notMobileDevice) {
             this._subscription.add(
-                observableFromEvent<MouseEvent>(hostElement, 'mousedown').pipe(
+                observableFromEvent<MouseEvent>(interactiveAreaElement, 'mousedown').pipe(
                     filter(() => {
                         return !Number.isNaN(this.duration);
                     }),
                     map((event: MouseEvent) => {
-                        return {rect: hostElement.getBoundingClientRect(), event: event};
+                        return {rect: interactiveAreaElement.getBoundingClientRect(), event: event};
                     }),
                     tap(({rect, event}: { rect: ClientRect, event: MouseEvent }) => {
                         event.preventDefault();
                         this._dragProgressRatio = VideoPlayerHelpers.calcSliderRatio(rect, event.clientX);
                         this.startDrag();
                         this.updateTip(rect, event, tipElement);
-                        this.pointOpacity = 1;
+                        this.visibility = 'visible';
                     }),
                     mergeMap(() => {
                         return observableFromEvent<MouseEvent>(document, 'mousemove').pipe(
                             map((event: MouseEvent) => {
-                                return {rect: hostElement.getBoundingClientRect(), event: event};
+                                return {rect: interactiveAreaElement.getBoundingClientRect(), event: event};
                             }),
                             takeUntil(observableFromEvent<MouseEvent>(document, 'mouseup').pipe(
                                 map((event: MouseEvent) => {
-                                    return {rect: hostElement.getBoundingClientRect(), event: event};
+                                    return {rect: interactiveAreaElement.getBoundingClientRect(), event: event};
                                 }),
                                 tap(({rect, event}: { rect: ClientRect, event: MouseEvent }) => {
                                     this._videoPlayer.seek(VideoPlayerHelpers.calcSliderRatio(rect, event.clientX));
                                     this.stopDrag();
                                     if (!this.isEventInRect(rect, event)) {
-                                        this.pointOpacity = 0;
+                                        this.hideToolTip();
                                     }
                                 }),)),);
                     }),)
@@ -134,11 +149,11 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
             );
 
             this._subscription.add(
-                observableFromEvent<MouseEvent>(hostElement, 'mousemove').pipe(
+                observableFromEvent<MouseEvent>(interactiveAreaElement, 'mousemove').pipe(
                     filter(() => !Number.isNaN(this.duration)),
                     filter(() => !this._isDragging),
                     map((event: MouseEvent) => {
-                        return {rect: hostElement.getBoundingClientRect(), event: event};
+                        return {rect: interactiveAreaElement.getBoundingClientRect(), event: event};
                     }),
                     filter(({rect, event}: { rect: ClientRect, event: MouseEvent }) => {
                         return this.isEventInRect(rect, event);
@@ -148,26 +163,26 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
                     })
             );
             this._subscription.add(
-                observableFromEvent<MouseEvent>(hostElement, 'mouseenter').pipe(
+                observableFromEvent<MouseEvent>(interactiveAreaElement, 'mouseenter').pipe(
                     filter(() => !this._isDragging),
                     map((event: MouseEvent) => {
-                        return {rect: hostElement.getBoundingClientRect(), event: event};
+                        return {rect: interactiveAreaElement.getBoundingClientRect(), event: event};
                     }),)
                     .subscribe(({rect, event}: { rect: ClientRect, event: MouseEvent }) => {
                         this.updateTip(rect, event, tipElement);
-                        this.pointOpacity = 1;
+                        this.visibility = 'visible';
                     })
             );
             this._subscription.add(
-                observableFromEvent(hostElement, 'mouseleave').pipe(
+                observableFromEvent(interactiveAreaElement, 'mouseleave').pipe(
                     filter(() => !this._isDragging))
                     .subscribe(() => {
-                        this.pointOpacity = 0;
+                        this.hideToolTip();
                     })
             );
         } else {
             this._subscription.add(
-                observableFromEvent<TouchEvent>(hostElement, 'touchstart').pipe(
+                observableFromEvent<TouchEvent>(interactiveAreaElement, 'touchstart').pipe(
                     filter(() => {
                         return this.controlVisibleState;
                     }),
@@ -175,7 +190,7 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
                         return !Number.isNaN(this.duration);
                     }),
                     map((event: TouchEvent) => {
-                        return {rect: hostElement.getBoundingClientRect(), event: event};
+                        return {rect: interactiveAreaElement.getBoundingClientRect(), event: event};
                     }),
                     tap(({rect, event}: { rect: ClientRect, event: TouchEvent }) => {
                         event.preventDefault();
@@ -185,11 +200,11 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
                     mergeMap(() => {
                         return observableFromEvent<TouchEvent>(document, 'touchmove').pipe(
                             map((event: TouchEvent) => {
-                                return {rect: hostElement.getBoundingClientRect(), event: event};
+                                return {rect: interactiveAreaElement.getBoundingClientRect(), event: event};
                             }),
                             takeUntil(observableFromEvent<TouchEvent>(document, 'touchend').pipe(
                                 map((event: TouchEvent) => {
-                                    return {rect: hostElement.getBoundingClientRect(), event: event};
+                                    return {rect: interactiveAreaElement.getBoundingClientRect(), event: event};
                                 }),
                                 tap(({rect, event}: { rect: ClientRect, event: TouchEvent }) => {
                                     this._videoPlayer.seek(VideoPlayerHelpers.calcSliderRatio(rect, event.changedTouches[0].clientX));
@@ -242,13 +257,31 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
         } else if (pointX + rectOfTip.width > rect.width) {
             pointX = rect.width - rectOfTip.width;
         }
-
         if (pointX === 0) {
             this.pointTransform = `translateX(${-halfWidthOfTip})`;
         } else {
             this.pointTransform = `translateX(${pointX}px)`;
         }
         this.pointPosition = VideoPlayerHelpers.convertTime(this.duration * ratio);
+        this.updateKeyframePreview(ratio);
+    }
+
+    private hideToolTip(): void {
+        this.visibility = 'collapse';
+        // change to 0 so that any pointTransform change can be detected.
+        this.pointTransform = `translateX(0)`;
+    }
+
+    private updateKeyframePreview(ratio: number): void {
+        const videoFile= this._videoPlayer.videoFile;
+        const tileSize= videoFile.kf_tile_size;
+        // console.log(videoFile);
+        let keyframeSeq = Math.round((this.duration * ratio) / 2);
+        let imgSeq = Math.floor(keyframeSeq / (tileSize * tileSize));
+        keyframeSeq = keyframeSeq - imgSeq * tileSize * tileSize;
+        this.previewBgPosX = -1 * keyframeSeq % videoFile.kf_tile_size * videoFile.kf_frame_width;
+        this.previewBgPosY = -1 * Math.floor(keyframeSeq / videoFile.kf_tile_size) * videoFile.kf_frame_height;
+        this.previewBgImageUrl = videoFile.kf_image_path_list[imgSeq];
     }
 
     private isEventInRect(rect: ClientRect, event: MouseEvent): boolean {

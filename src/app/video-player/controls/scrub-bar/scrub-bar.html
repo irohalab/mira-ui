@@ -1,7 +1,19 @@
-<div class="scrub-bar-wrapper">
-    <div class="buffered-bar" [style.width]="bufferedPercentage + '%'"></div>
-    <div class="play-progress-bar" [style.width]="playProgressPercentage + '%'"></div>
+<div class="scrub-bar-interactive-area" [ngClass]="{'not-mobile-device': notMobileDevice}" #scrubBarWrapper>
+    <div class="scrub-bar-wrapper">
+        <div class="buffered-bar" [style.width]="bufferedPercentage + '%'"></div>
+        <div class="play-progress-bar" [style.width]="playProgressPercentage + '%'"></div>
+    </div>
 </div>
-<div class="tip" [style.transform]="pointTransform" [style.opacity]="pointOpacity" #tip>
-    {{pointPosition}}
+<div class="tip"
+     [style.top]="previewOffset + 'px'"
+     [style.transform]="pointTransform"
+     [style.visibility]="visibility" #tip>
+    <div class="keyframe-image"
+         *ngIf="previewBgImageUrl"
+         [style.width]="previewKeyframeWidth + 'px'"
+         [style.height]="previewKeyframeHeight + 'px'"
+         [style.background-image]="'url(\''+previewBgImageUrl+'\')'"
+         [style.background-position-x]="previewBgPosX + 'px'"
+         [style.background-position-y]="previewBgPosY + 'px'"></div>
+    <div class="time-tip">{{pointPosition}}</div>
 </div>
