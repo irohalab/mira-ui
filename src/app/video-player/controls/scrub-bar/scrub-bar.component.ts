@@ -1,10 +1,15 @@
+import { fromEvent as observableFromEvent, interval as observableInterval, Subscription } from 'rxjs';
 
-import {interval as observableInterval, fromEvent as observableFromEvent,  Subscription } from 'rxjs';
-
-import {takeUntil, mergeMap, tap, map, filter} from 'rxjs/operators';
+import { filter, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
 import {
-    AfterViewInit, Component, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, OnInit,
-    Output, Self,
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
     ViewChild
 } from '@angular/core';
 import { VideoPlayerHelpers } from '../../core/helpers';
@@ -38,7 +43,7 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
     previewBgImageUrl: string;
 
     get previewOffset(): number {
-        return -(getRemPixel(1.7 + 1 + 0.8) + this.previewKeyframeHeight ?? 0);
+        return -(getRemPixel(1.7 + 1 + 0.8) + (this.previewKeyframeHeight ?? 0));
     }
 
     @Input()
@@ -83,12 +88,6 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        const videoFile= this._videoPlayer.videoFile;
-        if (Array.isArray(videoFile.kf_image_path_list) && videoFile.kf_image_path_list.length > 0) {
-            this.previewKeyframeWidth = videoFile.kf_frame_width;
-            this.previewKeyframeHeight = videoFile.kf_frame_height;
-            this.previewBgImageUrl = videoFile.kf_image_path_list[0];
-        }
         this._subscription.add(
             this._videoPlayer.currentTime.subscribe(time => this.currentTime = time)
         );
@@ -278,13 +277,18 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
         const videoFile= this._videoPlayer.videoFile;
         if (Array.isArray(videoFile.kf_image_path_list) && videoFile.kf_image_path_list.length > 0) {
             const tileSize= videoFile.kf_tile_size;
-            // console.log(videoFile);
+            this.previewKeyframeWidth = videoFile.kf_frame_width;
+            this.previewKeyframeHeight = videoFile.kf_frame_height;
             let keyframeSeq = Math.round((this.duration * ratio) / 2);
             let imgSeq = Math.floor(keyframeSeq / (tileSize * tileSize));
             keyframeSeq = keyframeSeq - imgSeq * tileSize * tileSize;
             this.previewBgPosX = -1 * keyframeSeq % videoFile.kf_tile_size * videoFile.kf_frame_width;
             this.previewBgPosY = -1 * Math.floor(keyframeSeq / videoFile.kf_tile_size) * videoFile.kf_frame_height;
             this.previewBgImageUrl = videoFile.kf_image_path_list[imgSeq];
+        } else {
+            this.previewKeyframeWidth = 0;
+            this.previewKeyframeHeight = 0;
+            this.previewBgImageUrl = null;
         }
     }
 
