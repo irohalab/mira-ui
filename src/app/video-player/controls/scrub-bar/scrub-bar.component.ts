@@ -274,14 +274,16 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
 
     private updateKeyframePreview(ratio: number): void {
         const videoFile= this._videoPlayer.videoFile;
-        const tileSize= videoFile.kf_tile_size;
-        // console.log(videoFile);
-        let keyframeSeq = Math.round((this.duration * ratio) / 2);
-        let imgSeq = Math.floor(keyframeSeq / (tileSize * tileSize));
-        keyframeSeq = keyframeSeq - imgSeq * tileSize * tileSize;
-        this.previewBgPosX = -1 * keyframeSeq % videoFile.kf_tile_size * videoFile.kf_frame_width;
-        this.previewBgPosY = -1 * Math.floor(keyframeSeq / videoFile.kf_tile_size) * videoFile.kf_frame_height;
-        this.previewBgImageUrl = videoFile.kf_image_path_list[imgSeq];
+        if (Array.isArray(videoFile.kf_image_path_list) && videoFile.kf_image_path_list.length > 0) {
+            const tileSize= videoFile.kf_tile_size;
+            // console.log(videoFile);
+            let keyframeSeq = Math.round((this.duration * ratio) / 2);
+            let imgSeq = Math.floor(keyframeSeq / (tileSize * tileSize));
+            keyframeSeq = keyframeSeq - imgSeq * tileSize * tileSize;
+            this.previewBgPosX = -1 * keyframeSeq % videoFile.kf_tile_size * videoFile.kf_frame_width;
+            this.previewBgPosY = -1 * Math.floor(keyframeSeq / videoFile.kf_tile_size) * videoFile.kf_frame_height;
+            this.previewBgImageUrl = videoFile.kf_image_path_list[imgSeq];
+        }
     }
 
     private isEventInRect(rect: ClientRect, event: MouseEvent): boolean {
