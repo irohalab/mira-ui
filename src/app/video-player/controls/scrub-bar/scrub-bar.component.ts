@@ -84,9 +84,11 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnInit(): void {
         const videoFile= this._videoPlayer.videoFile;
-        this.previewKeyframeWidth = videoFile.kf_frame_width;
-        this.previewKeyframeHeight = videoFile.kf_frame_height;
-        this.previewBgImageUrl = videoFile.kf_image_path_list[0];
+        if (Array.isArray(videoFile.kf_image_path_list) && videoFile.kf_image_path_list.length > 0) {
+            this.previewKeyframeWidth = videoFile.kf_frame_width;
+            this.previewKeyframeHeight = videoFile.kf_frame_height;
+            this.previewBgImageUrl = videoFile.kf_image_path_list[0];
+        }
         this._subscription.add(
             this._videoPlayer.currentTime.subscribe(time => this.currentTime = time)
         );
