@@ -9,7 +9,7 @@
     <div class="ui top left attached mini grey label" *ngIf="job.jobMessage.jobType === eJobType.META_JOB">META</div>
     <div class="ui bottom attached progress" [ngClass]="{
         success: job.status === eJobStatus.Finished,
-        'blue active': job.status === eJobStatus.Running,
+        'blue active': job.status === eJobStatus.Running || job.status === eJobStatus.MetaData,
         teal: job.status === eJobStatus.Queueing,
         warning: job.status === eJobStatus.Pause,
         error: job.status === eJobStatus.UnrecoverableError,
