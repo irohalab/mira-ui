@@ -65,6 +65,7 @@ import { VertexGraphComponent } from './video-process-job-detail/vertex-graph/ve
 import { StreamLogViewerComponent } from './video-process-job-detail/stream-log-viewer/stream-log-viewer.component';
 import { VertexInfoPanelComponent } from './video-process-job-detail/vertex-info-panel/vertex-info-panel.component';
 import { DownloadJobDetailComponent } from './download-manager/download-job-detail/download-job-detail.component';
+import { DownloadEditorComponent } from './bangumi-detail/universal-builder/download-editor/download-editor.component';
 
 
 @NgModule({
@@ -112,7 +113,8 @@ import { DownloadJobDetailComponent } from './download-manager/download-job-deta
         VertexGraphComponent,
         StreamLogViewerComponent,
         VertexInfoPanelComponent,
-        DownloadJobDetailComponent
+        DownloadJobDetailComponent,
+        DownloadEditorComponent
     ],
     providers: [
         AdminService,
@@ -156,7 +158,8 @@ import { DownloadJobDetailComponent } from './download-manager/download-job-deta
         VideoProcessRuleEditorComponent,
         FileMappingListComponent,
         VertexInfoPanelComponent,
-        DownloadJobDetailComponent
+        DownloadJobDetailComponent,
+        DownloadEditorComponent
     ]
 })
 export class AdminModule {

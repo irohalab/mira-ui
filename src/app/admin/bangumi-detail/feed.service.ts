@@ -38,7 +38,7 @@ export class FeedService extends BaseService {
           catchError(this.handleError),);
   }
 
-  queryUniversal<T>(mode: string, keyword: string): Observable<Array<Item>> {
+  queryUniversal<T>(mode: string, keyword: string): Observable<Item[]> {
       return this.http.post<{data: Array<Item>, status: number}>(`${this.baseUrl}/universal`, {mode, keyword}).pipe(
           map(res => res.data),
           catchError(this.handleError),);

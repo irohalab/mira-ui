@@ -1,10 +1,11 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
-import { Bangumi } from '../../../entity';
+import { Bangumi, Episode } from '../../../entity';
 import { Item } from '../../../entity/item';
 import { FeedService } from '../feed.service';
+import { DownloadEditorComponent } from './download-editor/download-editor.component';
 
 @Component({
     selector: 'universal-builder',
@@ -26,7 +27,8 @@ export class UniversalBuilderComponent implements OnInit, OnDestroy {
     @Input()
     mode: string;
 
-    itemList: Array<Item>;
+    tableItemList: Item[];
+    itemList: Item[];
 
     keywordControl: FormControl;
 
@@ -35,8 +37,13 @@ export class UniversalBuilderComponent implements OnInit, OnDestroy {
     isSearching: boolean;
     noResultFound: boolean;
 
+    static DIALOG_RESULT_UPDATE_BANGUMI = 'update_bangumi';
+    static DIALOG_RESULT_DOWNLOAD_DIRECTLY = 'download_directly';
+    static DIALOG_RESULT_DELETE = 'delete';
+
     constructor(private _feedService: FeedService,
                 private _dialogRef: UIDialogRef<UniversalBuilderComponent>,
+                private _uiDialog: UIDialog,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
     }
@@ -53,7 +60,7 @@ export class UniversalBuilderComponent implements OnInit, OnDestroy {
                 break;
             }
         }
-        this._dialogRef.close({result: universalList});
+        this._dialogRef.close({result: UniversalBuilderComponent.DIALOG_RESULT_DELETE, data: universalList});
     }
 
     ngOnDestroy(): void {
@@ -111,7 +118,7 @@ export class UniversalBuilderComponent implements OnInit, OnDestroy {
         } else {
             universalList.push(result);
         }
-        this._dialogRef.close({result: universalList});
+        this._dialogRef.close({result: UniversalBuilderComponent.DIALOG_RESULT_UPDATE_BANGUMI, data: universalList});
     }
 
     selectMode(mode: string): void {
@@ -137,5 +144,31 @@ export class UniversalBuilderComponent implements OnInit, OnDestroy {
                     this._toastRef.show(error.message);
                 })
         );
+    }
+
+    downloadItemDirectly(index: number, item: Item): void {
+        const dialogRef = this._uiDialog.open(DownloadEditorComponent, {stickyDialog: true, backdrop: true});
+        dialogRef.componentInstance.files = item.files
+        dialogRef.componentInstance.eps_mapping = item.eps_no_list.map(entry => {
+            const episode = this.bangumi.episodes.find(eps => {
+                return eps.episode_no === entry.eps_no;
+            })
+            return {
+                eps_no: entry.eps_no,
+                format: entry.format,
+                selected: episode ? episode.status === Episode.STATUS_NOT_DOWNLOADED : false};
+        });
+        dialogRef.componentInstance.downloadUrl = item.magnet_uri;
+        dialogRef.componentInstance.bangumi_id = this.bangumi.id;
+        dialogRef.componentInstance.torrentTitle = item.title;
+
+        this._subscription.add(dialogRef.afterClosed().subscribe({
+            next: (result: boolean) => {
+                if (result) {
+                    this._toastRef.show('已添加下载');
+                    this._dialogRef.close({result: UniversalBuilderComponent.DIALOG_RESULT_DOWNLOAD_DIRECTLY});
+                }
+            }
+        }));
     }
 }

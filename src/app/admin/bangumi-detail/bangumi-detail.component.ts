@@ -3,7 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
-import { filter, mergeMap } from 'rxjs/operators';
+import { filter, mergeMap, tap } from 'rxjs/operators';
 import { BaseError } from '../../../helpers/error';
 import { Bangumi, Episode } from '../../entity';
 import { Announce } from '../../entity/announce';
@@ -227,16 +227,26 @@ export class BangumiDetail implements OnInit, OnDestroy {
                 filter((result: any) => !!result),
                 mergeMap((result: any) => {
                     this.isLoading = true;
-                    this.bangumi.universal = JSON.stringify(result.result);
-                    return this._adminService.updateBangumi(this.bangumi);
+                    if (result.result === UniversalBuilderComponent.DIALOG_RESULT_DOWNLOAD_DIRECTLY) {
+                        return this._adminService.getBangumi(this.bangumi.id)
+                            .pipe(tap((bangumi) => {
+                                this.bangumi = bangumi;
+                            }));
+                    } else {
+                        this.bangumi.universal = JSON.stringify(result.data);
+                        return this._adminService.updateBangumi(this.bangumi);
+                    }
                 }),)
-                .subscribe(() => {
-                    this.isLoading = false;
-                    this._toastRef.show('更新成功');
-                    this.updateAvailableModeCount();
-                }, (error) => {
-                    this.isLoading = false;
-                    this._toastRef.show(error.message);
+                .subscribe({
+                    next: () => {
+                        this.isLoading = false;
+                        this._toastRef.show('更新成功');
+                        this.updateAvailableModeCount();
+                    },
+                    error: (error) => {
+                        this.isLoading = false;
+                        this._toastRef.show(error.message);
+                    }
                 })
         );
     }

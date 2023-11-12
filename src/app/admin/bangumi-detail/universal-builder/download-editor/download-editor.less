@@ -1,4 +1,4 @@
-.universal-builder-container {
+.download-editor-container {
   text-align: left;
   @media(max-width: 767px) {
     width: 100%;
@@ -30,69 +30,44 @@
   border-radius: 4px;
   background-color: #fff;
   overflow: hidden;
-  padding-top: 4rem;
+  padding-top: 5rem;
   .ui.dropdown .menu {
-    z-index: 300;
+    z-index: 310;
   }
 }
-.search-bar {
+
+.torrent-info-wrapper {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 4rem;
+  height: 5rem;
   border-bottom: 1px solid #cccccc;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
   background-color: #ffffff;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  .input-box-wrapper {
-    flex: 1 1 auto;
-    margin: 0 1rem;
+  .torrent-name {
+    margin: 0.5rem 0.6rem;
   }
-  .test-button {
-    margin: 0 1rem 0 0;
+  .download-url-wrapper {
+    margin-left: 0.6rem;
+    margin-right: 0.6rem;
   }
 }
-.search-result-wrapper {
+
+.file-list-wrapper {
   position: relative;
   height: 100%;
   width: 100%;
   padding-bottom: 5rem;
   overflow-y: scroll;
   overflow-x: auto;
-  .anchor-button {
-    cursor: pointer;
+
+  td.episode-number > input[type=number] {
+    width: 4.5em;
   }
 }
-.no-result-wrapper,
-.searching-wrapper{
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  z-index: 200;
-}
 
-.no-result-tip {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 8em;
-  height: 2em;
-  font-size: 4rem;
-  color: #9f9f9f;
-}
-.searching-wrapper .loader {
-  color: #9f9f9f;
-}
 .footer {
   position: absolute;
   width: 100%;
