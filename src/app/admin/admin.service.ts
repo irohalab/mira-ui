@@ -113,4 +113,12 @@ export class AdminService extends BaseService {
         return this.http.put<any>(`${this.baseUrl}/video-file/${videoFile.id}`, videoFile).pipe(
             catchError(this.handleError),);
     }
+
+    downloadDirectly(bangumi_id: string,
+                     urlEpsList: {download_url: string, eps_no: number, file_path: string, file_name: string}[]): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}/download-directly`, {
+            bangumi_id,
+            url_eps_list: urlEpsList
+        }).pipe(catchError(this.handleError),);
+    }
 }

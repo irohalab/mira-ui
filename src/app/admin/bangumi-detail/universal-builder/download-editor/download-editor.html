@@ -1,0 +1,38 @@
+<div class="download-editor-container">
+    <div class="torrent-info-wrapper">
+        <h3 class="torrent-name">{{torrentTitle}}</h3>
+        <div class="download-url-wrapper ui mini fluid icon input">
+            <input class="download-url" type="text" [value]="downloadUrl" #downloadUrlTextBox />
+            <i class="copy outline link icon" (click)="copyDownloadUrlToClipboard()"></i>
+        </div>
+    </div>
+    <div class="file-list-wrapper">
+        <table class="file-list-table ui striped table">
+            <thead>
+            <tr>
+                <th>File Path</th>
+                <th>Size</th>
+                <th>Episode</th>
+                <th>Select</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let file of files; index as i">
+                <td>{{file.path}}</td>
+                <td>{{file.size | readableUnit:'byte':2}}</td>
+                <td class="episode-number"><input type="number" [(ngModel)]="eps_mapping[i].eps_no" /></td>
+                <td>
+                    <div class="ui checkbox">
+                        <input type="checkbox" [(ngModel)]="eps_mapping[i].selected">
+                        <label></label>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="footer">
+        <button class="ui button" (click)="cancel()">取消</button>
+        <button class="ui primary button" (click)="download()">下载</button>
+    </div>
+</div>

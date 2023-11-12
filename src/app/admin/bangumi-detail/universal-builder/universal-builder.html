@@ -20,12 +20,17 @@
         <table class="search-result ui striped table" *ngIf="itemList && itemList.length > 0">
             <thead>
             <tr>
+                <th>时间</th>
+                <th>发布者</th>
                 <th>标题</th>
                 <th>集数</th>
+                <th>Action</th>
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let item of itemList">
+            <tr *ngFor="let item of itemList; index as i">
+                <td>{{item.timestamp}}</td>
+                <td>{{item.publisher?.name}}</td>
                 <td>{{item.title}}</td>
                 <td class="eps-no-list">
                     <span class="ui label" *ngFor="let eps_no of item.eps_no_list">
@@ -33,6 +38,7 @@
                         <span class="detail">{{eps_no.format}}</span>
                     </span>
                 </td>
+                <td><a class="anchor-button" title="Download This" (click)="downloadItemDirectly(i, item)"><i class="cloud download icon"></i></a></td>
             </tr>
             </tbody>
         </table>
