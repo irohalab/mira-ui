@@ -53,4 +53,7 @@ export class Episode {
     static STATUS_NOT_DOWNLOADED = 0;
     static STATUS_DOWNLOADING = 1;
     static STATUS_DOWNLOADED = 2;
+
+    // for display purpose, not persistent
+    removedMark: boolean;
 }

@@ -121,4 +121,27 @@ export class AdminService extends BaseService {
             url_eps_list: urlEpsList
         }).pipe(catchError(this.handleError),);
     }
+
+    syncEpisodes(bangumiId: string, bgmId: number): Observable<{
+        data: {
+            new_episodes?: Episode[],
+            removed_episodes?: Episode[],
+            updated_episodes?: Episode[]
+        },
+        msg?: string,
+        status?: number
+    }> {
+        return this.http.post<{
+            data: {
+                new_episodes?: Episode[],
+                removed_episodes?: Episode[],
+                updated_episodes?: Episode[]
+            },
+            msg?: string,
+            status?: number
+        }>(`${this.baseUrl}/sync-episodes`, {
+            bangumi_id: bangumiId,
+            bgm_id: bgmId
+        }).pipe(catchError(this.handleError),);
+    }
 }

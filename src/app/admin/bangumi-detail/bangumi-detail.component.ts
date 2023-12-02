@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
-import { Subscription } from 'rxjs';
-import { filter, mergeMap, tap } from 'rxjs/operators';
+import { EMPTY, forkJoin, Subscription } from 'rxjs';
+import { filter, mergeMap, take, tap } from 'rxjs/operators';
 import { BaseError } from '../../../helpers/error';
 import { Bangumi, Episode } from '../../entity';
 import { Announce } from '../../entity/announce';
@@ -20,9 +20,17 @@ import { KeywordBuilder } from './keyword-builder/keyword-builder.component';
 import { UniversalBuilderComponent } from './universal-builder/universal-builder.component';
 import { VideoFileModal } from './video-file-modal/video-file-modal.component';
 import { environment } from '../../../environments/environment';
+import { AlertDialog } from '../../alert-dialog/alert-dialog.component';
+import { ConfirmDialogModal } from '../../confirm-dialog/confirm-dialog-modal.component';
 
 export enum AnnounceStatus {
     NOT_SET, NOT_YET, ANNOUNCING, EXPIRED
+}
+
+const EP_STATUS_TEXT = {
+    [Episode.STATUS_NOT_DOWNLOADED]: '未下载',
+    [Episode.STATUS_DOWNLOADING]: '下载中',
+    [Episode.STATUS_DOWNLOADED]: '已下载'
 }
 
 @Component({
@@ -217,7 +225,7 @@ export class BangumiDetail implements OnInit, OnDestroy {
         );
     }
 
-    editBangumiUniversal(mode?: string) {
+    editBangumiUniversal(mode?: string): void {
         let dialogRef = this._uiDialog.open(UniversalBuilderComponent, {stickyDialog: true, backdrop: true});
         dialogRef.componentInstance.bangumi = this.bangumi;
         dialogRef.componentInstance.modeList = this.modeList;
@@ -251,7 +259,7 @@ export class BangumiDetail implements OnInit, OnDestroy {
         );
     }
 
-    editEpisode(episode?: Episode) {
+    editEpisode(episode?: Episode): void {
         let dialogRef = this._uiDialog.open(EpisodeDetail, {stickyDialog: true, backdrop: true});
         dialogRef.componentInstance.episode = episode;
         dialogRef.componentInstance.bangumi_id = this.bangumi.id;
@@ -275,12 +283,101 @@ export class BangumiDetail implements OnInit, OnDestroy {
         )
     }
 
-    editVideoFile(episode: Episode) {
+    syncEpisodes(): void {
+        this.isLoading = true;
+        this._subscription.add(
+            this._adminService.syncEpisodes(this.bangumi.id, this.bangumi.bgm_id)
+                .pipe(mergeMap((res) => {
+                    this.isLoading = false;
+                    if (res.status === 0) {
+                        if (res.data.removed_episodes.length > 0) {
+                            for (let ep of this.orderedEpisodeList) {
+                                if (res.data.removed_episodes.some(eps => eps.id === ep.id)) {
+                                    ep.removedMark = true;
+                                }
+                            }
+                            const confirmDialogRef = this._uiDialog.open(ConfirmDialogModal, {stickyDialog: true, backdrop: true});
+                            confirmDialogRef.componentInstance.title = '同步剧集结果';
+                            confirmDialogRef.componentInstance.content = `已经从bgm.tv同步剧集.\n新增的剧集： ${
+                                res.data.new_episodes.length === 0 ? '无' : '[' + res.data.new_episodes.map(ep => {
+                                    if (ep.name) {
+                                        return ep.episode_no + '(' + ep.name + ')'
+                                    } else {
+                                        return ep.episode_no;
+                                    }
+                                }).join(', ') + ']'
+                            }\n更新的剧集：${
+                                res.data.updated_episodes.length === 0 ? '无' : '[' + res.data.updated_episodes.map(ep => {
+                                    if (ep.name) {
+                                        return ep.episode_no + '(' + ep.name + ')'
+                                    } else {
+                                        return ep.episode_no;
+                                    }
+                                }).join(', ') + ']'
+                            }\n以下剧集在bgm已经删除，要删除剧集吗（可之后手动删除）：${
+                                res.data.removed_episodes.map(ep => ep.episode_no + '(' + ep.name + ')' + '[' + EP_STATUS_TEXT[ep.status] + ']').join(', ')
+                            }`;
+                            return confirmDialogRef.afterClosed()
+                                .pipe(
+                                    take(1),
+                                    filter(result => result === 'confirm'),
+                                    mergeMap(() => {
+                                        this.isLoading = true;
+                                        const deleteObservables = [];
+                                        for(let removedEp of res.data.removed_episodes) {
+                                            deleteObservables.push(this._adminService.deleteEpisode(removedEp.id));
+                                        }
+                                        return forkJoin(deleteObservables);
+                                    }),);
+                        } else {
+                            const alertDialogRef = this._uiDialog.open(AlertDialog, {stickyDialog: true, backdrop: true});
+                            alertDialogRef.componentInstance.title = '同步剧集结果';
+                            alertDialogRef.componentInstance.content = `已经从bgm.tv同步剧集.\n新增的剧集： ${
+                                res.data.new_episodes.length === 0 ? '无' : '[' + res.data.new_episodes.map(ep => {
+                                    if (ep.name) {
+                                        return ep.episode_no + '(' + ep.name + ')'
+                                    } else {
+                                        return ep.episode_no;
+                                    }
+                                }).join(', ') + ']'
+                            }\n更新的剧集： ${
+                                res.data.updated_episodes.length === 0 ? '无' : '[' + res.data.updated_episodes.map(ep => {
+                                    if (ep.name) {
+                                        return ep.episode_no + '(' + ep.name + ')'
+                                    } else {
+                                        return ep.episode_no;
+                                    }
+                                }).join(', ') + ']'
+                            }`;
+                            alertDialogRef.componentInstance.confirmButtonText = '知道了';
+                            return alertDialogRef.afterClosed();
+                        }
+                    } else {
+                        this._toastRef.show(res.msg);
+                        return EMPTY;
+                    }
+                }),mergeMap(() => {
+                   return this._adminService.getBangumi(this.bangumi.id);
+                }))
+                .subscribe({
+                    next: (bangumi) => {
+                        this.bangumi = bangumi;
+                        this.isLoading = false;
+                    },
+                    error: (error) => {
+                        this.isLoading = false;
+                        this._toastRef.show(error?.message || 'unknown error');
+                    }
+                })
+        );
+    }
+
+    editVideoFile(episode: Episode): void {
         let dialogRef = this._uiDialog.open(VideoFileModal, {stickyDialog: true, backdrop: true});
         dialogRef.componentInstance.episode = episode;
     }
 
-    deleteEpisode(episode_id: string) {
+    deleteEpisode(episode_id: string): void {
         this._subscription.add(
             this._adminService.deleteEpisode(episode_id).pipe(
                 mergeMap(() => {
