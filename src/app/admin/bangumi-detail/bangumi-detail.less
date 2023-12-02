@@ -9,6 +9,12 @@
   background-color: #f0f0f0;
 }
 
+.loading-container {
+  .bangumi-detail-container();
+  overflow-y: hidden;
+  background-color: transparent;
+}
+
 .anchor-button {
   cursor: pointer;
   color: #9f9f9f;
@@ -138,7 +144,7 @@
 }
 
 .bangumi-episodes {
-  margin: 1rem 1rem 6rem 1rem;
+  margin: 1rem 1rem 10rem 1rem;
   .notice {
     margin: 0 2rem 2rem 1.5rem;
     padding: 0;
@@ -177,6 +183,10 @@
       background: #e8f0ff !important;
       color: #225d73 !important;
     }
+    tr.removed {
+      background: #ffe8e6 !important;
+      color: #db2828 !important;
+    }
   }
   .image-wrapper {
     display: table;
@@ -205,13 +215,16 @@
   }
 }
 
-.float-action-button.ui.primary.button {
-  font-size: 1.4rem;
+.float-action-buttons {
   position: fixed;
   bottom: 3rem;
   right: 4rem;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.45);
   z-index: 1000;
+  > button {
+    font-size: 1.4rem;
+    margin-left: 1rem;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.45);
+  }
 }
 
 .initial-placeholder {

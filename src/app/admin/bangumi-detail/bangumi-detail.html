@@ -174,7 +174,10 @@
                 </thead>
                 <tbody>
                 <tr *ngFor="let episode of orderedEpisodeList"
-                    [ngClass]="{downloaded: episode.status === 2, downloading: episode.status === 1}">
+                    [ngClass]="{
+                        downloaded: episode.status === 2 && !episode.removedMark,
+                        downloading: episode.status === 1 && !episode.removedMark,
+                        removed: episode.removedMark}">
                     <td>{{episode.episode_no}}</td>
                     <td>
                         <div class="image-wrapper" *ngIf="episode.status !== 2 || !episode.thumbnail_image">
@@ -215,11 +218,24 @@
             </table>
         </div>
     </div>
-    <button class="ui circular icon primary button float-action-button" (click)="editEpisode()" type="button"><i class="plus icon"></i></button>
-    <div class="ui inverted dimmer" [ngClass]="{active: isLoading}">
-        <div class="ui large loader"></div>
+    <div class="float-action-buttons">
+        <button class="ui circular icon primary button" (click)="editEpisode()" title="Add Episode" type="button">
+            <i class="plus icon"></i>
+        </button>
+        <button class="ui circular icon orange button"
+                confirmDialog
+                dialogTitle="确定要同步剧集吗？"
+                dialogContent="如果bgm.tv增加了新的剧集，会被自动添加，如果bgm修改了id或删除了剧集可能会出现删除的提示。所有已有剧集会被更新信息"
+                (onConfirm)="syncEpisodes()" title="Sync Episodes" type="button">
+            <i class="sync icon"></i>
+        </button>
     </div>
 </div>
 <div class="initial-placeholder" *ngIf="!bangumi && !adminList">
     <div class="placeholder-text">加载中...</div>
+</div>
+<div class="loading-container" *ngIf="isLoading">
+    <div class="ui inverted dimmer active">
+        <div class="ui large loader"></div>
+    </div>
 </div>
