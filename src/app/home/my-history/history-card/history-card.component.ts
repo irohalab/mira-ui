@@ -60,6 +60,9 @@ export class HistoryCardComponent implements OnInit, OnDestroy {
 
     private setImage(): void {
         const videoFile = this.watchProgress.video_file;
+        if (!videoFile.kf_image_path_list || videoFile.kf_image_path_list.length === 0) {
+            return;
+        }
         const tileSize = videoFile.kf_tile_size;
         const scaledX = getRemPixel(THUMBNAIL_WIDTH);
         const scaledY = getRemPixel(THUMBNAIL_HEIGHT);

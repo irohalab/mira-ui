@@ -56,7 +56,7 @@ export class MyHistoryComponent implements OnInit, OnDestroy {
             this._watchService.list_history(offset, this.countPerPage)
                 .subscribe({
                     next: ({data, total}) => {
-                        this.watchProgressList = data;
+                        this.watchProgressList = data.concat(data).concat(data);
                         this.total = total;
                         this.isLoading = false;
                     },
