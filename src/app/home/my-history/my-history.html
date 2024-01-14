@@ -1,0 +1,17 @@
+<div class="history-list-container" [ngClass]="{'dark-theme': isDarkTheme}">
+    <div class="filter-container">
+
+    </div>
+    <div class="history-list" *ngIf="!isLoading && !!watchProgressList && watchProgressList.length > 0">
+        <history-card *ngFor="let watchProgress of watchProgressList" [watchProgress]="watchProgress"></history-card>
+        <div class="pagination-container" *ngIf="total > countPerPage">
+            <ui-pagination [currentPage]="currentPage" [total]="total" [countPerPage]="countPerPage" [max]="5" (pageChange)="getHistoryList($event)"></ui-pagination>
+        </div>
+    </div>
+    <div class="no-result-container" *ngIf="!isLoading && (!watchProgressList || watchProgressList.length === 0)">
+        <div class="no-result-tips"><i class="warning circle icon"></i>还没有内容</div>
+    </div>
+    <div class="loading-container" *ngIf="isLoading">
+        <div class="ui inverted massive text active loader">Loading...</div>
+    </div>
+</div>

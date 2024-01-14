@@ -1,3 +1,7 @@
+import { Episode } from './episode';
+import { Bangumi } from './bangumi';
+import { VideoFile } from './video-file';
+
 export class WatchProgress {
   id: string;
   bangumi_id: string;
@@ -7,6 +11,10 @@ export class WatchProgress {
   last_watch_position: number;
   last_watch_time: number;
   percentage: number;
+
+  episode?: Episode;
+  bangumi?: Bangumi;
+  video_file?: VideoFile;
 
   static WISH = 1;
   static WATCHED = 2;

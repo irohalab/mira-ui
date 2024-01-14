@@ -40,6 +40,8 @@ export class HomeService extends BaseService {
                         this.childRouteChanges.emit('PV');
                     } else if (urlSegements.paths[0] === 'favorite') {
                         this.childRouteChanges.emit('Favorite');
+                    } else if (urlSegements.paths[0] === 'history') {
+                        this.childRouteChanges.emit('History');
                     }
                 }
             }

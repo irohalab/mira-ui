@@ -1,0 +1,32 @@
+<div class="ui container">
+    <a class="ui segment" [routerLink]="['/play', watchProgress.episode.id]" [ngClass]="{inverted: isDarkTheme}">
+        <div class="history-list-item">
+            <div class="thumbnail-wrapper">
+                <div class="video-file-kf-image" *ngIf="!!thumbnailUrl"
+                     [style.background-size]="bgScaleW + ' ' + bgScaleH"
+                     [style.background-image]="'url(\''+thumbnailUrl+'\')'"
+                     [style.background-position-x]="thumbnailBgPosX + 'px'"
+                     [style.background-position-y]="thumbnailBgPosY + 'px'"></div>
+            </div>
+            <div class="list-item-text">
+                <h4 class="bangumi-title">{{watchProgress.bangumi.name_cn || watchProgress.bangumi.name || '暂无'}}</h4>
+                <p class="episode-info">
+                    <span class="episode-no">第{{watchProgress.episode.episode_no}}話</span>
+                    <span class="episode-title">{{watchProgress.episode.name_cn || watchProgress.episode.name || ''}}</span>
+                </p>
+            </div>
+            <div class="watch-info">
+                <div class="watch-datetime">
+                    <span class="key">上次观看时间：</span>
+                    <span class="value">{{watchProgress.last_watch_time | date:'YYYY-MM-dd HH:mm:ss'}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="ui bottom attached progress" [ngClass]="{
+            'blue': watchProgress.watch_status === eWatchStatus.WATCHING,
+            'green': watchProgress.watch_status === eWatchStatus.WATCHED
+        }">
+            <div class="bar" [style.width]="watchProgress.percentage * 100 + '%'"></div>
+        </div>
+    </a>
+</div>
