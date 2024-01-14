@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
 import { PersistStorage } from '../user-service/persist-storage';
+import { WatchProgress } from '../entity/watch-progress';
 
 export const PREFIX = 'watch_history';
 
@@ -52,6 +53,15 @@ export class WatchService extends BaseService {
             percentage: percentage
         }).pipe(
             catchError(this.handleError),)
+    }
+
+    list_history(offset: number, limit: number): Observable<{data: WatchProgress[], total: number, status: number}> {
+        return this._http.get<{data: WatchProgress[], total: number, status: number}>(`${this._baseUrl}/history`, {
+            params: {
+                offset,
+                limit
+            }
+        }).pipe(catchError(this.handleError));
     }
 
     updateWatchProgress(bangumi_id: string, episode_id: string, last_watch_position: number, percentage: number, is_finished: boolean): void {

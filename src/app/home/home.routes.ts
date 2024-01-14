@@ -10,6 +10,7 @@ import { WebHookComponent } from './web-hook/web-hook.component';
 import { PreviewVideoComponent } from './preview-video/preview-video.component';
 import { FavoriteListComponent } from './favorite-list/favorite-list.component';
 import { BangumiAccountBindingComponent } from './bangumi-account-binding/bangumi-account-binding.component';
+import { MyHistoryComponent } from './my-history/my-history.component';
 export const homeRoutes: Routes = [
     {
         path: '',
@@ -58,6 +59,10 @@ export const homeRoutes: Routes = [
             {
                 path: 'favorite',
                 component: FavoriteListComponent
+            },
+            {
+                path: 'history',
+                component: MyHistoryComponent
             }
         ]
     },

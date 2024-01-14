@@ -48,6 +48,8 @@ import { BrowserExtensionTipComponent } from './user-action/browser-extension-ti
 import { FeedbackComponent } from './play-episode/feedback/feedback.component';
 import { RevealExtraComponent } from './play-episode/reveal-extra/reveal-extra.component';
 import { DarkThemeToggleComponent } from './dark-theme-toggle/dark-theme-toggle.component';
+import { MyHistoryComponent } from './my-history/my-history.component';
+import { HistoryCardComponent } from './my-history/history-card/history-card.component';
 
 
 @NgModule({
@@ -80,7 +82,9 @@ import { DarkThemeToggleComponent } from './dark-theme-toggle/dark-theme-toggle.
         BrowserExtensionTipComponent,
         FeedbackComponent,
         RevealExtraComponent,
-        DarkThemeToggleComponent
+        DarkThemeToggleComponent,
+        MyHistoryComponent,
+        HistoryCardComponent
     ],
     providers: [
         HomeService,

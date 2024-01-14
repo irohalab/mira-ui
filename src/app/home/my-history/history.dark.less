@@ -1,0 +1,18 @@
+@import "../../_dark-theme-helpers";
+
+.dark-loader() {
+  .loading-container {
+    background-color: @darkBackground;
+    .loader {
+      color: darken(@darkForeground, 15%);
+    }
+  }
+}
+
+.dark-no-search-result() {
+  .no-result-container {
+    .no-result-tips {
+      color: darken(@darkForeground, 15%);
+    }
+  }
+}
