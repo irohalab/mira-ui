@@ -14,9 +14,16 @@ import { HomeChild, HomeService } from "../home.service";
 import { WatchService } from '../watch.service';
 import { FeedbackComponent } from './feedback/feedback.component';
 import { environment } from '../../../environments/environment';
+import { PersistStorage } from '../../user-service';
 
 export const MIN_WATCHED_PERCENTAGE = 0.95;
 
+const LAYOUT_TYPE: string = 'play_episode_layout_type';
+const LAYOUT_TYPES = {
+    GRID: 'grid_layout',
+    LIST: 'list_layout'
+}
+const SORT_ORDER: string = 'play_episode_eps_sort_order';
 
 @Component({
     selector: 'play-episode',
@@ -38,6 +45,32 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
 
     currentVideoFile: VideoFile;
 
+    layoutType: string;
+    eLayoutTypes = LAYOUT_TYPES;
+    sortOrder: 'asc' | 'desc' = 'asc';
+    private _reversedEpisodeList: Episode[];
+    get episodeList(): Episode[] {
+        if (this.sortOrder === 'desc') {
+            if (!this._reversedEpisodeList) {
+                let firstUnfinished = -1;
+                this._reversedEpisodeList = this.episode.bangumi.episodes
+                    .filter((eps, index) => {
+                        if (firstUnfinished === -1 && eps.status !== Episode.STATUS_DOWNLOADED) {
+                            firstUnfinished = index;
+                            return true;
+                        }
+                        return eps.status === Episode.STATUS_DOWNLOADED
+                    })
+                    .reverse();
+            }
+            return this._reversedEpisodeList;
+        } else {
+            const list = this.episode.bangumi.episodes;
+            list[0].name_cn = '産婦人科医・ゴローの前に現れた患者は、推しのアイドル・アイだった。ショックを受けながらも医者として彼女を支えるゴロー。だが出産直前、ゴローは何者かに襲われ…！？©赤坂アカ×横槍メンゴ／集英社・【推しの子】製作委員会';
+            return list;
+        }
+    }
+
     @HostBinding('class.dark-theme')
     isDarkTheme: boolean;
     /**
@@ -58,10 +91,21 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
                 private _chromeExtensionService: ChromeExtensionService,
                 private _dialogService: UIDialog,
                 private _videoPlayerService: VideoPlayerService,
+                private _persistStorage: PersistStorage,
                 private _darkThemeService: DarkThemeService,
                 toast: UIToast) {
         super(homeService);
         this._toastRef = toast.makeText();
+    }
+
+    toggleSortOrder(): void {
+        this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+        this._persistStorage.setItem(SORT_ORDER, this.sortOrder);
+    }
+
+    changeLayoutType(layoutType: string): void {
+        this.layoutType = layoutType;
+        this._persistStorage.setItem(LAYOUT_TYPE, layoutType);
     }
 
     feedback() {
@@ -101,6 +145,9 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
     }
 
     ngOnInit(): void {
+        this.layoutType = this._persistStorage.getItem(LAYOUT_TYPE, LAYOUT_TYPES.LIST);
+        this.sortOrder = this._persistStorage.getItem(SORT_ORDER, 'asc') as 'asc' | 'desc';
+
         this._subscription.add(
             this._darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })

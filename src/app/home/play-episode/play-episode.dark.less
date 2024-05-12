@@ -7,7 +7,16 @@
         color: darken(@darkForeground, 25%);
       }
     }
-    .episode-list {
+    .episode-layout-button-groups {
+      > .layout-button {
+        color: @darkLinkColor;
+        &:focus,
+        &:hover {
+          color: @darkLinkHoverColor;
+        }
+      }
+    }
+    .episode-list-view, .episode-grid-view {
       .episode-link.ui.segment {
         background: @darkPanelBg;
         color: @darkLinkColor;
