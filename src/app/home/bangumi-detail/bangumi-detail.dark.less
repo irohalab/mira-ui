@@ -33,7 +33,16 @@
 .dark-episode-list() {
   .episode-list {
     background-color: transparent;
-    .episode-card {
+    .episode-layout-button-groups {
+      > .layout-button {
+        color: @darkLinkColor;
+        &:focus,
+        &:hover {
+          color: @darkLinkHoverColor;
+        }
+      }
+    }
+    .episode-card, .episode-list-view-item {
       background-color: lighten(@darkBackground, 5%);
       box-shadow: 0px 1px 3px 0px @darkBoxShadowColor, 0px 0px 0px 1px @darkBoxShadowColor;
       .image-fallback {
@@ -49,6 +58,9 @@
       }
       .content.unfinished {
         color: darken(@darkLinkColor, 10%);
+        .content-heading {
+          color: darken(@darkLinkColor, 10%);
+        }
       }
     }
   }

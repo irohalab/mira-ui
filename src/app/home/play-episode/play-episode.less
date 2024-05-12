@@ -149,11 +149,29 @@
       }
     }
   }
-
-  .episode-list {
+  .episode-list-view, .episode-grid-view {
     .episode-link {
       display: block;
+    }
+  }
+
+  .episode-grid-view {
+    .episode-link {
       text-align: center;
+    }
+  }
+
+  .episode-list-view {
+    .episode-link {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      .eps-no {
+        display: inline-block;
+        margin-right: 2em;
+        color: #a6a6a6;
+        font-weight: 600;
+      }
     }
   }
 
@@ -166,4 +184,25 @@
 
 .comment-section {
   margin-top: 2rem;
+}
+
+.episode-list-container {
+  position: relative;
+  .episode-layout-button-groups {
+    position: absolute;
+    right: 0.4rem;
+    top: 0;
+    > .sort-button {
+      margin-right: 1.5em;
+    }
+    > .layout-button {
+      display: inline-block;
+      cursor: pointer;
+      color: #4c4c4c;
+      &:focus,
+      &:hover {
+        color: #101010;
+      }
+    }
+  }
 }

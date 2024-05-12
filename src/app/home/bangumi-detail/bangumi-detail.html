@@ -47,9 +47,73 @@
     </div>
     <div class="episode-list">
         <h4 class="episode-list-heading">各话列表</h4>
+        <div class="episode-layout-button-groups">
+            <a class="layout-button sort-button" [title]="sortOrder === 'desc' ? '最早在前，显示所有' : '最新在前，仅显示可观看'" (click)="toggleSortOrder()">
+                <i class="ui sort numeric icon" [ngClass]="{up: sortOrder === 'asc', down: sortOrder === 'desc'}"></i>
+            </a>
+            <a class="layout-button" title="网格视图" (click)="changeLayoutType(eLayoutTypes.GRID)"><i class="ui th icon"></i></a>
+            <a class="layout-button" title="列表视图" (click)="changeLayoutType(eLayoutTypes.LIST)"><i class="ui th list icon"></i></a>
+        </div>
         <div class="ui divider"></div>
-        <div class="ui six doubling cards">
-            <div class="card episode-card" *ngFor="let episode of bangumi.episodes">
+        <div *ngIf="layoutType === eLayoutTypes.LIST" class="episode-list-view ui stackable two column grid">
+            <div class="column" *ngFor="let episode of episodeList">
+                <div class="ui segment episode-list-view-item">
+                    <div class="image" *ngIf="episode.status!==2">
+                        <div class="image-wrapper">
+                            <div class="image-fallback">
+                                <h4 class="ui icon film icon-holder">
+                                    <i class="film icon"></i>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="episode.status!==2" class="content unfinished">
+                        <div class="content-heading">
+                            <span>第{{episode.episode_no}}话&nbsp;</span>
+                            <span *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
+                        </div>
+                        <div class="extra-info">
+                            <span>时长:&nbsp;{{episode.duration}}</span>
+                            <span>更新时间:{{episode.airdate}}</span>
+                            <span class="ui tiny teal label" *ngIf="sortOrder === 'desc' && episode.status !== 2">即将播出</span>
+                        </div>
+                    </div>
+                    <a *ngIf="episode.status===2" class="image" [routerLink]="['/play', episode.id]">
+                        <responsive-image [src]="episode.thumbnail_image.url"
+                                          [size]="{
+                                        width: '100%',
+                                        ratio: 0.5625,
+                                        originalWidth: episode.thumbnail_image.width,
+                                        originalHeight: episode.thumbnail_image.height}"
+                                          [background]="episode.thumbnail_image.dominant_color"></responsive-image>
+                    </a>
+                    <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">
+                        <div class="content-heading">
+                            <span>第{{episode.episode_no}}话</span>
+                            <span *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
+                        </div>
+                        <div class="extra-info">
+                            <span>时长:&nbsp;{{episode.duration}}</span>
+                            <span>更新时间:{{episode.airdate}}</span>
+                            <span class="ui tiny teal label" *ngIf="sortOrder === 'desc' && episode.status !== 2">即将播出</span>
+                        </div>
+                    </a>
+                    <div class="ui bottom attached progress"
+                         *ngIf="episode.watch_progress && episode.watch_progress.percentage"
+                         [ngClass]="{
+                     orange: episode.watch_progress.watch_status === 1,
+                     olive: episode.watch_progress.watch_status === 2,
+                     blue: episode.watch_progress.watch_status === 3,
+                     brown: episode.watch_progress.watch_status === 4,
+                     grey: episode.watch_progress.watch_status === 5
+                     }">
+                        <div class="bar" [style.width]="episode.watch_progress.percentage * 100 + '%'"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="layoutType === eLayoutTypes.GRID" class="ui six doubling cards">
+            <div class="card episode-card" *ngFor="let episode of episodeList">
                 <div class="image" *ngIf="episode.status!==2">
                     <div class="image-wrapper">
                         <div class="image-fallback">
@@ -60,7 +124,7 @@
                     </div>
                 </div>
                 <div *ngIf="episode.status!==2" class="content unfinished">
-                    <span>第{{episode.episode_no}}话</span>
+                    <span class="episode-title" *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
                 </div>
                 <a *ngIf="episode.status===2" class="image" [routerLink]="['/play', episode.id]">
                     <responsive-image [src]="episode.thumbnail_image.url"
@@ -71,8 +135,9 @@
                                         originalHeight: episode.thumbnail_image.height}"
                                       [background]="episode.thumbnail_image.dominant_color"></responsive-image>
                 </a>
+                <span class="episode-number">{{episode.episode_no}}</span>
                 <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">
-                    <span>第{{episode.episode_no}}话</span>
+                    <span class="episode-title" *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
                 </a>
                 <div class="ui bottom attached progress"
                      *ngIf="episode.watch_progress && episode.watch_progress.percentage"
