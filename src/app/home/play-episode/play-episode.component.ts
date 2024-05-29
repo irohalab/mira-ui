@@ -65,9 +65,7 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
             }
             return this._reversedEpisodeList;
         } else {
-            const list = this.episode.bangumi.episodes;
-            list[0].name_cn = '産婦人科医・ゴローの前に現れた患者は、推しのアイドル・アイだった。ショックを受けながらも医者として彼女を支えるゴロー。だが出産直前、ゴローは何者かに襲われ…！？©赤坂アカ×横槍メンゴ／集英社・【推しの子】製作委員会';
-            return list;
+            return this.episode.bangumi.episodes;
         }
     }
 
