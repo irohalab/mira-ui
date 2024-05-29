@@ -69,7 +69,7 @@
                     </div>
                     <div *ngIf="episode.status!==2" class="content unfinished">
                         <div class="content-heading">
-                            <span>第{{episode.episode_no}}话&nbsp;</span>
+                            <span class="eps-no">第{{episode.episode_no}}话</span>
                             <span *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
                         </div>
                         <div class="extra-info">
@@ -89,7 +89,7 @@
                     </a>
                     <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">
                         <div class="content-heading">
-                            <span>第{{episode.episode_no}}话</span>
+                            <span class="eps-no">第{{episode.episode_no}}话</span>
                             <span *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
                         </div>
                         <div class="extra-info">

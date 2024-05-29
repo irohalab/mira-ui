@@ -269,9 +269,17 @@
         }
       }
     }
-    > .content.unfinished {
-      .content-heading {
-        color: #696969;
+    > .content {
+      > span {
+        display: inline-block;
+      }
+      .eps-no {
+        margin-right: 1.5em;
+      }
+      &.unfinished {
+        .content-heading {
+          color: #6f6f6f;
+        }
       }
     }
   }
