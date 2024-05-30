@@ -38,7 +38,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
         DOWNLOADED: VideoFile.STATUS_DOWNLOADED
     };
 
-    enable_blob_storage_options = false;
+    enableBlobStorageOptions = false;
 
     constructor(private _dialogRef: UIDialogRef<VideoFileModal>,
                 private _adminService: AdminService,
