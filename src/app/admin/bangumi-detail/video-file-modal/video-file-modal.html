@@ -29,20 +29,24 @@
             <div class="three fields">
                 <div class="field">
                     <label>resolution_w</label>
-                    <input type="text" formControlName="resolution_w" readonly>
+                    <input type="text" formControlName="resolution_w" [readonly]="!enable_blob_storage_options">
                 </div>
                 <div class="field">
                     <label>resolution_h</label>
-                    <input type="text" formControlName="resolution_h" readonly>
+                    <input type="text" formControlName="resolution_h" [readonly]="!enable_blob_storage_options">
                 </div>
                 <div class="field">
                     <label>duration</label>
-                    <input type="text" formControlName="duration" readonly>
+                    <input type="text" formControlName="duration" [readonly]="!enable_blob_storage_options">
                 </div>
             </div>
             <div class="field">
                 <label>download_url</label>
                 <input type="text" placeholder="magnet或torrent文件的url" formControlName="download_url">
+            </div>
+            <div class="field" *ngIf="enable_blob_storage_options">
+                <label>blob_storage_url_v0</label>
+                <input type="text" placeholder="S3 存储 URL" formControlName="blob_storage_url_v0">
             </div>
             <div class="inline fields">
                 <label>状态</label>
@@ -94,6 +98,7 @@
         </form>
     </div>
     <div class="footer">
+        <ui-toggle text="(测试) 开启 S3 存储选项" [(ngModel)]="enable_blob_storage_options"></ui-toggle>
         <p><i class="help circle icon"></i>替换已完成或下载中的VideoFile的方法，先删除要替换的VideoFile在新建VideoFile</p>
     </div>
 </div>

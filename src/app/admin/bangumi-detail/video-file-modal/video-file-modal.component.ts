@@ -38,6 +38,8 @@ export class VideoFileModal implements OnInit, OnDestroy {
         DOWNLOADED: VideoFile.STATUS_DOWNLOADED
     };
 
+    enable_blob_storage_options = false;
+
     constructor(private _dialogRef: UIDialogRef<VideoFileModal>,
                 private _adminService: AdminService,
                 private _fb: FormBuilder,
@@ -130,7 +132,8 @@ export class VideoFileModal implements OnInit, OnDestroy {
             resolution_w: null,
             resolution_h: null,
             duration: null,
-            label: null
+            label: null,
+            blob_storage_url_v0: '',
         });
         this.videoFileList.unshift(videoFileFormGroup);
     }
@@ -158,7 +161,8 @@ export class VideoFileModal implements OnInit, OnDestroy {
                             resolution_w: videoFile.resolution_w,
                             resolution_h: videoFile.resolution_h,
                             duration: videoFile.duration,
-                            label: videoFile.label
+                            label: videoFile.label,
+                            blob_storage_url_v0: videoFile.blob_storage_url_v0,
                         }));
                     }
 

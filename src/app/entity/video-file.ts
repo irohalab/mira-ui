@@ -19,7 +19,7 @@ export class VideoFile {
     kf_frame_width?: number;
     kf_frame_height?: number;
     kf_image_path_list?: string;
-
+    blob_storage_url_v0?: string;
 
     static STATUS_DOWNLOAD_PENDING = 1;
     static STATUS_DOWNLOADING = 2;
