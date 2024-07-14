@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
     selector: 'developers',
     templateUrl: './developers.html',
     styles: [`
-        @import "../static-content.dark";
+        @import "../static-content.dark.less";
         .parent-dark-theme();
     `]
 })

@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
     selector: 'privacy',
     templateUrl: './privacy.html',
     styles: [`
-        @import "../static-content.dark";
+        @import "../static-content.dark.less";
         .parent-dark-theme();
     `]
 })

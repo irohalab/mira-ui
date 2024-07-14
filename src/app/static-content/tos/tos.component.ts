@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
     selector: 'tos',
     templateUrl: './tos.html',
     styles: [`
-        @import "../static-content.dark";
+        @import "../static-content.dark.less";
         .parent-dark-theme();
     `]
 })
