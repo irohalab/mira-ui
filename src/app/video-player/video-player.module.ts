@@ -55,16 +55,6 @@ import { VideoPlayerService } from './video-player.service';
     ],
     exports: [
         VideoPlayer
-    ],
-    entryComponents: [
-        VideoPlayer, // need declare for creating via VideoPlayerService
-        VideoControls,
-        VideoTouchControls,
-        CapturedImageOperationDialog,
-        VideoPlayerHelpDialog,
-        VideoPlayerHelpButton,
-        VideoConfigPanelComponent,
-        FloatControlsComponent
     ]
 })
 export class VideoPlayerModule {

@@ -1,18 +1,18 @@
 {
-  "/api/*": {
-    "target": "http://localhost:5000",
+  "/api/**": {
+    "target": "http://127.0.0.1:5000",
     "secure": false
   },
-  "/pic/*": {
-    "target": "http://localhost:8000",
+  "/pic/**": {
+    "target": "http://127.0.0.1:8000",
     "secure": false
   },
-  "/video/*": {
-    "target": "http://localhost:8000",
+  "/video/**": {
+    "target": "http://127.0.0.1:8000",
     "secure": false
   },
   "/rt-log": {
-    "target": "http://localhost:8083/rt-log/",
+    "target": "http://127.0.0.1:8083/rt-log/",
     "secure": false,
     "changeOrigin": true,
     "ws": true

@@ -5,12 +5,12 @@ import {catchError, map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { UserService } from './user.service';
 import { User } from '../entity';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { AuthError } from '../../helpers/error/AuthError';
 
 
 @Injectable()
-export class Authentication implements CanActivate {
+export class Authentication  {
 
     user: User;
 

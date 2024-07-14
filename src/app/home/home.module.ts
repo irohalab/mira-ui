@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FavoriteManagerService } from './favorite-manager.service';
 import { Home } from './home.component';
 import { DefaultComponent } from './default/default.component';
@@ -52,8 +52,7 @@ import { MyHistoryComponent } from './my-history/my-history.component';
 import { HistoryCardComponent } from './my-history/history-card/history-card.component';
 
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         Home,
         DefaultComponent,
         PlayEpisode,
@@ -85,20 +84,8 @@ import { HistoryCardComponent } from './my-history/history-card/history-card.com
         DarkThemeToggleComponent,
         MyHistoryComponent,
         HistoryCardComponent
-    ],
-    providers: [
-        HomeService,
-        WatchService,
-        ImageLoadingStrategy,
-        BangumiListService,
-        UserCenterService,
-        SynchronizeService,
-        FavoriteManagerService
-    ],
-    imports: [
-        RouterModule.forChild(homeRoutes),
+    ], imports: [RouterModule.forChild(homeRoutes),
         BrowserModule,
-        HttpClientModule,
         UIModule,
         CommonModule,
         DenebCommonPipes,
@@ -108,16 +95,16 @@ import { HistoryCardComponent } from './my-history/history-card/history-card.com
         ResponsiveImageModule,
         VideoPlayerModule,
         ConfirmDialogModule,
-        BrowserExtensionModule
-    ],
-    entryComponents: [
-        EditReviewDialogComponent,
-        ConflictDialogComponent,
-        UserActionPanelComponent,
-        BrowserExtensionTipComponent,
-        FeedbackComponent
-    ]
-})
+        BrowserExtensionModule], providers: [
+        HomeService,
+        WatchService,
+        ImageLoadingStrategy,
+        BangumiListService,
+        UserCenterService,
+        SynchronizeService,
+        FavoriteManagerService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class HomeModule {
 
 }

@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Admin } from './admin.component';
@@ -68,8 +68,7 @@ import { DownloadJobDetailComponent } from './download-manager/download-job-deta
 import { DownloadEditorComponent } from './bangumi-detail/universal-builder/download-editor/download-editor.component';
 
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         Admin,
         SearchBangumi,
         ResultDetail,
@@ -115,8 +114,17 @@ import { DownloadEditorComponent } from './bangumi-detail/universal-builder/down
         VertexInfoPanelComponent,
         DownloadJobDetailComponent,
         DownloadEditorComponent
-    ],
-    providers: [
+    ], imports: [CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        RouterModule.forChild(adminRoutes),
+        UIModule,
+        ConfirmDialogModule,
+        DenebCommonPipes,
+        ResponsiveImageModule,
+        UserServiceModule,
+        DpDatePickerModule,
+        NgxGraphModule], providers: [
         AdminService,
         FeedService,
         BangumiMoeService,
@@ -127,40 +135,8 @@ import { DownloadEditorComponent } from './bangumi-detail/universal-builder/down
         WebHookService,
         VideoProcessRuleService,
         DownloadManagerService,
-        VideoProcessManagerService
-    ],
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        RouterModule.forChild(adminRoutes),
-        HttpClientModule,
-        UIModule,
-        ConfirmDialogModule,
-        DenebCommonPipes,
-        ResponsiveImageModule,
-        UserServiceModule,
-        DpDatePickerModule,
-        NgxGraphModule
-    ],
-    entryComponents: [
-        SearchBangumi,
-        BangumiBasic,
-        KeywordBuilder,
-        EpisodeDetail,
-        BangumiMoeBuilder,
-        UserPromoteModal,
-        VideoFileModal,
-        EditAnnounceComponent,
-        EditWebHookComponent,
-        EditBangumiRecommendComponent,
-        UniversalBuilderComponent,
-        VideoProcessRuleEditorComponent,
-        FileMappingListComponent,
-        VertexInfoPanelComponent,
-        DownloadJobDetailComponent,
-        DownloadEditorComponent
-    ]
-})
+        VideoProcessManagerService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AdminModule {
 }

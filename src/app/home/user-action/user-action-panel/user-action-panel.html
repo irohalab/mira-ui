@@ -3,7 +3,7 @@
         <div *ngIf="!!bgmAccountInfo" class="header bgm-account-info">
             <img *ngIf="!!bgmAccountInfo" [src]="bgmAccountInfo.avatar.medium" class="bangumi-avatar" alt="bangumi-avatar">
             <div class="nickname">{{bgmAccountInfo.nickname}}</div>
-            <div class="username">@{{bgmAccountInfo.username}}</div>
+            <div class="username">&#64;{{bgmAccountInfo.username}}</div>
             <div class="actions">
                 <a class="ui tiny basic button" [ngClass]="{inverted: isDarkTheme}" routerLink="/settings/bangumi">管理Bangumi关联</a>
             </div>

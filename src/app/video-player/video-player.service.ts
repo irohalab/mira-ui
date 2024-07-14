@@ -1,10 +1,8 @@
 import {
     ApplicationRef,
-    ComponentFactoryResolver,
-    ComponentRef,
+    ComponentRef, createComponent,
     ElementRef,
     Injectable,
-    Injector,
 } from '@angular/core';
 import { PRIMARY_OUTLET, Router } from '@angular/router';
 import { Observable, Subject, Subscription, throttleTime } from 'rxjs';
@@ -85,9 +83,7 @@ export class VideoPlayerService {
         return this._videoPlayerComponentRef.instance.isFloatPlay;
     }
 
-    constructor(private _componentFactoryResolver: ComponentFactoryResolver,
-                private _injector: Injector,
-                private _appRef: ApplicationRef,
+    constructor(private _appRef: ApplicationRef,
                 private _watchService: WatchService,
                 private _router: Router,
                 private _persistent: PersistStorage) {
@@ -284,8 +280,8 @@ export class VideoPlayerService {
         if (!this._currentViewContainer) {
             throw new Error('No container available');
         }
-        const componentFactory = this._componentFactoryResolver.resolveComponentFactory(VideoPlayer);
-        this._videoPlayerComponentRef = componentFactory.create(this._injector);
+        const environmentInjector = this._appRef.injector;
+        this._videoPlayerComponentRef = createComponent(VideoPlayer, {environmentInjector});
         this._appRef.attachView(this._videoPlayerComponentRef.hostView);
         const containerElement = this._currentViewContainer.nativeElement as HTMLElement;
         containerElement.appendChild(getComponentRootNode(this._videoPlayerComponentRef));
