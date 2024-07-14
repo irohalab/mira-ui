@@ -44,3 +44,5 @@ Thumbs.db
 # files are about to change in deployment
 src/environments/environment.prod.ts
 src/index.prod.html
+
+env.sh
