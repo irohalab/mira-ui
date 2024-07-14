@@ -109,13 +109,6 @@ import { HistoryCardComponent } from './my-history/history-card/history-card.com
         VideoPlayerModule,
         ConfirmDialogModule,
         BrowserExtensionModule
-    ],
-    entryComponents: [
-        EditReviewDialogComponent,
-        ConflictDialogComponent,
-        UserActionPanelComponent,
-        BrowserExtensionTipComponent,
-        FeedbackComponent
     ]
 })
 export class HomeModule {

@@ -142,24 +142,6 @@ import { DownloadEditorComponent } from './bangumi-detail/universal-builder/down
         UserServiceModule,
         DpDatePickerModule,
         NgxGraphModule
-    ],
-    entryComponents: [
-        SearchBangumi,
-        BangumiBasic,
-        KeywordBuilder,
-        EpisodeDetail,
-        BangumiMoeBuilder,
-        UserPromoteModal,
-        VideoFileModal,
-        EditAnnounceComponent,
-        EditWebHookComponent,
-        EditBangumiRecommendComponent,
-        UniversalBuilderComponent,
-        VideoProcessRuleEditorComponent,
-        FileMappingListComponent,
-        VertexInfoPanelComponent,
-        DownloadJobDetailComponent,
-        DownloadEditorComponent
     ]
 })
 export class AdminModule {

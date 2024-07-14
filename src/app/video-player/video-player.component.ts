@@ -1,12 +1,10 @@
 import {
-    AfterViewInit,
+    AfterViewInit, ApplicationRef,
     ChangeDetectorRef,
     Component,
-    ComponentFactoryResolver,
     ElementRef, EmbeddedViewRef,
     EventEmitter,
     HostBinding,
-    Injector,
     Input,
     OnChanges,
     OnDestroy,
@@ -33,7 +31,7 @@ import { Bangumi, Episode } from '../entity';
 import { VideoFile } from '../entity/video-file';
 import { VideoControls } from './controls/controls.component';
 import { FullScreenAPI } from './core/full-screen-api';
-import { getComponentRootNode, VideoPlayerHelpers } from './core/helpers';
+import { VideoPlayerHelpers } from './core/helpers';
 import { VideoPlayerShortcuts } from './core/shortcuts';
 import { PlayState, ReadyState } from './core/state';
 import { VideoCapture } from './core/video-capture.service';
@@ -219,8 +217,6 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     constructor(@Self() public videoPlayerRef: ElementRef,
                 private _changeDetector: ChangeDetectorRef,
                 private _videoCapture: VideoCapture,
-                private _injector: Injector,
-                private _componentFactoryResolver: ComponentFactoryResolver,
                 private _dialogService: UIDialog) {
     }
 
@@ -374,16 +370,14 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
         controlElement.parentNode?.removeChild(controlElement);
         // const containerElement = this.controlContainer.element.nativeElement as HTMLElement;
         if (this.isFloatPlay) {
-            const factory = this._componentFactoryResolver.resolveComponentFactory(FloatControlsComponent);
-            const componentRef = factory.create(this._injector);
+            const componentRef = this.controlContainer.createComponent<FloatControlsComponent>(FloatControlsComponent, {injector: this.controlContainer.injector});
             componentRef.instance.videoTitle = `${this.bangumiName} ${this.episodeNo}`;
-            this.controlContainer.insert(componentRef.hostView);
         } else {
             // TODO isMobileDevice is somewhat confusion. we should use isTouchDevice
             if (VideoPlayerHelpers.isMobileDevice()) {
-                this.controlContainer.createComponent(this._componentFactoryResolver.resolveComponentFactory(VideoTouchControls));
+                this.controlContainer.createComponent<VideoTouchControls>(VideoTouchControls, {injector: this.controlContainer.injector});
             } else {
-                this.controlContainer.createComponent(this._componentFactoryResolver.resolveComponentFactory(VideoControls));
+                this.controlContainer.createComponent<VideoControls>(VideoControls, {injector: this.controlContainer.injector});
             }
         }
     }
@@ -439,15 +433,12 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     }
 
     ngOnInit(): void {
-        let controlsComponentFactory, componentRef;
         if (VideoPlayerHelpers.isMobileDevice()) {
             // TODO: for mobile device, should init a touch controls
-            controlsComponentFactory = this._componentFactoryResolver.resolveComponentFactory(VideoTouchControls);
+            this.controlContainer.createComponent(VideoTouchControls, {injector: this.controlContainer.injector});
         } else {
-            controlsComponentFactory = this._componentFactoryResolver.resolveComponentFactory(VideoControls);
+            this.controlContainer.createComponent(VideoControls, {injector: this.controlContainer.injector});
         }
-        componentRef = controlsComponentFactory.create(this._injector);
-        this.controlContainer.insert(componentRef.hostView);
         // this is not content related. so can be determined here.
         this.isPortrait = VideoPlayerHelpers.isPortrait();
     }

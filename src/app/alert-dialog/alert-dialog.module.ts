@@ -4,8 +4,7 @@ import { UIDialogModule } from '@irohalab/deneb-ui';
 @NgModule({
     declarations: [AlertDialog],
     imports: [UIDialogModule],
-    exports: [AlertDialog],
-    entryComponents: [AlertDialog]
+    exports: [AlertDialog]
 })
 export class AlertDialogModule {
 
