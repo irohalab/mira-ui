@@ -37,17 +37,22 @@ export class DownloadEditorComponent implements OnDestroy {
         this._toastRef.show('已经复制到剪贴板');
     }
     download(): void {
+        const result = [];
+        for (let i = 0; i < this.eps_mapping.length; i++) {
+            let mapping = this.eps_mapping[i];
+            if (mapping.selected) {
+                result.push({
+                    download_url: this.downloadUrl,
+                    eps_no: mapping.eps_no,
+                    file_path: this.files[i].path,
+                    file_name: this.files[i].name
+                });
+            }
+        }
         this._subscription.add(
             this._adminService.downloadDirectly(
                 this.bangumi_id,
-                this.eps_mapping.filter(mapping => mapping.selected).map((mapping, idx) => {
-                    return {
-                        download_url: this.downloadUrl,
-                        eps_no: mapping.eps_no,
-                        file_path: this.files[idx].path,
-                        file_name: this.files[idx].name
-                    };
-                }))
+                result)
                 .subscribe({
                     next: () => {
                         this._dialogRef.close(true);
