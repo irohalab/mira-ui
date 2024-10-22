@@ -24,6 +24,7 @@
     "@irohalab/semantic-ui": "^2.4.1",
     "@swimlane/ngx-graph": "^8.4.0",
     "d3-scale": "^4.0.2",
+    "d3-selection": "^1.4.2",
     "dayjs": "^1.11.7",
     "downloadjs": "^1.4.7",
     "hammerjs": "^2.0.8",
