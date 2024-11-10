@@ -8,7 +8,7 @@ import { BangumiDetail } from './bangumi-detail/bangumi-detail.components';
 import { FavoriteChooser } from './favorite-chooser/favorite-chooser.component';
 import { NgModule } from '@angular/core';
 import { HomeService } from './home.service';
-import { UIModule } from '@irohalab/deneb-ui';
+import { ResponsiveGenerateSrcService, SRC_GENERATOR_SERVICE, UIModule } from '@irohalab/deneb-ui';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { homeRoutes } from './home.routes';
@@ -20,7 +20,6 @@ import { ImageLoadingStrategy } from './bangumi-card/image-loading-strategy.serv
 import { UserCenter } from './user-center/user-center.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AlertDialogModule } from '../alert-dialog/alert-dialog.module';
-import { ResponsiveImageModule } from '../responsive-image/responsive-image.module';
 import { VideoPlayerModule } from '../video-player/video-player.module';
 import { MyBangumiComponent } from './my-bangumi/my-bangumi.component';
 import { BottomFloatBannerComponent } from './bottom-float-banner/bottom-float-banner.component';
@@ -52,7 +51,8 @@ import { MyHistoryComponent } from './my-history/my-history.component';
 import { HistoryCardComponent } from './my-history/history-card/history-card.component';
 
 
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         Home,
         DefaultComponent,
         PlayEpisode,
@@ -84,7 +84,8 @@ import { HistoryCardComponent } from './my-history/history-card/history-card.com
         DarkThemeToggleComponent,
         MyHistoryComponent,
         HistoryCardComponent
-    ], imports: [RouterModule.forChild(homeRoutes),
+    ],
+    imports: [RouterModule.forChild(homeRoutes),
         BrowserModule,
         UIModule,
         CommonModule,
@@ -92,10 +93,11 @@ import { HistoryCardComponent } from './my-history/history-card/history-card.com
         ReactiveFormsModule,
         FormsModule,
         AlertDialogModule,
-        ResponsiveImageModule,
         VideoPlayerModule,
         ConfirmDialogModule,
-        BrowserExtensionModule], providers: [
+        BrowserExtensionModule
+    ],
+    providers: [
         HomeService,
         WatchService,
         ImageLoadingStrategy,
@@ -103,8 +105,10 @@ import { HistoryCardComponent } from './my-history/history-card/history-card.com
         UserCenterService,
         SynchronizeService,
         FavoriteManagerService,
-        provideHttpClient(withInterceptorsFromDi())
-    ] })
+        provideHttpClient(withInterceptorsFromDi()),
+        {provide: SRC_GENERATOR_SERVICE, useClass: ResponsiveGenerateSrcService}
+    ]
+})
 export class HomeModule {
 
 }

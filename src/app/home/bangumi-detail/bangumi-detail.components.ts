@@ -116,6 +116,19 @@ export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
         );
     }
 
+    changeEpStatus(episode: Episode, status: number): void {
+        this._subscription.add(
+            this._watchService.favorite_favorite(
+                episode.bangumi_id,
+                episode.id,
+                status)
+                .subscribe(() => {
+                    episode.watch_progress.watch_status = status;
+                    this._toastRef.show('已更新');
+                })
+        );
+    }
+
     changeLayoutType(layoutType: string): void {
         this.layoutType = layoutType;
         this._persistStorage.setItem(LAYOUT_TYPE, layoutType);

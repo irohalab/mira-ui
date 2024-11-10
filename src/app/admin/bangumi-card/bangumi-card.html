@@ -1,6 +1,6 @@
 <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
     <div class="bangumi-list-item">
-        <responsive-image class="cover-wrapper"
+        <ui-responsive-image class="cover-wrapper"
                           *ngIf="!!bangumi.cover_image"
                           [src]="imageUrl"
                           [size]="{
@@ -10,7 +10,7 @@
                             originalHeight: bangumi.cover_image.height}"
                           [background]="bangumi.cover_image.dominant_color"
                           (imageLoad)="onImageLoad()">
-        </responsive-image>
+        </ui-responsive-image>
         <div class="cover-wrapper" *ngIf="!!bangumi.image && !bangumi.cover_image">
             <img [src]="bangumi.image" alt="image" class="bangumi-image">
         </div>
