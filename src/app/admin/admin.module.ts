@@ -15,7 +15,7 @@ import { adminRoutes } from './admin.routes';
 import { FeedService } from './bangumi-detail/feed.service';
 import { AdminNavbar } from './admin-navbar/admin-navbar.component';
 import { BangumiCard } from './bangumi-card/bangumi-card.component';
-import { UIModule } from '@irohalab/deneb-ui';
+import { ResponsiveGenerateSrcService, SRC_GENERATOR_SERVICE, UIModule } from '@irohalab/deneb-ui';
 import { BangumiTypeNamePipe } from './bangumi-pipes/type-name-pipe';
 import { ResultDetail } from './search-bangumi/result-detail/result-detail.component';
 import { BangumiBasic } from './bangumi-detail/bangumi-basic/bangumi-basic.component';
@@ -32,7 +32,6 @@ import { UserManagerSerivce } from './user-manager/user-manager.service';
 import { UserPromoteModal } from './user-manager/user-promote-modal/user-promote-modal.component';
 import { DenebCommonPipes } from '../pipes';
 import { VideoFileModal } from './bangumi-detail/video-file-modal/video-file-modal.component';
-import { ResponsiveImageModule } from '../responsive-image/responsive-image.module';
 import { AnnounceComponent } from './announce/announce.component';
 import { EditAnnounceComponent } from './announce/edit-announce/edit-announce.component';
 import { AnnounceService } from './announce/announce.service';
@@ -47,8 +46,12 @@ import { NyaaPipe } from './bangumi-pipes/nyaa-pipe';
 import { EditBangumiRecommendComponent } from './announce/edit-bangumi-recommend/edit-bangumi-recommend.component';
 import { VideoProcessRuleComponent } from './bangumi-detail/video-processs-rule/video-process-rule.component';
 import { VideoProcessRuleService } from './bangumi-detail/video-processs-rule/video-process-rule.service';
-import { VideoProcessRuleEditorComponent } from './bangumi-detail/video-processs-rule/video-process-rule-editor/video-process-rule-editor.component';
-import { VideoProcessRuleItemComponent } from './bangumi-detail/video-processs-rule/video-process-rule-item/video-process-rule-item.component';
+import {
+    VideoProcessRuleEditorComponent
+} from './bangumi-detail/video-processs-rule/video-process-rule-editor/video-process-rule-editor.component';
+import {
+    VideoProcessRuleItemComponent
+} from './bangumi-detail/video-processs-rule/video-process-rule-item/video-process-rule-item.component';
 import { ActionTypePipe } from './bangumi-detail/video-processs-rule/action-type.pipe';
 import { ProfileTypePipe } from './bangumi-detail/video-processs-rule/profile-type.pipe';
 import { DownloadManagerComponent } from './download-manager/download-manager.component';
@@ -68,7 +71,8 @@ import { DownloadJobDetailComponent } from './download-manager/download-job-deta
 import { DownloadEditorComponent } from './bangumi-detail/universal-builder/download-editor/download-editor.component';
 
 
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         Admin,
         SearchBangumi,
         ResultDetail,
@@ -114,17 +118,20 @@ import { DownloadEditorComponent } from './bangumi-detail/universal-builder/down
         VertexInfoPanelComponent,
         DownloadJobDetailComponent,
         DownloadEditorComponent
-    ], imports: [CommonModule,
+    ],
+    imports: [
+        CommonModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule.forChild(adminRoutes),
         UIModule,
         ConfirmDialogModule,
         DenebCommonPipes,
-        ResponsiveImageModule,
         UserServiceModule,
         DpDatePickerModule,
-        NgxGraphModule], providers: [
+        NgxGraphModule
+    ],
+    providers: [
         AdminService,
         FeedService,
         BangumiMoeService,
@@ -136,7 +143,9 @@ import { DownloadEditorComponent } from './bangumi-detail/universal-builder/down
         VideoProcessRuleService,
         DownloadManagerService,
         VideoProcessManagerService,
-        provideHttpClient(withInterceptorsFromDi())
-    ] })
+        provideHttpClient(withInterceptorsFromDi()),
+        {provide: SRC_GENERATOR_SERVICE, useClass: ResponsiveGenerateSrcService}
+    ],
+})
 export class AdminModule {
 }

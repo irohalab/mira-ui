@@ -15,14 +15,14 @@
 <div class="bangumi-detail-container" *ngIf="bangumi && adminList">
     <div class="bangumi-basic-info section-card">
         <div class="cover-wrapper" *ngIf="bangumi.cover_image">
-            <responsive-image
+            <ui-responsive-image
                 [src]="bangumi.cover_image.url"
                 [size]="{
                     width: '100%',
                     height: 'auto',
                     originalWidth: bangumi.cover_image.width,
                     originalHeight: bangumi.cover_image.height}"
-                [background]="bangumi.cover_image.dominant_color"></responsive-image>
+                [background]="bangumi.cover_image.dominant_color"></ui-responsive-image>
         </div>
         <div class="bangumi-info-text">
             <h3 class="bangumi-title">
@@ -187,7 +187,7 @@
                                 </h4>
                             </div>
                         </div>
-                        <responsive-image
+                        <ui-responsive-image
                             [src]="episode.thumbnail_image.url"
                             [size]="{
                                 width: '6rem',
@@ -195,7 +195,7 @@
                                 originalWidth: episode.thumbnail_image.width,
                                 originalHeight: episode.thumbnail_image.height}"
                             display="table" *ngIf="episode.status === 2 && !!episode.thumbnail_image"
-                            [background]="episode.thumbnail_image.dominant_color"></responsive-image>
+                            [background]="episode.thumbnail_image.dominant_color"></ui-responsive-image>
                     </td>
                     <td class="title">
                         <span class="key">日文:</span><span class="value">{{episode.name}}</span> <br>

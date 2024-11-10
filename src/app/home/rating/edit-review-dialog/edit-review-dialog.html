@@ -6,13 +6,13 @@
 </div>
 <div class="edit-review-container">
     <div class="bangumi-info">
-        <responsive-image [src]="bangumi.cover_image.url"
+        <ui-responsive-image [src]="bangumi.cover_image.url"
                           [size]="{
                                 width: '100%',
                                 height: 'auto',
                                 originalWidth: bangumi.cover_image.width,
                                 originalHeight: bangumi.cover_image.height}"
-                          [background]="bangumi.cover_image.dominant_color"></responsive-image>
+                          [background]="bangumi.cover_image.dominant_color"></ui-responsive-image>
         <div class="bangumi-name-cn" *ngIf="bangumi.name_cn">{{bangumi.name_cn}}</div>
     </div>
     <form class="ui form" [formGroup]="reviewForm" (submit)="onSubmit($event)" [ngClass]="{inverted: isDarkTheme}">

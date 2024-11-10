@@ -4,13 +4,13 @@
 <div class="ui container bangumi-default-container" *ngIf="bangumi" [ngClass]="{'dark-theme': isDarkTheme}">
     <div class="bangumi-info">
         <div #bangumiCover class="bangumi-cover" *ngIf="bangumi.cover">
-            <responsive-image [src]="bangumi.cover_image.url"
+            <ui-responsive-image [src]="bangumi.cover_image.url"
                               [size]="{
                                 width: '100%',
                                 ratio: bangumi.cover_image.height / bangumi.cover_image.width,
                                 originalWidth: bangumi.cover_image.width,
                                 originalHeight: bangumi.cover_image.height}"
-                              [background]="bangumi.cover_image.dominant_color"></responsive-image>
+                              [background]="bangumi.cover_image.dominant_color"></ui-responsive-image>
             <bangumi-staff-info *ngIf="!!extraInfo && !!extraInfo.staff" [staffList]="extraInfo.staff"></bangumi-staff-info>
         </div>
         <div class="bangumi-cover-revealer" [style.height]="coverRevealerHeight" (click)="toggleCover()">
@@ -79,13 +79,13 @@
                         </div>
                     </div>
                     <a *ngIf="episode.status===2" class="image" [routerLink]="['/play', episode.id]">
-                        <responsive-image [src]="episode.thumbnail_image.url"
+                        <ui-responsive-image [src]="episode.thumbnail_image.url"
                                           [size]="{
                                         width: '100%',
                                         ratio: 0.5625,
                                         originalWidth: episode.thumbnail_image.width,
                                         originalHeight: episode.thumbnail_image.height}"
-                                          [background]="episode.thumbnail_image.dominant_color"></responsive-image>
+                                          [background]="episode.thumbnail_image.dominant_color"></ui-responsive-image>
                     </a>
                     <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">
                         <div class="content-heading">
@@ -98,6 +98,13 @@
                             <span class="ui tiny teal label" *ngIf="sortOrder === 'desc' && episode.status !== 2">即将播出</span>
                         </div>
                     </a>
+                    <div class="ui dropdown extend-menu-button" uiDropdown="click" [stopPropagation]="false">
+                        <div class="text"><i class="ellipsis vertical icon"></i></div>
+                        <div class="left menu">
+                            <div class="item" (click)="changeEpStatus(episode, 2)">看过</div>
+                            <div class="item" (click)="changeEpStatus(episode, 3)">在看</div>
+                        </div>
+                    </div>
                     <div class="ui bottom attached progress"
                          *ngIf="episode.watch_progress && episode.watch_progress.percentage"
                          [ngClass]="{
@@ -127,13 +134,13 @@
                     <span class="episode-title" *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
                 </div>
                 <a *ngIf="episode.status===2" class="image" [routerLink]="['/play', episode.id]">
-                    <responsive-image [src]="episode.thumbnail_image.url"
+                    <ui-responsive-image [src]="episode.thumbnail_image.url"
                                       [size]="{
                                         width: '100%',
                                         ratio: 0.5625,
                                         originalWidth: episode.thumbnail_image.width,
                                         originalHeight: episode.thumbnail_image.height}"
-                                      [background]="episode.thumbnail_image.dominant_color"></responsive-image>
+                                      [background]="episode.thumbnail_image.dominant_color"></ui-responsive-image>
                 </a>
                 <span class="episode-number">{{episode.episode_no}}</span>
                 <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">

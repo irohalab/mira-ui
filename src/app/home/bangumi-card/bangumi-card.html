@@ -1,7 +1,7 @@
 <div class="ui container">
     <a class="ui segment" [routerLink]="['/bangumi', bangumi.id]" [ngClass]="{inverted: isDarkTheme}">
         <div class="bangumi-list-item">
-            <responsive-image class="cover-wrapper"
+            <ui-responsive-image class="cover-wrapper"
                               [src]="imageUrl"
                               [size]="{
                                 width: '10rem',
@@ -11,7 +11,7 @@
                               }"
                               [background]="bangumi.cover_image.dominant_color"
                               (imageLoad)="onImageLoad()"
-            ></responsive-image>
+            ></ui-responsive-image>
             <div class="list-item-text">
                 <h4 class="bangumi-title">{{bangumi.name_cn || '暂无'}}</h4>
                 <h4 class="entry">

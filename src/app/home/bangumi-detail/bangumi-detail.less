@@ -256,6 +256,7 @@
       flex: 0 0 8rem;
     }
     > .content {
+      flex: 1 0 auto;
       padding: 0.7em 1em;
       .extra-info {
         margin-top: 0.2em;
@@ -280,6 +281,17 @@
         .content-heading {
           color: #6f6f6f;
         }
+      }
+    }
+    .extend-menu-button {
+      align-self: center;
+      display: inline-block;
+      padding: 0.7em 0.2em 0.7em 0.5em;
+      cursor: pointer;
+      color: #4c4c4c;
+      &:focus,
+      &:hover {
+        color: #101010;
       }
     }
   }
