@@ -38,6 +38,8 @@ import { VideoCapture } from './core/video-capture.service';
 import { FloatControlsComponent } from './float-controls/float-controls.component';
 import { VideoPlayerHelpDialog } from './help-dialog/help-dialog.component';
 import { VideoTouchControls } from './touch-controls/touch-controls.component';
+import { PersistStorage } from '../user-service';
+import { CorePlayer } from './core/settings';
 
 let nextId = 0;
 
@@ -86,6 +88,8 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
      */
     @Input()
     startPosition = 0;
+
+    lastPlayedPosition = 0;
 
     @Input()
     thumbnail: string;
@@ -217,7 +221,8 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     constructor(@Self() public videoPlayerRef: ElementRef,
                 private _changeDetector: ChangeDetectorRef,
                 private _videoCapture: VideoCapture,
-                private _dialogService: UIDialog) {
+                private _dialogService: UIDialog,
+                private _persistStorage: PersistStorage,) {
     }
 
     setPendingState(state: number): void {
@@ -327,6 +332,17 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
         }
     }
 
+    jumpToPosition(position: number): void {
+        this.startPosition = position;
+        const mediaElement = this.mediaRef.nativeElement as HTMLMediaElement;
+        console.log(position, mediaElement.duration, mediaElement.readyState);
+        if (mediaElement.readyState >= ReadyState.HAVE_METADATA) {
+            this._currentTimeSubject.next(position);
+            mediaElement.currentTime = position;
+            this.play();
+        }
+    }
+
     fastForward(time: number): void {
         if (Number.isNaN(this._durationSubject.getValue())) {
             return;
@@ -425,9 +441,19 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
         this.nextEpisodeName = nextEpisode.name;
         this.nextEpisodeNameCN = nextEpisode.name_cn;
         this.videoFile = videoFile;
-        this.startPosition = startPosition;
+        this.lastPlayedPosition = startPosition;
+        // auto jump to last position when user config enables this feature,
+        // otherwise start from the beginning and popup an overlay to ask user whether to jump to lastPosition
+        const autoPlayFromLastPosition = this._persistStorage.getItem(CorePlayer.AUTO_PLAY_FROM_LAST_POSITION, 'false');
         if (lastVideoFileId !== videoFile.id) {
+            if (autoPlayFromLastPosition === 'true' && this.videoFile.duration && this.lastPlayedPosition < this.videoFile.duration - 1) {
+                this.startPosition = this.lastPlayedPosition;
+            } else {
+                this.startPosition = 0;
+            }
             this._resetPlayer();
+        } else {
+            this.startPosition = startPosition;
         }
         this._initiatePlayer();
     }

@@ -1,0 +1,8 @@
+<div class="overlay-panel ui segment" *ngIf="isShowOverlay">
+    <a class="anchor-flat-button" (click)="playFromBeginning($event)" *ngIf="touchControl">从头开始</a>
+    <a class="anchor-flat-button" (click)="playFromLastPosition($event)">从{{lastPositionReadableTime}}开始</a>
+    <a class="icon-button"><i class="times icon"></i></a>
+    <div class="ui bottom attached teal progress">
+        <div class="bar" [style.width]="progress"></div>
+    </div>
+</div>

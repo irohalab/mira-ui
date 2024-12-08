@@ -22,6 +22,8 @@ import { VideoPlayerHelpButton } from "./controls/help-button/help-button.compon
 import { VideoNextEpisodeOverlay } from './next-episode-overlay/next-episode-overlay.component';
 import { VideoConfigPanelComponent } from './controls/config-button/config-panel/config-panel.component';
 import { VideoPlayerService } from './video-player.service';
+import { LastPositionOverlayComponent } from './last-position-overlay/last-position-overlay.component';
+import { DenebCommonPipes } from '../pipes';
 
 @NgModule({
     declarations: [
@@ -42,7 +44,8 @@ import { VideoPlayerService } from './video-player.service';
         VideoNextEpisodeOverlay,
         VideoConfigPanelComponent,
         FloatControlsComponent,
-        NonInteractiveProgressBarComponent
+        NonInteractiveProgressBarComponent,
+        LastPositionOverlayComponent
     ],
     providers: [
         VideoCapture,
@@ -51,7 +54,8 @@ import { VideoPlayerService } from './video-player.service';
     imports: [
         CommonModule,
         UIToggleModule,
-        FormsModule
+        FormsModule,
+        DenebCommonPipes
     ],
     exports: [
         VideoPlayer
