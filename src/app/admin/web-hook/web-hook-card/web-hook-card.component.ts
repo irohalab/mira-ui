@@ -5,7 +5,8 @@ import { WebHook } from '../../../entity/web-hook';
     selector: 'web-hook-card',
     templateUrl: './web-hook-card.html',
     styleUrls: ['./web-hook-card.less'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class WebHookCardComponent {
     @Input()

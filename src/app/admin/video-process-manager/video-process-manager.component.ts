@@ -15,7 +15,8 @@ const JOB_CARD_HEIGHT_REM = 4.5;
 @Component({
     selector: 'video-process-manager',
     templateUrl: './video-process-manager.html',
-    styleUrls: ['./video-process-manager.less']
+    styleUrls: ['./video-process-manager.less'],
+    standalone: false
 })
 export class VideoProcessManagerComponent implements OnInit, OnDestroy {
     private _jobListSub = new Subscription();

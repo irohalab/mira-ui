@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
     selector: 'static-content',
     templateUrl: './static-content.html',
     styleUrls: ['./static-content.less'],
+    standalone: false
 })
 export class StaticContentComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

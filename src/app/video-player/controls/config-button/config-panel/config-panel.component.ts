@@ -11,7 +11,8 @@ import { PersistStorage } from '../../../../user-service';
 @Component({
     selector: 'video-config-panel',
     templateUrl: './config-panel.html',
-    styleUrls: ['./config-panel.less']
+    styleUrls: ['./config-panel.less'],
+    standalone: false
 })
 export class VideoConfigPanelComponent extends UIPopoverContent implements OnDestroy {
     private _subscription = new Subscription();

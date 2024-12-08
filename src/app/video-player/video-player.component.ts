@@ -54,7 +54,8 @@ export const FLOAT_PLAYER_SCALE_RATIO = 0.4;
     styleUrls: ['./video-player.less'],
     host: {
         'tabindex': '0'
-    }
+    },
+    standalone: false
 })
 export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges {
     private _subscription = new Subscription();

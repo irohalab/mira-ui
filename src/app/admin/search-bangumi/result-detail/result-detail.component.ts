@@ -7,7 +7,8 @@ import {Subscription} from 'rxjs';
 @Component({
     selector: 'result-detail',
     templateUrl: './result-detail.html',
-    styleUrls: ['./result-detail.less']
+    styleUrls: ['./result-detail.less'],
+    standalone: false
 })
 export class ResultDetail implements OnChanges, OnDestroy {
 

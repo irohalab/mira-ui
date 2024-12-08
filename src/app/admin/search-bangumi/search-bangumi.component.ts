@@ -14,7 +14,8 @@ import {BangumiRaw} from '../../entity/bangumi-raw';
 @Component({
     selector: 'search-bangumi',
     templateUrl: './search-bangumi.html',
-    styleUrls: ['./search-bangumi.less']
+    styleUrls: ['./search-bangumi.less'],
+    standalone: false
 })
 export class SearchBangumi implements AfterViewInit {
     private _subscription = new Subscription();

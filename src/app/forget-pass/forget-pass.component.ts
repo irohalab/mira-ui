@@ -9,7 +9,8 @@ import { removeDarkTheme } from '../../helpers/dark-theme-helper';
 @Component({
     selector: 'forget-pass',
     templateUrl: './forget-pass.html',
-    styleUrls: ['./forget-pass.less']
+    styleUrls: ['./forget-pass.less'],
+    standalone: false
 })
 export class ForgetPass implements OnDestroy {
     private _subscription = new Subscription();

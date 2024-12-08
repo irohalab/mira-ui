@@ -10,7 +10,8 @@ import { removeDarkTheme } from '../../helpers/dark-theme-helper';
 @Component({
     selector: 'reset-pass',
     templateUrl: './reset-pass.html',
-    styleUrls: ['./reset-pass.less']
+    styleUrls: ['./reset-pass.less'],
+    standalone: false
 })
 export class ResetPass implements OnInit, OnDestroy {
     private _subscription = new Subscription();

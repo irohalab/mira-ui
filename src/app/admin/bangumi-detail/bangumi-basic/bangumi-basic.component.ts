@@ -7,7 +7,8 @@ import { User } from '../../../entity/user';
 @Component({
     selector: 'bangumi-basic',
     templateUrl: './bangumi-basic.html',
-    styleUrls: ['./bangumi-basic.less']
+    styleUrls: ['./bangumi-basic.less'],
+    standalone: false
 })
 export class BangumiBasic implements OnInit {
 

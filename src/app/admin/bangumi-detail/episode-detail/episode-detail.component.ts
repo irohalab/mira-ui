@@ -9,7 +9,8 @@ import {Subscription} from 'rxjs';
 @Component({
     selector: 'episode-detail',
     templateUrl: './episode-detail.html',
-    styleUrls: ['./episode-detail.less']
+    styleUrls: ['./episode-detail.less'],
+    standalone: false
 })
 export class EpisodeDetail implements OnInit, OnDestroy {
 

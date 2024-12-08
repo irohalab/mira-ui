@@ -8,7 +8,8 @@ import { RATING_TEXT } from '../rating.component';
 @Component({
     selector: 'edit-review-dialog',
     templateUrl: './edit-review-dialog.html',
-    styleUrls: ['./edit-review-dialog.less']
+    styleUrls: ['./edit-review-dialog.less'],
+    standalone: false
 })
 export class EditReviewDialogComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

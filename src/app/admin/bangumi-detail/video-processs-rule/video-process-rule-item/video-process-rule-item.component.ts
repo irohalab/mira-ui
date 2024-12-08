@@ -10,7 +10,8 @@ import { ProfileType } from '../../../../entity/ProfileType';
 @Component({
     selector: 'video-process-rule-item',
     templateUrl: './video-process-rule-item.html',
-    styleUrls: ['./video-process-rule-item.less']
+    styleUrls: ['./video-process-rule-item.less'],
+    standalone: false
 })
 export class VideoProcessRuleItemComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

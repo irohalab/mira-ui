@@ -17,7 +17,8 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'list-bangumi',
     templateUrl: './list-bangumi.html',
-    styleUrls: ['./list-bangumi.less']
+    styleUrls: ['./list-bangumi.less'],
+    standalone: false
 })
 export class ListBangumi implements OnDestroy, OnInit {
     private _subscription = new Subscription();

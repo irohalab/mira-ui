@@ -29,7 +29,8 @@ import { Subscription } from 'rxjs';
                 color: @darkLinkHoverColor;
             }
         }
-    `]
+    `],
+    standalone: false
 })
 export class DarkThemeToggleComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

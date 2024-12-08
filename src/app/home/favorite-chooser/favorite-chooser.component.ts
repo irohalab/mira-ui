@@ -20,7 +20,8 @@ import { SynchronizeService } from '../synchronize.service';
     selector: 'favorite-chooser',
     templateUrl: './favorite-chooser.html',
     styleUrls: ['./favorite-chooser.less'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class FavoriteChooser implements OnInit, OnDestroy {
     private _subscription = new Subscription();

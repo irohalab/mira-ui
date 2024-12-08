@@ -25,7 +25,8 @@ const SORT_ORDER: string = 'bangumi_detail_eps_sort_order';
 @Component({
     selector: 'view-bangumi-detail',
     templateUrl: './bangumi-detail.html',
-    styleUrls: ['./bangumi-detail.less']
+    styleUrls: ['./bangumi-detail.less'],
+    standalone: false
 })
 export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
     private _toastRef: UIToastRef<UIToastComponent>;

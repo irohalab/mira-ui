@@ -14,7 +14,8 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'user-manager',
     templateUrl: './user-manager.html',
-    styleUrls: ['./user-manager.less']
+    styleUrls: ['./user-manager.less'],
+    standalone: false
 })
 export class UserManager implements OnInit, OnDestroy {
     private _subscription = new Subscription();

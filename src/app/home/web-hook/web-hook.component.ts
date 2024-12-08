@@ -11,7 +11,8 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'web-hook',
     templateUrl: './web-hook.html',
-    styleUrls: ['./web-hook.less']
+    styleUrls: ['./web-hook.less'],
+    standalone: false
 })
 export class WebHookComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

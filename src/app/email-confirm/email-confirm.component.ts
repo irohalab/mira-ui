@@ -10,7 +10,8 @@ import { removeDarkTheme } from '../../helpers/dark-theme-helper';
     selector: 'email-confirm',
     templateUrl: './email-confirm.html',
     styleUrls: ['./email-confirm.less'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class EmailConfirm implements OnInit, OnDestroy {
     private _subscription = new Subscription();

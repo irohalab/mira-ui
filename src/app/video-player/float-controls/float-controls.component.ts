@@ -31,7 +31,8 @@ import { VideoPlayerService } from '../video-player.service';
             transition('show => hide', animate('200ms ease-out')),
             transition('hide => show', animate('200ms ease-in'))
         ])
-    ]
+    ],
+    standalone: false
 })
 export class FloatControlsComponent implements OnInit, AfterViewInit, OnDestroy {
     private _subscription = new Subscription();

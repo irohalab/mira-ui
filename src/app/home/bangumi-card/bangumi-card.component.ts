@@ -27,7 +27,8 @@ export const IMAGE_LOAD_DELAY = 1000;
     templateUrl: './bangumi-card.html',
     styleUrls: ['./bangumi-card.less'],
     encapsulation: ViewEncapsulation.Emulated,
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.Default,
+    standalone: false
 })
 export class BangumiCard implements OnInit, OnDestroy, OnChanges {
     private _subscription = new Subscription();

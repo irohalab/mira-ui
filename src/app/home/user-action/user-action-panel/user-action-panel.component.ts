@@ -9,7 +9,8 @@ import { User } from '../../../entity';
 @Component({
     selector: 'user-action-panel',
     templateUrl: './user-action-panel.html',
-    styleUrls: ['./user-action-panel.less']
+    styleUrls: ['./user-action-panel.less'],
+    standalone: false
 })
 export class UserActionPanelComponent extends UIPopoverContent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

@@ -21,7 +21,8 @@ export const MAIL_SEND_INTERVAL = 60;
 @Component({
     selector: 'user-center',
     templateUrl: './user-center.html',
-    styleUrls: ['./user-center.less']
+    styleUrls: ['./user-center.less'],
+    standalone: false
 })
 export class UserCenter implements OnInit, OnDestroy {
 

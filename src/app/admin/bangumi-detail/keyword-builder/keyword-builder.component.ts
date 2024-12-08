@@ -8,7 +8,8 @@ import { AVAILABLE_CATEGORY, AVAILABLE_FILTER } from '../../bangumi-pipes/nyaa-p
 @Component({
     selector: 'keyword-builder',
     templateUrl: './keyword-builder.html',
-    styleUrls: ['./keyword-builder.less']
+    styleUrls: ['./keyword-builder.less'],
+    standalone: false
 })
 export class KeywordBuilder implements OnInit, OnDestroy {
     private _subscription = new Subscription();

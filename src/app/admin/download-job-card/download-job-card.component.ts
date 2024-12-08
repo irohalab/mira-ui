@@ -10,7 +10,8 @@ import { Subscription } from 'rxjs';
     selector: 'download-job-card',
     templateUrl: './download-job-card.html',
     styleUrls: ['./download-job-card.less'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class DownloadJobCardComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

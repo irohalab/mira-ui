@@ -6,7 +6,8 @@ import { VideoProcessJobStatus } from '../../entity/VideoProcessJobStatus';
 @Component({
     selector: 'video-process-job-card',
     templateUrl: './video-process-job-card.html',
-    styleUrls: ['./video-process-job-card.less']
+    styleUrls: ['./video-process-job-card.less'],
+    standalone: false
 })
 export class VideoProcessJobCardComponent {
     @Input()

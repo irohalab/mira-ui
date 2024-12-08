@@ -7,7 +7,8 @@ import { Bangumi } from '../../../entity';
 @Component({
     selector: 'reveal-extra',
     templateUrl: './reveal-extra.html',
-    styleUrls: ['./reveal-extra.less']
+    styleUrls: ['./reveal-extra.less'],
+    standalone: false
 })
 export class RevealExtraComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

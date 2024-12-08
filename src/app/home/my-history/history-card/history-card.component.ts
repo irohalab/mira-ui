@@ -25,7 +25,8 @@ const THUMBNAIL_HEIGHT = 4.5;
     templateUrl: './history-card.html',
     styleUrls: ['./history-card.less'],
     encapsulation: ViewEncapsulation.Emulated,
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.Default,
+    standalone: false
 })
 export class HistoryCardComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

@@ -22,7 +22,8 @@ const GRAPH_HEIGHT = getRemPixel(30);
 @Component({
     selector: 'vertex-graph',
     templateUrl: './vertex-graph.html',
-    styleUrls: ['./vertex-graph.less']
+    styleUrls: ['./vertex-graph.less'],
+    standalone: false
 })
 export class VertexGraphComponent implements AfterViewInit, OnInit, OnChanges {
     readonly eActionType = ActionType;

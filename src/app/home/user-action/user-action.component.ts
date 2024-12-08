@@ -21,7 +21,8 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'user-action',
     templateUrl: './user-action.html',
-    styleUrls: ['./user-action.less']
+    styleUrls: ['./user-action.less'],
+    standalone: false
 })
 export class UserActionComponent implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();

@@ -15,7 +15,8 @@ export const CARD_HEIGHT_REM = 16;
     selector: 'bangumi-card',
     templateUrl: './bangumi-card.html',
     styleUrls: ['./bangumi-card.less'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class BangumiCard implements OnInit, OnChanges, OnDestroy{
     private _subscription = new Subscription();

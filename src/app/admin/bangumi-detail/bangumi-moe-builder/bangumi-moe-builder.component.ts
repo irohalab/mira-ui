@@ -12,7 +12,8 @@ import {Tag, Torrent} from './bangum-moe-entity';
 @Component({
     selector: 'bangumi-moe-builder',
     templateUrl: './bangumi-moe-builder.html',
-    styleUrls: ['./bangumi-moe-builder.less']
+    styleUrls: ['./bangumi-moe-builder.less'],
+    standalone: false
 })
 export class BangumiMoeBuilder implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();

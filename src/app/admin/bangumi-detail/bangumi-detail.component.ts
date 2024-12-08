@@ -36,7 +36,8 @@ const EP_STATUS_TEXT = {
 @Component({
     selector: 'bangumi-detail',
     templateUrl: './bangumi-detail.html',
-    styleUrls: ['./bangumi-detail.less']
+    styleUrls: ['./bangumi-detail.less'],
+    standalone: false
 })
 export class BangumiDetail implements OnInit, OnDestroy {
 

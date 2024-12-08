@@ -4,6 +4,7 @@ import { Component, HostBinding } from '@angular/core';
     selector: 'bottom-float-banner',
     templateUrl: './bottom-float-banner.html',
     styleUrls: ['./bottom-float-banner.less'],
+    standalone: false
 })
 export class BottomFloatBannerComponent {
 

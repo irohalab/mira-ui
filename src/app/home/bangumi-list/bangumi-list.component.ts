@@ -19,7 +19,8 @@ import { FormGroup } from '@angular/forms';
 @Component({
     selector: 'bangumi-list',
     templateUrl: './bangumi-list.html',
-    styleUrls: ['./bangumi-list.less']
+    styleUrls: ['./bangumi-list.less'],
+    standalone: false
 })
 export class BangumiList extends HomeChild implements OnInit, OnDestroy {
 

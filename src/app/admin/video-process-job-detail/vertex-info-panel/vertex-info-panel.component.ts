@@ -13,7 +13,8 @@ import { UIDialogRef } from '@irohalab/deneb-ui';
 @Component({
     selector: 'vertex-info-panel',
     templateUrl: './vertex-info-panel.html',
-    styleUrls: ['./vertex-info-panel.less']
+    styleUrls: ['./vertex-info-panel.less'],
+    standalone: false
 })
 export class VertexInfoPanelComponent implements OnDestroy {
     private _subscription = new Subscription();

@@ -8,7 +8,8 @@ import { NavigationService } from '../../navigation.service';
     selector: 'admin-navbar',
     templateUrl: './admin-navbar.html',
     styleUrls: ['./admin-navbar.less'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class AdminNavbar implements OnInit, OnDestroy {
     private _subscription = new Subscription();

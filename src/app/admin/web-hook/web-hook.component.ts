@@ -15,7 +15,8 @@ const CARD_HEIGHT_REM = 12;
 @Component({
     selector: 'web-hook-manager',
     templateUrl: './web-hook.html',
-    styleUrls: ['./web-hook.less']
+    styleUrls: ['./web-hook.less'],
+    standalone: false
 })
 export class WebHookComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

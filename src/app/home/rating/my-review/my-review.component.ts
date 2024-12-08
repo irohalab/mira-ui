@@ -15,7 +15,8 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'my-review',
     templateUrl: './my-review.html',
-    styleUrls: ['./my-review.less']
+    styleUrls: ['./my-review.less'],
+    standalone: false
 })
 export class MyReviewComponent implements AfterViewInit, OnChanges, OnInit, OnDestroy {
     private _subscription = new Subscription();

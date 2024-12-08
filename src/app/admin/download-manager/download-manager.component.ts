@@ -19,7 +19,8 @@ type SearchType = 'Job ID' | 'Bangumi ID' | 'Bangumi Name';
 @Component({
     selector: 'download-manager',
     templateUrl: './download-manager.html',
-    styleUrls: ['./download-manager.less']
+    styleUrls: ['./download-manager.less'],
+    standalone: false
 })
 export class DownloadManagerComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

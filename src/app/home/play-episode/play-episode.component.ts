@@ -28,7 +28,8 @@ const SORT_ORDER: string = 'play_episode_eps_sort_order';
 @Component({
     selector: 'play-episode',
     templateUrl: './play-episode.html',
-    styleUrls: ['./play-episode.less']
+    styleUrls: ['./play-episode.less'],
+    standalone: false
 })
 export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();

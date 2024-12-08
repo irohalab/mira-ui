@@ -13,7 +13,8 @@ const BANGUMI_TYPE_KEY = 'default_bangumi_type';
 @Component({
     selector: 'default-component',
     templateUrl: './default.html',
-    styleUrls: ['./default.less']
+    styleUrls: ['./default.less'],
+    standalone: false
 })
 export class DefaultComponent extends HomeChild implements OnInit, OnDestroy {
     private _subscription = new Subscription();

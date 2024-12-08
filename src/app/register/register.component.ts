@@ -18,7 +18,8 @@ import { removeDarkTheme } from '../../helpers/dark-theme-helper';
 @Component({
     selector: 'register',
     templateUrl: './register.html',
-    styleUrls: ['./register.less']
+    styleUrls: ['./register.less'],
+    standalone: false
 })
 export class Register implements OnInit, OnDestroy {
     private _subscription = new Subscription();

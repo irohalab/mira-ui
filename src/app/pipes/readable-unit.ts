@@ -8,7 +8,10 @@ dayjs.extend(relativeTime);
 
 const byteUnit = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 const thresh = 1024;
-@Pipe({name: 'readableUnit'})
+@Pipe({
+    name: 'readableUnit',
+    standalone: false
+})
 export class ReadableUnit implements PipeTransform {
     public transform(value: any, unit: string, decimal: number): any {
         let readableValue: any;

@@ -18,7 +18,8 @@ import { NavigationService } from './navigation.service';
         <router-outlet>
         </router-outlet>
     `,
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class App {
 

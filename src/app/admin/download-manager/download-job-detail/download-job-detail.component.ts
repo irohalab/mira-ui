@@ -10,7 +10,8 @@ import { TorrentFile } from '../../../entity/TorrentFile';
 @Component({
     selector: 'download-job-detail',
     templateUrl: './download-job-detail.html',
-    styleUrls: ['./download-job-detail.less']
+    styleUrls: ['./download-job-detail.less'],
+    standalone: false
 })
 export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

@@ -19,7 +19,8 @@ import { Subscription } from 'rxjs';
             cursor: pointer;
             line-height: 1;
         }
-    `]
+    `],
+    standalone: false
 })
 export class VideoPlayerConfigButton implements OnDestroy {
     private _subscription = new Subscription();

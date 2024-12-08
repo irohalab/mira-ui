@@ -10,7 +10,8 @@ import { DownloadEditorComponent } from './download-editor/download-editor.compo
 @Component({
     selector: 'universal-builder',
     templateUrl: './universal-builder.html',
-    styleUrls: ['./universal-builder.less']
+    styleUrls: ['./universal-builder.less'],
+    standalone: false
 })
 export class UniversalBuilderComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

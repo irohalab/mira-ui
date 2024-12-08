@@ -9,7 +9,8 @@ import { copyElementValueToClipboard } from '../../../../../helpers/clipboard';
 @Component({
     selector: 'download-editor',
     templateUrl: './download-editor.html',
-    styleUrls: ['./download-editor.less']
+    styleUrls: ['./download-editor.less'],
+    standalone: false
 })
 export class DownloadEditorComponent implements OnDestroy {
     private _subscription = new Subscription();

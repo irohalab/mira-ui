@@ -16,7 +16,8 @@ import {
 @Component({
     selector: 'video-file-modal',
     templateUrl: './video-file-modal.html',
-    styleUrls: ['./video-file-list.less']
+    styleUrls: ['./video-file-list.less'],
+    standalone: false
 })
 export class VideoFileModal implements OnInit, OnDestroy {
     private _subscription = new Subscription();

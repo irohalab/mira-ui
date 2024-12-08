@@ -5,7 +5,10 @@ const actionTypeMapping: {[key: string]: string} = {
     'Merge': 'Merge Action'
 };
 
-@Pipe({name: 'ActionType'})
+@Pipe({
+    name: 'ActionType',
+    standalone: false
+})
 export class ActionTypePipe implements PipeTransform {
     transform(value: any, ...args: any[]): any {
         return actionTypeMapping[value] || value;

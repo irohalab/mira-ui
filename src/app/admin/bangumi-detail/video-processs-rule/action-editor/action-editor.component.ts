@@ -22,7 +22,8 @@ const NODE_EDITOR_WIDTH = 20; //unit rem;
 @Component({
     selector: 'action-editor',
     templateUrl: './action-editor.html',
-    styleUrls: ['./action-editor.less']
+    styleUrls: ['./action-editor.less'],
+    standalone: false
 })
 export class ActionEditorComponent implements OnInit, AfterViewInit {
 

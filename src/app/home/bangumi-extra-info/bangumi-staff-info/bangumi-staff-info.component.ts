@@ -6,7 +6,8 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'bangumi-staff-info',
     templateUrl: './bangumi-staff-info.html',
-    styleUrls: ['./bangumi-staff-info.less']
+    styleUrls: ['./bangumi-staff-info.less'],
+    standalone: false
 })
 export class BangumiStaffInfoComponent implements OnInit {
     private _subscription = new Subscription();

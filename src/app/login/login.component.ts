@@ -13,7 +13,8 @@ import { removeDarkTheme } from '../../helpers/dark-theme-helper';
 @Component({
     selector: 'login',
     templateUrl: './login.html',
-    styleUrls: ['./login.less']
+    styleUrls: ['./login.less'],
+    standalone: false
 })
 export class Login implements OnInit, OnDestroy {
     private _subscription = new Subscription();

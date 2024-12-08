@@ -20,7 +20,8 @@ export function rangeLimitWithMaxRange(group: FormGroup) {
 @Component({
     selector: 'edit-bangumi-recommend',
     templateUrl: './edit-bangumi-recommend.html',
-    styleUrls: ['./edit-bangumi-recommend.less']
+    styleUrls: ['./edit-bangumi-recommend.less'],
+    standalone: false
 })
 export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

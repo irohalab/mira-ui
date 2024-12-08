@@ -28,7 +28,8 @@ const BREAK_POINT = 1330;
             transition('inactive => active', animate('100ms ease-in')),
             transition('active => inactive', animate('100ms ease-out'))
         ])
-    ]
+    ],
+    standalone: false
 })
 export class Home implements OnInit, OnDestroy {
 

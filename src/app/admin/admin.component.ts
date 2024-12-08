@@ -8,7 +8,8 @@ import { DownloadJobStatus } from '../entity/DownloadJobStatus';
 @Component({
     selector: 'admin',
     templateUrl: './admin.html',
-    styleUrls: ['./admin.less']
+    styleUrls: ['./admin.less'],
+    standalone: false
 })
 export class Admin implements OnDestroy {
     private _subscription = new Subscription();

@@ -11,7 +11,8 @@ import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 @Component({
     selector: 'bangumi-comment-form',
     templateUrl: './comment-form.html',
-    styleUrls: ['./comment-form.less']
+    styleUrls: ['./comment-form.less'],
+    standalone: false
 })
 export class CommentFormComponent implements OnInit, AfterViewInit, OnDestroy {
     private _subscription = new Subscription();

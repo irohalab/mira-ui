@@ -22,7 +22,8 @@ let lastSortField: string;
 @Component({
     selector: 'favorite-list',
     templateUrl: './favorite-list.html',
-    styleUrls: ['./favorite-list.less']
+    styleUrls: ['./favorite-list.less'],
+    standalone: false
 })
 export class FavoriteListComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

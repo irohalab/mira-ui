@@ -6,7 +6,10 @@ export const BANGUMI_STATUS: {[key: number]: string} = {
     2: 'Finished'
 };
 
-@Pipe({name: 'bangumiStatusName'})
+@Pipe({
+    name: 'bangumiStatusName',
+    standalone: false
+})
 export class BangumiStatusNamePipe implements PipeTransform {
     transform(value: number): any {
         return BANGUMI_STATUS[value];
@@ -19,7 +22,10 @@ export const VIDEO_FILE_STATUS: {[key: number]: string} = {
     3: '已下载'
 };
 
-@Pipe({name: 'videoFileStatusName'})
+@Pipe({
+    name: 'videoFileStatusName',
+    standalone: false
+})
 export class VideoFileStatusNamePipe implements PipeTransform {
 
     transform(value: number): any {

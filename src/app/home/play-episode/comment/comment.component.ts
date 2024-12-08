@@ -59,7 +59,8 @@ export const COMMENT_SORT_ORDER = 'comment_sort_order';
     selector: 'bangumi-comment',
     templateUrl: './comment.html',
     styleUrls: ['./comment.less'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class CommentComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
     private _subscription = new Subscription();

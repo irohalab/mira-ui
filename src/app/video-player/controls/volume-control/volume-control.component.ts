@@ -12,7 +12,8 @@ import { VideoPlayer } from '../../video-player.component';
 @Component({
     selector: 'video-volume-control',
     templateUrl: './volume-control.html',
-    styleUrls: ['./volume-control.less']
+    styleUrls: ['./volume-control.less'],
+    standalone: false
 })
 export class VideoVolumeControl implements AfterViewInit, OnInit, OnDestroy {
     private _subscription = new Subscription();

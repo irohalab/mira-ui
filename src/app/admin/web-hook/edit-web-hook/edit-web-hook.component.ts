@@ -20,7 +20,8 @@ export function sharedSecretValidator(isEditMode: boolean) {
 @Component({
     selector: 'edit-web-hook',
     templateUrl: './edit-web-hook.html',
-    styleUrls: ['./edit-web-hook.less']
+    styleUrls: ['./edit-web-hook.less'],
+    standalone: false
 })
 export class EditWebHookComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

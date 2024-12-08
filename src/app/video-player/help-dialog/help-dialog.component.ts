@@ -13,7 +13,8 @@ export const KEY_ESC = 27;
     styleUrls: ['./help-dialog.less'],
     host: {
         'tabIndex': '-1'
-    }
+    },
+    standalone: false
 })
 export class VideoPlayerHelpDialog implements OnInit, AfterViewInit, OnDestroy {
     private _subscription = new Subscription();

@@ -13,7 +13,8 @@ import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 @Component({
     selector: 'my-bangumi',
     templateUrl: './my-bangumi.html',
-    styleUrls: ['./my-bangumi.less']
+    styleUrls: ['./my-bangumi.less'],
+    standalone: false
 })
 export class MyBangumiComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

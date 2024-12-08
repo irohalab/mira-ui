@@ -8,7 +8,8 @@ import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 @Component({
     selector: 'apps-guide',
     templateUrl: './apps.html',
-    styleUrls: ['./apps.less']
+    styleUrls: ['./apps.less'],
+    standalone: false
 })
 export class AppsComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

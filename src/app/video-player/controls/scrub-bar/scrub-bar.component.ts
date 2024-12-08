@@ -19,7 +19,8 @@ import { getRemPixel } from '../../../../helpers/dom';
 @Component({
     selector: 'video-player-scrub-bar',
     templateUrl: './scrub-bar.html',
-    styleUrls: ['./scrub-bar.less']
+    styleUrls: ['./scrub-bar.less'],
+    standalone: false
 })
 export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
     private _subscription = new Subscription();

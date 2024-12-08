@@ -13,7 +13,8 @@ const countDownTimer = 5; // unit second
 @Component({
     selector: 'last-position-overlay',
     templateUrl: './last-position-overlay.html',
-    styleUrls: ['./last-position-overlay.less']
+    styleUrls: ['./last-position-overlay.less'],
+    standalone: false
 })
 export class LastPositionOverlayComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();

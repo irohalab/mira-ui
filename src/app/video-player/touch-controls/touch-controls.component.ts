@@ -23,7 +23,8 @@ import {closest} from "../../../helpers/dom";
             transition('show => hide', animate('200ms ease-out')),
             transition('hide => show', animate('200ms ease-in'))
         ])
-    ]
+    ],
+    standalone: false
 })
 export class VideoTouchControls implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();
