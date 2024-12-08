@@ -1,5 +1,11 @@
 export const PREFIX = 'VideoPlayer';
 
+export class CorePlayer {
+    static className = 'CorePlayer';
+    static prefix = `${PREFIX}:${CorePlayer.className}`;
+    static AUTO_PLAY_FROM_LAST_POSITION = `${CorePlayer.prefix}:AutoPlayFromLastPosition`;
+}
+
 export class Capture {
     static className = 'Capture';
     static prefix = `${PREFIX}:${Capture.className}`;

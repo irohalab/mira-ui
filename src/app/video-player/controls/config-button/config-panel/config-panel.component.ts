@@ -5,7 +5,7 @@ import { filter } from 'rxjs/operators';
 import { UIPopoverContent, UIPopoverRef } from '@irohalab/deneb-ui';
 import { Component, ElementRef, OnDestroy, Self } from '@angular/core';
 import { UserActionPanelComponent } from '../../../../home/user-action/user-action-panel/user-action-panel.component';
-import { Capture, FloatPlayer, PlayList } from '../../../core/settings';
+import { Capture, CorePlayer, FloatPlayer, PlayList } from '../../../core/settings';
 import { PersistStorage } from '../../../../user-service';
 
 @Component({
@@ -19,6 +19,7 @@ export class VideoConfigPanelComponent extends UIPopoverContent implements OnDes
     private _autoPlayNext: boolean;
     private _autoFloatPlayWhenScroll: boolean;
     private _autoFloatPlayWhenLeave: boolean;
+    private _autoPlayFromLastPosition: boolean;
 
     set directDownload(v: boolean) {
         this._directDownload = v;
@@ -56,6 +57,15 @@ export class VideoConfigPanelComponent extends UIPopoverContent implements OnDes
         return this._autoFloatPlayWhenLeave;
     }
 
+    set autoPlayFromLastPosition(v: boolean) {
+        this._autoPlayFromLastPosition = v;
+        this._persistStorage.setItem(CorePlayer.AUTO_PLAY_FROM_LAST_POSITION, v + '');
+    }
+
+    get autoPlayFromLastPosition(): boolean {
+        return this._autoPlayFromLastPosition;
+    }
+
     constructor(@Self() private _selfElementRef: ElementRef,
                 popoverRef: UIPopoverRef<UserActionPanelComponent>,
                 private _persistStorage: PersistStorage) {
@@ -64,10 +74,12 @@ export class VideoConfigPanelComponent extends UIPopoverContent implements OnDes
         const autoPlayNext = this._persistStorage.getItem(PlayList.AUTO_PLAY_NEXT, 'true');
         const autoFloatPlayWhenScroll = this._persistStorage.getItem(FloatPlayer.AUTO_FLOAT_WHEN_SCROLL, 'true');
         const autoFloatPlayWhenLeave = this._persistStorage.getItem(FloatPlayer.AUTO_FLOAT_WHEN_LEAVE, 'true');
+        const autoPlayFromLastPosition = this._persistStorage.getItem(CorePlayer.AUTO_PLAY_FROM_LAST_POSITION, 'false');
         this._directDownload = savedDirectDownload === 'true';
         this._autoPlayNext = autoPlayNext === 'true';
         this._autoFloatPlayWhenScroll = autoFloatPlayWhenScroll === 'true';
         this._autoFloatPlayWhenLeave = autoFloatPlayWhenLeave === 'true';
+        this._autoPlayFromLastPosition = autoPlayFromLastPosition === 'true';
     }
 
     ngAfterViewInit() {

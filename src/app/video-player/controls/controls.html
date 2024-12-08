@@ -6,6 +6,7 @@
     <next-episode-overlay *ngIf="hasNextEpisode && isPlayEnd"
                           [hasNextEpisode]="hasNextEpisode"
                           (onCancel)="onCancelNext()"></next-episode-overlay>
+    <last-position-overlay [@controlBarState]="controlBarState"></last-position-overlay>
     <div class="control-bar" (click)="onControlBarClick($event)" [@controlBarState]="controlBarState">
         <video-player-scrub-bar (motion)="onMotion()" [showControls]="showControls"></video-player-scrub-bar>
         <div class="control-buttons">
