@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { UserService } from './user.service';
 import { storageAPI } from '../../helpers/localstorage';
 import { Subject ,  Observable } from 'rxjs';
+import { User } from '../entity';
 
 export const PREFIX = 'ps';
 
@@ -69,9 +70,9 @@ export class PersistStorage {
     private _itemChange = new Subject<{key: string, value: string}>();
 
     constructor(private _userService: UserService) {
-        this._userService.getUserInfo()
+        this._userService.userInfo
             .subscribe((user) => {
-                if (!user) {
+                if (!user || user.id === User.ID_INITIAL_USER) {
                     this.clear();
                 }
             })

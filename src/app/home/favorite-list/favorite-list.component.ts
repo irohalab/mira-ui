@@ -1,22 +1,23 @@
+import { interval as observableInterval, Subject, Subscription } from 'rxjs';
 
-import { interval as observableInterval, Subscription, Subject } from 'rxjs';
-
-import {mergeMap, map, take} from 'rxjs/operators';
+import { map, mergeMap, take } from 'rxjs/operators';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HomeService } from '../home.service';
-import { Bangumi } from '../../entity/bangumi';
 import { Home } from '../home.component';
 import { DARK_THEME, DarkThemeService, InfiniteList, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
 import { getRemPixel } from '../../../helpers/dom';
-import { BaseError } from '../../../helpers/error/BaseError';
+import { BaseError } from '../../../helpers/error';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
+import { FavoriteStatus } from '../../entity/FavoriteStatus';
+import { Favorite } from '../../entity/Favorite';
+import { FavoriteService } from '../favorite.service';
 
-let lastType: number;
+let lastType: string;
 let lastScrollPosition: number = 0;
 let lastSort: string;
-let lastStatus: number;
+let lastStatus: FavoriteStatus;
 let lastSortField: string;
 
 @Component({
@@ -27,30 +28,31 @@ let lastSortField: string;
 })
 export class FavoriteListComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
-    private _statusSubject = new Subject<number>();
+    private _statusSubject = new Subject<FavoriteStatus>();
     private _toastRef: UIToastRef<UIToastComponent>;
-    private _favoriteList: Bangumi[];
+    private _favoriteList: Favorite[];
 
-    favoriteStatus = Bangumi.WATCHING;
+    favoriteStatus = FavoriteStatus.WATCHING;
+    eFavoriteStatus = FavoriteStatus;
 
-    favoriteList: Bangumi[];
+    favoriteList: Favorite[];
 
     isLoading = true;
 
     sort = 'desc';
-    type = -1;
-    sort_field = 'favorite_update_time';
+    type = 'all';
+    orderBy = 'updateTime';
 
     typeMenuLabel: {[idx: string]: string} = {
-        '-1': '全部',
-        '2': '动画',
-        '6': '电视剧'
+        'all': '全部',
+        'anime': '动画',
+        'real': '电视剧'
     };
 
     sortFieldLabel: {[k: string]: string} = {
-        'favorite_update_time': '按我修改的时间',
+        'updateTime': '按我修改的时间',
         'eps_update_time': '按最近更新的时间',
-        'air_date': '按开播时间'
+        'airDate': '按开播时间'
     };
 
     cardHeight: number;
@@ -63,6 +65,7 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
 
     constructor(private _homeService: HomeService,
                 private _homeComponent: Home,
+                private favoriteService: FavoriteService,
                 private _darkThemeService: DarkThemeService,
                 toastService: UIToast,
                 titleService: Title) {
@@ -91,56 +94,56 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
         if (Number.isInteger(lastType)) {
             this.type = lastType;
         }
-        if (Number.isInteger(lastStatus)) {
-            this.favoriteStatus = lastStatus;
-        }
+        // if (Number.isInteger(lastStatus)) {
+        //     this.favoriteStatus = lastStatus;
+        // }
         if (lastSortField) {
-            this.sort_field = lastSortField;
+            this.orderBy = lastSortField;
         }
         this._toastRef = toastService.makeText();
     }
 
     filterFavorites() {
         this.favoriteList = this._favoriteList
-            .filter(bangumi => {
-                if (this.type === -1) {
+            .filter(favorite => {
+                if (this.type === 'all') {
                     return true;
                 }
-                return bangumi.type === this.type;
+                return favorite.bangumi.type === this.type;
             })
-            .sort((bgm1: Bangumi, bgm2: Bangumi) => {
-                if (this.sort_field === 'air_date' || bgm1[this.sort_field] === bgm2[this.sort_field]) {
-                    let t1, t2;
-                    t1 = bgm1.air_date ? Date.parse(bgm1.air_date).valueOf() : Date.now();
-                    t2 = bgm2.air_date ? Date.parse(bgm2.air_date).valueOf() : Date.now();
-                    return this.sort === 'asc' ? t1 - t2 : t2 - t1;
-                }
-                return this.sort === 'asc' ? bgm1[this.sort_field] - bgm2[this.sort_field] : bgm2[this.sort_field] - bgm1[this.sort_field];
-            });
+            .sort(this.sortFunc);
         this.timestampList = this._favoriteList
-            .filter(bangumi => {
-                if (this.type === -1) {
+            .filter(fav => {
+                if (this.type === 'all') {
                     return true;
                 }
-                return bangumi.type === this.type;
+                return fav.bangumi.type === this.type;
             })
-            .sort((bgm1: Bangumi, bgm2: Bangumi) => {
-                if (this.sort_field === 'air_date' || bgm1[this.sort_field] === bgm2[this.sort_field]) {
-                    let t1, t2;
-                    t1 = bgm1.air_date ? Date.parse(bgm1.air_date).valueOf() : Date.now();
-                    t2 = bgm2.air_date ? Date.parse(bgm2.air_date).valueOf() : Date.now();
-                    return this.sort === 'asc' ? t1 - t2 : t2 - t1;
-                }
-                return this.sort === 'asc' ? bgm1[this.sort_field] - bgm2[this.sort_field] : bgm2[this.sort_field] - bgm1[this.sort_field];
-            })
-            .map(bangumi => {
-                if (this.sort_field === 'air_date') {
-                    return bangumi.air_date ? Date.parse(bangumi.air_date) : Date.now();
+            .sort(this.sortFunc)
+            .map(fav => {
+                if (this.orderBy === 'airDate') {
+                    return fav.bangumi.airDate ? Date.parse(fav.bangumi.airDate) : Date.now();
                 } else {
-                    return bangumi[this.sort_field];
+                    return fav.bangumi[this.orderBy] ? Date.parse(fav.bangumi[this.orderBy]) : Date.now();
                 }
 
             });
+    }
+
+    sortFunc(fav1: Favorite, fav2: Favorite): number {
+        let delta = 0;
+        if (this.orderBy === 'air_date' || fav1[this.orderBy] === fav2[this.orderBy]) {
+            delta = fav1.bangumi.airDate === fav2.bangumi.airDate ? 0 : (fav1.bangumi.airDate < fav2.bangumi.airDate ? -1 : 1);
+            if (this.sort === 'desc') {
+                delta = 0 - delta;
+            }
+        } else {
+            delta = fav1[this.orderBy] === fav2[this.orderBy] ? 0 : (fav1[this.orderBy] < fav2[this.orderBy] ? -1 : 1);
+            if (this.sort === 'desc') {
+                delta = 0 - delta;
+            }
+        }
+        return delta;
     }
 
     onClickFilterContainer() {
@@ -171,15 +174,15 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
         this.filterFavorites();
     }
 
-    onTypeChange(type: number) {
+    onTypeChange(type: string) {
         this.type = type;
         lastType = this.type;
         this.filterFavorites();
     }
 
     onSortFieldChange(sortField: string) {
-        this.sort_field = sortField;
-        lastSortField = this.sort_field;
+        this.orderBy = sortField;
+        lastSortField = this.orderBy;
         this.filterFavorites();
     }
 
@@ -187,7 +190,7 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
         lastScrollPosition = p;
     }
 
-    onStatusChange(status: number) {
+    onStatusChange(status: FavoriteStatus) {
         this.favoriteStatus = status;
         lastStatus = this.favoriteStatus;
         this._statusSubject.next(lastStatus);
@@ -202,17 +205,25 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
             this._statusSubject.asObservable().pipe(
                 mergeMap((status) => {
                     this.isLoading = true;
-                    return this._homeService.myBangumi(status);
+                    return this.favoriteService.listFavorite({
+                        status,
+                        offset: 0,
+                        limit: -1,
+                        countUnwatched: false,
+                        enableEpsUpdateTime: true,
+                        coverImage: true
+                    });
                 }))
-                .subscribe((bangumiList) => {
-                    this._favoriteList = bangumiList;
+                .subscribe({
+                    next: ({data, total}) => {
+                    this._favoriteList = data;
                     this.filterFavorites();
                     this.isLoading = false;
                 },
-                (error: BaseError) => {
+                error: (error: BaseError) => {
                     this._toastRef.show(error.message);
                     this.isLoading = false;
-                })
+                }})
         );
         this._statusSubject.next(this.favoriteStatus);
     }

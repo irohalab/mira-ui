@@ -2,14 +2,14 @@
     <div class="filter-container" (click)="onClickFilterContainer()">
         <div class="ui container">
             <div class="ui secondary pointing menu" [ngClass]="{inverted: isDarkTheme}">
-                <a class="item" [ngClass]="{active: favoriteStatus === 1}" (click)="onStatusChange(1)">想看</a>
-                <a class="item" [ngClass]="{active: favoriteStatus === 3}" (click)="onStatusChange(3)">在看</a>
-                <a class="item" [ngClass]="{active: favoriteStatus === 2}" (click)="onStatusChange(2)">看过</a>
-                <a class="item" [ngClass]="{active: favoriteStatus === 4}" (click)="onStatusChange(4)">搁置</a>
-                <a class="item" [ngClass]="{active: favoriteStatus === 5}" (click)="onStatusChange(5)">抛弃</a>
+                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.WISH}" (click)="onStatusChange(eFavoriteStatus.WISH)">想看</a>
+                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.WATCHING}" (click)="onStatusChange(eFavoriteStatus.WATCHING)">在看</a>
+                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.WATCHED}" (click)="onStatusChange(eFavoriteStatus.WATCHED)">看过</a>
+                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.PAUSE}" (click)="onStatusChange(eFavoriteStatus.PAUSE)">搁置</a>
+                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.ABANDONED}" (click)="onStatusChange(eFavoriteStatus.ABANDONED)">抛弃</a>
                 <div class="right menu">
                     <div class="ui item inline dropdown" uiDropdown="click" [stopPropagation]="true">
-                        <div class="text">{{sortFieldLabel[sort_field]}}</div>
+                        <div class="text">{{sortFieldLabel[orderBy]}}</div>
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             <div class="item" (click)="onSortFieldChange('favorite_update_time')">按我修改的时间</div>
@@ -26,9 +26,9 @@
                         <div class="text">{{typeMenuLabel[type]}}</div>
                         <i class="dropdown icon"></i>
                         <div class="menu">
-                            <div class="item" (click)="onTypeChange(-1)">全部</div>
-                            <div class="item" (click)="onTypeChange(2)">动画</div>
-                            <div class="item" (click)="onTypeChange(6)">电视剧</div>
+                            <div class="item" (click)="onTypeChange('all')">全部</div>
+                            <div class="item" (click)="onTypeChange('anime')">动画</div>
+                            <div class="item" (click)="onTypeChange('real')">电视剧</div>
                         </div>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
         <ui-timeline-meter [rowHeight]="cardHeight" [timestampList]="timestampList">
             <infinite-list [rowHeight]="cardHeight" [newScrollPosition]="lastScrollPosition"
                            (scrollPosition)="onScrollPositionChange($event)">
-                <bangumi-card *infiniteFor="let favorite of favoriteList" [bangumi]="favorite"></bangumi-card>
+                <bangumi-card *infiniteFor="let favorite of favoriteList" [bangumi]="favorite.bangumi" [isInit]="true"></bangumi-card>
             </infinite-list>
         </ui-timeline-meter>
     </div>

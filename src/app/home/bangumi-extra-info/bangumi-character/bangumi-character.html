@@ -1,5 +1,5 @@
-<div class="crt-header" *ngIf="bangumi.type === 2">角色和声优</div>
-<div class="crt-header" *ngIf="bangumi.type === 6">角色</div>
+<div class="crt-header" *ngIf="bangumi.type === 'anime'">角色和声优</div>
+<div class="crt-header" *ngIf="bangumi.type === 'real'">角色</div>
 <div class="ui stackable three column grid chara-grid">
     <div class="column" *ngFor="let character of characterList">
         <div class="character-wrapper">

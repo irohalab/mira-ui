@@ -18,7 +18,7 @@ type ReqData = {
 
 @Injectable()
 export class VideoProcessManagerService extends BaseService {
-    private _baseUrl = '/api/video-rule/proxy';
+    private _baseUrl = '/api/admin/video-process/proxy';
     private _sessionId: string;
     constructor(private _httpClient: HttpClient) {
         super();

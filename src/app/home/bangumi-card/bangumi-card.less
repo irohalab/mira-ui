@@ -50,6 +50,22 @@ a.ui.segment {
   .list-item-text {
     width: 100%;
     padding-right: 1rem;
+    &.ui.placeholder {
+      margin: 0 0 0 1.5rem;
+      padding-right: 0;
+      .title.line {
+        margin-bottom: 1.2em;
+        &:after {
+          height: 1.2em;
+        }
+      }
+      .subtitle.line {
+        margin-bottom: 0.8em;
+        &:after {
+          height: 0.8em;
+        }
+      }
+    }
     .bangumi-title {
       width: 100%;
       overflow: hidden;

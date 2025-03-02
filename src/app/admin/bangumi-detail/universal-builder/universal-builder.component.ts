@@ -72,7 +72,7 @@ export class UniversalBuilderComponent implements OnInit, OnDestroy {
         this.keywordControl = new FormControl();
         let universalList: any[];
         if (this.bangumi.universal) {
-            universalList = JSON.parse(this.bangumi.universal) as {mode: string, keyword: string}[];
+            universalList = JSON.parse(this.bangumi.universal) as { mode: string, keyword: string }[];
             this.availableMode = this.modeList.filter(mode => {
                 if (!this.mode) {
                     return mode === this.mode || !universalList.some(u => u.mode === mode)
@@ -136,13 +136,16 @@ export class UniversalBuilderComponent implements OnInit, OnDestroy {
         }
         this._subscription.add(
             this._feedService.queryUniversal(this.mode, keyword)
-                .subscribe((result) => {
-                    this.itemList = result;
-                    this.noResultFound = this.itemList.length === 0;
-                    this.isSearching = false;
-                }, (error) => {
-                    this.isSearching = false;
-                    this._toastRef.show(error.message);
+                .subscribe({
+                    next: (result) => {
+                        this.itemList = result;
+                        this.noResultFound = this.itemList.length === 0;
+                        this.isSearching = false;
+                    },
+                    error: (error) => {
+                        this.isSearching = false;
+                        this._toastRef.show(error.message);
+                    }
                 })
         );
     }
@@ -152,12 +155,13 @@ export class UniversalBuilderComponent implements OnInit, OnDestroy {
         dialogRef.componentInstance.files = item.files
         dialogRef.componentInstance.eps_mapping = item.eps_no_list.map(entry => {
             const episode = this.bangumi.episodes.find(eps => {
-                return eps.episode_no === entry.eps_no;
+                return eps.episodeNo === entry.eps_no;
             })
             return {
                 eps_no: entry.eps_no,
                 format: entry.format,
-                selected: episode ? episode.status === Episode.STATUS_NOT_DOWNLOADED : false};
+                selected: episode ? episode.status === Episode.STATUS_NOT_DOWNLOADED : false
+            };
         });
         dialogRef.componentInstance.downloadUrl = item.magnet_uri;
         dialogRef.componentInstance.bangumi_id = this.bangumi.id;

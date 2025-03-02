@@ -1,68 +1,61 @@
 import { Episode } from "./episode";
 import { Image } from './image';
-import { User } from './user';
+import { Favorite } from './Favorite';
+import { Account } from './Account';
 
 export class Bangumi {
-    id: string;
-    bgm_id: number;
-    name: string;
-    name_cn: string;
-    type: number;
-    eps: number;
-    summary: string;
-    image: string;
-    air_date: string;
-    air_weekday: number;
-    // @Deprecated
-    rss: string;
-    // @Deprecated
-    eps_regex: string;
-    dmhy: string;
-    acg_rip: string;
-    libyk_so: string;
-    bangumi_moe: string;
-    nyaa: string;
-    universal: string;
-    status: number;
-    create_time: number;
-    update_time: number;
+    id!: string;
+    bgmId!: number;
+    name!: string;
+    nameCn!: string;
+    type!: string;
+    eps!: number;
+    summary!: string;
+    image!: string;
+    airDate!: string;
+    airWeekday!: number;
+    subType!: string;
+    universal!: string;
+    status!: number;
+    createTime!: number;
+    updateTime!: number;
     // @Optional
-    // @deprecated
-    cover: string;
+    eps_no_offset!: number;
     // @Optional
-    eps_no_offset: number;
+    episodes!: Episode[];
     // @Optional
-    episodes: Episode[];
+    favorite_status!: number;
     // @Optional
-    favorite_status: number;
+    unwatched_count!: number;
     // @Optional
-    unwatched_count: number;
+    favorite_update_time!: number;
     // @Optional
-    favorite_update_time: number;
+    favorite_check_time!: number;
     // @Optional
-    favorite_check_time: number;
+    eps_update_time!: number;
     // @Optional
-    eps_update_time: number;
-    // @Optional
-    delete_mark: number;
+    delete_mark!: number;
 
     // @Optional
-    delete_eta: number;
+    favorite!: Favorite;
+
+    // @Optional
+    delete_eta!: number;
 
     // @deprecated
-    cover_color: string;
+    cover_color!: string;
 
-    cover_image: Image | null;
-
-    // @Optional
-    created_by: User;
+    coverImage!: Image | null;
 
     // @Optional
-    maintained_by: User;
-    maintained_by_uid: string;
+    created_by!: Account;
 
     // @Optional
-    alert_timeout: number;
+    maintained_by!: Account;
+    maintained_by_uid!: string;
+
+    // @Optional
+    alert_timeout!: number;
 
     static WISH = 1;
     static WATCHED = 2;
@@ -70,16 +63,20 @@ export class Bangumi {
     static PAUSE = 4;
     static ABANDONED = 5;
 
+    static TYPE_ALL = 'all';
+    static TYPE_ANIME = 'anime';
+    static TYPE_REAL = 'real';
+
     static containKeyword(bangumi: Bangumi, name: string): boolean {
         let nameLowerCase = name.toLowerCase();
         let keywords = nameLowerCase.split(' ');
         if (keywords.length === 1 && !keywords[0]) {
             return (bangumi.name && bangumi.name.toLowerCase().indexOf(nameLowerCase) !== -1)
-                || (bangumi.name_cn && bangumi.name_cn.toLowerCase().indexOf(nameLowerCase) !== -1)
+                || (bangumi.nameCn && bangumi.nameCn.toLowerCase().indexOf(nameLowerCase) !== -1)
                 || (bangumi.summary && bangumi.summary.toLowerCase().indexOf(nameLowerCase) !== -1);
         }
         return (bangumi.name && keywords.every(k => bangumi.name.toLowerCase().indexOf(k) !== -1))
-            || (bangumi.name_cn && keywords.every(k => bangumi.name_cn.toLowerCase().indexOf(k) !== -1))
+            || (bangumi.nameCn && keywords.every(k => bangumi.nameCn.toLowerCase().indexOf(k) !== -1))
             || (bangumi.summary && keywords.every(k => bangumi.summary.toLowerCase().indexOf(k) !== -1));
     }
     // for index convenient

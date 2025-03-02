@@ -19,7 +19,7 @@ type ReqData = {
 
 @Injectable()
 export class DownloadManagerService extends BaseService {
-    private _baseUrl = '/api/download-manager';
+    private _baseUrl = '/api/admin/download';
     private bangumiDict: { [bgmId: string]: Bangumi };
 
     constructor(private _httpClient: HttpClient, private _adminService: AdminService) {
@@ -28,7 +28,7 @@ export class DownloadManagerService extends BaseService {
     }
 
     private sendRequest<T>(reqData: ReqData): Observable<T> {
-        return this._httpClient.post<T>(`${this._baseUrl + '/proxy'}`, reqData)
+        return this._httpClient.post<T>(`${this._baseUrl}/proxy`, reqData)
             .pipe(
                 catchError(this.handleError)
             );

@@ -3,10 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
-import { queryString } from '../../helpers/url'
-import { Bangumi, BangumiRaw } from '../entity';
-import { Episode } from '../entity';
+import { Bangumi, Episode, MainItem } from '../entity';
 import { VideoFile } from '../entity/video-file';
+import { BangumiRaw } from '../entity/BangumiRaw';
 
 
 @Injectable()
@@ -18,42 +17,52 @@ export class AdminService extends BaseService {
         super();
     }
 
-    queryBangumi(bgmId: number): Observable<BangumiRaw> {
+    queryBangumi(bgmId: number): Observable<MainItem> {
         let queryUrl = this.baseUrl + '/query/' + bgmId;
         return this.http.get<any>(queryUrl).pipe(
-            map<any, BangumiRaw>(res => new BangumiRaw(res)),
+            map<any, MainItem>(res => new MainItem(res)),
             catchError(this.handleError));
     }
 
-    searchBangumi(params: {name: string, type: number, offset: number, count: number}): Observable<{data: Bangumi[], total: number}> {
-        let queryParams = queryString(params);
-        return this.http.get<{data: Bangumi[], total: number}>(`${this.baseUrl}/query?${queryParams}`).pipe(
+    searchBangumi(params: {keyword: string, type: number, offset: number, count: number}): Observable<{data: BangumiRaw[], total: number}> {
+        return this.http.get<{data: BangumiRaw[], total: number}>(`${this.baseUrl}/bangumi/search`, {
+            params
+        }).pipe(
             catchError(this.handleError),);
     }
 
-    addBangumi(bangumiRaw: BangumiRaw): Observable<string> {
-        let queryUrl = this.baseUrl + '/bangumi';
-        return this.http.post<{data:{id: string}}>(queryUrl, bangumiRaw).pipe(
-            map(res => res.data.id),
-            catchError(this.handleError),);
+    addBangumi(itemId: string): Observable<BangumiRaw> {
+        return this.http.post<BangumiRaw>(`${this.baseUrl}/bangumi`, null, {
+            params: {
+                itemId
+            }
+        });
+    }
+
+    getTimeline(params: {type: number, eps: number, sort: string, orderBy: string}): Observable<number[]> {
+        return this.http.get<{data: string[]}>(`${this.baseUrl}/bangumi/timeline`, {
+            params
+        }).pipe(map(res => res.data.map(date => new Date(date).valueOf())));
     }
 
     listBangumi(params: {
-        page: number,
-        count: number,
-        order_by: string,
+        offset: number,
+        limit: number,
+        eps?: number,
+        orderBy: string,
         sort: string,
-        name?: string,
-        type?: number}): Observable<{ data: Bangumi[], total: number }> {
-        let queryParams = queryString(params);
-        return this.http.get<{ data: Bangumi[], total: number }>(`${this.baseUrl}/bangumi?${queryParams}`).pipe(
+        keyword?: string,
+        type?: string,
+        subType?: string}): Observable<{ data: BangumiRaw[], total: number }> {
+        return this.http.get<{ data: BangumiRaw[], total: number }>(`${this.baseUrl}/bangumi`, {
+            params
+        }).pipe(
             catchError(this.handleError),);
     }
 
     getBangumi(id: string): Observable<Bangumi> {
         let queryUrl = this.baseUrl + '/bangumi/' + id;
-        return this.http.get<{ data: Bangumi }>(queryUrl).pipe(
-            map(res => res.data),
+        return this.http.get<Bangumi>(queryUrl).pipe(
             catchError(this.handleError),)
     }
 
@@ -92,8 +101,12 @@ export class AdminService extends BaseService {
             catchError(this.handleError),)
     }
 
-    getEpisodeVideoFiles(episode_id: string): Observable<VideoFile[]> {
-        return this.http.get<{data: VideoFile[]}>(`${this.baseUrl}/video-file?episode_id=${episode_id}`).pipe(
+    getEpisodeVideoFiles(episodeId: string): Observable<VideoFile[]> {
+        return this.http.get<{data: VideoFile[]}>(`${this.baseUrl}/video-file`, {
+            params: {
+                episodeId
+            }
+        }).pipe(
             map(res => res.data),
             catchError(this.handleError),);
     }
@@ -114,11 +127,11 @@ export class AdminService extends BaseService {
             catchError(this.handleError),);
     }
 
-    downloadDirectly(bangumi_id: string,
-                     urlEpsList: {download_url: string, eps_no: number, file_path: string, file_name: string}[]): Observable<any> {
-        return this.http.post<any>(`${this.baseUrl}/download-directly`, {
-            bangumi_id,
-            url_eps_list: urlEpsList
+    downloadDirectly(bangumiId: string,
+                     urlEpsList: {downloadUrl: string, epsNo: number, filePath: string, fileName: string}[]): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}/episode/download-directly`, {
+            bangumiId,
+            urlEpsList
         }).pipe(catchError(this.handleError),);
     }
 

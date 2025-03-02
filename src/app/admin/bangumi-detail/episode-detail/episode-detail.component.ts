@@ -1,10 +1,10 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {Episode} from '../../../entity/episode';
-import {AdminService} from '../../admin.service';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {UIDialogRef, UIToast, UIToastComponent, UIToastRef} from '@irohalab/deneb-ui';
-import {BaseError} from '../../../../helpers/error/BaseError';
-import {Subscription} from 'rxjs';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Episode } from '../../../entity';
+import { AdminService } from '../../admin.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { BaseError } from '../../../../helpers/error';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'episode-detail',
@@ -39,10 +39,10 @@ export class EpisodeDetail implements OnInit, OnDestroy {
                 private _fb: FormBuilder) {
         this._toastRef = toastService.makeText();
         this.episodeForm = _fb.group({
-            episode_no: 0,
+            episodeNo: 0,
             name: '',
-            name_cn: '',
-            bgm_eps_id: 0,
+            nameCn: '',
+            bgmEpsId: 0,
             airdate: '',
             duration: '',
             status: 0
@@ -68,10 +68,10 @@ export class EpisodeDetail implements OnInit, OnDestroy {
         let modelValue = this.episodeForm.value;
         let episode = Object.assign({}, this.episode);
         episode.bangumi_id = this.bangumi_id;
-        episode.episode_no = modelValue.episode_no as number;
-        episode.bgm_eps_id = modelValue.bgm_eps_id as number;
+        episode.episodeNo = modelValue.episodeNo as number;
+        episode.bgmEpsId = modelValue.bgmEpsId as number;
         episode.name = modelValue.name as string;
-        episode.name_cn = modelValue.name_cn as string;
+        episode.nameCn = modelValue.nameCn as string;
         episode.airdate = modelValue.airdate as string;
         episode.status = modelValue.status as number;
         if (!episode.airdate) {

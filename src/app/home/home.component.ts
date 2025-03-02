@@ -1,15 +1,14 @@
-
-import {fromEvent as observableFromEvent, Subscription } from 'rxjs';
+import { fromEvent as observableFromEvent, Observable, Subscription } from 'rxjs';
 import { Component, EventEmitter, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { HomeService } from './home.service';
 import { Bangumi, User } from '../entity';
 import { Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { AlertDialog } from '../alert-dialog/alert-dialog.component';
 import { DARK_THEME, DarkThemeService, UIDialog } from '@irohalab/deneb-ui';
 import { UserService } from '../user-service';
 import { environment } from '../../environments/environment';
+import { map } from 'rxjs/operators';
 
 const BREAK_POINT = 1330;
 
@@ -33,9 +32,11 @@ const BREAK_POINT = 1330;
 })
 export class Home implements OnInit, OnDestroy {
 
-    private _subscription = new Subscription();
+    private subscription = new Subscription();
 
-    user: User;
+    isShowAdminLink: Observable<boolean>;
+    isUserLogonObservable: Observable<boolean>;
+    isUserActivated: Observable<boolean>;
 
     siteTitle: string = environment.siteTitle;
 
@@ -55,16 +56,16 @@ export class Home implements OnInit, OnDestroy {
     today = Date.now();
 
     constructor(titleService: Title,
-                private _darkThemeService: DarkThemeService,
-                private _homeService: HomeService,
-                private _dialogService: UIDialog,
-                private _userService: UserService,
-                private _router: Router) {
+                private darkThemeService: DarkThemeService,
+                private homeService: HomeService,
+                private dialogService: UIDialog,
+                private userService: UserService,
+                private router: Router) {
         this.checkOverlapMode();
         if (this.sidebarOverlap) {
             this.sidebarActive = 'inactive';
         }
-        _homeService.childRouteChanges.subscribe((routeName) => {
+        homeService.childRouteChanges.subscribe((routeName) => {
             if (routeName === 'Play' || routeName === 'PV') {
                 this.sidebarActive = 'inactive';
             } else if (!this.sidebarOverlap) {
@@ -79,10 +80,18 @@ export class Home implements OnInit, OnDestroy {
                 titleService.setTitle(this.siteTitle);
             }
         });
+
+        this.isShowAdminLink = this.userService.userInfo.pipe(map(user => user && user.role === User.ADMIN_ROLE || user.role === User.SUPER_ADMIN_ROLE));
+        this.isUserLogonObservable = this.userService.userInfo.pipe(map(user => user && user.id !== User.ID_INITIAL_USER));
+        this.isUserActivated = this.userService.userInfo.pipe(map(user => user && user.id !== User.ID_INITIAL_USER && user.role !== User.GUEST_ROLE));
+    }
+
+    login(): void {
+        this.userService.login();
     }
 
     searchBangumi(name: string) {
-        this._router.navigate(['/bangumi', {name: name}]);
+        this.router.navigate(['/bangumi', {name: name}]);
     }
 
     toggleFloatSearchFrame() {
@@ -120,36 +129,13 @@ export class Home implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this._subscription.add(
-            this._darkThemeService.themeChange
+        this.subscription.add(
+            this.darkThemeService.themeChange
                 .subscribe(theme => {
                     this.isDarkTheme = theme === DARK_THEME;
                 })
         );
-        this._subscription.add(this._userService.userInfo
-            .subscribe(
-                (user: User) => {
-                    this.user = user;
-                    if (user && (!user.email_confirmed || !user.email)) {
-                        console.log('please input your email');
-                        let dialogRef = this._dialogService.open(AlertDialog, {stickyDialog: true, backdrop: true});
-                        if (user.email && !user.email_confirmed) {
-                            dialogRef.componentInstance.title = '请验证你的邮箱地址！';
-                            dialogRef.componentInstance.content = '我们已经向您的邮箱地址发送了验证邮件，请前往您的邮箱查看该邮件并完成验证。';
-                            dialogRef.componentInstance.confirmButtonText = '知道了';
-                            this._subscription.add(dialogRef.afterClosed().subscribe(() => {}));
-                        } else {
-                            dialogRef.componentInstance.title = '请填写您的邮箱地址！';
-                            dialogRef.componentInstance.content = '我们检测到您还没有填写邮箱地址，使用邀请码重置密码功能已经关闭。请务必填写邮箱地址以保证正常使用';
-                            dialogRef.componentInstance.confirmButtonText = '前往用户设置';
-                            this._subscription.add(dialogRef.afterClosed().subscribe(() => {
-                                this._router.navigate(['/settings/user']);
-                            }));
-                        }
-                    }
-                }
-            ));
-        this._subscription.add(observableFromEvent(window, 'resize')
+        this.subscription.add(observableFromEvent(window, 'resize')
             .subscribe(
                 () => {
                     this.checkOverlapMode();
@@ -159,7 +145,7 @@ export class Home implements OnInit, OnDestroy {
 
 
     ngOnDestroy(): void {
-        this._subscription.unsubscribe();
+        this.subscription.unsubscribe();
     }
 
 

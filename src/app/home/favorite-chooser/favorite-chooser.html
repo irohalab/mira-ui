@@ -1,25 +1,25 @@
 <div class="favorite-wrapper">
-    <button *ngIf="!bangumi.favorite_status && !isChoosingFavorite"
+    <button *ngIf="!bangumi.favorite && !isChoosingFavorite"
             class="small ui basic button"
             [ngClass]="{inverted: isDarkTheme}"
             [disabled]="isOnSynchronizing && syncEnabled"
             (click)="toggleFavoriteChooser()"><i class="remove bookmark icon"></i> {{toggleButtonText}}
     </button>
-    <button class="ui small labeled icon button" *ngIf="!isChoosingFavorite && !!bangumi.favorite_status"
+    <button class="ui small labeled icon button" *ngIf="!isChoosingFavorite && bangumi.favorite"
             [ngClass]="{
-               orange: bangumi.favorite_status === 1,
-               olive: bangumi.favorite_status === 2,
-               blue: bangumi.favorite_status === 3,
-               brown: bangumi.favorite_status === 4,
-               grey: bangumi.favorite_status === 5,
+               orange: bangumi.favorite.status === eFavoriteStatus.WISH,
+               olive: bangumi.favorite.status === eFavoriteStatus.WATCHED,
+               blue: bangumi.favorite.status === eFavoriteStatus.WATCHING,
+               brown: bangumi.favorite.status === eFavoriteStatus.PAUSE,
+               grey: bangumi.favorite.status === eFavoriteStatus.ABANDONED,
                inverted: isDarkTheme
                }"
             [disabled]="isOnSynchronizing && syncEnabled"
             (click)="toggleFavoriteChooser()">
-        <i class="bookmark icon"></i>我{{FAVORITE_LABEL[bangumi.favorite_status]}}这部{{BANGUMI_TYPE[bangumi.type]}}</button>
+        <i class="bookmark icon"></i>我{{FAVORITE_LABEL[bangumi.favorite.status]}}这部{{BANGUMI_TYPE[bangumi.type]}}</button>
     <button class="ui small basic button"
             [ngClass]="{inverted: isDarkTheme}"
-            *ngIf="!!bangumi.favorite_status"
+            *ngIf="!!bangumi.favorite"
             confirmDialog
             dialogTitle="确定要删除收藏吗？"
             [dialogContent]="isExtensionEnabled ? '你可以随时重新收藏这部动画，删除收藏就会影响到一些订阅服务，比如web-hook推送, 同时会删除您在Bangumi的收藏' : '你可以随时重新收藏这部动画，删除收藏就会影响到一些订阅服务，比如web-hook推送'"
@@ -33,19 +33,19 @@
     </span>
     <span class="sync-disabled-tip" *ngIf="isExtensionEnabled && !syncEnabled">同步功能不可用，查看bgm.tv登录状态及帐号是否关联</span>
     <div *ngIf="isChoosingFavorite" class="small ui buttons" [ngClass]="{inverted: isDarkTheme, basic: !isDarkTheme}">
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 1, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(1)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 1, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.WISH)">
             想看
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 2, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(2)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 2, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.WATCHED)">
             看过
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 3, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(3)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 3, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.WATCHING)">
             在看
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 4, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(4)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 4, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.PAUSE)">
             搁置
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 5, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(5)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 5, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.ABANDONED)">
             抛弃
         </button>
     </div>

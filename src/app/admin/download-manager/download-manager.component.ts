@@ -197,7 +197,7 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
                     this.jobList = this._jobList.filter(job => {
                         let bangumiNameMatch = this.searchString(job.bangumi.name, value);
                         if (!bangumiNameMatch) {
-                            bangumiNameMatch = this.searchString(job.bangumi.name_cn, value);
+                            bangumiNameMatch = this.searchString(job.bangumi.nameCn, value);
                         }
                         return bangumiNameMatch;
                     });

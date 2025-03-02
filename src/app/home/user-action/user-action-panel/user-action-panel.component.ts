@@ -1,7 +1,6 @@
+import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 
-import {fromEvent as observableFromEvent,  Subscription ,  Observable } from 'rxjs';
-
-import {skip} from 'rxjs/operators';
+import { skip } from 'rxjs/operators';
 import { DARK_THEME, DarkThemeService, UIPopoverContent, UIPopoverRef } from '@irohalab/deneb-ui';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../../entity';
@@ -13,27 +12,15 @@ import { User } from '../../../entity';
     standalone: false
 })
 export class UserActionPanelComponent extends UIPopoverContent implements OnInit, OnDestroy {
-    private _subscription = new Subscription();
+    private subscription = new Subscription();
 
     @Input()
     user: User;
 
-    @Input()
-    isBangumiEnabled: boolean;
-
-    @Input()
-    bgmAccountInfo: {
-        nickname: string,
-        avatar: {large: string, medium: string, small: string},
-        username: string,
-        id: string,
-        url: string
-    };
-
     isDarkTheme: boolean;
 
     constructor(popoverRef: UIPopoverRef<UserActionPanelComponent>,
-                private _darkThemeService: DarkThemeService) {
+                private darkThemeService: DarkThemeService) {
         super(popoverRef);
     }
 
@@ -45,7 +32,7 @@ export class UserActionPanelComponent extends UIPopoverContent implements OnInit
 
     ngAfterViewInit() {
         super.ngAfterViewInit();
-        this._subscription.add(
+        this.subscription.add(
             observableFromEvent(document.body, 'click').pipe(
                 skip(1))
                 .subscribe(() => {
@@ -55,12 +42,12 @@ export class UserActionPanelComponent extends UIPopoverContent implements OnInit
     }
 
     ngOnDestroy() {
-        this._subscription.unsubscribe();
+        this.subscription.unsubscribe();
     }
 
     ngOnInit(): void {
-        this._subscription.add(
-            this._darkThemeService.themeChange
+        this.subscription.add(
+            this.darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
         );
     }

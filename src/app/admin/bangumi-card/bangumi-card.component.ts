@@ -1,11 +1,11 @@
 import {
-    Component, HostBinding, Input, OnChanges, OnDestroy, OnInit, Optional, SimpleChanges,
+    Component, Input, OnChanges, OnDestroy, OnInit, Optional, SimpleChanges,
     ViewEncapsulation
 } from '@angular/core';
-import {Bangumi} from '../../entity/bangumi';
 import { DARK_THEME, DarkThemeService, InfiniteList, SCROLL_STATE } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { ImageLoadingStrategy } from '../../home/bangumi-card/image-loading-strategy.service';
+import { BangumiRaw } from '../../entity/BangumiRaw';
 
 const IMAGE_LOAD_DELAY = 1000;
 
@@ -26,7 +26,13 @@ export class BangumiCard implements OnInit, OnChanges, OnDestroy{
     showAddedTag: boolean;
 
     @Input()
-    bangumi: Bangumi;
+    bangumi: BangumiRaw;
+
+    @Input()
+    isInit: boolean;
+
+    @Input()
+    index: number;
 
     scrollState: SCROLL_STATE;
     imageLoaded: boolean = false;
@@ -79,24 +85,24 @@ export class BangumiCard implements OnInit, OnChanges, OnDestroy{
     }
 
     onImageLoad() {
-        this._imageLoadingStrategy.addLoadedUrl(this.bangumi.cover_image.url);
+        this._imageLoadingStrategy.addLoadedUrl(this.bangumi.coverImage.url);
     }
 
     private checkIfCanloadImage() {
-        if (this.imageLoaded || !this.bangumi || !this.bangumi.cover_image) {
+        if (this.imageLoaded || !this.isInit || !this.bangumi || !this.bangumi.coverImage) {
             return;
         }
         if (!this.lazy) {
-            this.imageUrl = this.bangumi.cover_image.url;
+            this.imageUrl = this.bangumi.coverImage.url;
             return;
         }
         this.imageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII=';
-        if (this._imageLoadingStrategy.hasLoaded(this.bangumi.cover_image.url)) {
-            this.imageUrl = this.bangumi.cover_image.url;
+        if (this._imageLoadingStrategy.hasLoaded(this.bangumi.coverImage.url)) {
+            this.imageUrl = this.bangumi.coverImage.url;
         }
         if (this.scrollState === SCROLL_STATE.IDLE) {
             this._imageLoadDelayTimerId = window.setTimeout(() => {
-                this.imageUrl = this.bangumi.cover_image.url;
+                this.imageUrl = this.bangumi.coverImage.url;
             }, IMAGE_LOAD_DELAY);
         } else if (this.scrollState === SCROLL_STATE.SCROLLING) {
             clearTimeout(this._imageLoadDelayTimerId);

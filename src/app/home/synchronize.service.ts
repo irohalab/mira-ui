@@ -75,7 +75,7 @@ export class SynchronizeService {
             switchMap((result) => {
                 if (result.status === 1) {
                     let dialogRef = this._dialog.open(ConflictDialogComponent, {stickyDialog: true, backdrop: true});
-                    dialogRef.componentInstance.bangumiName = bangumi.name_cn || bangumi.name;
+                    dialogRef.componentInstance.bangumiName = bangumi.nameCn || bangumi.name;
                     dialogRef.componentInstance.siteStatus = result.diff.albireo;
                     dialogRef.componentInstance.bgmStatus = result.diff.bgm;
                     return dialogRef.afterClosed().pipe(

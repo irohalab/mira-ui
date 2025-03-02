@@ -1,4 +1,4 @@
-<div class="ui container">
+<div class="ui container" *ngIf="isInit">
     <a class="ui segment" [routerLink]="['/bangumi', bangumi.id]" [ngClass]="{inverted: isDarkTheme}">
         <div class="bangumi-list-item">
             <ui-responsive-image class="cover-wrapper"
@@ -6,14 +6,14 @@
                               [size]="{
                                 width: '10rem',
                                 height: '100%',
-                                originalWidth: bangumi.cover_image.width,
-                                originalHeight: bangumi.cover_image.height
+                                originalWidth: bangumi.coverImage.width,
+                                originalHeight: bangumi.coverImage.height
                               }"
-                              [background]="bangumi.cover_image.dominant_color"
+                              [background]="bangumi.coverImage.dominantColor"
                               (imageLoad)="onImageLoad()"
             ></ui-responsive-image>
             <div class="list-item-text">
-                <h4 class="bangumi-title">{{bangumi.name_cn || '暂无'}}</h4>
+                <h4 class="bangumi-title">{{bangumi.nameCn || '暂无'}}</h4>
                 <h4 class="entry">
                     <span class="entry-key">日文名</span>
                     <span class="entry-value">{{bangumi.name || '暂无'}}</span>
@@ -24,11 +24,11 @@
                 </p>
                 <p class="entry">
                     <span class="entry-key">放送开始</span>
-                    <span class="entry-value">{{bangumi.air_date || '未知'}}</span>
+                    <span class="entry-value">{{bangumi.airDate || '未知'}}</span>
                 </p>
                 <p class="entry">
                     <span class="entry-key">放送星期</span>
-                    <span class="entry-value">{{bangumi.air_weekday || '未知'}}</span>
+                    <span class="entry-value">{{bangumi.airWeekday || '未知'}}</span>
                 </p>
                 <p class="entry">
                     <span class="entry-key">话数</span>
@@ -47,4 +47,28 @@
             {{FAVORITE_LABEL[bangumi.favorite_status]}}
         </div>
     </a>
+</div>
+<div class="ui container" *ngIf="!isInit">
+    <div class="ui segment">
+        <div class="bangumi-list-item">
+            <div class="cover-wrapper ui placeholder">
+                <div class="image"></div>
+            </div>
+            <div class="list-item-text ui placeholder">
+                <div class="header">
+                    <div class="short title line"></div>
+                </div>
+                <div class="line">
+                </div>
+                <div class="line">
+                </div>
+                <div class="line">
+                </div>
+                <div class="line">
+                </div>
+                <div class="line">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

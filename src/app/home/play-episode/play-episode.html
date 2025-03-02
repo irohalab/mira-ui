@@ -4,58 +4,58 @@
 <div class="theater-backdrop" (click)="focusVideoPlayer($event)" #videoPlayerContainer>
     <!-- video player will be here -->
 </div>
-<div class="ui container video-file-picker-container" *ngIf="!!episode && episode.video_files.length > 1">
+<div class="ui container video-file-picker-container" *ngIf="!!episode && episode.videoFiles.length > 1">
     <div class="video-file-picker dropdown-picker">
         <span>选择视频源：</span>
         <div class="ui inline dropdown" uiDropdown="click" [stopPropagation]="true">
-            <div class="text">{{currentVideoFile.label || currentVideoFile.file_name}}</div>
+            <div class="text">{{currentVideoFile.label || currentVideoFile.fileName}}</div>
             <i class="dropdown icon"></i>
             <div class="menu">
-                <div class="item" *ngFor="let videoFile of episode.video_files" (click)="onVideoFileChange(videoFile)">{{videoFile.label || videoFile.file_name}}</div>
+                <div class="item" *ngFor="let videoFile of episode.videoFiles" (click)="onVideoFileChange(videoFile)">{{videoFile.label || videoFile.fileName}}</div>
             </div>
         </div>
     </div>
     <div class="video-file-picker label-picker">
         <span>选择视频源：</span>
         <a class="ui label"
-           *ngFor="let videoFile of episode.video_files"
+           *ngFor="let videoFile of episode.videoFiles"
            [ngClass]="{'blue': videoFile.id === currentVideoFile.id}"
            (click)="onVideoFileChange(videoFile)">
-            {{videoFile.label || videoFile.file_name}}
+            {{videoFile.label || videoFile.fileName}}
         </a>
     </div>
 </div>
 <div class="ui container episode-info-container" *ngIf="!!episode">
     <h3 class=episode-title>
-        <span class="bangumi-name">{{episode.bangumi.name_cn}}</span>
-        <span class="episode-no">{{episode.episode_no}}</span>
-        <span class="episode-name" *ngIf="!!episode.name_cn || !!episode.name">{{episode.name_cn || episode.name}}</span>
+        <span class="bangumi-name">{{episode.bangumi.nameCn}}</span>
+        <span class="episode-no">{{episode.episodeNo}}</span>
+        <span class="episode-name" *ngIf="!!episode.nameCn || !!episode.name">{{episode.nameCn || episode.name}}</span>
     </h3>
     <button class="feedback-button ui small basic button" [ngClass]="{inverted: isDarkTheme}" (click)="feedback()" title="报告错误"><i class="icon flag"></i>报告错误</button>
     <div class="ui divider">
     </div>
     <div class="bangumi-info">
         <div class="bangumi-cover">
-            <ui-responsive-image [src]="episode.bangumi.cover_image.url"
+            <ui-responsive-image [src]="episode.bangumi.coverImage.url"
                               [size]="{
                             width: '100%',
                             height: 'auto',
-                            originalWidth: episode.bangumi.cover_image.width,
-                            originalHeight: episode.bangumi.cover_image.height}"
-                              [background]="episode.bangumi.cover_image.dominant_color"></ui-responsive-image>
+                            originalWidth: episode.bangumi.coverImage.width,
+                            originalHeight: episode.bangumi.coverImage.height}"
+                              [background]="episode.bangumi.coverImage.dominantColor"></ui-responsive-image>
         </div>
         <div class="bangumi-basic-info">
             <h2 class="bangumi-title name-cn">
-                <a [routerLink]="['/bangumi', episode.bangumi_id]">
-                    {{episode.bangumi.name_cn}}
+                <a [routerLink]="['/bangumi', episode.bangumi.id]">
+                    {{episode.bangumi.nameCn}}
                 </a>
-                <a class="external-link" [href]="'https://bgm.tv/subject/' + episode.bangumi.bgm_id" target="_blank"
+                <a class="external-link" [href]="'https://bgm.tv/subject/' + episode.bangumi.bgmId" target="_blank"
                    title="在bgm.tv页面查看">
                     <i class="bgm-emo-47 bgm-link-icon"></i>
                 </a>
             </h2>
             <h4 class="bangumi-title name">{{episode.bangumi.name}}</h4>
-            <favorite-chooser *ngIf="isBangumiReady" [bangumi]="episode.bangumi"></favorite-chooser>
+            <favorite-chooser [bangumi]="episode.bangumi"></favorite-chooser>
             <div class="summary">
                 {{episode.bangumi.summary}}
             </div>
@@ -77,23 +77,23 @@
                 </div>
                 <div class="episode-list-view ui stackable two column grid" *ngIf="episode.bangumi.episodes && layoutType === eLayoutTypes.LIST" [ngClass]="{inverted: isDarkTheme}">
                     <div class="column" *ngFor="let eps of episodeList">
-                        <a class="ui segment episode-link" [title]="eps.name_cn || eps.name || ''" *ngIf="eps.status===2" [routerLink]="['/play', eps.id]" [ngClass]="{'dark-panel': isDarkTheme}">
-                            <span class="eps-no">第{{eps.episode_no}}话</span>
-                            <span class="eps-title">{{eps.name_cn || eps.name || ''}}</span>
+                        <a class="ui segment episode-link" [title]="eps.nameCn || eps.name || ''" *ngIf="eps.status===2" [routerLink]="['/play', eps.id]" [ngClass]="{'dark-panel': isDarkTheme}">
+                            <span class="eps-no">第{{eps.episodeNo}}话</span>
+                            <span class="eps-title">{{eps.nameCn || eps.name || ''}}</span>
                         </a>
-                        <a class="ui disabled segment episode-link" [title]="eps.name_cn || eps.name || ''" *ngIf="eps.status!==2" [ngClass]="{inverted: isDarkTheme}">
-                            <span class="eps-no">第{{eps.episode_no}}话</span>
-                            <span class="eps-title">{{eps.name_cn || eps.name || ''}}</span>
+                        <a class="ui disabled segment episode-link" [title]="eps.nameCn || eps.name || ''" *ngIf="eps.status!==2" [ngClass]="{inverted: isDarkTheme}">
+                            <span class="eps-no">第{{eps.episodeNo}}话</span>
+                            <span class="eps-title">{{eps.nameCn || eps.name || ''}}</span>
                         </a>
                     </div>
                 </div>
                 <div class="episode-grid-view ui eight column doubling grid" *ngIf="episode.bangumi.episodes && layoutType === eLayoutTypes.GRID" [ngClass]="{inverted: isDarkTheme}">
                     <div class="column" *ngFor="let eps of episodeList">
                         <a class="ui segment episode-link" *ngIf="eps.status===2" [routerLink]="['/play', eps.id]" [ngClass]="{'dark-panel': isDarkTheme}">
-                            {{eps.episode_no}}
+                            {{eps.episodeNo}}
                         </a>
                         <a class="ui disabled segment episode-link" *ngIf="eps.status!==2" [ngClass]="{inverted: isDarkTheme}">
-                            {{eps.episode_no}}
+                            {{eps.episodeNo}}
                         </a>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
 </div>
 <div class="comment-section" *ngIf="!!episode && commentEnabled">
     <div class="ui container">
-        <bangumi-comment [bgmEpsId]="episode.bgm_eps_id"></bangumi-comment>
+        <bangumi-comment [bgmEpsId]="episode.bgmEpsId"></bangumi-comment>
     </div>
 </div>
 

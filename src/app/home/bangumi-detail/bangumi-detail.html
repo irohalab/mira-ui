@@ -3,22 +3,22 @@
 </div>
 <div class="ui container bangumi-default-container" *ngIf="bangumi" [ngClass]="{'dark-theme': isDarkTheme}">
     <div class="bangumi-info">
-        <div #bangumiCover class="bangumi-cover" *ngIf="bangumi.cover">
-            <ui-responsive-image [src]="bangumi.cover_image.url"
+        <div #bangumiCover class="bangumi-cover" *ngIf="bangumi.coverImage">
+            <ui-responsive-image [src]="bangumi.coverImage.url"
                               [size]="{
                                 width: '100%',
-                                ratio: bangumi.cover_image.height / bangumi.cover_image.width,
-                                originalWidth: bangumi.cover_image.width,
-                                originalHeight: bangumi.cover_image.height}"
-                              [background]="bangumi.cover_image.dominant_color"></ui-responsive-image>
+                                ratio: bangumi.coverImage.height / bangumi.coverImage.width,
+                                originalWidth: bangumi.coverImage.width,
+                                originalHeight: bangumi.coverImage.height}"
+                              [background]="bangumi.coverImage.dominantColor"></ui-responsive-image>
             <bangumi-staff-info *ngIf="!!extraInfo && !!extraInfo.staff" [staffList]="extraInfo.staff"></bangumi-staff-info>
         </div>
         <div class="bangumi-cover-revealer" [style.height]="coverRevealerHeight" (click)="toggleCover()">
         </div>
         <div class="bangumi-base-info">
             <h2 class="bangumi-title name-cn">
-                {{bangumi.name_cn}}
-                <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgm_id" target="_blank"
+                {{bangumi.nameCn}}
+                <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgmId" target="_blank"
                    title="在bgm.tv页面查看">
                     <i class="bgm-emo-47 bgm-link-icon"></i>
                 </a>
@@ -29,7 +29,7 @@
             <h3 class="bangumi-title name">
                 <span class="tip">日文名:</span><span class="name-text">{{bangumi.name}}</span>
             </h3>
-            <favorite-chooser [bangumi]="bangumi" [loadBgmInfo]="true" (reloadEpisodes)="reloadEpisodes()"></favorite-chooser>
+            <favorite-chooser *ngIf="user && user.id !== User.ID_INITIAL_USER && user.role !== User.GUEST_ROLE" [bangumi]="bangumi" [loadBgmInfo]="true" (reloadEpisodes)="reloadEpisodes()"></favorite-chooser>
             <div class="rating facade-item" *ngIf="isExtraInfoEnabled && !!extraInfo && !!extraInfo.rating">
                 <bangumi-rating [rating]="extraInfo.rating"></bangumi-rating>
             </div>
@@ -38,14 +38,14 @@
             </div>
             <div class="on-air-info facade-item">
                 <span class="key">放送开始：</span>
-                <span class="value">{{bangumi.air_date}}</span>
+                <span class="value">{{bangumi.airDate}}</span>
                 <span class="key">放送星期：</span>
-                <span class="value">{{bangumi.air_weekday | weekday}}</span>
+                <span class="value">{{bangumi.airWeekday | weekday}}</span>
             </div>
             <bangumi-character *ngIf="!!extraInfo && !!extraInfo.crt" [bangumi]="bangumi" [characterList]="extraInfo.crt"></bangumi-character>
         </div>
     </div>
-    <div class="episode-list">
+    <div class="episode-list" *ngIf="episodeList && episodeList.length > 0">
         <h4 class="episode-list-heading">各话列表</h4>
         <div class="episode-layout-button-groups">
             <a class="layout-button sort-button" [title]="sortOrder === 'desc' ? '最早在前，显示所有' : '最新在前，仅显示可观看'" (click)="toggleSortOrder()">
@@ -69,8 +69,8 @@
                     </div>
                     <div *ngIf="episode.status!==2" class="content unfinished">
                         <div class="content-heading">
-                            <span class="eps-no">第{{episode.episode_no}}话</span>
-                            <span *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
+                            <span class="eps-no">第{{episode.episodeNo}}话</span>
+                            <span *ngIf="episode.nameCn || episode.name">{{episode.nameCn || episode.name}}</span>
                         </div>
                         <div class="extra-info">
                             <span>时长:&nbsp;{{episode.duration}}</span>
@@ -79,18 +79,18 @@
                         </div>
                     </div>
                     <a *ngIf="episode.status===2" class="image" [routerLink]="['/play', episode.id]">
-                        <ui-responsive-image [src]="episode.thumbnail_image.url"
+                        <ui-responsive-image [src]="episode.thumbnailImage.url"
                                           [size]="{
                                         width: '100%',
                                         ratio: 0.5625,
-                                        originalWidth: episode.thumbnail_image.width,
-                                        originalHeight: episode.thumbnail_image.height}"
-                                          [background]="episode.thumbnail_image.dominant_color"></ui-responsive-image>
+                                        originalWidth: episode.thumbnailImage.width,
+                                        originalHeight: episode.thumbnailImage.height}"
+                                          [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
                     </a>
                     <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">
                         <div class="content-heading">
-                            <span class="eps-no">第{{episode.episode_no}}话</span>
-                            <span *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
+                            <span class="eps-no">第{{episode.episodeNo}}话</span>
+                            <span *ngIf="episode.nameCn || episode.name">{{episode.nameCn || episode.name}}</span>
                         </div>
                         <div class="extra-info">
                             <span>时长:&nbsp;{{episode.duration}}</span>
@@ -106,15 +106,15 @@
                         </div>
                     </div>
                     <div class="ui bottom attached progress"
-                         *ngIf="episode.watch_progress && episode.watch_progress.percentage"
+                         *ngIf="episode.watchProgress && episode.watchProgress.percentage"
                          [ngClass]="{
-                     orange: episode.watch_progress.watch_status === 1,
-                     olive: episode.watch_progress.watch_status === 2,
-                     blue: episode.watch_progress.watch_status === 3,
-                     brown: episode.watch_progress.watch_status === 4,
-                     grey: episode.watch_progress.watch_status === 5
+                     orange: episode.watchProgress.watchStatus === 1,
+                     olive: episode.watchProgress.watchStatus === 2,
+                     blue: episode.watchProgress.watchStatus === 3,
+                     brown: episode.watchProgress.watchStatus === 4,
+                     grey: episode.watchProgress.watchStatus === 5
                      }">
-                        <div class="bar" [style.width]="episode.watch_progress.percentage * 100 + '%'"></div>
+                        <div class="bar" [style.width]="episode.watchProgress.percentage * 100 + '%'"></div>
                     </div>
                 </div>
             </div>
@@ -131,31 +131,31 @@
                     </div>
                 </div>
                 <div *ngIf="episode.status!==2" class="content unfinished">
-                    <span class="episode-title" *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
+                    <span class="episode-title" *ngIf="episode.nameCn || episode.name">{{episode.nameCn || episode.name}}</span>
                 </div>
                 <a *ngIf="episode.status===2" class="image" [routerLink]="['/play', episode.id]">
-                    <ui-responsive-image [src]="episode.thumbnail_image.url"
+                    <ui-responsive-image [src]="episode.thumbnailImage.url"
                                       [size]="{
                                         width: '100%',
                                         ratio: 0.5625,
-                                        originalWidth: episode.thumbnail_image.width,
-                                        originalHeight: episode.thumbnail_image.height}"
-                                      [background]="episode.thumbnail_image.dominant_color"></ui-responsive-image>
+                                        originalWidth: episode.thumbnailImage.width,
+                                        originalHeight: episode.thumbnailImage.height}"
+                                      [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
                 </a>
-                <span class="episode-number">{{episode.episode_no}}</span>
+                <span class="episode-number">{{episode.episodeNo}}</span>
                 <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">
-                    <span class="episode-title" *ngIf="episode.name_cn || episode.name">{{episode.name_cn || episode.name}}</span>
+                    <span class="episode-title" *ngIf="episode.nameCn || episode.name">{{episode.nameCn || episode.name}}</span>
                 </a>
                 <div class="ui bottom attached progress"
-                     *ngIf="episode.watch_progress && episode.watch_progress.percentage"
+                     *ngIf="episode.watchProgress && episode.watchProgress.percentage"
                      [ngClass]="{
-                     orange: episode.watch_progress.watch_status === 1,
-                     olive: episode.watch_progress.watch_status === 2,
-                     blue: episode.watch_progress.watch_status === 3,
-                     brown: episode.watch_progress.watch_status === 4,
-                     grey: episode.watch_progress.watch_status === 5
+                     orange: episode.watchProgress.watchStatus === 1,
+                     olive: episode.watchProgress.watchStatus === 2,
+                     blue: episode.watchProgress.watchStatus === 3,
+                     brown: episode.watchProgress.watchStatus === 4,
+                     grey: episode.watchProgress.watchStatus === 5
                      }">
-                    <div class="bar" [style.width]="episode.watch_progress.percentage * 100 + '%'"></div>
+                    <div class="bar" [style.width]="episode.watchProgress.percentage * 100 + '%'"></div>
                 </div>
             </div>
         </div>

@@ -69,7 +69,7 @@ export class DownloadJobCardComponent implements OnInit, OnDestroy {
             this.episodeNoList = this.job.fileMapping
                 .map(mapping => mapping.episode)
                 .filter(eps => !!eps)
-                .map(eps => eps.episode_no + '');
+                .map(eps => eps.episodeNo + '');
         }
     }
 

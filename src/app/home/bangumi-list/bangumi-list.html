@@ -1,4 +1,4 @@
-<div class="bangumi-list-container" *ngIf="!name && !isLoading" [ngClass]="{'dark-theme': isDarkTheme}">
+<div class="bangumi-list-container" *ngIf="!name" [ngClass]="{'dark-theme': isDarkTheme}">
     <form class="filter-container" (click)="onClickFilterContainer()">
         <div class="ui container">
             <a class="sort-button anchor-button" (click)="onOrderChange($event)" [title]="sort === 'desc' ? '降序': '升序'">
@@ -9,19 +9,23 @@
                 <div class="text">{{typeMenuLabel[type]}}</div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <div class="item" (click)="onTypeChange(-1)">全部</div>
-                    <div class="item" (click)="onTypeChange(2)">动画</div>
-                    <div class="item" (click)="onTypeChange(6)">电视剧</div>
+                    <div class="item" (click)="onTypeChange('all')">全部</div>
+                    <div class="item" (click)="onTypeChange('anime')">动画</div>
+                    <div class="item" (click)="onTypeChange('real')">电视剧</div>
                 </div>
             </div>
         </div>
     </form>
-    <div class="timeline-container">
+    <div class="timeline-container" *ngIf="!isLoading" >
         <ui-timeline-meter [rowHeight]="cardHeight" [timestampList]="timestampList">
             <infinite-list [rowHeight]="cardHeight" [newScrollPosition]="lastScrollPosition" (scrollPosition)="onScrollPositionChange($event)">
-                <bangumi-card *infiniteFor="let bangumi of bangumiList" [bangumi]="bangumi"></bangumi-card>
+                <bangumi-card *infiniteFor="let bangumi of bangumiList; withBucket: bucketsStub; let isInit = isInitialized; let idx = index;"
+                              [bangumi]="bangumi" [isInit]="isInit" [index]="idx"></bangumi-card>
             </infinite-list>
         </ui-timeline-meter>
+    </div>
+    <div class="loading-container" *ngIf="isLoading" [ngClass]="{'dark-theme': isDarkTheme}">
+        <div class="ui inverted massive text active loader">Loading...</div>
     </div>
 </div>
 <div class="search-result" *ngIf="!!name && !isLoading && bangumiList.length > 0" [ngClass]="{'dark-theme': isDarkTheme}">
@@ -30,6 +34,6 @@
 <div class="no-result-container" *ngIf="!isLoading && (!bangumiList || bangumiList.length === 0)" [ngClass]="{'dark-theme': isDarkTheme}">
     <div class="no-result-tips"><i class="warning circle icon"></i>没有找到相关番组</div>
 </div>
-<div class="loading-container" *ngIf="isLoading" [ngClass]="{'dark-theme': isDarkTheme}">
+<div class="loading-container" *ngIf="name && isLoading" [ngClass]="{'dark-theme': isDarkTheme}">
     <div class="ui inverted massive text active loader">Loading...</div>
 </div>

@@ -7,21 +7,19 @@ import { filter, mergeMap, take, tap } from 'rxjs/operators';
 import { BaseError } from '../../../helpers/error';
 import { Bangumi, Episode } from '../../entity';
 import { Announce } from '../../entity/announce';
-import { User } from '../../entity';
 import { AdminService } from '../admin.service';
 import { AnnounceService } from '../announce/announce.service';
 import { EditBangumiRecommendComponent } from '../announce/edit-bangumi-recommend/edit-bangumi-recommend.component';
 import { UserManagerSerivce } from '../user-manager/user-manager.service';
 import { BangumiBasic } from './bangumi-basic/bangumi-basic.component';
-import { BangumiMoeBuilder } from './bangumi-moe-builder/bangumi-moe-builder.component';
 import { EpisodeDetail } from './episode-detail/episode-detail.component';
 import { FeedService } from './feed.service';
-import { KeywordBuilder } from './keyword-builder/keyword-builder.component';
 import { UniversalBuilderComponent } from './universal-builder/universal-builder.component';
 import { VideoFileModal } from './video-file-modal/video-file-modal.component';
 import { environment } from '../../../environments/environment';
 import { AlertDialog } from '../../alert-dialog/alert-dialog.component';
 import { ConfirmDialogModal } from '../../confirm-dialog/confirm-dialog-modal.component';
+import { Account } from '../../entity/Account';
 
 export enum AnnounceStatus {
     NOT_SET, NOT_YET, ANNOUNCING, EXPIRED
@@ -47,9 +45,9 @@ export class BangumiDetail implements OnInit, OnDestroy {
 
     set bangumi(bangumi: Bangumi) {
         this._bangumi = bangumi;
-        if (this.bangumi.episodes && this.bangumi.episodes.length > 0) {
-            this.orderedEpisodeList = this.bangumi.episodes.sort((episode1, episode2) => {
-                return episode1.episode_no - episode2.episode_no;
+        if (this._bangumi.episodes && this._bangumi.episodes.length > 0) {
+            this.orderedEpisodeList = this._bangumi.episodes.sort((episode1, episode2) => {
+                return episode1.episodeNo - episode2.episodeNo;
             });
         } else {
             this.orderedEpisodeList = [];
@@ -72,7 +70,7 @@ export class BangumiDetail implements OnInit, OnDestroy {
     // }
     orderedEpisodeList: Episode[] = [];
 
-    adminList: User[];
+    adminList: Account[];
 
     announceList: Announce[];
     announceStatus: AnnounceStatus;
@@ -100,11 +98,12 @@ export class BangumiDetail implements OnInit, OnDestroy {
     ngOnInit(): void {
         this._subscription.add(
             this._userManagerService
-                .listUser({
-                    count: -1,
-                    offset: 0,
-                    minlevel: User.LEVEL_ADMIN
-                })
+                .listUser(
+                    0,
+                    -1,
+                    'role',
+                    '[Admin,SuperAdmin]'
+                )
                 .subscribe((result) => {
                     this.adminList = result.data;
                 })
@@ -115,24 +114,27 @@ export class BangumiDetail implements OnInit, OnDestroy {
                     let id = params['id'];
                     return this._adminService.getBangumi(id);
                 }))
-                .subscribe(
-                    (bangumi: Bangumi) => {
+                .subscribe({
+                    next: (bangumi: Bangumi) => {
                         this.bangumi = bangumi;
                         this.updateAvailableModeCount();
                         this.fetchAnnounceList(bangumi.id);
                     },
-                    (error: BaseError) => {
+                    error: (error: BaseError) => {
                         this._toastRef.show(error.message);
                     }
-                )
+                })
         );
         this._subscription.add(
             this._feedService.getUniversalMeta()
-                .subscribe((metaList) => {
-                    this.modeList = metaList;
-                    this.updateAvailableModeCount();
-                }, (error) => {
-                    this._toastRef.show(error.message);
+                .subscribe({
+                    next: (metaList) => {
+                        this.modeList = metaList;
+                        this.updateAvailableModeCount();
+                    },
+                    error: (error) => {
+                        this._toastRef.show(error.message);
+                    }
                 })
         );
     }
@@ -152,77 +154,23 @@ export class BangumiDetail implements OnInit, OnDestroy {
                 mergeMap(
                     (basicInfo: any) => {
                         this.isLoading = true;
-                        this.bangumi.name = basicInfo.name as string;
-                        this.bangumi.name_cn = basicInfo.name_cn as string;
-                        this.bangumi.summary = basicInfo.summary as string;
-                        this.bangumi.air_date = basicInfo.air_date as string;
-                        this.bangumi.air_weekday = basicInfo.air_weekday as number;
                         this.bangumi.eps_no_offset = basicInfo.eps_no_offset as number;
                         this.bangumi.status = basicInfo.status as number;
-                        this.bangumi.maintained_by = this.adminList.find(user => user.id == basicInfo.maintained_by_uid);
+                        this.bangumi.maintained_by = this.adminList.find(account => account.uid == basicInfo.maintained_by_uid);
                         this.bangumi.alert_timeout = basicInfo.alert_timeout as number;
                         return this._adminService.updateBangumi(this.bangumi);
                     }
                 ),)
-                .subscribe(
-                    () => {
+                .subscribe({
+                    next: () => {
                         this.isLoading = false;
                         this._toastRef.show('更新成功');
                     },
-                    (error: BaseError) => {
+                    error: (error: BaseError) => {
                         this.isLoading = false;
                         this._toastRef.show(error.message);
                     }
-                )
-        );
-    }
-
-    editKeyword(siteName: string) {
-        let dialogRef = this._uiDialog.open(KeywordBuilder, {stickyDialog: true, backdrop: true});
-        dialogRef.componentInstance.keyword = this.bangumi[siteName];
-        dialogRef.componentInstance.siteName = siteName;
-        this._subscription.add(
-            dialogRef.afterClosed().pipe(
-                filter((result: any) => !!result),
-                mergeMap((result: any) => {
-                    this.isLoading = true;
-                  this.bangumi[siteName] = result.keyword as string;
-                    return this._adminService.updateBangumi(this.bangumi);
-                }),)
-                .subscribe(
-                    () => {
-                        this.isLoading = false;
-                        this._toastRef.show('更新成功');
-                    },
-                    (error: BaseError) => {
-                        this.isLoading = false;
-                        this._toastRef.show(error.message);
-                    }
-                )
-        );
-    }
-
-    editBangumiMoe() {
-        let dialogRef = this._uiDialog.open(BangumiMoeBuilder, {stickyDialog: true, backdrop: true});
-        dialogRef.componentInstance.bangumi = this.bangumi;
-        this._subscription.add(
-            dialogRef.afterClosed().pipe(
-                filter((result: any) => !!result),
-                mergeMap((result: any) => {
-                    this.isLoading = true;
-                    this.bangumi.bangumi_moe = result.result as string;
-                    return this._adminService.updateBangumi(this.bangumi);
-                }),)
-                .subscribe(
-                    () => {
-                        this.isLoading = false;
-                        this._toastRef.show('更新成功');
-                    },
-                    (error: BaseError) => {
-                        this.isLoading = false;
-                        this._toastRef.show(error.message);
-                    }
-                )
+                })
         );
     }
 
@@ -287,7 +235,7 @@ export class BangumiDetail implements OnInit, OnDestroy {
     syncEpisodes(): void {
         this.isLoading = true;
         this._subscription.add(
-            this._adminService.syncEpisodes(this.bangumi.id, this.bangumi.bgm_id)
+            this._adminService.syncEpisodes(this.bangumi.id, this.bangumi.bgmId)
                 .pipe(mergeMap((res) => {
                     this.isLoading = false;
                     if (res.status === 0) {
@@ -302,21 +250,21 @@ export class BangumiDetail implements OnInit, OnDestroy {
                             confirmDialogRef.componentInstance.content = `已经从bgm.tv同步剧集.\n新增的剧集： ${
                                 res.data.new_episodes.length === 0 ? '无' : '[' + res.data.new_episodes.map(ep => {
                                     if (ep.name) {
-                                        return ep.episode_no + '(' + ep.name + ')'
+                                        return ep.episodeNo + '(' + ep.name + ')'
                                     } else {
-                                        return ep.episode_no;
+                                        return ep.episodeNo;
                                     }
                                 }).join(', ') + ']'
                             }\n更新的剧集：${
                                 res.data.updated_episodes.length === 0 ? '无' : '[' + res.data.updated_episodes.map(ep => {
                                     if (ep.name) {
-                                        return ep.episode_no + '(' + ep.name + ')'
+                                        return ep.episodeNo + '(' + ep.name + ')'
                                     } else {
-                                        return ep.episode_no;
+                                        return ep.episodeNo;
                                     }
                                 }).join(', ') + ']'
                             }\n以下剧集在bgm已经删除，要删除剧集吗（可之后手动删除）：${
-                                res.data.removed_episodes.map(ep => ep.episode_no + '(' + ep.name + ')' + '[' + EP_STATUS_TEXT[ep.status] + ']').join(', ')
+                                res.data.removed_episodes.map(ep => ep.episodeNo + '(' + ep.name + ')' + '[' + EP_STATUS_TEXT[ep.status] + ']').join(', ')
                             }`;
                             return confirmDialogRef.afterClosed()
                                 .pipe(
@@ -336,17 +284,17 @@ export class BangumiDetail implements OnInit, OnDestroy {
                             alertDialogRef.componentInstance.content = `已经从bgm.tv同步剧集.\n新增的剧集： ${
                                 res.data.new_episodes.length === 0 ? '无' : '[' + res.data.new_episodes.map(ep => {
                                     if (ep.name) {
-                                        return ep.episode_no + '(' + ep.name + ')'
+                                        return ep.episodeNo + '(' + ep.name + ')'
                                     } else {
-                                        return ep.episode_no;
+                                        return ep.episodeNo;
                                     }
                                 }).join(', ') + ']'
                             }\n更新的剧集： ${
                                 res.data.updated_episodes.length === 0 ? '无' : '[' + res.data.updated_episodes.map(ep => {
                                     if (ep.name) {
-                                        return ep.episode_no + '(' + ep.name + ')'
+                                        return ep.episodeNo + '(' + ep.name + ')'
                                     } else {
-                                        return ep.episode_no;
+                                        return ep.episodeNo;
                                     }
                                 }).join(', ') + ']'
                             }`;

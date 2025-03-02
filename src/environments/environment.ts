@@ -3,12 +3,21 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
-  siteTitle: 'mira',
-  chromeExtensionId: '',
-  firefoxExtensionId: '',
-  firefoxExtensionUrl: '',
-  edgeExtensionId: ''
+    production: false,
+    siteTitle: 'mira',
+    chromeExtensionId: '',
+    firefoxExtensionId: '',
+    firefoxExtensionUrl: '',
+    edgeExtensionId: '',
+    authAudience: 'https://iroha.io',
+    authIssuer: 'http://box.moe:4444',
+    authRedirectUri: 'http://localhost:4200',
+    authClientId: '79e0ed3b-5ecf-4589-94a2-c320704120fd',
+    authShowDebugInformation: true,
+    authRequireHttps: false,
+    resourceProvider: '/api',
+    resourceProviderClientId: '9e2b0512-c267-4b63-a1c1-0da5bfd33ed9',
+    bgmProviderBaseURL: 'http://box.moe:8080'
 };
 
 /*

@@ -6,16 +6,16 @@ import { Observable } from "rxjs";
 import { catchError, map } from 'rxjs/operators';
 import { BaseService } from "../../helpers/base.service";
 // import {homeRoutes} from './home.routes';
-import { queryString } from '../../helpers/url'
 import { Bangumi, Episode } from "../entity";
 import { Announce } from '../entity/announce';
 import { WatchProgress } from "../entity/watch-progress";
 import { WatchService } from './watch.service';
+import { Favorite } from '../entity/Favorite';
 
 @Injectable()
 export class HomeService extends BaseService {
 
-    private _baseUrl = '/api/home';
+    private _baseUrl = '/api/bangumi';
     private _toastRef: UIToastRef<UIToastComponent>;
 
     constructor(private _http: HttpClient,
@@ -59,18 +59,6 @@ export class HomeService extends BaseService {
 
     childRouteChanges: EventEmitter<any> = new EventEmitter();
 
-    favoriteChecked: EventEmitter<{bangumi_id: string, check_time: number}> = new EventEmitter<{bangumi_id: string, check_time: number}>();
-
-    checkFavorite(bangumi_id: string) {
-        this._watchService.check_favorite(bangumi_id)
-            .subscribe((data) => {
-                this.favoriteChecked.emit({bangumi_id: bangumi_id, check_time: data.data});
-                console.log(`bangumi ${bangumi_id} checked`);
-            }, (error) => {
-                console.log(error);
-            });
-    }
-
     /**
      * @Deprecated
      */
@@ -98,49 +86,67 @@ export class HomeService extends BaseService {
      * @param {number} type
      * @returns {Observable<Bangumi[]>}
      */
-    onAir(type: number): Observable<Bangumi[]> {
-        return this._http.get<{ data: Bangumi[] }>(`${this._baseUrl}/on_air?type=${type}`).pipe(
+    onAir(type: string): Observable<Bangumi[]> {
+        return this._http.get<{ data: Bangumi[] }>(`/api/bangumi/on-air?type=${type}`).pipe(
             map(res => res.data),
             catchError(this.handleError),);
     }
 
     episode_detail(episode_id: string): Observable<Episode> {
-        return this._http.get<Episode>(`${this._baseUrl}/episode/${episode_id}`).pipe(
+        return this._http.get<Episode>(`/api/episode/${episode_id}`, {
+            params: {loadBangumiEpisodes: true, loadFavorite: true}
+        }).pipe(
             map(episode => this.synchronizeWatchProgressWithLocal(episode)),
             catchError(this.handleError),);
     }
 
     bangumi_detail(bangumi_id: string): Observable<Bangumi> {
-        return this._http.get<{ data: Bangumi }>(`${this._baseUrl}/bangumi/${bangumi_id}`).pipe(
-            map(res => res.data),
+        return this._http.get<Bangumi>(`/api/bangumi/${bangumi_id}`).pipe(
             map(bangumi => {
-                bangumi.episodes = bangumi.episodes.map(episode => this.synchronizeWatchProgressWithLocal(episode));
+                if (bangumi.episodes && bangumi.episodes.length > 0) {
+                    bangumi.episodes = bangumi.episodes.map(episode => this.synchronizeWatchProgressWithLocal(episode));
+                }
                 return bangumi;
             }),
             catchError(this.handleError),);
     }
 
+    timeline(sort: string, type?: string, eps?: number): Observable<number[]> {
+        const params: any = {sort};
+        if (Number.isInteger(eps)) {
+            params.eps = eps;
+        }
+        if (type) {
+            params.type = type;
+        }
+        return this._http.get<{data: string[]}>('/api/bangumi/timeline', {
+            params
+        }).pipe(map(res => res.data.map(date => new Date(date).valueOf())));
+    }
+
     listBangumi(params: {
-        name?: string,
-        page: number,
-        count: number,
-        order_by: string,
+        keyword?: string,
+        offset: number,
+        limit: number,
+        orderBy: string,
         sort: string,
-        type?: number}): Observable<{ data: Bangumi[], total: number }> {
-        let query = queryString(params);
-        return this._http.get<{ data: Bangumi[], total: number }>(`${this._baseUrl}/bangumi?${query}`).pipe(
+        type?: string,
+        subType?: string,
+        eps?: number}): Observable<{ data: Bangumi[], total: number }> {
+        return this._http.get<{ data: Bangumi[], total: number }>('/api/bangumi', {
+            params
+        }).pipe(
             catchError(this.handleError),);
     }
 
-    myBangumi(status: number): Observable<Bangumi[]> {
-        return this._http.get<{data: Bangumi[]}>(`${this._baseUrl}/my_bangumi?status=${status}`).pipe(
-            map(res => <Bangumi[]> res.data),
-            catchError(this.handleError),);
+    myBangumi(status: string): Observable<{data: Favorite[], total: number}> {
+        return this._http.get<{data: Favorite[], total: number}>('/api/favorite', {
+            params: { status, limit: -1 }
+        });
     }
 
     listAnnounce(): Observable<Announce[]> {
-        return this._http.get<{data: Announce[]}>(`${this._baseUrl}/announce`).pipe(
-            map(res => res.data),
+        return this._http.get<Announce[]>('/api/announce').pipe(
             catchError(this.handleError),);
     }
 
@@ -155,14 +161,15 @@ export class HomeService extends BaseService {
 
     private synchronizeWatchProgressWithLocal(episode: Episode): Episode {
         let record = this._watchService.getLocalWatchHistory(episode.id);
-        if (record && (!episode.watch_progress || record.last_watch_time > episode.watch_progress.last_watch_time)) {
-            if (!episode.watch_progress) {
-                episode.watch_progress = new WatchProgress();
+        console.log('record', record);
+        if (record && (!episode.watchProgress || record.lastWatchTime > episode.watchProgress.lastWatchTime)) {
+            if (!episode.watchProgress) {
+                episode.watchProgress = new WatchProgress();
             }
-            episode.watch_progress.last_watch_time = record.last_watch_time;
-            episode.watch_progress.last_watch_position = record.last_watch_position;
-            episode.watch_progress.percentage = record.percentage;
-            episode.watch_progress.watch_status = record.is_finished ? WatchProgress.WATCHED : WatchProgress.WATCHING;
+            episode.watchProgress.lastWatchTime = record.lastWatchTime;
+            episode.watchProgress.lastWatchPosition = record.lastWatchPosition;
+            episode.watchProgress.percentage = record.percentage;
+            episode.watchProgress.watchStatus = record.isFinished ? WatchProgress.WATCHED : WatchProgress.WATCHING;
         }
         return episode;
     }

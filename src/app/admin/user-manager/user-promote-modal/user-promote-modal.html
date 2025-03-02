@@ -1,13 +1,12 @@
 <div class="user-promote-modal">
     <div class="content">
         <div class="ui selection dropdown" uiDropdown="click">
-            <div class="text">{{level | userLevelName}}</div>
+            <div class="text">{{role}}</div>
             <i class="dropdown icon"></i>
             <div class="menu">
-                <div class="item" (click)="level = 0">{{0 | userLevelName}}</div>
-                <div class="item" (click)="level = 1">普通用户Level 1</div>
-                <div class="item" (click)="level = 2">管理员Level 2</div>
-                <div class="item" (click)="level = 2">超级管理员Level 3</div>
+                <div class="item" (click)="role = 'Invited'">Invited</div>
+                <div class="item" (click)="role = 'Admin'">Admin</div>
+                <div class="item" (click)="role = 'SuperAdmin'">SuperAdmin</div>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 import {
-    AfterViewInit, ApplicationRef,
+    AfterViewInit,
     ChangeDetectorRef,
     Component,
     ElementRef, EmbeddedViewRef,
@@ -436,11 +436,11 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
             lastVideoFileId = this.videoFile.id;
         }
 
-        this.bangumiName = bangumi.name_cn || bangumi.name;
-        this.episodeNo = episode.episode_no;
+        this.bangumiName = bangumi.nameCn || bangumi.name;
+        this.episodeNo = episode.episodeNo;
         this.nextEpisodeId = nextEpisode.id;
         this.nextEpisodeName = nextEpisode.name;
-        this.nextEpisodeNameCN = nextEpisode.name_cn;
+        this.nextEpisodeNameCN = nextEpisode.nameCn;
         this.videoFile = videoFile;
         this.lastPlayedPosition = startPosition;
         // auto jump to last position when user config enables this feature,
@@ -479,7 +479,7 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
         this.fullscreenAPI = new FullScreenAPI(mediaElement, hostElement);
         this.fullscreenAPI.onChangeFullscreen.subscribe(isFullscreen => {
             this.isFullscreen = isFullscreen;
-            if (this.videoFile && this.videoFile.resolution_w && this.videoFile.resolution_h) {
+            if (this.videoFile && this.videoFile.resolutionW && this.videoFile.resolutionH) {
                 this.togglePlayerDimension(hostElement);
             }
         });
@@ -493,7 +493,7 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
                 this.fullscreenAPI.onChangeFullscreen)
             .pipe(
                 filter(() => {
-                    return Boolean(this.videoFile && this.videoFile.resolution_w && this.videoFile.resolution_h);
+                    return Boolean(this.videoFile && this.videoFile.resolutionW && this.videoFile.resolutionH);
                 }),)
                 .subscribe(() => {
                     this.togglePlayerDimension(hostElement);
@@ -664,8 +664,8 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     private measurePlayerSize(): {width: number, height: number} {
         let viewportWidth = document.documentElement.clientWidth;
         let viewportHeight = document.documentElement.clientHeight;
-        let videoWidth = this.videoFile.resolution_w;
-        let videoHeight = this.videoFile.resolution_h;
+        let videoWidth = this.videoFile.resolutionW;
+        let videoHeight = this.videoFile.resolutionH;
         // space below the video
         const preserveHeight = 129;
         const navbarHeight = 50;

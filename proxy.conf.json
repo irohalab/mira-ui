@@ -1,7 +1,10 @@
 {
   "/api/**": {
-    "target": "http://127.0.0.1:5000",
-    "secure": false
+    "target": "http://127.0.0.1:9091",
+    "secure": false,
+    "pathRewrite": {
+      "^/api": ""
+    }
   },
   "/pic/**": {
     "target": "http://127.0.0.1:8000",

@@ -2,11 +2,10 @@
  * Angular 2 decorators and services
  */
 import { Component, ViewEncapsulation } from '@angular/core';
-
-import { AnalyticsService } from './analytics.service';
-import { Router, NavigationEnd, NavigationStart } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavigationService } from './navigation.service';
+import { UserService } from './user-service';
 
 /*
  * App Component
@@ -37,7 +36,8 @@ export class App {
         }
     }
 
-    constructor(analyticsSerivce: AnalyticsService, router: Router, navigationService: NavigationService) {
+    constructor(router: Router, navigationService: NavigationService,
+                userService: UserService) {
         this.routeEventsSubscription = router.events
             .subscribe(
                 (event) => {

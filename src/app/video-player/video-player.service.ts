@@ -295,8 +295,8 @@ export class VideoPlayerService {
 
     private _initializeData(episode: Episode, bangumi: Bangumi, nextEpisode: Episode, videoFile: VideoFile) {
         let startPosition = 0;
-        if (episode.watch_progress) {
-            startPosition =  episode.watch_progress.last_watch_position;
+        if (episode.watchProgress) {
+            startPosition =  episode.watchProgress.lastWatchPosition;
         }
         this._episode = Object.assign({}, episode);
         this._bangumi = Object.assign({}, bangumi);
@@ -339,20 +339,20 @@ export class VideoPlayerService {
                 map(({position, duration}) => {
                     // update episode watch progress
                     let isFinished = position / duration >= MIN_WATCHED_PERCENTAGE;
-                    if (!this._episode.watch_progress) {
-                        this._episode.watch_progress = new WatchProgress();
-                        this._episode.watch_progress.bangumi_id = this._bangumi.id;
-                        this._episode.watch_progress.episode_id = this._episode.id;
-                        this._episode.watch_progress.watch_status = WatchProgress.WATCHING;
+                    if (!this._episode.watchProgress) {
+                        this._episode.watchProgress = new WatchProgress();
+                        this._episode.watchProgress.bangumi = this._bangumi;
+                        this._episode.watchProgress.episode = this._episode;
+                        this._episode.watchProgress.watchStatus = WatchProgress.WATCHING;
                         this._watchStatusChanges.next(Object.assign({}, this._episode));
-                    } else if (this._episode.watch_progress.watch_status === WatchProgress.WATCHED) {
+                    } else if (this._episode.watchProgress.watchStatus === WatchProgress.WATCHED) {
                         isFinished = true;
                     }
-                    this._episode.watch_progress.last_watch_position = position;
+                    this._episode.watchProgress.lastWatchPosition = position;
                     const percentage = position / duration;
-                    if (this._episode.watch_progress.watch_status !== WatchProgress.WATCHED
+                    if (this._episode.watchProgress.watchStatus !== WatchProgress.WATCHED
                         && isFinished) {
-                        this._episode.watch_progress.watch_status = WatchProgress.WATCHED;
+                        this._episode.watchProgress.watchStatus = WatchProgress.WATCHED;
                         this._watchStatusChanges.next(Object.assign({}, this._episode));
                     }
                     return {
@@ -371,22 +371,22 @@ export class VideoPlayerService {
             this.onWatchStatusChanges.pipe(
                 tap(episode => {
                     const episodeOfBangumi = this._bangumi.episodes.find(e => e.id === this._episode.id);
-                    episodeOfBangumi.watch_progress = episode.watch_progress;
+                    episodeOfBangumi.watchProgress = episode.watchProgress;
                 }),
                 filter(episode => {
-                    return episode.watch_progress.watch_status === WatchProgress.WATCHED
+                    return episode.watchProgress.watchStatus === WatchProgress.WATCHED
                         && this._bangumi.favorite_status !== WatchProgress.WATCHED;
                 }))
                 .subscribe(() => {
                     const allWatched = this._bangumi.episodes
                         .every(episode => {
-                            return episode.watch_progress
-                                && episode.watch_progress.watch_status === WatchProgress.WATCHED;
+                            return episode.watchProgress
+                                && episode.watchProgress.watchStatus === WatchProgress.WATCHED;
                         });
 
                     if (allWatched) {
-                        this._bangumi.favorite_status = Bangumi.WATCHED;
-                        this._bangumiFavoriteChanges.next(Object.assign({}, this._bangumi));
+                        // this._bangumi.favorite_status = Bangumi.WATCHED;
+                        // this._bangumiFavoriteChanges.next(Object.assign({}, this._bangumi));
                     }
                 })
         );
