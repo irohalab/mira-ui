@@ -7,7 +7,7 @@ import { VideoPlayer } from '../../video-player.component';
 @Component({
     selector: 'video-play-button',
     template: `
-        <i class="icon" [ngClass]="iconClass"></i>
+        <i class="icon" [ngClass]="iconClass" [title]="tooltip"></i>
     `,
     styles: [`
         :host {
@@ -29,6 +29,10 @@ export class VideoPlayButton implements OnInit, OnDestroy {
     controlVisibleState: boolean;
 
     state: PlayState;
+
+    get tooltip(): string {
+        return this.state === PlayState.PLAYING ? '暂停' : '播放';
+    }
 
     get iconClass() : 'pause' | 'play' | 'repeat' {
         switch (this.state) {

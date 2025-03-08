@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'video-capture-button',
-    template: '<i class="camera retro icon"></i>',
+    template: '<i class="camera retro icon" title="截图"></i>',
     styles: [`
         :host {
             display: inline-block;

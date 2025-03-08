@@ -24,6 +24,7 @@ import { VideoConfigPanelComponent } from './controls/config-button/config-panel
 import { VideoPlayerService } from './video-player.service';
 import { LastPositionOverlayComponent } from './last-position-overlay/last-position-overlay.component';
 import { DenebCommonPipes } from '../pipes';
+import { TheaterButtonComponent } from './controls/theater-button/theater-button.component';
 
 @NgModule({
     declarations: [
@@ -45,7 +46,8 @@ import { DenebCommonPipes } from '../pipes';
         VideoConfigPanelComponent,
         FloatControlsComponent,
         NonInteractiveProgressBarComponent,
-        LastPositionOverlayComponent
+        LastPositionOverlayComponent,
+        TheaterButtonComponent,
     ],
     providers: [
         VideoCapture,
