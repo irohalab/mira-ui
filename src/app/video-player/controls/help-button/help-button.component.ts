@@ -3,7 +3,7 @@ import { VideoPlayer } from '../../video-player.component';
 
 @Component({
     selector: 'video-player-help-button',
-    template: '<i class="help circle icon"></i>',
+    template: '<i class="help circle icon" title="帮助"></i>',
     styles: [`
         :host {
             display: inline-block;

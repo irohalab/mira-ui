@@ -1,9 +1,14 @@
+import { fromEvent as observableFromEvent, interval as observableInterval, Subscription } from 'rxjs';
 
-import {interval as observableInterval, fromEvent as observableFromEvent,  Observable ,  Subscription } from 'rxjs';
-
-import {takeUntil, mergeMap, tap, distinctUntilChanged} from 'rxjs/operators';
+import { distinctUntilChanged, mergeMap, takeUntil, tap } from 'rxjs/operators';
 import {
-    AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output,
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    OnDestroy,
+    OnInit,
+    Output,
     ViewChild
 } from '@angular/core';
 import { VideoPlayerHelpers } from '../../core/helpers';
@@ -36,6 +41,10 @@ export class VideoVolumeControl implements AfterViewInit, OnInit, OnDestroy {
             return 'down';
         }
         return 'up';
+    }
+
+    get muteButtonTooltip(): string {
+        return this.muted ? '取消静音' : '静音';
     }
 
     @Output()

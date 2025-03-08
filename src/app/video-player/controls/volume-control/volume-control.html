@@ -1,4 +1,4 @@
-<div class="mute-button" (click)="onMuteButtonClick($event)">
+<div class="mute-button" (click)="onMuteButtonClick($event)" [title]="muteButtonTooltip">
     <i class="icon volume" [ngClass]="volumeLevelClass"></i>
 </div>
 <div class="volume-slider-wrapper" #slider>

@@ -1,8 +1,9 @@
 import {
-    AfterViewInit, ApplicationRef,
+    AfterViewInit,
     ChangeDetectorRef,
     Component,
-    ElementRef, EmbeddedViewRef,
+    ElementRef,
+    EmbeddedViewRef,
     EventEmitter,
     HostBinding,
     Input,
@@ -20,10 +21,10 @@ import {
     BehaviorSubject,
     fromEvent as observableFromEvent,
     interval as observableInterval,
+    merge,
     Observable,
     Subject,
-    Subscription,
-    merge
+    Subscription
 } from 'rxjs';
 
 import { filter, map, timeout } from 'rxjs/operators';
@@ -142,6 +143,9 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
 
     @HostBinding('class.float-play')
     isFloatPlay: boolean;
+
+    @HostBinding('class.theater-mode')
+    isTheaterMode: boolean;
 
     mediaUrl: string;
     mediaType: string;
@@ -372,6 +376,9 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     }
 
     toggleFullscreen(): void {
+        if (!this.isFullscreen && this.isTheaterMode) {
+            this.isTheaterMode = false;
+        }
         this.fullscreenAPI.toggleFullscreen();
     }
 
@@ -398,6 +405,15 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
         }
     }
 
+    toggleTheaterMode(): void {
+        this.isTheaterMode = !this.isTheaterMode;
+        if (this.isFullscreen) {
+            this.toggleFullscreen();
+        }
+        const hostElement = this.videoPlayerRef.nativeElement as HTMLElement;
+        this.togglePlayerDimension(hostElement);
+    }
+
     requestFocus(): void {
         let hostElement = this.videoPlayerRef.nativeElement as HTMLElement;
         hostElement.focus();
@@ -406,7 +422,7 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     openHelpDialog(): void {
         let dialogRef;
 
-        if (this.fullscreenAPI.isFullscreen) {
+        if (this.fullscreenAPI.isFullscreen || this.isTheaterMode) {
             dialogRef = this._dialogService.open(VideoPlayerHelpDialog, {
                 stickyDialog: false,
                 backdrop: true
@@ -696,7 +712,7 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
             this.playerMeasuredHeight = height;
         }
         this.onPlayerDimensionChanged.emit([this.playerMeasuredWidth, this.playerMeasuredHeight]);
-        if (!this.isFullscreen && !!this.playerMeasuredWidth && !!this.playerMeasuredHeight) {
+        if (!this.isFullscreen && !this.isTheaterMode && !!this.playerMeasuredWidth && !!this.playerMeasuredHeight) {
             hostElement.style.width = `${this.playerMeasuredWidth}px`;
             hostElement.style.height = `${this.playerMeasuredHeight}px`;
         } else {

@@ -2,7 +2,7 @@ import {Component, HostListener, Input} from '@angular/core';
 import {VideoPlayer} from '../../video-player.component';
 @Component({
     selector: 'video-fullscreen-button',
-    template: `<i class="icon" [ngClass]="{expand: !isFullscreen, compress: isFullscreen}"></i>`,
+    template: `<i class="icon" [ngClass]="{expand: !isFullscreen, compress: isFullscreen}" [title]="tooltip"></i>`,
     styles: [`
         :host {
             display: inline-block;
@@ -20,6 +20,10 @@ export class VideoFullscreenButton {
 
     @Input()
     controlVisibleState: boolean;
+
+    get tooltip(): string {
+        return this.isFullscreen ? '退出全屏' : '全屏';
+    }
 
     get isFullscreen() {
         if (this._videoPlayer) {

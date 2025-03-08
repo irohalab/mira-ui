@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'video-player-config-button',
-    template: '<i class="setting icon"></i>',
+    template: '<i class="setting icon" title="设置"></i>',
     styles: [`
         :host {
             display: inline-block;
