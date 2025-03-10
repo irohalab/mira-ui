@@ -18,6 +18,8 @@ import { getComponentRootNode, VideoPlayerHelpers } from './core/helpers';
 import { FloatPlayer } from './core/settings';
 import { PlayState } from './core/state';
 import { FLOAT_PLAYER_SCALE_RATIO, VideoPlayer } from './video-player.component';
+import { FavoriteStatus } from '../entity/FavoriteStatus';
+import { Favorite } from '../entity/Favorite';
 
 @Injectable({
     providedIn: 'root'
@@ -374,8 +376,9 @@ export class VideoPlayerService {
                     episodeOfBangumi.watchProgress = episode.watchProgress;
                 }),
                 filter(episode => {
+                    let isBangumiWatched = this._bangumi.favorite && this._bangumi.favorite.status === FavoriteStatus.WATCHED;
                     return episode.watchProgress.watchStatus === WatchProgress.WATCHED
-                        && this._bangumi.favorite_status !== WatchProgress.WATCHED;
+                        && !isBangumiWatched;
                 }))
                 .subscribe(() => {
                     const allWatched = this._bangumi.episodes
@@ -385,8 +388,13 @@ export class VideoPlayerService {
                         });
 
                     if (allWatched) {
-                        // this._bangumi.favorite_status = Bangumi.WATCHED;
-                        // this._bangumiFavoriteChanges.next(Object.assign({}, this._bangumi));
+                        let favorite = this._bangumi.favorite;
+                        if (!favorite) {
+                            favorite = new Favorite();
+                        }
+                        favorite.status = FavoriteStatus.WATCHED;
+                        this._bangumi.favorite = favorite;
+                        this._bangumiFavoriteChanges.next(Object.assign({}, this._bangumi));
                     }
                 })
         );

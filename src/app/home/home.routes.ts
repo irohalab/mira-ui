@@ -16,7 +16,7 @@ export const homeRoutes: Routes = [
         path: '',
         component: Home,
         data: {level: 0},
-        // canActivate: [Authentication],
+        // canActivate: [Authentication], // TODO: need route guard with new auth method
         children: [
             {
                 path: '',

@@ -25,27 +25,20 @@
             [dialogContent]="isExtensionEnabled ? '你可以随时重新收藏这部动画，删除收藏就会影响到一些订阅服务，比如web-hook推送, 同时会删除您在Bangumi的收藏' : '你可以随时重新收藏这部动画，删除收藏就会影响到一些订阅服务，比如web-hook推送'"
             (onConfirm)="deleteFavorite()"
             [disabled]="isOnSynchronizing && syncEnabled">删除收藏</button>
-    <span class="sync-loader-tip" *ngIf="isOnSynchronizing && syncEnabled">
-        <span class="ui active inline tiny loader"></span> 正在与Bangumi同步
-    </span>
-    <span class="sync-complete-tip" *ngIf="!isOnSynchronizing && syncEnabled">
-        <i class="icon checkmark"></i> 已与Bangumi同步
-    </span>
-    <span class="sync-disabled-tip" *ngIf="isExtensionEnabled && !syncEnabled">同步功能不可用，查看bgm.tv登录状态及帐号是否关联</span>
     <div *ngIf="isChoosingFavorite" class="small ui buttons" [ngClass]="{inverted: isDarkTheme, basic: !isDarkTheme}">
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 1, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.WISH)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite.status === eFavoriteStatus.WISH, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.WISH)">
             想看
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 2, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.WATCHED)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite.status === eFavoriteStatus.WATCHED, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.WATCHED)">
             看过
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 3, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.WATCHING)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite.status === eFavoriteStatus.WATCHING, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.WATCHING)">
             在看
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 4, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.PAUSE)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite.status === eFavoriteStatus.PAUSE, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.PAUSE)">
             搁置
         </button>
-        <button class="ui button" [ngClass]="{active: bangumi.favorite_status === 5, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.ABANDONED)">
+        <button class="ui button" [ngClass]="{active: bangumi.favorite.status === eFavoriteStatus.ABANDONED, inverted: isDarkTheme}" (click)="chooseFavoriteStatus(eFavoriteStatus.ABANDONED)">
             抛弃
         </button>
     </div>

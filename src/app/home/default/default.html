@@ -18,15 +18,16 @@
                                     originalHeight: announce.bangumi.coverImage.height}"
                                   [background]="announce.bangumi.coverImage.dominantColor"></ui-responsive-image>
             </a>
-            <div *ngIf="announce.bangumi.favorite_status" class="ui ribbon label"
-                 [ngClass]="{
-                   orange: announce.bangumi.favorite_status === 1,
-                   olive: announce.bangumi.favorite_status === 2,
-                   blue: announce.bangumi.favorite_status === 3,
-                   brown: announce.bangumi.favorite_status === 4,
-                   grey: announce.bangumi.favorite_status === 5
-                   }">{{FAVORITE_LABEL[announce.bangumi.favorite_status]}}
-            </div>
+            <!-- TODO: comment out because we don't support favorite status for announcement -->
+<!--            <div *ngIf="announce.bangumi.favorite_status" class="ui ribbon label"-->
+<!--                 [ngClass]="{-->
+<!--                   orange: announce.bangumi.favorite_status === 1,-->
+<!--                   olive: announce.bangumi.favorite_status === 2,-->
+<!--                   blue: announce.bangumi.favorite_status === 3,-->
+<!--                   brown: announce.bangumi.favorite_status === 4,-->
+<!--                   grey: announce.bangumi.favorite_status === 5-->
+<!--                   }">{{FAVORITE_LABEL[announce.bangumi.favorite_status]}}-->
+<!--            </div>-->
             <a class="content" [routerLink]="['/bangumi', announce.bangumi.id]">
                 <span>{{announce.bangumi.nameCn}}</span>
             </a>
@@ -50,15 +51,16 @@
                                     originalHeight: bangumi.coverImage.height}"
                                   [background]="bangumi.coverImage.dominantColor"></ui-responsive-image>
             </a>
-            <div *ngIf="bangumi.favorite_status" class="ui ribbon label"
-                 [ngClass]="{
-                   orange: bangumi.favorite_status === 1,
-                   olive: bangumi.favorite_status === 2,
-                   blue: bangumi.favorite_status === 3,
-                   brown: bangumi.favorite_status === 4,
-                   grey: bangumi.favorite_status === 5
-                   }">{{FAVORITE_LABEL[bangumi.favorite_status]}}
-            </div>
+            <!-- comment out because we don't support favorite status for on-air -->
+<!--            <div *ngIf="bangumi.favorite_status" class="ui ribbon label"-->
+<!--                 [ngClass]="{-->
+<!--                   orange: bangumi.favorite_status === 1,-->
+<!--                   olive: bangumi.favorite_status === 2,-->
+<!--                   blue: bangumi.favorite_status === 3,-->
+<!--                   brown: bangumi.favorite_status === 4,-->
+<!--                   grey: bangumi.favorite_status === 5-->
+<!--                   }">{{FAVORITE_LABEL[bangumi.favorite_status]}}-->
+<!--            </div>-->
             <a class="content" [routerLink]="['/bangumi', bangumi.id]">
                 <span>{{bangumi.nameCn}}</span>
             </a>

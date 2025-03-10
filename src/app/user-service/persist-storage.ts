@@ -67,14 +67,18 @@ export class PersistStorageIterator implements IterableIterator<PersistEntry> {
 
 @Injectable()
 export class PersistStorage {
+    private user!: User;
+
     private _itemChange = new Subject<{key: string, value: string}>();
 
     constructor(private _userService: UserService) {
         this._userService.userInfo
             .subscribe((user) => {
-                if (!user || user.id === User.ID_INITIAL_USER) {
+                // only clear cache when user changed.
+                if (this.user && this.user.id !== User.ID_INITIAL_USER && this.user.id !== user.id) {
                     this.clear();
                 }
+                this.user = user;
             })
     }
 

@@ -36,16 +36,17 @@
                 </p>
             </div>
         </div>
-        <div *ngIf="bangumi.favorite_status" class="ui right ribbon label"
-            [ngClass]="{
-            orange: bangumi.favorite_status === 1,
-            olive: bangumi.favorite_status === 2,
-            blue: bangumi.favorite_status === 3,
-            brown: bangumi.favorite_status === 4,
-            grey: bangumi.favorite_status === 5
-            }">
-            {{FAVORITE_LABEL[bangumi.favorite_status]}}
-        </div>
+        <!-- TODO: comment out because currently we don't support favorite for bangumi list -->
+<!--        <div *ngIf="bangumi.favorite_status" class="ui right ribbon label"-->
+<!--            [ngClass]="{-->
+<!--            orange: bangumi.favorite_status === 1,-->
+<!--            olive: bangumi.favorite_status === 2,-->
+<!--            blue: bangumi.favorite_status === 3,-->
+<!--            brown: bangumi.favorite_status === 4,-->
+<!--            grey: bangumi.favorite_status === 5-->
+<!--            }">-->
+<!--            {{FAVORITE_LABEL[bangumi.favorite_status]}}-->
+<!--        </div>-->
     </a>
 </div>
 <div class="ui container" *ngIf="!isInit">

@@ -18,7 +18,7 @@ export class UserService extends BaseService {
     private _userInfoSubject = new BehaviorSubject(new User(
         User.ID_INITIAL_USER,
         null,
-        User.GUEST_ROLE,
+        null,
         null,
         false));
 

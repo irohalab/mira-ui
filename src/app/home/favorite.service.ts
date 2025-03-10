@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { Favorite } from '../entity/Favorite';
 import { tap } from 'rxjs/operators';
 import { Bangumi } from '../entity';
+import { VideoPlayerService } from '../video-player/video-player.service';
 
 export type FavoriteChangeEvent = {
     op: 'change' | 'remove';
@@ -13,7 +14,12 @@ export type FavoriteChangeEvent = {
 
 @Injectable()
 export class FavoriteService {
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient,
+                videoPlayerService: VideoPlayerService,) {
+        videoPlayerService.onBangumiFavoriteChange
+            .subscribe((bangumi) => {
+                this.changeFavorite(bangumi.favorite.status, bangumi).subscribe((favorite) => {console.log(favorite)});
+            });
     }
 
     favoriteChecked: EventEmitter<{bangumi_id: string, check_time: string}> = new EventEmitter<{bangumi_id: string, check_time: string}>();

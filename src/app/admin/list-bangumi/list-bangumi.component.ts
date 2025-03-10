@@ -16,7 +16,7 @@ import {
     UIToastRef
 } from '@irohalab/deneb-ui';
 import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
-import { SearchBangumi } from '../search-bangumi/search-bangumi.component';
+import { SearchBangumi } from '../search-bangumi';
 import { ListBangumiService } from './list-bangumi.service';
 import { environment } from '../../../environments/environment';
 import { BangumiRaw } from '../../entity/BangumiRaw';
@@ -30,7 +30,6 @@ import { groupByQuarters } from '../../../helpers/TimelineListHelpers';
 })
 export class ListBangumi implements OnDestroy, OnInit {
     private _subscription = new Subscription();
-    private _allBangumiList: BangumiRaw[];
     private _toastRef: UIToastRef<UIToastComponent>;
     private _isMovie: boolean;
 
@@ -214,29 +213,6 @@ export class ListBangumi implements OnDestroy, OnInit {
                 }
             })
         );
-        // this._subscription.add(
-        //     this.adminService
-        //         .listBangumi({
-        //             offset: 0,
-        //             limit: 100,
-        //             orderBy: this.orderBy,
-        //             sort: this.sort,
-        //             type: this.type
-        //         })
-        //         .subscribe(
-        //             (result: { data: Bangumi[], total: number }) => {
-        //                 this._allBangumiList = result.data;
-        //                 this.bangumiList = this._allBangumiList;
-        //                 this.total = result.total;
-        //                 this.isLoading = false
-        //             },
-        //             (error: BaseError) => {
-        //                 console.log(error);
-        //                 this._toastRef.show(error.message);
-        //                 this.isLoading = false
-        //             }
-        //         )
-        // );
     }
 
     private onLoadBucket(bucketIndex: number): Promise<Iterable<any>> {

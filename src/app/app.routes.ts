@@ -10,7 +10,7 @@ export const appRoutes: Routes = [
     {
         path: 'admin',
         data: {level: 2},
-        // canActivate: [Authentication],
+        // canActivate: [Authentication], // TODO: need route guard with new auth method
         loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
     },
     {
