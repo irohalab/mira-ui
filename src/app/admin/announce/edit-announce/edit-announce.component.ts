@@ -15,7 +15,8 @@ export function rangeLimit(group: FormGroup) {
 @Component({
     selector: 'admin-edit-announce',
     templateUrl: './edit-announce.html',
-    styleUrls: ['./edit-announce.less']
+    styleUrls: ['./edit-announce.less'],
+    standalone: false
 })
 export class EditAnnounceComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

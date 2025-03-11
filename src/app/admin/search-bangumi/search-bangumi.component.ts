@@ -1,20 +1,20 @@
+import { fromEvent as observableFromEvent, Observable, Subscription } from 'rxjs';
 
-import {fromEvent as observableFromEvent, Observable, Subscription} from 'rxjs';
-
-import {distinctUntilChanged, map, debounceTime, takeWhile, mergeMap, tap, filter} from 'rxjs/operators';
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
-import {Bangumi} from '../../entity';
-import {AdminService} from '../admin.service';
-import {UIDialogRef, UIToast, UIToastComponent, UIToastRef} from '@irohalab/deneb-ui';
-import {BaseError} from '../../../helpers/error/BaseError';
-import {BangumiRaw} from '../../entity/bangumi-raw';
+import { distinctUntilChanged, map, debounceTime, takeWhile, mergeMap, tap, filter } from 'rxjs/operators';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AdminService } from '../admin.service';
+import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { BaseError } from '../../../helpers/error/BaseError';
+import { MainItem } from '../../entity/main-item';
+import { BangumiRaw } from '../../entity/BangumiRaw';
 
 // export const SEARCH_BAR_HEIGHT = 4.8;
 
 @Component({
     selector: 'search-bangumi',
     templateUrl: './search-bangumi.html',
-    styleUrls: ['./search-bangumi.less']
+    styleUrls: ['./search-bangumi.less'],
+    standalone: false
 })
 export class SearchBangumi implements AfterViewInit {
     private _subscription = new Subscription();
@@ -30,12 +30,12 @@ export class SearchBangumi implements AfterViewInit {
     total: number = 0;
     count: number = 10;
 
-    bangumiList: Bangumi[];
+    bangumiList: BangumiRaw[];
     isLoading: boolean = false;
 
     typePickerOpen: boolean = false;
 
-    selectedBgmId: number;
+    selectedBgm: BangumiRaw;
 
     showDetail: boolean = false;
     isSaving: boolean = false;
@@ -47,8 +47,8 @@ export class SearchBangumi implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        let searchBox = <HTMLElement> this.searchBox.nativeElement;
-        let typePicker = <HTMLElement> this.typePicker.nativeElement;
+        let searchBox = <HTMLElement>this.searchBox.nativeElement;
+        let typePicker = <HTMLElement>this.typePicker.nativeElement;
 
         this._subscription.add(
             observableFromEvent<MouseEvent>(typePicker, 'click').pipe(
@@ -115,51 +115,51 @@ export class SearchBangumi implements AfterViewInit {
         let offset = (this.currentPage - 1) * this.count;
         this.isLoading = true;
         this._adminService.searchBangumi({
-            name: this.name,
+            keyword: this.name,
             type: this.bangumiType,
             offset: offset,
             count: this.count
         })
-            .subscribe(
-                (result: { data: Bangumi[], total: number }) => {
+            .subscribe({
+                next: (result: { data: BangumiRaw[], total: number }) => {
                     this.bangumiList = result.data;
                     this.total = result.total;
                     this.isLoading = false;
                 },
-                (error: BaseError) => {
+                error: (error: BaseError) => {
                     this.bangumiList = [];
                     this._toastRef.show(error.message);
                     this.isLoading = false;
                 }
-            );
+            });
     }
 
     cancelSearch() {
         this._dialogRef.close('cancelled');
     }
 
-    viewDetail(bangumi: Bangumi): void {
+    viewDetail(bangumi: BangumiRaw): void {
         if (bangumi.id) {
             return;
         }
-        this.selectedBgmId = bangumi.bgm_id;
+        this.selectedBgm = bangumi;
         this.showDetail = true;
     }
 
-    fromDetail(bangumi: BangumiRaw): void {
-        if (bangumi) {
+    fromDetail(itemId: string): void {
+        if (itemId) {
             this.isSaving = true;
             this._subscription.add(
-                this._adminService.addBangumi(bangumi)
-                .subscribe(
-                    (bangumi_id: string) => {
-                        this._dialogRef.close(bangumi_id);
-                    },
-                    (error: BaseError) => {
-                        this.isSaving = false;
-                        this._toastRef.show(error.message);
-                    }
-                )
+                this._adminService.addBangumi(itemId)
+                    .subscribe({
+                        next: (bangumi: BangumiRaw) => {
+                            this._dialogRef.close(bangumi.id);
+                        },
+                        error: (error: BaseError) => {
+                            this.isSaving = false;
+                            this._toastRef.show(error.message);
+                        }
+                    })
             );
         } else {
             this.showDetail = false;

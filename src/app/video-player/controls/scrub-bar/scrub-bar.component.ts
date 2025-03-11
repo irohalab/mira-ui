@@ -19,7 +19,8 @@ import { getRemPixel } from '../../../../helpers/dom';
 @Component({
     selector: 'video-player-scrub-bar',
     templateUrl: './scrub-bar.html',
-    styleUrls: ['./scrub-bar.less']
+    styleUrls: ['./scrub-bar.less'],
+    standalone: false
 })
 export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -275,16 +276,16 @@ export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
 
     private updateKeyframePreview(ratio: number): void {
         const videoFile= this._videoPlayer.videoFile;
-        if (Array.isArray(videoFile.kf_image_path_list) && videoFile.kf_image_path_list.length > 0) {
-            const tileSize= videoFile.kf_tile_size;
-            this.previewKeyframeWidth = videoFile.kf_frame_width;
-            this.previewKeyframeHeight = videoFile.kf_frame_height;
+        if (Array.isArray(videoFile.kfImagePathList) && videoFile.kfImagePathList.length > 0) {
+            const tileSize= videoFile.kfTileSize;
+            this.previewKeyframeWidth = videoFile.kfFrameWidth;
+            this.previewKeyframeHeight = videoFile.kfFrameHeight;
             let keyframeSeq = Math.round((this.duration * ratio) / 2);
             let imgSeq = Math.floor(keyframeSeq / (tileSize * tileSize));
             keyframeSeq = keyframeSeq - imgSeq * tileSize * tileSize;
-            this.previewBgPosX = -1 * keyframeSeq % videoFile.kf_tile_size * videoFile.kf_frame_width;
-            this.previewBgPosY = -1 * Math.floor(keyframeSeq / videoFile.kf_tile_size) * videoFile.kf_frame_height;
-            this.previewBgImageUrl = videoFile.kf_image_path_list[imgSeq];
+            this.previewBgPosX = -1 * keyframeSeq % videoFile.kfTileSize * videoFile.kfFrameWidth;
+            this.previewBgPosY = -1 * Math.floor(keyframeSeq / videoFile.kfTileSize) * videoFile.kfFrameHeight;
+            this.previewBgImageUrl = videoFile.kfImagePathList[imgSeq];
         } else {
             this.previewKeyframeWidth = 0;
             this.previewKeyframeHeight = 0;

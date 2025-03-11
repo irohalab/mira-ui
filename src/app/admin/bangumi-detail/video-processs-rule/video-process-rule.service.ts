@@ -15,7 +15,7 @@ type ReqData = {
 
 @Injectable()
 export class VideoProcessRuleService extends BaseService {
-    private _convertUrl = '/api/video-rule/proxy';
+    private _convertUrl = '/api/admin/video-process/proxy';
     constructor(private _httpClient: HttpClient) {
         super();
     }
@@ -95,10 +95,10 @@ export class VideoProcessRuleService extends BaseService {
             method: 'POST',
             url: '/rule/video-file',
             body: {
-                bangumiId: videoFile.bangumi_id,
+                bangumiId: videoFile.bangumi.id,
                 videoFileId: videoFile.id,
                 fileUrl: videoFile.url,
-                filename: videoFile.file_path.substring(videoFile.file_path.lastIndexOf('/') + 1)
+                filename: videoFile.filePath.substring(videoFile.filePath.lastIndexOf('/') + 1)
             }
         };
         return this.sendRequest<any>(reqData);

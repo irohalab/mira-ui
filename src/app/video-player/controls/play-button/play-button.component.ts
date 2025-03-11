@@ -20,7 +20,8 @@ import { VideoPlayer } from '../../video-player.component';
             cursor: pointer;
             line-height: 1;
         }
-    `]
+    `],
+    standalone: false
 })
 export class VideoPlayButton implements OnInit, OnDestroy {
     private _subscription = new Subscription();

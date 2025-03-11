@@ -35,7 +35,8 @@ export interface PVManifest {
             transition('enter => active', animate('150ms linear')),
             transition('active => leave', animate('150ms linear'))
         ])
-    ]
+    ],
+    standalone: false
 })
 export class PreviewVideoComponent implements OnInit, OnDestroy {
     videoFile: VideoFile;

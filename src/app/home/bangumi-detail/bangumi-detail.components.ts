@@ -1,18 +1,17 @@
-
 import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 
-import {filter, tap, mergeMap} from 'rxjs/operators';
+import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HomeChild, HomeService } from "../home.service";
 import { Bangumi, Episode, User } from "../../entity";
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { PersistStorage, UserService } from '../../user-service';
-import { ChromeExtensionService, ENABLED_STATUS } from '../../browser-extension/chrome-extension.service';
 import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { AuthError } from '../../../helpers/error';
 import { WatchService } from '../watch.service';
 import { environment } from '../../../environments/environment';
+import { FavoriteService } from '../favorite.service';
 
 const LAYOUT_TYPE: string = 'layout_type';
 const LAYOUT_TYPES = {
@@ -25,7 +24,8 @@ const SORT_ORDER: string = 'bangumi_detail_eps_sort_order';
 @Component({
     selector: 'view-bangumi-detail',
     templateUrl: './bangumi-detail.html',
-    styleUrls: ['./bangumi-detail.less']
+    styleUrls: ['./bangumi-detail.less'],
+    standalone: false
 })
 export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
     private _toastRef: UIToastRef<UIToastComponent>;
@@ -72,29 +72,23 @@ export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
     }
 
     constructor(homeService: HomeService,
-                userService: UserService,
-                private _darkThemeService: DarkThemeService,
-                private _chromeExtensionService: ChromeExtensionService,
-                private _dialog: UIDialog,
-                private _route: ActivatedRoute,
-                private _titleService: Title,
-                private _changeDetector: ChangeDetectorRef,
-                private _watchService: WatchService,
-                private _persistStorage: PersistStorage,
+                private userService: UserService,
+                private darkThemeService: DarkThemeService,
+                private dialog: UIDialog,
+                private route: ActivatedRoute,
+                private titleService: Title,
+                private changeDetector: ChangeDetectorRef,
+                private favoriteService: FavoriteService,
+                private watchService: WatchService,
+                private persistStorage: PersistStorage,
                 toast: UIToast) {
         super(homeService);
         this._toastRef = toast.makeText();
-        this._subscription.add(
-            userService.userInfo
-                .subscribe(user => {
-                    this.user = user;
-                })
-        );
     }
 
     toggleSortOrder(): void {
         this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-        this._persistStorage.setItem(SORT_ORDER, this.sortOrder);
+        this.persistStorage.setItem(SORT_ORDER, this.sortOrder);
     }
 
     toggleCover() {
@@ -111,19 +105,19 @@ export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
             this.homeService.bangumi_detail(this.bangumi.id)
                 .subscribe(bangumi => {
                     this.bangumi.episodes = bangumi.episodes;
-                    this._changeDetector.detectChanges();
+                    this.changeDetector.detectChanges();
                 })
         );
     }
 
     changeEpStatus(episode: Episode, status: number): void {
         this._subscription.add(
-            this._watchService.favorite_favorite(
-                episode.bangumi_id,
+            this.watchService.updateEpisodeWatchStatus(
+                this.bangumi.id,
                 episode.id,
                 status)
-                .subscribe(() => {
-                    episode.watch_progress.watch_status = status;
+                .subscribe((watchProgress) => {
+                    episode.watchProgress = watchProgress;
                     this._toastRef.show('已更新');
                 })
         );
@@ -131,41 +125,37 @@ export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
 
     changeLayoutType(layoutType: string): void {
         this.layoutType = layoutType;
-        this._persistStorage.setItem(LAYOUT_TYPE, layoutType);
+        this.persistStorage.setItem(LAYOUT_TYPE, layoutType);
     }
 
     ngOnInit(): void {
-        this.layoutType = this._persistStorage.getItem(LAYOUT_TYPE, LAYOUT_TYPES.LIST);
-        this.sortOrder = this._persistStorage.getItem(SORT_ORDER, 'asc') as 'asc' | 'desc';
+        this.layoutType = this.persistStorage.getItem(LAYOUT_TYPE, LAYOUT_TYPES.LIST);
+        this.sortOrder = this.persistStorage.getItem(SORT_ORDER, 'asc') as 'asc' | 'desc';
         this._subscription.add(
-            this._darkThemeService.themeChange
+            this.darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
         );
         this._subscription.add(
-            this._route.params.pipe(
+            this.route.params.pipe(
+                switchMap((params) => {
+                    return this.userService.userInfo.pipe(map((user) => {
+                        this.user = user;
+                        return {bangumiId: params['bangumi_id'], user};
+                    }))
+                }),
                 mergeMap((params) => {
-                    return this.homeService.bangumi_detail(params['bangumi_id']);
+                    return this.homeService.bangumi_detail(params.bangumiId);
                 }),
                 tap(bangumi => {
-                    this.homeService.checkFavorite(bangumi.id);
-                }),
-                mergeMap(bangumi => {
-                    let bgmTitle = `${bangumi.name} - ${environment.siteTitle}`;
-                    this._titleService.setTitle(bgmTitle);
-                    this.bangumi = bangumi;
-                    return this._chromeExtensionService.isEnabled
-                }),
-                tap(isEnabled => {
-                    this.isExtraInfoEnabled = isEnabled === ENABLED_STATUS.TRUE;
-                }),
-                filter(isEnabled => isEnabled === ENABLED_STATUS.TRUE),
-                mergeMap(() => {
-                    return this._chromeExtensionService.invokeBangumiMethod('bangumiDetail', [this.bangumi.bgm_id]);
+                    if (this.user.id !== User.ID_INITIAL_USER && this.user.role !== User.GUEST_ROLE) {
+                        this.favoriteService.checkFavorite(bangumi.id);
+                    }
                 }),)
                 .subscribe({
-                    next: (extraInfo) => {
-                        // console.log(extraInfo);
-                        this.extraInfo = extraInfo;
+                    next: (bangumi) => {
+                        let bgmTitle = `${bangumi.name} - ${environment.siteTitle}`;
+                        this.titleService.setTitle(bgmTitle);
+                        this.bangumi = bangumi;
                     },
                     error: (error) => {
                         console.log(error);
@@ -204,4 +194,6 @@ export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
             this.coverRevealerHeight = 0 + '';
         }
     }
+
+    protected readonly User = User;
 }

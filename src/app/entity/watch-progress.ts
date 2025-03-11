@@ -1,20 +1,18 @@
 import { Episode } from './episode';
 import { Bangumi } from './bangumi';
-import { VideoFile } from './video-file';
 
 export class WatchProgress {
   id: string;
   bangumi_id: string;
   episode_id: string;
-  user_id: string;
-  watch_status: number;
-  last_watch_position: number;
-  last_watch_time: number;
+  userId: string;
+  watchStatus: number;
+  lastWatchPosition: number;
+  lastWatchTime: string;
   percentage: number;
 
   episode?: Episode;
   bangumi?: Bangumi;
-  video_file?: VideoFile;
 
   static WISH = 1;
   static WATCHED = 2;

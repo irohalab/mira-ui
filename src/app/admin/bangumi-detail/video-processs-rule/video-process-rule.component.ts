@@ -12,7 +12,8 @@ import { VideoFile } from '../../../entity/video-file';
 @Component({
     selector: 'video-process-rule',
     templateUrl: './video-process-rule.html',
-    styleUrls: ['./video-process-rule.less']
+    styleUrls: ['./video-process-rule.less'],
+    standalone: false
 })
 export class VideoProcessRuleComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

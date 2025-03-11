@@ -8,7 +8,8 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'bangumi-character',
     templateUrl: './bangumi-character.html',
-    styleUrls: ['./bangumi-character.less']
+    styleUrls: ['./bangumi-character.less'],
+    standalone: false
 })
 export class BangumiCharacterComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

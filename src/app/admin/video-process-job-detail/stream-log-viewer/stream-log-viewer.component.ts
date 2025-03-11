@@ -17,7 +17,8 @@ import { filter, tap } from 'rxjs/operators';
 @Component({
     selector: 'stream-log-viewer',
     templateUrl: './stream-log.html',
-    styleUrls: ['./stream-log.less']
+    styleUrls: ['./stream-log.less'],
+    standalone: false
 })
 export class StreamLogViewerComponent implements AfterViewInit, OnInit, OnDestroy {
     private _subscription = new Subscription();

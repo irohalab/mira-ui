@@ -11,7 +11,8 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'task-manager',
     templateUrl: './task-manager.html',
-    styleUrls: ['./task-manager.less']
+    styleUrls: ['./task-manager.less'],
+    standalone: false
 })
 export class TaskManager implements OnInit, OnDestroy {
     private _subscription = new Subscription();

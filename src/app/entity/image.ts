@@ -1,6 +1,7 @@
 export class Image {
-    url: string;
-    dominant_color: string;
-    width: number;
-    height: number;
+    id!: string;
+    url!: string;
+    dominantColor!: string;
+    width!: number;
+    height!: number;
 }

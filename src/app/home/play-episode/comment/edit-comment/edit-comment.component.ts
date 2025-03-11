@@ -7,7 +7,8 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'bangumi-edit-comment',
     templateUrl: './edit-comment.html',
-    styleUrls: ['./edit-comment.less']
+    styleUrls: ['./edit-comment.less'],
+    standalone: false
 })
 export class EditCommentComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

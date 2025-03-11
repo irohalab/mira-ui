@@ -10,31 +10,32 @@
     <div class="ui five doubling cards" *ngIf="!!announce_in_bangumi && announce_in_bangumi.length > 0">
         <div class="card bangumi-card" *ngFor="let announce of announce_in_bangumi">
             <a class="image" [routerLink]="['/bangumi', announce.bangumi.id]">
-                <ui-responsive-image [src]="announce.bangumi.cover_image.url"
+                <ui-responsive-image [src]="announce.bangumi.coverImage.url"
                                   [size]="{
                                     width: '100%',
                                     ratio: 0.8,
-                                    originalWidth: announce.bangumi.cover_image.width,
-                                    originalHeight: announce.bangumi.cover_image.height}"
-                                  [background]="announce.bangumi.cover_image.dominant_color"></ui-responsive-image>
+                                    originalWidth: announce.bangumi.coverImage.width,
+                                    originalHeight: announce.bangumi.coverImage.height}"
+                                  [background]="announce.bangumi.coverImage.dominantColor"></ui-responsive-image>
             </a>
-            <div *ngIf="announce.bangumi.favorite_status" class="ui ribbon label"
-                 [ngClass]="{
-                   orange: announce.bangumi.favorite_status === 1,
-                   olive: announce.bangumi.favorite_status === 2,
-                   blue: announce.bangumi.favorite_status === 3,
-                   brown: announce.bangumi.favorite_status === 4,
-                   grey: announce.bangumi.favorite_status === 5
-                   }">{{FAVORITE_LABEL[announce.bangumi.favorite_status]}}
-            </div>
+            <!-- TODO: comment out because we don't support favorite status for announcement -->
+<!--            <div *ngIf="announce.bangumi.favorite_status" class="ui ribbon label"-->
+<!--                 [ngClass]="{-->
+<!--                   orange: announce.bangumi.favorite_status === 1,-->
+<!--                   olive: announce.bangumi.favorite_status === 2,-->
+<!--                   blue: announce.bangumi.favorite_status === 3,-->
+<!--                   brown: announce.bangumi.favorite_status === 4,-->
+<!--                   grey: announce.bangumi.favorite_status === 5-->
+<!--                   }">{{FAVORITE_LABEL[announce.bangumi.favorite_status]}}-->
+<!--            </div>-->
             <a class="content" [routerLink]="['/bangumi', announce.bangumi.id]">
-                <span>{{announce.bangumi.name_cn}}</span>
+                <span>{{announce.bangumi.nameCn}}</span>
             </a>
         </div>
     </div>
     <div class="ui fluid two item secondary pointing menu" [ngClass]="{inverted: isDarkTheme}">
-        <a class="item" [ngClass]="{active: bangumiType === 2}" (click)="changeBangumiType(2)">动画</a>
-        <a class="item" [ngClass]="{active: bangumiType === 6}" (click)="changeBangumiType(6)">日剧</a>
+        <a class="item" [ngClass]="{active: bangumiType === eBangumiType.Anime}" (click)="changeBangumiType(eBangumiType.Anime)">动画</a>
+        <a class="item" [ngClass]="{active: bangumiType === eBangumiType.Real}" (click)="changeBangumiType(eBangumiType.Real)">日剧</a>
     </div>
     <div class="on-air-loading-wrapper" *ngIf="!onAirBangumi">
         <div class="ui active medium loader"></div>
@@ -42,25 +43,26 @@
     <div class="ui five doubling cards" *ngIf="onAirBangumi">
         <div class="card bangumi-card" *ngFor="let bangumi of onAirBangumi">
             <a class="image" [routerLink]="['/bangumi', bangumi.id]">
-                <ui-responsive-image [src]="bangumi.cover_image.url"
+                <ui-responsive-image [src]="bangumi.coverImage.url"
                                   [size]="{
                                     width: '100%',
                                     ratio: 1.405152224824,
-                                    originalWidth: bangumi.cover_image.width,
-                                    originalHeight: bangumi.cover_image.height}"
-                                  [background]="bangumi.cover_image.dominant_color"></ui-responsive-image>
+                                    originalWidth: bangumi.coverImage.width,
+                                    originalHeight: bangumi.coverImage.height}"
+                                  [background]="bangumi.coverImage.dominantColor"></ui-responsive-image>
             </a>
-            <div *ngIf="bangumi.favorite_status" class="ui ribbon label"
-                 [ngClass]="{
-                   orange: bangumi.favorite_status === 1,
-                   olive: bangumi.favorite_status === 2,
-                   blue: bangumi.favorite_status === 3,
-                   brown: bangumi.favorite_status === 4,
-                   grey: bangumi.favorite_status === 5
-                   }">{{FAVORITE_LABEL[bangumi.favorite_status]}}
-            </div>
+            <!-- comment out because we don't support favorite status for on-air -->
+<!--            <div *ngIf="bangumi.favorite_status" class="ui ribbon label"-->
+<!--                 [ngClass]="{-->
+<!--                   orange: bangumi.favorite_status === 1,-->
+<!--                   olive: bangumi.favorite_status === 2,-->
+<!--                   blue: bangumi.favorite_status === 3,-->
+<!--                   brown: bangumi.favorite_status === 4,-->
+<!--                   grey: bangumi.favorite_status === 5-->
+<!--                   }">{{FAVORITE_LABEL[bangumi.favorite_status]}}-->
+<!--            </div>-->
             <a class="content" [routerLink]="['/bangumi', bangumi.id]">
-                <span>{{bangumi.name_cn}}</span>
+                <span>{{bangumi.nameCn}}</span>
             </a>
         </div>
     </div>

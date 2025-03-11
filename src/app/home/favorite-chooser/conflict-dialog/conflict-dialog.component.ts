@@ -5,7 +5,8 @@ import { environment } from '../../../../environments/environment';
 @Component({
     selector: 'conflict-dialog',
     templateUrl: './conflict-dialog.html',
-    styleUrls: ['./conflict-dialog.less']
+    styleUrls: ['./conflict-dialog.less'],
+    standalone: false
 })
 export class ConflictDialogComponent {
     siteTitle = environment.siteTitle;

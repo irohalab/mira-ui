@@ -21,7 +21,8 @@ export const RATING_COLOR = [
 @Component({
     selector: 'bangumi-rating',
     templateUrl: './rating.html',
-    styleUrls: ['./rating.less']
+    styleUrls: ['./rating.less'],
+    standalone: false
 })
 export class RatingComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

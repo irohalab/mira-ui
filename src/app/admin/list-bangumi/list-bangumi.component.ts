@@ -1,29 +1,35 @@
-import { fromEvent, Subscription } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 
-import { debounceTime, filter } from 'rxjs/operators';
-import { Bangumi } from '../../entity';
-import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { Component, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { AdminService } from '../admin.service';
 import { getRemPixel } from '../../../helpers/dom';
-import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
-import { BaseError } from '../../../helpers/error/BaseError';
+import {
+    DARK_THEME,
+    DarkThemeService,
+    InfiniteDataBucketsStub,
+    UIDialog,
+    UIToast,
+    UIToastComponent,
+    UIToastRef
+} from '@irohalab/deneb-ui';
 import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
-import { SearchBangumi } from '../search-bangumi/search-bangumi.component';
+import { SearchBangumi } from '../search-bangumi';
 import { ListBangumiService } from './list-bangumi.service';
 import { environment } from '../../../environments/environment';
+import { BangumiRaw } from '../../entity/BangumiRaw';
+import { groupByQuarters } from '../../../helpers/TimelineListHelpers';
 
 @Component({
     selector: 'list-bangumi',
     templateUrl: './list-bangumi.html',
-    styleUrls: ['./list-bangumi.less']
+    styleUrls: ['./list-bangumi.less'],
+    standalone: false
 })
 export class ListBangumi implements OnDestroy, OnInit {
     private _subscription = new Subscription();
-
-    private _bangumiList: Bangumi[];
-    private _allBangumiList: Bangumi[];
     private _toastRef: UIToastRef<UIToastComponent>;
     private _isMovie: boolean;
 
@@ -31,35 +37,24 @@ export class ListBangumi implements OnDestroy, OnInit {
 
     name: string;
     total: number = 0;
-    orderBy: string = 'create_time';
-    sort: string = 'desc';
-    type: number = -1;
+    orderBy!: string;
+    sort!: string;
+    type!: number;
 
     orderByMenuLabel: {[key: string]:string} = {
-        create_time: '按创建时间',
-        update_time: '按修改时间',
-        air_date: '按开播日期'
+        createTime: '按创建时间',
+        updateTime: '按修改时间',
+        airDate: '按开播日期'
     };
 
-    typeMenuLabel: {[key: string]:string} = {
-        '-1': '全部',
-        '2': '动画',
-        '6': '电视剧'
+    typeMenuLabel: {[key: number]:string} = {
+        0: '全部',
+        2: '动画',
+        6: '电视剧'
     };
 
-    set bangumiList(list: Bangumi[]) {
-        this._bangumiList = list;
-        this.timestampList = list.map((bangumi: Bangumi) => {
-            if (this.orderBy === 'air_date') {
-                return bangumi.air_date ? Date.parse(bangumi.air_date) : Date.now();
-            }
-            return bangumi[this.orderBy];
-        });
-    };
-
-    get bangumiList(): Bangumi[] {
-        return this._bangumiList;
-    };
+    bangumiList: BangumiRaw[] = [];
+    bucketsStub: InfiniteDataBucketsStub;
 
     isLoading: boolean = false;
 
@@ -81,7 +76,7 @@ export class ListBangumi implements OnDestroy, OnInit {
     set isMovie(v: boolean) {
         this._isMovie = v;
         this._listBangumiService.isMovie = v;
-        this.filterBangumiList();
+        this.loadFromServer();
     }
 
     constructor(private adminService: AdminService,
@@ -105,9 +100,7 @@ export class ListBangumi implements OnDestroy, OnInit {
         if (this._listBangumiService.orderBy) {
             this.orderBy = this._listBangumiService.orderBy;
         }
-        if (Number.isInteger(this._listBangumiService.type)) {
-            this.type = this._listBangumiService.type;
-        }
+        this.type = this._listBangumiService.type;
     }
 
     onScrollPositionChange(p: number) {
@@ -121,13 +114,13 @@ export class ListBangumi implements OnDestroy, OnInit {
         }
         this._listBangumiService.orderBy = this.orderBy;
         this._listBangumiService.sort = this.sort;
-        this.filterBangumiList();
+        this.loadFromServer();
     }
 
     onTypeChange(type: number) {
         this.type = type;
         this._listBangumiService.type = this.type;
-        this.filterBangumiList();
+        this.loadFromServer();
     }
 
     addBangumi(): void {
@@ -158,78 +151,128 @@ export class ListBangumi implements OnDestroy, OnInit {
     onFilterAction(): void {
         const searchBoxElement = this.searchBox.nativeElement;
         this.name = searchBoxElement.value;
-        this.filterBangumiList();
+        if (this.name) {
+            this.searchFromServer();
+        } else {
+            this.loadFromServer();
+        }
     }
 
     ngOnDestroy(): void {
         this._subscription.unsubscribe();
     }
 
-    private loadFromServer() {
+    private searchFromServer(): void {
         this.isLoading = true;
+        const eps = this.isMovie ? 1 : -1;
+        const options: any = {
+            offset: 0,
+            limit: 100,
+            orderBy: this.orderBy,
+            sort: this.sort,
+            keyword: this.name,
+            type: this.type,
+        }
         this._subscription.add(
-            this.adminService
-                .listBangumi({
-                    page: 1,
-                    count: -1,
-                    order_by: this.orderBy,
-                    sort: this.sort,
-                    type: this.type
-                })
-                .subscribe(
-                    (result: { data: Bangumi[], total: number }) => {
-                        this._allBangumiList = result.data;
-                        this.bangumiList = this._allBangumiList;
-                        this.total = result.total;
-                        this.isLoading = false
+            this.adminService.listBangumi(options)
+                .subscribe({
+                    next: result => {
+                        this.bangumiList = result.data;
+                        this.isLoading = false;
                     },
-                    (error: BaseError) => {
-                        console.log(error);
-                        this._toastRef.show(error.message);
-                        this.isLoading = false
+                    error: err => {
+                        this._toastRef.show(err.message || 'Server Error');
+                        this.bangumiList = [];
+                        this.isLoading = false;
                     }
-                )
+                })
         );
     }
 
-    public editBangumi(bangumi: Bangumi): void {
+    private loadFromServer() {
+        this.isLoading = true;
+        const eps = this.isMovie ? 1 : -1;
+        this._subscription.add(
+            this.adminService.getTimeline({
+                type: this.type,
+                orderBy: this.orderBy,
+                sort: this.sort,
+                eps
+            }).subscribe({
+                next: (result) => {
+                    this.timestampList = result;
+                    const buckets = groupByQuarters(result);
+                    this.bucketsStub = new InfiniteDataBucketsStub(buckets, this, this.onLoadBucket);
+                    this.bangumiList = [];
+                    this.isLoading = false
+                },
+                error: (err) => {
+                    console.log(err);
+                    this._toastRef.show(err.message);
+                    this.isLoading = false
+                }
+            })
+        );
+    }
+
+    private onLoadBucket(bucketIndex: number): Promise<Iterable<any>> {
+        const bucket = this.bucketsStub.buckets[bucketIndex];
+        const options: any = {
+            offset: bucket.start,
+            limit: bucket.end - bucket.start + 1,
+            orderBy: this.orderBy,
+            sort: this.sort,
+        }
+
+        if (this.isMovie) {
+            options.eps = 1;
+        }
+
+        if (this.type !== 0) {
+            options.type = this.type;
+        }
+
+        return lastValueFrom(this.adminService.listBangumi(options).pipe(map(res => res.data)));
+    }
+
+    public editBangumi(bangumi: BangumiRaw): void {
         this.router.navigate(['/admin/bangumi', bangumi.id]);
     }
 
-    filterBangumiList() {
-        if (!this._allBangumiList) {
-            return;
-        }
-        this.bangumiList = this._allBangumiList
-            .filter(bangumi => {
-                if (this.isMovie) {
-                    return bangumi.eps === 1;
-                }
-                return true;
-            })
-            .filter(bangumi => {
-                if (this.type === -1) {
-                    return true;
-                }
-                return bangumi.type === this.type;
-            })
-            .filter(bangumi => {
-                if (this.name) {
-                    return Bangumi.containKeyword(bangumi, this.name);
-                }
-                return true;
-            })
-            .sort((bgm1: Bangumi, bgm2: Bangumi) => {
-                let t1, t2;
-                if (this.orderBy === 'air_date') {
-                    t1 = bgm1.air_date ? Date.parse(bgm1.air_date).valueOf() : Date.now();
-                    t2 = bgm2.air_date ? Date.parse(bgm2.air_date).valueOf() : Date.now();
-                } else {
-                    t1 = bgm1[this.orderBy];
-                    t2 = bgm2[this.orderBy];
-                }
-                return this.sort === 'asc' ? t1 - t2 : t2 - t1;
-            });
-    }
+    // filterBangumiList() {
+    //     if (!this._allBangumiList) {
+    //         return;
+    //     }
+    //     this.bangumiList = this._allBangumiList
+    //         .filter(bangumi => {
+    //             if (this.isMovie) {
+    //                 return bangumi.eps === 1;
+    //             }
+    //             return true;
+    //         })
+    //         .filter(bangumi => {
+    //             if (this.type === 0) {
+    //                 return true;
+    //             }
+    //             return bangumi.type === this.type;
+    //         })
+    //         .filter(bangumi => {
+    //             if (this.name) {
+    //                 return Bangumi.containKeyword(bangumi, this.name);
+    //             }
+    //             return true;
+    //         })
+    //         .sort((bgm1: Bangumi, bgm2: Bangumi) => {
+    //             let t1, t2;
+    //             if (this.orderBy === 'air_date') {
+    //                 t1 = bgm1.airDate ? Date.parse(bgm1.airDate).valueOf() : Date.now();
+    //                 t2 = bgm2.airDate ? Date.parse(bgm2.airDate).valueOf() : Date.now();
+    //             } else {
+    //                 t1 = bgm1[this.orderBy];
+    //                 t2 = bgm2[this.orderBy];
+    //             }
+    //             return this.sort === 'asc' ? t1 - t2 : t2 - t1;
+    //         });
+    // }
 
 }

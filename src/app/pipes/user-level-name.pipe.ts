@@ -2,7 +2,10 @@ import {Pipe, PipeTransform} from '@angular/core';
 
 export const LEVEL_NAMES = ['默认等级Level 0', '用户Level 1', '管理员Level 2', '超级管理员Level 3'];
 
-@Pipe({name: 'userLevelName'})
+@Pipe({
+    name: 'userLevelName',
+    standalone: false
+})
 export class UserLevelNamePipe implements PipeTransform {
 
     transform(level: number): any {

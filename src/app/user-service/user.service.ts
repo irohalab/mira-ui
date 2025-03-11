@@ -1,95 +1,105 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { catchError, map, mergeMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
+import { filter, tap } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
 import { User } from '../entity';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { AuthCodeFlowConfig } from '../authCodeFlow.config';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { Account } from '../entity/Account';
 
 
 @Injectable()
 export class UserService extends BaseService {
-    private _baseUrl = '/api/user';
 
-    private _userInfoSubject = new BehaviorSubject(null);
+    private baseUrl = environment + '/api/account';
+
+    private _userInfoSubject = new BehaviorSubject(new User(
+        User.ID_INITIAL_USER,
+        null,
+        null,
+        null,
+        false));
 
     constructor(
-        private _http: HttpClient,
-        private _router: Router
+        private httpClient: HttpClient,
+        private oAuthService: OAuthService,
     ) {
         super();
-        // console.log('init user service: #' + (Math.random()* 1000));
-        this.getUserInfo().subscribe(() => {});
+        this.oAuthService.configure(AuthCodeFlowConfig);
+        this.oAuthService.loadDiscoveryDocumentAndTryLogin()
+            .then((result) => {
+                console.log(this.oAuthService.getIdentityClaims());
+                console.log(this.oAuthService.getIdToken());
+                console.log(this.oAuthService.getAccessToken());
+                console.log(result);
+                return this.getUserInfo();
+            })
+            .then(() => {
+                console.log('user', this._userInfoSubject.getValue());
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        this.oAuthService.setupAutomaticSilentRefresh();
+        this.oAuthService.events
+            .pipe(tap(e => {
+                console.log('event', e);
+            }),filter((e) => e.type === 'token_received'))
+            .subscribe((_) => {
+                console.debug('state', this.oAuthService.state);
+                this.oAuthService.loadUserProfile();
+
+                const scopes = this.oAuthService.getGrantedScopes();
+                console.debug('scopes', scopes);
+            });
+
     }
 
     get userInfo(): Observable<User> {
         return this._userInfoSubject.asObservable();
     }
 
-    register(user: User): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/register`, user).pipe(
-            catchError(this.handleError),);
+    login(): void {
+        this.oAuthService.initLoginFlow();
     }
 
-    login(user: User): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/login`, user).pipe(
-            mergeMap(() => {
-                return this.getUserInfo();
-            }),
-            catchError(this.handleError),);
+    logout(): void {
+        this.oAuthService.logOut();
+        this._userInfoSubject.next(null);
     }
 
-    logout(): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/logout`, null).pipe(
-            tap(() => {
-                this._router.navigateByUrl('/login');
-                this._userInfoSubject.next(null);
-            }),
-            catchError(this.handleError),);
+    activateAccount(invitation: string): Observable<Account> {
+        return this.httpClient.post<Account>('/api/account', {invitation})
+            .pipe(tap((account) => {
+                this.updateUser(this._userInfoSubject.getValue(), account);
+            }))
     }
 
-    getUserInfo(): Observable<User> {
-        return this._http.get<{data: User}>(`${this._baseUrl}/info`).pipe(
-            map(res => res.data),
-            tap(user => {
-                this._userInfoSubject.next(user);
-            }),
-            catchError(this.handleError),);
+    async getUserInfo(): Promise<void> {
+        try {
+            if (!this.oAuthService.hasValidAccessToken() && this.oAuthService.getRefreshToken()) {
+                await this.oAuthService.refreshToken();
+            }
+            if (!this.oAuthService.hasValidAccessToken()) {
+                return;
+            }
+            const userProfile = (await this.oAuthService.loadUserProfile() as any).info;
+            const account = await lastValueFrom(this.httpClient.get<Account>('/api/account/info'));
+            console.log('userProfile: ', userProfile, account);
+            this.updateUser(userProfile, account);
+        } catch (ex) {
+            console.log(ex);
+        }
     }
 
-    updateEmail(email: string, current_pass: string): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/email`, {email: email, password: current_pass}).pipe(
-            mergeMap(() => {
-                return this.getUserInfo();
-            }),
-            catchError(this.handleError),);
-    }
-
-    updatePass(password: string, new_password: string, new_password_repeat: string): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/update-pass`, {
-            new_password: new_password,
-            new_password_repeat: new_password_repeat,
-            password: password
-        }).pipe(
-            catchError(this.handleError),);
-    }
-
-    requestResetPass(email: string): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/request-reset-pass`,{email: email}).pipe(
-            catchError(this.handleError),);
-    }
-
-    resetPassword(new_pass: string, new_pass_repeat: string, token: string): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/reset-pass`, {
-            new_pass: new_pass,
-            new_pass_repeat: new_pass_repeat,
-            token: token
-        }).pipe(
-            catchError(this.handleError),);
-    }
-
-    resendMail(): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/email/resend`, null).pipe(
-            catchError(this.handleError),);
+    private updateUser(userProfile: User, account: Account): void {
+        this._userInfoSubject.next(new User(
+            userProfile.sub,
+            userProfile.name,
+            account.role ? account.role : User.GUEST_ROLE,
+            userProfile.email,
+            userProfile.email_verified,));
     }
 }

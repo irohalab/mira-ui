@@ -13,7 +13,8 @@ const countDownTimer = 5; // unit second
 @Component({
     selector: 'last-position-overlay',
     templateUrl: './last-position-overlay.html',
-    styleUrls: ['./last-position-overlay.less']
+    styleUrls: ['./last-position-overlay.less'],
+    standalone: false
 })
 export class LastPositionOverlayComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
@@ -55,12 +56,12 @@ export class LastPositionOverlayComponent implements OnInit, OnDestroy {
                         // close overlay if exists
                         this.closeOverlay();
                         const autoPlayFromLastPosition = this._persistStorage.getItem(CorePlayer.AUTO_PLAY_FROM_LAST_POSITION, 'false');
-                        if (autoPlayFromLastPosition !== 'true' && this._lastEpisodeId !== this._videoPlayer.videoFile.episode_id) {
+                        if (autoPlayFromLastPosition !== 'true' && this._lastEpisodeId !== this._videoPlayer.videoFile.episode.id) {
                             if (this._videoPlayer.videoFile.duration && this._videoPlayer.lastPlayedPosition && this._videoPlayer.lastPlayedPosition < this._videoPlayer.videoFile.duration - 1) {
                                 this.popupOverlay();
                             }
                         }
-                        this._lastEpisodeId = this._videoPlayer.videoFile.episode_id;
+                        this._lastEpisodeId = this._videoPlayer.videoFile.episode.id;
                     }
                 })
         );

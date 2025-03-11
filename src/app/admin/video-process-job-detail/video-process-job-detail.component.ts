@@ -22,7 +22,8 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'video-process-job-detail',
     templateUrl: './video-process-job-detail.html',
-    styleUrls: ['./video-process-job-detail.less']
+    styleUrls: ['./video-process-job-detail.less'],
+    standalone: false
 })
 export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();

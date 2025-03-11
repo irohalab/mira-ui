@@ -9,21 +9,21 @@ export class Episode {
     static EPISODE_TYPE_SPECIAL: number = 1;
 
     id: string;
+    bangumi: Bangumi;
     bangumi_id: string;
-    bgm_eps_id: number;
-    episode_no: number;
+    bgmEpsId: number;
+    episodeNo: number;
     name: string;
-    name_cn: string;
+    nameCn: string;
     duration: string;
     airdate: string;
     status: number;
     torrent_id: string;
     create_time: number;
     update_time: number;
-    bangumi: Bangumi; // optional
     // @deprecated
     thumbnail: string; // optional
-    video_files: VideoFile[]; // optional
+    videoFiles: VideoFile[]; // optional
 
     // @Optional
     delete_mark: number;
@@ -31,20 +31,20 @@ export class Episode {
     delete_eta: number;
 
     // optional
-    watch_progress: WatchProgress;
+    watchProgress: WatchProgress;
 
     // deprecated
     thumbnail_color: string;
 
-    thumbnail_image: Image | null;
+    thumbnailImage: Image | null;
 
 
     static fromRawData(rawData: any, episode_no?: number) {
         let episode = new Episode();
-        episode.bgm_eps_id = rawData.id;
-        episode.episode_no = episode_no;
+        episode.bgmEpsId = rawData.id;
+        episode.episodeNo = episode_no;
         episode.name = rawData.name;
-        episode.name_cn = rawData.name_cn;
+        episode.nameCn = rawData.name_cn;
         episode.duration = rawData.duration;
         episode.airdate = rawData.airdate;
         return episode;

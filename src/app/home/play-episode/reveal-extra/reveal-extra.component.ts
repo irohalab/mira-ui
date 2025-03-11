@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ChromeExtensionService, ENABLED_STATUS } from '../../../browser-extension/chrome-extension.service';
 import { Subscription } from 'rxjs';
 import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
@@ -7,7 +7,8 @@ import { Bangumi } from '../../../entity';
 @Component({
     selector: 'reveal-extra',
     templateUrl: './reveal-extra.html',
-    styleUrls: ['./reveal-extra.less']
+    styleUrls: ['./reveal-extra.less'],
+    standalone: false
 })
 export class RevealExtraComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -34,7 +35,7 @@ export class RevealExtraComponent implements OnInit, OnDestroy {
         if (!this.extraInfo) {
             this.isLoading = true;
             this._subscription.add(
-                this._chromeExtensionService.invokeBangumiMethod('bangumiDetail', [this.bangumi.bgm_id])
+                this._chromeExtensionService.invokeBangumiMethod('bangumiDetail', [this.bangumi.bgmId])
                     .subscribe((extraInfo) => {
                         this.isLoading = false;
                         this.extraInfo = extraInfo;

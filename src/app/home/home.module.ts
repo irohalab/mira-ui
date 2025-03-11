@@ -1,5 +1,4 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { FavoriteManagerService } from './favorite-manager.service';
 import { Home } from './home.component';
 import { DefaultComponent } from './default/default.component';
 import { PlayEpisode } from './play-episode/play-episode.component';
@@ -49,6 +48,7 @@ import { RevealExtraComponent } from './play-episode/reveal-extra/reveal-extra.c
 import { DarkThemeToggleComponent } from './dark-theme-toggle/dark-theme-toggle.component';
 import { MyHistoryComponent } from './my-history/my-history.component';
 import { HistoryCardComponent } from './my-history/history-card/history-card.component';
+import { FavoriteService } from './favorite.service';
 
 
 @NgModule({
@@ -97,14 +97,17 @@ import { HistoryCardComponent } from './my-history/history-card/history-card.com
         ConfirmDialogModule,
         BrowserExtensionModule
     ],
+    exports: [
+        BangumiCard
+    ],
     providers: [
+        FavoriteService,
         HomeService,
         WatchService,
         ImageLoadingStrategy,
         BangumiListService,
         UserCenterService,
         SynchronizeService,
-        FavoriteManagerService,
         provideHttpClient(withInterceptorsFromDi()),
         {provide: SRC_GENERATOR_SERVICE, useClass: ResponsiveGenerateSrcService}
     ]

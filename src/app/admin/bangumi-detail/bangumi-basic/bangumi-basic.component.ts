@@ -1,13 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Bangumi } from '../../../entity/bangumi';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Bangumi } from '../../../entity';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { UIDialogRef } from '@irohalab/deneb-ui';
-import { User } from '../../../entity/user';
+import { Account } from '../../../entity/Account';
 
 @Component({
     selector: 'bangumi-basic',
     templateUrl: './bangumi-basic.html',
-    styleUrls: ['./bangumi-basic.less']
+    styleUrls: ['./bangumi-basic.less'],
+    standalone: false
 })
 export class BangumiBasic implements OnInit {
 
@@ -16,21 +17,14 @@ export class BangumiBasic implements OnInit {
 
     bangumiForm: FormGroup;
 
-    adminList: User[];
+    adminList: Account[];
 
     constructor(private _fb: FormBuilder,
                 private _dialogRef: UIDialogRef<BangumiBasic>) {
     }
 
     ngOnInit(): void {
-
-
         this.bangumiForm = this._fb.group({
-            name: [this.bangumi.name, Validators.required],
-            name_cn: [this.bangumi.name_cn, Validators.required],
-            summary: this.bangumi.summary,
-            air_date: [this.bangumi.air_date, Validators.required],
-            air_weekday: this.bangumi.air_weekday,
             eps_no_offset: this.bangumi.eps_no_offset,
             status: this.bangumi.status,
             maintained_by_uid: this.bangumi.maintained_by ? this.bangumi.maintained_by.id: '',

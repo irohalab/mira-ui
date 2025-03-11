@@ -20,7 +20,8 @@ import { ActionEditorComponent } from '../action-editor/action-editor.component'
 @Component({
     selector: 'video-process-rule-editor',
     templateUrl: './video-process-rule-editor.html',
-    styleUrls: ['./video-process-rule-editor.less']
+    styleUrls: ['./video-process-rule-editor.less'],
+    standalone: false
 })
 export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

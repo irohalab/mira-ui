@@ -19,7 +19,8 @@ type SearchType = 'Job ID' | 'Bangumi ID' | 'Bangumi Name';
 @Component({
     selector: 'download-manager',
     templateUrl: './download-manager.html',
-    styleUrls: ['./download-manager.less']
+    styleUrls: ['./download-manager.less'],
+    standalone: false
 })
 export class DownloadManagerComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -196,7 +197,7 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
                     this.jobList = this._jobList.filter(job => {
                         let bangumiNameMatch = this.searchString(job.bangumi.name, value);
                         if (!bangumiNameMatch) {
-                            bangumiNameMatch = this.searchString(job.bangumi.name_cn, value);
+                            bangumiNameMatch = this.searchString(job.bangumi.nameCn, value);
                         }
                         return bangumiNameMatch;
                     });

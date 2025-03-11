@@ -12,7 +12,8 @@ export const RESULT_TRASH = 'trash';
 @Component({
     selector: 'captured-image-operation-dialog',
     templateUrl: './operation-dialog.html',
-    styleUrls: ['./operation-dialog.less']
+    styleUrls: ['./operation-dialog.less'],
+    standalone: false
 })
 export class CapturedImageOperationDialog implements AfterViewInit {
     private _autoRemove: boolean;

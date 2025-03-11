@@ -4,27 +4,26 @@ import { AnalyticsService } from './analytics.service';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { appRoutes } from './app.routes';
-import { Login } from './login/login.component';
-import { Register } from './register/register.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ErrorComponent } from './error/error.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TaskService } from './admin/task-manager/task.service';
-import { HomeModule } from './home/home.module';
-import { EmailConfirmModule } from './email-confirm/email-confirm.module';
-import { ForgetPassModule } from './forget-pass/forget-pass.module';
-import { ResetPassModule } from './reset-pass/reset-pass.module';
-import { UserServiceModule } from './user-service/index';
+import { HomeModule } from './home';
+import { UserServiceModule } from './user-service';
 import { StaticContentModule } from './static-content/static-content.module';
 import { RefreshSameRouteStrategy } from './RefreshSameRouteStrategy';
 import { NavigationService } from './navigation.service';
+import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
+import { OAuthStorage, provideOAuthClient } from 'angular-oauth2-oidc';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { storageAPI } from '../helpers/localstorage';
+import { environment } from '../environments/environment';
 
 @NgModule({
     declarations: [
         App,
-        Login,
-        Register,
-        ErrorComponent
+        ErrorComponent,
+        NotFoundComponent,
     ],
     providers: [
         AnalyticsService,
@@ -33,7 +32,15 @@ import { NavigationService } from './navigation.service';
         {
             provide: RouteReuseStrategy,
             useClass: RefreshSameRouteStrategy
-        }
+        },
+        provideHttpClient(withFetch(), withInterceptorsFromDi()),
+        provideOAuthClient({
+            resourceServer: {
+                allowedUrls: [environment.resourceProvider],
+                sendAccessToken: true
+            }
+        }),
+        {provide: OAuthStorage, useFactory: () => storageAPI}
     ],
     imports: [
         RouterModule.forRoot(appRoutes, {
@@ -43,9 +50,6 @@ import { NavigationService } from './navigation.service';
         ReactiveFormsModule,
         BrowserAnimationsModule,
         HomeModule,
-        EmailConfirmModule,
-        ForgetPassModule,
-        ResetPassModule,
         UserServiceModule,
         StaticContentModule
     ],

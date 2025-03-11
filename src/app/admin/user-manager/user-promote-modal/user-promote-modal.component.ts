@@ -4,11 +4,12 @@ import {UIDialogRef} from '@irohalab/deneb-ui';
 @Component({
     selector: 'user-promote-modal',
     templateUrl: './user-promote-modal.html',
-    styleUrls: ['./user-promote-modal.less']
+    styleUrls: ['./user-promote-modal.less'],
+    standalone: false
 })
 export class UserPromoteModal {
 
-    @Input() level: number;
+    @Input() role: string;
 
     constructor(private _dialogRef: UIDialogRef<UserPromoteModal>){}
 
@@ -17,6 +18,6 @@ export class UserPromoteModal {
     }
 
     save() {
-        this._dialogRef.close({level: this.level});
+        this._dialogRef.close({role: this.role});
     }
 }

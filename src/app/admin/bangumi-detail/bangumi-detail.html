@@ -14,20 +14,20 @@
 </admin-navbar>
 <div class="bangumi-detail-container" *ngIf="bangumi && adminList">
     <div class="bangumi-basic-info section-card">
-        <div class="cover-wrapper" *ngIf="bangumi.cover_image">
+        <div class="cover-wrapper" *ngIf="bangumi.coverImage">
             <ui-responsive-image
-                [src]="bangumi.cover_image.url"
+                [src]="bangumi.coverImage.url"
                 [size]="{
                     width: '100%',
                     height: 'auto',
-                    originalWidth: bangumi.cover_image.width,
-                    originalHeight: bangumi.cover_image.height}"
-                [background]="bangumi.cover_image.dominant_color"></ui-responsive-image>
+                    originalWidth: bangumi.coverImage.width,
+                    originalHeight: bangumi.coverImage.height}"
+                [background]="bangumi.coverImage.dominantColor"></ui-responsive-image>
         </div>
         <div class="bangumi-info-text">
             <h3 class="bangumi-title">
-                {{bangumi.name_cn || '暂无'}}
-                <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgm_id" target="_blank" title="在bgm.tv页面查看">
+                {{bangumi.nameCn || '暂无'}}
+                <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgmId" target="_blank" title="在bgm.tv页面查看">
                     <i class="bgm-emo-47 bgm-link-icon"></i>
                 </a>
             </h3>
@@ -41,11 +41,11 @@
             </p>
             <p class="entry">
                 <span class="entry-key">放送开始</span>
-                <span class="entry-value">{{bangumi.air_date || '未知'}}</span>
+                <span class="entry-value">{{bangumi.airDate || '未知'}}</span>
             </p>
             <p class="entry">
                 <span class="entry-key">放送星期</span>
-                <span class="entry-value">{{bangumi.air_weekday || '未知'}}</span>
+                <span class="entry-value">{{bangumi.airWeekday || '未知'}}</span>
             </p>
             <p class="entry">
                 <span class="entry-key">集数偏移</span>
@@ -61,19 +61,19 @@
             </p>
             <p class="entry">
                 <span class="entry-key">创建时间</span>
-                <span class="entry-value">{{bangumi.create_time | date: 'medium'}}</span>
+                <span class="entry-value">{{bangumi.createTime | date: 'medium'}}</span>
             </p>
             <p class="entry">
                 <span class="entry-key">更新时间</span>
-                <span class="entry-value">{{bangumi.update_time | date: 'medium'}}</span>
+                <span class="entry-value">{{bangumi.updateTime | date: 'medium'}}</span>
             </p>
             <p class="entry">
                 <span class="entry-key">创建者</span>
-                <span class="entry-value">{{bangumi.created_by?.name || 'System'}}</span>
+                <span class="entry-value">{{bangumi.created_by?.nickName || 'System'}}</span>
             </p>
             <p class="entry">
                 <span class="entry-key">维护者</span>
-                <span class="entry-value">{{bangumi.maintained_by?.name || 'System'}}</span>
+                <span class="entry-value">{{bangumi.maintained_by?.nickName || 'System'}}</span>
             </p>
             <p class="entry">
                 <span class="entry-key">报警超时值</span>
@@ -98,56 +98,6 @@
            (click)="editBangumiUniversal()"><i class="plus icon"></i>添加来源</a>
         <div class="ui inverted dimmer" [ngClass]="{active: !modeList}">
             <div class="ui large loader"></div>
-        </div>
-    </div>
-    <div class="download-info section-card">
-        <h4 class="section-header">抓取来源</h4>
-        <div class="ui warning message">DMHY, ACG.RIP, NYAA在未来的版本将会默认被禁用，请使用Universal</div>
-        <div class="bangumi-moe-entry entry">
-            <div class="entry-key">BANGUMI.MOE</div>
-            <div class="entry-value">
-                <div class="ui horizontal label" *ngFor="let tag of bangumi.bangumi_moe | parseJson">
-                    {{tag.locale.zh_cn || tag.name}}
-                </div>
-                <a class="edit-button anchor-button" (click)="editBangumiMoe()"><i class="edit icon"></i></a>
-            </div>
-        </div>
-        <div class="dmhy-entry entry">
-            <div class="entry-key">DMHY</div>
-            <div class="entry-value">
-                <span class="ui horizontal label" *ngIf="bangumi.dmhy">{{bangumi.dmhy}}</span>
-                <a class="edit-button anchor-button" (click)="editKeyword('dmhy')"><i class="edit icon"></i></a>
-            </div>
-        </div>
-        <div class="acg-rip-entry entry">
-            <div class="entry-key">ACG.RIP</div>
-            <div class="entry-value">
-                <span class="ui horizontal label" *ngIf="bangumi.acg_rip">{{bangumi.acg_rip}}</span>
-                <a class="edit-button anchor-button" (click)="editKeyword('acg_rip')"><i class="edit icon"></i></a>
-            </div>
-        </div>
-        <div class="libyk-entry entry">
-            <div class="entry-key">LIBYK</div>
-            <div class="entry-value">
-                <div class="ui horizontal label" *ngIf="bangumi.libyk_so">
-                    <i class="rss icon"></i>
-                    {{bangumi.libyk_so | libykFormat:'t'}}
-                    <div class="detail">{{bangumi.libyk_so | libykFormat:'q'}}</div>
-                </div>
-                <a class="edit-button anchor-button" (click)="editKeyword('libyk_so')"><i class="edit icon"></i></a>
-            </div>
-        </div>
-        <div class="libyk-entry entry">
-            <div class="entry-key">NYAA</div>
-            <div class="entry-value">
-                <div class="ui horizontal label" *ngIf="bangumi.nyaa">
-                    <i class="filter icon"></i>
-                    {{bangumi.nyaa | NyaaPipe:'f'}}
-                    <div class="detail">{{bangumi.nyaa | NyaaPipe:'c'}}</div>
-                </div>
-                <div class="ui horizontal label" *ngIf="bangumi.nyaa">{{bangumi.nyaa | NyaaPipe:'q'}}</div>
-                <a class="edit-button anchor-button" (click)="editKeyword('nyaa')"><i class="edit icon"></i></a>
-            </div>
         </div>
     </div>
     <div class="video-process section-card" *ngIf="bangumi && bangumi.id">
@@ -178,9 +128,9 @@
                         downloaded: episode.status === 2 && !episode.removedMark,
                         downloading: episode.status === 1 && !episode.removedMark,
                         removed: episode.removedMark}">
-                    <td>{{episode.episode_no}}</td>
+                    <td>{{episode.episodeNo}}</td>
                     <td>
-                        <div class="image-wrapper" *ngIf="episode.status !== 2 || !episode.thumbnail_image">
+                        <div class="image-wrapper" *ngIf="episode.status !== 2 || !episode.thumbnailImage">
                             <div class="image-fallback">
                                 <h4 class="ui icon film icon-holder">
                                     <i class="film icon"></i>
@@ -188,18 +138,18 @@
                             </div>
                         </div>
                         <ui-responsive-image
-                            [src]="episode.thumbnail_image.url"
+                            [src]="episode.thumbnailImage.url"
                             [size]="{
                                 width: '6rem',
                                 height: '3.375rem',
-                                originalWidth: episode.thumbnail_image.width,
-                                originalHeight: episode.thumbnail_image.height}"
-                            display="table" *ngIf="episode.status === 2 && !!episode.thumbnail_image"
-                            [background]="episode.thumbnail_image.dominant_color"></ui-responsive-image>
+                                originalWidth: episode.thumbnailImage.width,
+                                originalHeight: episode.thumbnailImage.height}"
+                            display="table" *ngIf="episode.status === 2 && !!episode.thumbnailImage"
+                            [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
                     </td>
                     <td class="title">
                         <span class="key">日文:</span><span class="value">{{episode.name}}</span> <br>
-                        <span class="key">中文:</span><span class="value">{{episode.name_cn}}</span>
+                        <span class="key">中文:</span><span class="value">{{episode.nameCn}}</span>
                     </td>
                     <td>{{episode.airdate}}</td>
                     <td>{{episode.duration}}</td>

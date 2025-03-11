@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { UserService } from './user.service';
 import { storageAPI } from '../../helpers/localstorage';
 import { Subject ,  Observable } from 'rxjs';
+import { User } from '../entity';
 
 export const PREFIX = 'ps';
 
@@ -66,14 +67,18 @@ export class PersistStorageIterator implements IterableIterator<PersistEntry> {
 
 @Injectable()
 export class PersistStorage {
+    private user!: User;
+
     private _itemChange = new Subject<{key: string, value: string}>();
 
     constructor(private _userService: UserService) {
-        this._userService.getUserInfo()
+        this._userService.userInfo
             .subscribe((user) => {
-                if (!user) {
+                // only clear cache when user changed.
+                if (this.user && this.user.id !== User.ID_INITIAL_USER && this.user.id !== user.id) {
                     this.clear();
                 }
+                this.user = user;
             })
     }
 

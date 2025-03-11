@@ -13,7 +13,8 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'admin-announce',
     templateUrl: './announce.html',
-    styleUrls: ['./announce.less']
+    styleUrls: ['./announce.less'],
+    standalone: false
 })
 export class AnnounceComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

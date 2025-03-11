@@ -17,7 +17,8 @@ import { Subscription } from 'rxjs';
             cursor: pointer;
             line-height: 1;
         }
-    `]
+    `],
+    standalone: false
 })
 export class VideoCaptureButton implements OnInit, OnDestroy{
     private _subscription = new Subscription();

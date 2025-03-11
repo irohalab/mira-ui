@@ -5,7 +5,8 @@ import { VideoPlayer } from '../../video-player.component';
 @Component({
     selector: 'non-interactive-progress-bar',
     templateUrl: 'non-interactive-progress-bar.html',
-    styleUrls: ['./non-interactive-progress-bar.less']
+    styleUrls: ['./non-interactive-progress-bar.less'],
+    standalone: false
 })
 export class NonInteractiveProgressBarComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

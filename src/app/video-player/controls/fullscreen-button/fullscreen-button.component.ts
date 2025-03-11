@@ -14,7 +14,8 @@ import {VideoPlayer} from '../../video-player.component';
             cursor: pointer;
             line-height: 1;
         }
-    `]
+    `],
+    standalone: false
 })
 export class VideoFullscreenButton {
 

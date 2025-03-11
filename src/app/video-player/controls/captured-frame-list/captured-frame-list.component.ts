@@ -28,7 +28,8 @@ import { VideoPlayer } from '../../video-player.component';
             transition('out => in', animate('100ms ease-in')),
             transition('in => out', animate('100ms ease-out'))
         ])
-    ]
+    ],
+    standalone: false
 })
 export class CapturedFrameList implements OnInit, AfterViewInit, OnDestroy, PreviewContainer {
     private _subscription = new Subscription();

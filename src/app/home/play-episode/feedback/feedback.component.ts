@@ -6,7 +6,8 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'feedback-dialog',
     templateUrl: './feedback.html',
-    styleUrls: ['./feedback.less']
+    styleUrls: ['./feedback.less'],
+    standalone: false
 })
 export class FeedbackComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

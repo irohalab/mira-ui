@@ -8,7 +8,7 @@ import { Item } from '../../entity/item';
 @Injectable()
 export class FeedService extends BaseService {
 
-  private baseUrl = '/api/feed';
+  private baseUrl = '/api/admin/feed';
 
   constructor(private http: HttpClient) {
     super()
@@ -44,9 +44,8 @@ export class FeedService extends BaseService {
           catchError(this.handleError),);
   }
 
-  getUniversalMeta(): Observable<Array<string>> {
-      return this.http.get<{data: string[], status: number}>(`${this.baseUrl}/universal/meta`).pipe(
-          map(res => res.data),
+  getUniversalMeta(): Observable<string[]> {
+      return this.http.get<string[]>(`${this.baseUrl}/universal/meta`).pipe(
           catchError(this.handleError),);
   }
 

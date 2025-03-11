@@ -1,4 +1,4 @@
 export {Bangumi} from './bangumi';
 export {Episode} from './episode';
-export {BangumiRaw} from './bangumi-raw';
+export {MainItem} from './main-item';
 export {User} from './user';

@@ -1,15 +1,15 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { MediaFile } from '../../../../entity/MediaFile';
 import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { AdminService } from '../../../admin.service';
-import { Item } from '../../../../entity/item';
 import { copyElementValueToClipboard } from '../../../../../helpers/clipboard';
 
 @Component({
     selector: 'download-editor',
     templateUrl: './download-editor.html',
-    styleUrls: ['./download-editor.less']
+    styleUrls: ['./download-editor.less'],
+    standalone: false
 })
 export class DownloadEditorComponent implements OnDestroy {
     private _subscription = new Subscription();
@@ -42,10 +42,10 @@ export class DownloadEditorComponent implements OnDestroy {
             let mapping = this.eps_mapping[i];
             if (mapping.selected) {
                 result.push({
-                    download_url: this.downloadUrl,
-                    eps_no: mapping.eps_no,
-                    file_path: this.files[i].path,
-                    file_name: this.files[i].name
+                    downloadUrl: this.downloadUrl,
+                    epsNo: mapping.eps_no,
+                    filePath: this.files[i].path,
+                    fileName: this.files[i].name
                 });
             }
         }

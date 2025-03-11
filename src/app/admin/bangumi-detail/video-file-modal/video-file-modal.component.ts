@@ -16,7 +16,8 @@ import {
 @Component({
     selector: 'video-file-modal',
     templateUrl: './video-file-modal.html',
-    styleUrls: ['./video-file-list.less']
+    styleUrls: ['./video-file-list.less'],
+    standalone: false
 })
 export class VideoFileModal implements OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -56,15 +57,15 @@ export class VideoFileModal implements OnInit, OnDestroy {
             if (videoFileGroup.dirty) {
                 this._subscription.add(
                     this._adminService.updateVideoFile(videoFile)
-                        .subscribe(
-                            () => {
+                        .subscribe({
+                            next: () => {
                                 this._toastRef.show('保存Video File成功');
                                 videoFileGroup.markAsPristine();
                             },
-                            (error: BaseError) => {
+                            error: (error: BaseError) => {
                                 this._toastRef.show('保存失败, ' + error.message);
                             }
-                        )
+                        })
                 );
             }
             if (this.ruleMap[videoFileId] && this.ruleMap[videoFileId].isDirty) {
@@ -120,20 +121,21 @@ export class VideoFileModal implements OnInit, OnDestroy {
     }
 
     addVideoFile() {
+        console.log(this.episode);
         let videoFileFormGroup = this._fb.group({
             id: `VIDEO_ID_${this.videoTempId}`,
-            bangumi_id: this.episode.bangumi_id,
-            episode_id: this.episode.id,
-            download_url: '',
-            torrent_id: null,
+            bangumiId: this.episode.bangumi.id,
+            episodeId: this.episode.id,
+            downloadUrl: '',
+            torrentId: null,
             status: VideoFile.STATUS_DOWNLOAD_PENDING,
-            file_path: null,
-            file_name: null,
-            resolution_w: null,
-            resolution_h: null,
+            filePath: null,
+            fileName: null,
+            resolutionW: null,
+            resolutionH: null,
             duration: null,
             label: null,
-            blob_storage_url_v0: '',
+            blobStorageUrlV0: '',
         });
         this.videoFileList.unshift(videoFileFormGroup);
     }
@@ -151,22 +153,22 @@ export class VideoFileModal implements OnInit, OnDestroy {
                     for (const videoFile of videoFileList) {
                         this.videoFileList.push(this._fb.group({
                             id: videoFile.id,
-                            bangumi_id: videoFile.bangumi_id,
-                            episode_id: videoFile.episode_id,
-                            download_url: videoFile.download_url,
-                            torrent_id: videoFile.torrent_id,
+                            bangumiId: videoFile.bangumi.id,
+                            episodeId: videoFile.episode.id,
+                            downloadUrl: videoFile.downloadUrl,
+                            torrentId: videoFile.torrentId,
                             status: videoFile.status,
-                            file_path: videoFile.file_path,
-                            file_name: videoFile.file_name,
-                            resolution_w: videoFile.resolution_w,
-                            resolution_h: videoFile.resolution_h,
+                            filePath: videoFile.filePath,
+                            fileName: videoFile.fileName,
+                            resolutionW: videoFile.resolutionW,
+                            resolutionH: videoFile.resolutionH,
                             duration: videoFile.duration,
                             label: videoFile.label,
-                            blob_storage_url_v0: videoFile.blob_storage_url_v0,
+                            blobStorageUrlV0: videoFile.blobStorageUrlV0,
                         }));
                     }
 
-                    return this._videoProcessRuleService.listRulesByBangumi(this.episode.bangumi_id);
+                    return this._videoProcessRuleService.listRulesByBangumi(this.episode.bangumi.id);
                 }))
                 .subscribe({
                     next: (ruleList: VideoProcessRule[]) => {
@@ -214,7 +216,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
         const editRuleDialogRef = this._uiDialog.open(VideoProcessRuleEditorComponent, {
             stickyDialog: false, backdrop: true
         });
-        editRuleDialogRef.componentInstance.bangumiId = this.episode.bangumi_id;
+        editRuleDialogRef.componentInstance.bangumiId = this.episode.bangumi.id;
         editRuleDialogRef.componentInstance.videoId = videoFileId;
         editRuleDialogRef.componentInstance.saveOnClose = false;
         editRuleDialogRef.afterClosed()

@@ -1,19 +1,22 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-// import {Episode} from "../../entity/episode";
-import {HomeService, HomeChild} from "../home.service";
-import {Bangumi} from "../../entity/bangumi";
-import {FAVORITE_LABEL} from '../../entity/constants';
+import { HomeChild, HomeService } from "../home.service";
+import { Bangumi } from "../../entity";
+import { FAVORITE_LABEL } from '../../entity/constants';
 import { Subscription } from 'rxjs';
 import { Announce } from '../../entity/announce';
-import { PersistStorage } from '../../user-service/persist-storage';
+import { PersistStorage } from '../../user-service';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
+import { UserService } from '../../user-service';
+import { filter, switchMap } from 'rxjs/operators';
+import { User } from '../../entity';
 
-const BANGUMI_TYPE_KEY = 'default_bangumi_type';
+const BANGUMI_TYPE_KEY = 'default_bangumi_type_2';
 
 @Component({
     selector: 'default-component',
     templateUrl: './default.html',
-    styleUrls: ['./default.less']
+    styleUrls: ['./default.less'],
+    standalone: false
 })
 export class DefaultComponent extends HomeChild implements OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -22,7 +25,11 @@ export class DefaultComponent extends HomeChild implements OnInit, OnDestroy {
 
     onAirBangumi: Bangumi[];
 
-    bangumiType = 2; // 2 is anime, 6 is japanese tv drama Series
+    bangumiType = 'anime'; // anime , real
+    eBangumiType = {
+        Anime: Bangumi.TYPE_ANIME,
+        Real: Bangumi.TYPE_REAL,
+    }
 
     FAVORITE_LABEL = FAVORITE_LABEL;
 
@@ -32,14 +39,15 @@ export class DefaultComponent extends HomeChild implements OnInit, OnDestroy {
     isDarkTheme: boolean;
 
     constructor(homeService: HomeService,
-                private _persistStorage: PersistStorage,
-                private _darkThemeService: DarkThemeService) {
+                private persistStorage: PersistStorage,
+                private darkThemeService: DarkThemeService,
+                private userService: UserService) {
         super(homeService);
     }
 
-    changeBangumiType(type: number) {
+    changeBangumiType(type: string) {
         this.bangumiType = type;
-        this._persistStorage.setItem(BANGUMI_TYPE_KEY, `${type}`);
+        this.persistStorage.setItem(BANGUMI_TYPE_KEY, `${type}`);
         this.getOnAir();
     }
 
@@ -47,33 +55,30 @@ export class DefaultComponent extends HomeChild implements OnInit, OnDestroy {
         this._subscription.add(
             this.homeService.onAir(this.bangumiType)
                 .subscribe(
-                    (bangumiList: Bangumi[]) => {
-                        this.onAirBangumi = bangumiList;
-                    },
-                    error => console.log(error)
+                    {
+                        next:(bangumiList: Bangumi[]) => {
+                            this.onAirBangumi = bangumiList;
+                        },
+                        error: (error) => console.log(error)
+                    }
                 )
         );
     }
 
     ngOnInit(): void {
         this._subscription.add(
-            this._darkThemeService.themeChange
+            this.darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME })
         );
-        // this.homeService.recentEpisodes()
-        //   .subscribe(
-        //     (episodeList: Episode[]) => {
-        //       this.recentEpisodes = episodeList;
-        //     },
-        //     error => console.log(error)
-        //   );
-        let defaultBangumiType = this._persistStorage.getItem(BANGUMI_TYPE_KEY, null);
-        if (defaultBangumiType !== null) {
-            this.bangumiType = parseInt(defaultBangumiType, 10);
-        }
+        this.bangumiType = this.persistStorage.getItem(BANGUMI_TYPE_KEY, Bangumi.TYPE_ANIME);
         this.getOnAir();
         this._subscription.add(
-            this.homeService.listAnnounce()
+            this.userService.userInfo.pipe(
+                filter(userInfo => !!userInfo && userInfo.id !== User.ID_INITIAL_USER && userInfo.role !== User.GUEST_ROLE),
+                switchMap(() => {
+                    return this.homeService.listAnnounce();
+                })
+            )
                 .subscribe((announce_list) => {
                     this.announce_in_banner = announce_list.find((announce) => {
                         return announce.position === Announce.POSITION_BANNER;

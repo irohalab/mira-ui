@@ -1,6 +1,9 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
-@Pipe({name: 'libykFormat'})
+@Pipe({
+    name: 'libykFormat',
+    standalone: false
+})
 export class LibykPipe implements PipeTransform {
     transform(value: string, key?: string): any {
         if (value) {

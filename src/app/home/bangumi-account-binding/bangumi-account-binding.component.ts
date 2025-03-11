@@ -14,7 +14,8 @@ import { Title } from '@angular/platform-browser';
 @Component({
     selector: 'bangumi-account-binding',
     templateUrl: './bangumi-account-binding.html',
-    styleUrls: ['./bangumi-account-binding.less']
+    styleUrls: ['./bangumi-account-binding.less'],
+    standalone: false
 })
 export class BangumiAccountBindingComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

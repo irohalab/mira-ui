@@ -1,22 +1,24 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
-import { PersistStorage } from '../user-service/persist-storage';
+import { PersistStorage } from '../user-service';
 import { WatchProgress } from '../entity/watch-progress';
 
 export const PREFIX = 'watch_history';
 
 export const TASK_INTERVAL = 3 * 60 * 1000;
 
+export const WATCH_HISTORY_RECORD_VERSION = 2;
 export interface WatchHistoryRecord {
-    bangumi_id: string;
-    episode_id: string;
-    last_watch_position: number;
-    last_watch_time: number;
+    bangumiId: string;
+    episodeId: string;
+    lastWatchPosition: number;
+    lastWatchTime: string;
     percentage: number;
-    is_finished: boolean;
+    isFinished: boolean;
+    version: number;
 }
 
 @Injectable()
@@ -24,47 +26,34 @@ export class WatchService extends BaseService {
 
     private _baseUrl = '/api/watch';
 
-    constructor(private _http: HttpClient, private _persistStorage: PersistStorage) {
+    constructor(private http: HttpClient, private _persistStorage: PersistStorage) {
         super();
         this.synchronizeWatchProgress();
         this.runPeriodTask();
     }
 
-    favorite_bangumi(bangumi_id: string, status: number): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/favorite/bangumi/${bangumi_id}`, {status: status}).pipe(
-            catchError(this.handleError),);
-    }
-
-    delete_favorite(bangumi_id: string): Observable<any> {
-        return this._http.delete<any>(`${this._baseUrl}/favorite/bangumi/${bangumi_id}`).pipe(
-            catchError(this.handleError),);
-    }
-
-    check_favorite(bangumi_id: string): Observable<any> {
-        return this._http.put<any>(`${this._baseUrl}/favorite/check/${bangumi_id}`, null).pipe(
-            catchError(this.handleError),);
-    }
-
-    favorite_favorite(bangumiId: string, episodeId: string, watchStatus: number): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/favorite/episode/${episodeId}`, {
-            bangumi_id: bangumiId,
-            status: watchStatus,
+    updateEpisodeWatchStatus(bangumiId: string, episodeId: string, watchStatus: number): Observable<WatchProgress> {
+        return this.http.post<any>('/api/episode/watch', {
+            bangumi: {id: bangumiId},
+            episode: {id: episodeId},
+            watchStatus,
         }).pipe(
             catchError(this.handleError),);
     }
 
-    episode_history(bangumi_id: string, episode_id: string, last_watch_position: number, percentage: number, is_finished: boolean): Observable<any> {
-        return this._http.post<any>(`${this._baseUrl}/history/${episode_id}`, {
-            bangumi_id: bangumi_id,
-            last_watch_position: last_watch_position,
-            is_finished: is_finished,
+    episode_history(bangumiId: string, episodeId: string, lastWatchPosition: number, percentage: number, isFinished: boolean): Observable<any> {
+        return this.http.post<any>(`${this._baseUrl}/history/${episodeId}`, {
+            bangumiId: bangumiId,
+            lastWatchPosition: lastWatchPosition,
+            lastWatchTime: new Date().toISOString(),
+            isFinished: isFinished,
             percentage: percentage
         }).pipe(
             catchError(this.handleError),)
     }
 
-    list_history(offset: number, limit: number): Observable<{data: WatchProgress[], total: number, status: number}> {
-        return this._http.get<{data: WatchProgress[], total: number, status: number}>(`${this._baseUrl}/history`, {
+    list_history(offset: number, limit: number): Observable<{data: WatchProgress[], total: number}> {
+        return this.http.get<{data: WatchProgress[], total: number}>('/api/episode/watch/history', {
             params: {
                 offset,
                 limit
@@ -72,21 +61,23 @@ export class WatchService extends BaseService {
         }).pipe(catchError(this.handleError));
     }
 
-    updateWatchProgress(bangumi_id: string, episode_id: string, last_watch_position: number, percentage: number, is_finished: boolean): void {
-        this._persistStorage.setItem(`${PREFIX}:${episode_id}`, JSON.stringify({
-            bangumi_id: bangumi_id,
-            episode_id: episode_id,
-            last_watch_position: last_watch_position,
-            last_watch_time: Date.now(),
-            is_finished: is_finished,
-            percentage: percentage
+    updateWatchProgress(bangumiId: string, episodeId: string, lastWatchPosition: number, percentage: number, isFinished: boolean): void {
+        this._persistStorage.setItem(`${PREFIX}:${episodeId}`, JSON.stringify({
+            bangumiId: bangumiId,
+            episodeId: episodeId,
+            lastWatchPosition: lastWatchPosition,
+            lastWatchTime: new Date().toISOString(),
+            isFinished: isFinished,
+            percentage: percentage,
+            version: WATCH_HISTORY_RECORD_VERSION
         }));
     }
 
     getLocalWatchHistory(episode_id: string): WatchHistoryRecord | null {
         let recordStr = this._persistStorage.getItem(`${PREFIX}:${episode_id}`, null);
         if (recordStr) {
-            return JSON.parse(recordStr);
+            const record = JSON.parse(recordStr) as WatchHistoryRecord;
+            return record.version === WATCH_HISTORY_RECORD_VERSION ? record : null;
         }
         return null;
     }
@@ -94,33 +85,37 @@ export class WatchService extends BaseService {
     private synchronizeWatchProgress(): void {
         let iterator = this._persistStorage.iterator();
         let watchHistoryRecords: WatchHistoryRecord[] = [];
-        for (let result = iterator.next(); !result.done; result = iterator.next()) {
-            let entry = result.value;
-            if(this._persistStorage.startsWith(entry.key, PREFIX) && entry.value) {
-                watchHistoryRecords.push(JSON.parse(entry.value));
+        for (const item of iterator) {
+            if(this._persistStorage.startsWith(item.key, PREFIX) && item.value) {
+                const record = JSON.parse(item.value) as WatchHistoryRecord;
+                if (record.version === WATCH_HISTORY_RECORD_VERSION) {
+                    watchHistoryRecords.push(record);
+                }
             }
         }
         if (watchHistoryRecords.length === 0) {
             return;
         }
-        this._http.post<any>(`${this._baseUrl}/history/synchronize`, {
+        this.http.post<any>('/api/episode/watch/sync', {
             records: watchHistoryRecords
         }).pipe(
             catchError(this.handleError),)
-            .subscribe(() => {
-                watchHistoryRecords.forEach(record => {
-                    let key = `${PREFIX}:${record.episode_id}`;
-                    let recordInStorageStr = this._persistStorage.getItem(key, null);
-                    if (recordInStorageStr) {
-                        let recordInStorage = JSON.parse(recordInStorageStr);
-                        if (recordInStorage.last_watch_time === record.last_watch_time) {
-                            // we delete same records because they are not updated.
-                            this._persistStorage.removeItem(key);
+            .subscribe({
+                next: () => {
+                    watchHistoryRecords.forEach(record => {
+                        let key = `${PREFIX}:${record.episodeId}`;
+                        let recordInStorageStr = this._persistStorage.getItem(key, null);
+                        if (recordInStorageStr) {
+                            let recordInStorage = JSON.parse(recordInStorageStr) as WatchHistoryRecord;
+                            if (recordInStorage.lastWatchTime === record.lastWatchTime) {
+                                // we delete same records because they are not updated.
+                                this._persistStorage.removeItem(key);
+                            }
                         }
-                    }
-                });
-            }, (error) => {
-                console.log(error);
+                    });
+                }, error: (error) => {
+                    console.log(error);
+                }
             });
     }
 

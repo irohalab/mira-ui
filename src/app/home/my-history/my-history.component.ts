@@ -10,7 +10,8 @@ import { WatchService } from '../watch.service';
 @Component({
     selector: 'my-history',
     templateUrl: './my-history.html',
-    styleUrls: ['./my-history.less']
+    styleUrls: ['./my-history.less'],
+    standalone: false
 })
 export class MyHistoryComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
