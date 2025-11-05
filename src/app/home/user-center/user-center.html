@@ -26,8 +26,8 @@
                        formControlName="email"
                        autocomplete="off"
                        (blur)="onFormChanged(emailFormErrors, emailValidationMessages, emailForm)">
-                <span class="warning text" *ngIf="user && user.email && !user.email_confirmed">邮箱地址未验证</span>
-                <button *ngIf="user && user.email && !user.email_confirmed"
+                <span class="warning text" *ngIf="user && !user.email_confirmed">邮箱地址未验证</span>
+                <button *ngIf="user && !user.email_confirmed"
                         type="button"
                         class="ui button"
                         [ngClass]="{inverted: isDarkTheme}"
@@ -53,7 +53,7 @@
                     <!--<li *ngFor="let error of emailFormErrors.current_pass">{{error}}</li>-->
                 <!--</ul>-->
             <!--</div>-->
-            <button type="button" class="ui button" [ngClass]="{inverted: isDarkTheme}" [disabled]="emailForm.invalid || emailForm.pristine" (click)="updateEmail()">保存更改</button>
+            <button type="button" class="ui button" [ngClass]="{inverted: isDarkTheme}" [disabled]="emailForm.invalid || !emailForm.dirty" (click)="updateEmail()">保存更改</button>
         </form>
     </div>
     <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
@@ -95,7 +95,7 @@
             <div class="ui error message" *ngIf="passwordForm.errors && passwordForm.errors['mismatchedPasswords']">
                 <p>密码不一致</p>
             </div>
-            <button type="button" class="ui button" [ngClass]="{inverted: isDarkTheme}" [disabled]="passwordForm.invalid || passwordForm.pristine" (click)="updatePass()">保存更改</button>
+            <button type="button" class="ui button" [ngClass]="{inverted: isDarkTheme}" [disabled]="passwordForm.invalid || !passwordForm.dirty" (click)="updatePass()">保存更改</button>
         </form>
     </div>
     <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
