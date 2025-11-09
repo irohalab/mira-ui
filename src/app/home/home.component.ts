@@ -129,22 +129,13 @@ export class Home implements OnInit, OnDestroy {
             .subscribe(
                 (user: User) => {
                     this.user = user;
-                    if (user && (!user.email_confirmed || !user.email)) {
+                    if (user && (!user.email_confirmed)) {
                         console.log('please input your email');
                         let dialogRef = this._dialogService.open(AlertDialog, {stickyDialog: true, backdrop: true});
-                        if (user.email && !user.email_confirmed) {
-                            dialogRef.componentInstance.title = '请验证你的邮箱地址！';
-                            dialogRef.componentInstance.content = '我们已经向您的邮箱地址发送了验证邮件，请前往您的邮箱查看该邮件并完成验证。';
-                            dialogRef.componentInstance.confirmButtonText = '知道了';
-                            this._subscription.add(dialogRef.afterClosed().subscribe(() => {}));
-                        } else {
-                            dialogRef.componentInstance.title = '请填写您的邮箱地址！';
-                            dialogRef.componentInstance.content = '我们检测到您还没有填写邮箱地址，使用邀请码重置密码功能已经关闭。请务必填写邮箱地址以保证正常使用';
-                            dialogRef.componentInstance.confirmButtonText = '前往用户设置';
-                            this._subscription.add(dialogRef.afterClosed().subscribe(() => {
-                                this._router.navigate(['/settings/user']);
-                            }));
-                        }
+                        dialogRef.componentInstance.title = '请验证你的邮箱地址！';
+                        dialogRef.componentInstance.content = '我们已经向您的邮箱地址发送了验证邮件，请前往您的邮箱查看该邮件并完成验证。';
+                        dialogRef.componentInstance.confirmButtonText = '知道了';
+                        this._subscription.add(dialogRef.afterClosed().subscribe(() => {}));
                     }
                 }
             ));
