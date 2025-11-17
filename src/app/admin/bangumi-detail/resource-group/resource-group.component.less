@@ -1,0 +1,38 @@
+.resource-group-container {
+  margin: 1rem;
+}
+
+.scanner-item {
+  display: grid;
+  grid-template-columns: max-content max-content auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem;
+  &:hover {
+    background: #eff2f5;
+    cursor: pointer;
+  }
+  .feed {
+    width: 6em;
+    text-align: right;
+  }
+  .offset {
+    width: 8em;
+  }
+  .criteria {
+
+  }
+  .regex {
+    grid-column: 3;
+    grid-row: 2;
+  }
+}
+
+.anchor-button {
+  cursor: pointer;
+  color: #9f9f9f;
+  &:hover,
+  &:focus {
+    color: #5f94c5;
+  }
+}

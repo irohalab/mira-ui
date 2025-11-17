@@ -16,10 +16,11 @@ import { VideoFile } from '../../../entity/video-file';
     standalone: false
 })
 export class VideoProcessRuleComponent implements OnInit, OnDestroy {
-    private _subscription = new Subscription();
-    private _toastRef: UIToastRef<UIToastComponent>;
+    private subscription = new Subscription();
+    private toastRef: UIToastRef<UIToastComponent>;
+
     @Input()
-    bangumiId: string;
+    bangumi: Bangumi;
 
     videoProcessRuleList: VideoProcessRule[];
 
@@ -29,14 +30,14 @@ export class VideoProcessRuleComponent implements OnInit, OnDestroy {
                 private _videoProcessRuleService: VideoProcessRuleService,
                 private _adminService: AdminService,
                 toastService: UIToast) {
-        this._toastRef = toastService.makeText();
+        this.toastRef = toastService.makeText();
     }
 
     onAddRule(): void {
         const editRuleDialogRef = this._uiDialog.open(VideoProcessRuleEditorComponent, {
             stickyDialog: true, backdrop: true
         });
-        editRuleDialogRef.componentInstance.bangumiId = this.bangumiId;
+        editRuleDialogRef.componentInstance.bangumiId = this.bangumi.id;
         editRuleDialogRef.componentInstance.saveOnClose = true;
         editRuleDialogRef.afterClosed()
             .pipe(filter(result => !!result))
@@ -46,27 +47,32 @@ export class VideoProcessRuleComponent implements OnInit, OnDestroy {
     }
 
     refreshList(): void {
-        this._subscription.add(
+        this.subscription.add(
             this._videoProcessRuleService
-                .listRulesByBangumi(this.bangumiId)
-                .subscribe((list) => {
-                    this.videoProcessRuleList = list.filter(rule => !rule.videoFileId);
+                .listRulesByBangumi(this.bangumi.id)
+                .subscribe({
+                    next: (list) => {
+                        this.videoProcessRuleList = list.filter(rule => !rule.videoFileId);
+                    },
+                    error: (err) => {
+                        this.toastRef.show(err.message);
+                    }
                 })
         );
     }
 
     reprocessAll(): void {
         this.isWorkingOnReprocess = true;
-        this._subscription.add(
+        this.subscription.add(
             this._videoProcessRuleService
-                .listRulesByBangumi(this.bangumiId)
+                .listRulesByBangumi(this.bangumi.id)
                 .pipe(
                     switchMap((rules) => {
                         if (rules.length === 0) {
                             // no rules found, cancel
                             throw new Error('No Rules for current bangumi');
                         }
-                        return this._adminService.getBangumi(this.bangumiId)
+                        return this._adminService.getBangumi(this.bangumi.id)
                     }),
                     mergeMap((bangumi: Bangumi) => {
                         return from(bangumi.episodes.map(eps => eps.id));
@@ -87,18 +93,18 @@ export class VideoProcessRuleComponent implements OnInit, OnDestroy {
                 .subscribe({
                     next: () => {
                         this.isWorkingOnReprocess = false;
-                        this._toastRef.show('Create convert jobs successfully');
+                        this.toastRef.show('Create convert jobs successfully');
                     },
                     error: (error: any) => {
                         this.isWorkingOnReprocess = false;
-                        this._toastRef.show('Something went wrong when trying to create convert jobs: ' + error?.message);
+                        this.toastRef.show('Something went wrong when trying to create convert jobs: ' + error?.message);
                     }
                 })
         );
     }
 
     ngOnDestroy(): void {
-        this._subscription.unsubscribe();
+        this.subscription.unsubscribe();
     }
 
     ngOnInit(): void {

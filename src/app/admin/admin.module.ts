@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Admin } from './admin.component';
-import { UniversalBuilderComponent } from './bangumi-detail/universal-builder/universal-builder.component';
+import { ResourceScannerEditor } from './bangumi-detail/resource-scanner-editor/resource-scanner-editor.component';
 import { SearchBangumi } from './search-bangumi';
 import { ListBangumi } from './list-bangumi/list-bangumi.component';
 import { BangumiDetail } from './bangumi-detail';
@@ -61,8 +61,10 @@ import { VertexGraphComponent } from './video-process-job-detail/vertex-graph/ve
 import { StreamLogViewerComponent } from './video-process-job-detail/stream-log-viewer/stream-log-viewer.component';
 import { VertexInfoPanelComponent } from './video-process-job-detail/vertex-info-panel/vertex-info-panel.component';
 import { DownloadJobDetailComponent } from './download-manager/download-job-detail/download-job-detail.component';
-import { DownloadEditorComponent } from './bangumi-detail/universal-builder/download-editor/download-editor.component';
-
+import { DownloadEditorComponent } from './bangumi-detail/resource-scanner-editor/download-editor/download-editor.component';
+import { BangumiOverviewComponent } from './bangumi-detail/bangumi-overview/bangumi-overview.component';
+import { ResourceGroupComponent } from './bangumi-detail/resource-group/resource-group.component';
+import { EpisodeListComponent } from './bangumi-detail/episode-list/episode-list.component';
 
 @NgModule({
     declarations: [
@@ -88,7 +90,6 @@ import { DownloadEditorComponent } from './bangumi-detail/universal-builder/down
         AnnounceComponent,
         EditAnnounceComponent,
         EditBangumiRecommendComponent,
-        UniversalBuilderComponent,
         VideoProcessRuleComponent,
         VideoProcessRuleEditorComponent,
         VideoProcessRuleItemComponent,
@@ -105,7 +106,11 @@ import { DownloadEditorComponent } from './bangumi-detail/universal-builder/down
         StreamLogViewerComponent,
         VertexInfoPanelComponent,
         DownloadJobDetailComponent,
-        DownloadEditorComponent
+        DownloadEditorComponent,
+        BangumiOverviewComponent,
+        ResourceGroupComponent,
+        ResourceScannerEditor,
+        EpisodeListComponent
     ],
     imports: [
         CommonModule,
@@ -132,6 +137,10 @@ import { DownloadEditorComponent } from './bangumi-detail/universal-builder/down
         provideHttpClient(withInterceptorsFromDi()),
         {provide: SRC_GENERATOR_SERVICE, useClass: ResponsiveGenerateSrcService}
     ],
+    exports: [
+        BangumiStatusNamePipe,
+        BangumiTypeNamePipe
+    ]
 })
 export class AdminModule {
 }

@@ -1,21 +1,32 @@
-<div class="universal-builder-container">
-    <div class="search-bar">
-        <div class="ui large label">
-            <i class="rss icon"></i>
-            Universal
+<div class="resource-scanner-editor-container">
+    <form class="scanner-form" [formGroup]="scannerForm">
+        <div class="name">
+            <div class="ui large label">
+                <i class="rss icon"></i>
+                Scanner# {{scannerIndex}}
+            </div>
+        </div>
+        <div class="ui labeled input offset-field">
+            <div class="ui label">Offset</div>
+            <input type="number" formControlName="offset">
         </div>
         <div class="input-box-wrapper ui left action input">
             <div class="ui basic dropdown button" uiDropdown="click">
-                <div class="text">{{mode}}</div>
+                <div class="text">{{scannerForm.controls['feed'].value}}</div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <div class="item" *ngFor="let mode of availableMode" (click)="selectMode(mode)">{{mode}}</div>
+                    <div class="item" *ngFor="let feed of feedList" (click)="selectMode(feed)">{{feed}}</div>
                 </div>
             </div>
-            <input type="text" [formControl]="keywordControl" name="query" placeholder="请输入搜索关键词" (keyup.enter)="testFeed()">
+            <input type="text" formControlName="criteria" name="criteria" placeholder="请输入搜索关键词" (keyup.enter)="testFeed()">
         </div>
         <button class="ui primary button test-button" type="button" (click)="testFeed()">Test</button>
-    </div>
+        <ui-toggle class="regex-toggle" formControlName="enableRegex">Enable Regex</ui-toggle>
+        <div class="ui labeled input match-regex-input" [ngClass]="{disabled: !scannerForm.controls['enableRegex'].value}">
+            <div class="ui label">匹配集数正则</div>
+            <input type="text" formControlName="matchRegex" placeholder="匹配集数正则">
+        </div>
+    </form>
     <div class="search-result-wrapper">
         <table class="search-result ui striped table" *ngIf="itemList && itemList.length > 0">
             <thead>
@@ -53,9 +64,9 @@
     </div>
     <div class="footer">
         <button class="ui button negative"
-                *ngIf="isEdit"
+                *ngIf="isEditing"
                 confirmDialog
-                [dialogTitle]="'确定要删除' + mode + '来源吗？'"
+                [dialogTitle]="'确定要删除' + scanner.feed + '来源吗？'"
                 dialogContent="该操作立即生效，你可以在编辑番組界面重新添加该来源"
                 (onConfirm)="delete()">删除</button>
         <button class="ui button" (click)="cancel()">取消</button>

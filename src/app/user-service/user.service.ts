@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
-import { filter, tap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
 import { User } from '../entity';
 import { OAuthService } from 'angular-oauth2-oidc';
@@ -9,15 +9,15 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Account } from '../entity/Account';
 
+const baseUrl = environment.resourceProvider + '/account';
+
+const legacyBaseUrl = environment.legacyApiBaseURL;
 
 @Injectable()
 export class UserService extends BaseService {
 
-    private baseUrl = environment + '/api/account';
-
     private _userInfoSubject = new BehaviorSubject(new User(
         User.ID_INITIAL_USER,
-        null,
         null,
         null,
         false));
@@ -71,7 +71,7 @@ export class UserService extends BaseService {
     }
 
     activateAccount(invitation: string): Observable<Account> {
-        return this.httpClient.post<Account>('/api/account', {invitation})
+        return this.httpClient.post<Account>(baseUrl, {invitation})
             .pipe(tap((account) => {
                 this.updateUser(this._userInfoSubject.getValue(), account);
             }))
@@ -86,7 +86,7 @@ export class UserService extends BaseService {
                 return;
             }
             const userProfile = (await this.oAuthService.loadUserProfile() as any).info;
-            const account = await lastValueFrom(this.httpClient.get<Account>('/api/account/info'));
+            const account = await lastValueFrom(this.httpClient.get<Account>(`${baseUrl}/info`));
             console.log('userProfile: ', userProfile, account);
             this.updateUser(userProfile, account);
         } catch (ex) {
@@ -94,12 +94,41 @@ export class UserService extends BaseService {
         }
     }
 
+    loginAlbireoAccount(name: string, password: string): Observable<boolean> {
+        return this.httpClient.post<{msg: string}>(`${legacyBaseUrl}/user/login`, {
+            name,
+            password,
+        }, {
+            withCredentials: true
+        }).pipe(map(resp => resp.msg === 'OK'));
+    }
+
+    linkAlbireoAccount(): Observable<Account> {
+        return this.httpClient.post<{migration_token: string}>(`${legacyBaseUrl}/user/migration-token`, null, {
+            withCredentials: true
+        }).pipe(
+            map((result) => result.migration_token),
+            switchMap((token) => {
+                return this.httpClient.post<Account>(`${baseUrl}/migrate`, { migration_token: token })
+            }),
+            tap((account) => {
+                this.updateUser(this._userInfoSubject.getValue(), account);
+            })
+        );
+    }
+
+    getAlbireoUserInfo(): Observable<User> {
+        return this.httpClient.get<{data: User}>(`${legacyBaseUrl}/user/info`, {
+            withCredentials: true
+        }).pipe(map((result) => result.data), catchError(this.handleError));
+    }
+
     private updateUser(userProfile: User, account: Account): void {
         this._userInfoSubject.next(new User(
             userProfile.sub,
             userProfile.name,
             account.role ? account.role : User.GUEST_ROLE,
-            userProfile.email,
+            // userProfile.email,
             userProfile.email_verified,));
     }
 }

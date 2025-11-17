@@ -1,5 +1,5 @@
 
-import {throwError as observableThrowError, Observable} from 'rxjs';
+import { throwError as observableThrowError, Observable, throwError } from 'rxjs';
 import {AuthError} from './error';
 import {ServerError} from './error/ServerError';
 import {ClientError} from './error/ClientError';
@@ -25,7 +25,7 @@ export abstract class BaseService {
         } else {
             error = new ServerError('Network Error', 0);
         }
-        return observableThrowError(error);
+        return throwError(() => error);
     }
 
 }

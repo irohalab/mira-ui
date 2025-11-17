@@ -1,0 +1,57 @@
+<div class="bangumi-basic-info section-card">
+    <div class="cover-wrapper" *ngIf="bangumi.coverImage">
+        <ui-responsive-image
+            [src]="bangumi.coverImage.url"
+            [size]="{
+                    width: '100%',
+                    height: 'auto',
+                    originalWidth: bangumi.coverImage.width,
+                    originalHeight: bangumi.coverImage.height}"
+            [background]="bangumi.coverImage.dominantColor"></ui-responsive-image>
+    </div>
+    <div class="bangumi-info-text">
+        <h3 class="bangumi-title">
+            {{bangumi.nameCn || '暂无'}}
+            <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgmId" target="_blank" title="在bgm.tv页面查看">
+                <i class="bgm-emo-47 bgm-link-icon"></i>
+            </a>
+        </h3>
+        <h4 class="entry">
+            <span class="entry-key">日文名</span>
+            <span class="entry-value">{{bangumi.name || '暂无'}}</span>
+        </h4>
+        <p class="entry">
+            <span class="entry-key">简介</span>
+            <span class="entry-value">{{bangumi.summary || '暂无'}}</span>
+        </p>
+        <p class="entry">
+            <span class="entry-key">放送开始</span>
+            <span class="entry-value">{{bangumi.airDate || '未知'}}</span>
+        </p>
+        <p class="entry">
+            <span class="entry-key">放送星期</span>
+            <span class="entry-value">{{bangumi.airWeekday || '未知'}}</span>
+        </p>
+        <p class="entry">
+            <span class="entry-key">类型</span>
+            <span class="entry-value">{{bangumi.type | bangumiTypeName}}</span>
+        </p>
+        <p class="entry">
+            <span class="entry-key">创建时间</span>
+            <span class="entry-value">{{bangumi.createTime | date: 'medium'}}</span>
+        </p>
+        <p class="entry">
+            <span class="entry-key">更新时间</span>
+            <span class="entry-value">{{bangumi.updateTime | date: 'medium'}}</span>
+        </p>
+        <p class="entry">
+            <span class="entry-key">创建者</span>
+            <span class="entry-value">{{bangumi.created_by?.nickName || 'System'}}</span>
+        </p>
+        <p class="entry">
+            <span class="entry-key">维护者</span>
+            <span class="entry-value">{{bangumi.maintained_by?.nickName || 'System'}}</span>
+        </p>
+    </div>
+    <a class="edit-button anchor-button" (click)="editBasicInfo()"><i class="edit icon"></i></a>
+</div>

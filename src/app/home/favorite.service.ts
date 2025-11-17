@@ -6,11 +6,14 @@ import { Favorite } from '../entity/Favorite';
 import { tap } from 'rxjs/operators';
 import { Bangumi } from '../entity';
 import { VideoPlayerService } from '../video-player/video-player.service';
+import { environment } from '../../environments/environment';
 
 export type FavoriteChangeEvent = {
     op: 'change' | 'remove';
     favorite: Partial<Favorite> | Favorite;
 };
+
+const baseUrl = `${environment.resourceProvider}/favorite`;
 
 @Injectable()
 export class FavoriteService {
@@ -26,7 +29,7 @@ export class FavoriteService {
     favoriteChanged: EventEmitter<FavoriteChangeEvent> = new EventEmitter<FavoriteChangeEvent>();
 
     checkFavorite(bangumi_id: string) {
-        this.http.post<any>(`/api/favorite/check/${bangumi_id}`, null)
+        this.http.post<any>(`${baseUrl}/check/${bangumi_id}`, null)
             .subscribe((data) => {
                 this.favoriteChecked.emit({bangumi_id: bangumi_id, check_time: data.data});
                 console.log(`bangumi ${bangumi_id} checked`);
@@ -39,13 +42,13 @@ export class FavoriteService {
         countUnwatched: boolean,
         enableEpsUpdateTime: boolean,
         coverImage: boolean}): Observable<{data: Favorite[], total: number}> {
-        return this.http.get<{data: Favorite[], total: number}>('/api/favorite', {
+        return this.http.get<{data: Favorite[], total: number}>(baseUrl, {
             params
         });
     }
 
     changeFavorite(status: string, bangumi: Bangumi): Observable<Favorite> {
-        return this.http.post<any>('/api/favorite', null, {
+        return this.http.post<any>(baseUrl, null, {
             params: {
                 bangumi_id: bangumi.id,
                 status
@@ -61,7 +64,7 @@ export class FavoriteService {
     }
 
     deleteFavorite(favoriteId: string): Observable<any> {
-        return this.http.delete<any>(`/api/favorite/${favoriteId}`)
+        return this.http.delete<any>(`${baseUrl}/${favoriteId}`)
             .pipe(tap(() => {
                 this.favoriteChanged.emit({
                     op: 'remove',

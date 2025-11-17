@@ -5,7 +5,8 @@ import {Subscription} from 'rxjs';
 
 @Directive({
     selector: '[confirmDialog]',
-    standalone: false
+    providers: [ConfirmDialogModal],
+    standalone: true
 })
 export class ConfirmDialogDirective implements OnDestroy {
 

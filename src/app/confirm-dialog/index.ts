@@ -4,8 +4,8 @@ import {UIDialogModule} from '@irohalab/deneb-ui';
 import {ConfirmDialogModal} from './confirm-dialog-modal.component';
 
 @NgModule({
-    declarations: [ConfirmDialogDirective, ConfirmDialogModal],
-    imports: [UIDialogModule],
+    declarations: [],
+    imports: [UIDialogModule, ConfirmDialogDirective, ConfirmDialogModal],
     exports: [ConfirmDialogDirective]
 })
 export class ConfirmDialogModule {

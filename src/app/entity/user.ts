@@ -3,15 +3,15 @@ export class User {
     name: string;
     level: number;
     role: string;
-    email: string;
+    // email: string;
     email_verified: boolean;
     sub: string;
 
-    constructor(id: string, name: string, role: string, email: string, email_verified: boolean) {
+    constructor(id: string, name: string, role: string, email_verified: boolean) {
         this.id = id;
         this.name = name;
         this.role = role;
-        this.email = email;
+        // this.email = email;
         this.email_verified = email_verified;
     }
 

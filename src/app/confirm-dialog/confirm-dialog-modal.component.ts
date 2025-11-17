@@ -12,7 +12,7 @@ import {UIDialogRef} from '@irohalab/deneb-ui';
             height: 100%;
         }
     `],
-    standalone: false
+    standalone: true
 })
 export class ConfirmDialogModal {
 

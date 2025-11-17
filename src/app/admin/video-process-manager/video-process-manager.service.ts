@@ -8,6 +8,7 @@ import { Injectable } from '@angular/core';
 import { io } from 'socket.io-client';
 import { Vertex } from '../../entity/Vertex';
 import { LogType } from './LogType';
+import { environment } from '../../../environments/environment';
 
 type ReqData = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -16,16 +17,17 @@ type ReqData = {
     params?: {[key: string]: string};
 }
 
+const baseUrl = `${environment.resourceProvider}/admin/video-process/proxy`;
+
 @Injectable()
 export class VideoProcessManagerService extends BaseService {
-    private _baseUrl = '/api/admin/video-process/proxy';
     private _sessionId: string;
     constructor(private _httpClient: HttpClient) {
         super();
     }
 
     private sendRequest<T>(reqData: ReqData): Observable<T> {
-        return this._httpClient.post<T>(`${this._baseUrl}`, reqData)
+        return this._httpClient.post<T>(`${baseUrl}`, reqData)
             .pipe(
                 catchError(this.handleError)
             );

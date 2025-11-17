@@ -1,4 +1,4 @@
-import { filter } from 'rxjs/operators';
+import { filter, switchMap } from 'rxjs/operators';
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../entity';
 import { UserService } from '../../user-service';
@@ -7,6 +7,7 @@ import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
 import { FormControl, Validators } from '@angular/forms';
+import { AuthError } from '../../../helpers/error';
 
 @Component({
     selector: 'user-center',
@@ -18,14 +19,19 @@ export class UserCenter implements OnInit, OnDestroy {
 
     private subscription = new Subscription();
 
-    user: User;
+    user!: User;
 
+    albireoUser!: User;
+
+    isSubmitting = false;
     isLoading = false;
 
     @HostBinding('class.dark-theme')
-    isDarkTheme: boolean;
+    isDarkTheme!: boolean;
 
     invitationCode = new FormControl('', Validators.required);
+
+    errorMessage!: string;
 
     constructor(private userService: UserService,
                 private darkThemeService: DarkThemeService,
@@ -48,6 +54,7 @@ export class UserCenter implements OnInit, OnDestroy {
                     }
                 )
         );
+        this.loadAlbireoUserInfo();
     }
 
     ngOnDestroy(): void {
@@ -56,11 +63,67 @@ export class UserCenter implements OnInit, OnDestroy {
 
     submitInvitationCode() {
         if (this.invitationCode.valid) {
-            this.isLoading = true;
+            this.isSubmitting = true;
             this.subscription.add(
                 this.userService.activateAccount(this.invitationCode.value.trim())
-                    .subscribe(() => { this.isLoading = false; })
+                    .subscribe({
+                        next: () => {
+                            this.isSubmitting = false;
+                        },
+                        error: (err) => {
+                            this.isSubmitting = false;
+                            this.errorMessage = err.error?.message || 'Unknown Error';
+                        }
+                    })
             );
         }
+    }
+
+    linkAlbireoUser() {
+        this.isSubmitting = true;
+        this.subscription.add(
+            this.userService.linkAlbireoAccount()
+                .subscribe({
+                    next: () => {
+                        this.isSubmitting = false;
+                    },
+                    error: (err) => {
+                        this.isSubmitting = false;
+                        const message = err.error?.message || 'Unknown Error';
+                        if (typeof message === 'string') {
+                            this.errorMessage = message;
+                        } else {
+                            this.errorMessage = message.details || message.error || 'Unknown Error';
+                        }
+                    }
+                })
+        );
+    }
+
+    onLoginSuccess() {
+        this.loadAlbireoUserInfo();
+    }
+
+    private loadAlbireoUserInfo() {
+        this.isLoading = true;
+        this.subscription.add(
+            this.userService.getAlbireoUserInfo()
+                .subscribe({
+                    next:(user) => {
+                        this.isLoading = false;
+                        this.albireoUser = user;
+                    },
+                    error: err => {
+                        this.isLoading = false;
+                        if (err instanceof AuthError) {
+                            if (err.status === 401) {
+                                // not login
+                            } else {
+                                // other case
+                            }
+                        }
+                    }
+                })
+        );
     }
 }

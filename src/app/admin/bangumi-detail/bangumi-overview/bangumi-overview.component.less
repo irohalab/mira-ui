@@ -1,0 +1,72 @@
+@import '../common.less';
+
+.bangumi-basic-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: stretch;
+  padding: 0;
+  .cover-wrapper {
+    width: 20%;
+    padding: 1rem 0.5rem 1rem 1rem;
+    overflow: hidden;
+  }
+
+  .bangumi-info-text {
+    width: 80%;
+    padding: 1rem 2.5rem 1rem 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    .bangumi-title {
+      overflow: hidden;
+      margin: 0 3rem 1rem 1.5rem;
+      white-space: normal;
+      word-break: break-all;
+      .external-link {
+        display: inline-block;
+        margin-left: 1.5rem;
+        font-size: 0.8em;
+        color: #818181;
+      }
+    }
+    h4.entry {
+      margin: 0 0 0.6rem 0;
+      .entry-value {
+        padding-left: 7.4em;
+      }
+    }
+    .entry {
+      position: relative;
+      margin: 0 0 0.6em 0;
+      .entry-key {
+        width: 7em;
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        text-align: right;
+        padding-right: 1em;
+        font-size: 1rem;
+        color: #828574;
+        font-weight: normal;
+      }
+      .entry-value {
+        display: block;
+        padding-left: 8em;
+        width: 100%;
+        white-space: normal;
+        word-break: break-all;
+      }
+    }
+  }
+
+  .edit-button {
+    position: absolute;
+    top: 1.2rem;
+    right: 1rem;
+    font-size: 1.5rem;
+  }
+}
+

@@ -16,16 +16,48 @@
         </div>
     </div>
     <div class="ui segment basic-info" [ngClass]="{inverted: isDarkTheme}" *ngIf="user?.role === 'Guest'">
-        <div class="ui active inverted dimmer" *ngIf="isLoading">
+        <div class="ui active inverted dimmer" *ngIf="isSubmitting">
             <div class="ui large text loader">提交中...</div>
         </div>
         <h4>实验性功能</h4>
-        <form class="ui form" [ngClass]="{inverted: isDarkTheme}">
-            <div class="inline field">
-                <label>邀请码</label>
-                <input name="invitationCode" type="text" [formControl]="invitationCode" />
+        <div class="ui message">
+            使用下方功能可获得账户等级的变化。激活码与旧账户关联只能二选一且不可逆，请谨慎选择。
+        </div>
+        <div *ngIf="errorMessage" class="ui error message">
+            {{errorMessage}}
+        </div>
+        <div class="ui basic placeholder segment">
+            <div class="ui two column very relaxed stackable grid">
+                <div class="column">
+                    <form class="ui form" [ngClass]="{inverted: isDarkTheme}">
+                        <div class="field">
+                            <label>邀请码</label>
+                            <input name="invitationCode" type="text" [formControl]="invitationCode" />
+                        </div>
+                        <button class="ui button" (click)="submitInvitationCode()">提交</button>
+                    </form>
+                </div>
+                <div class="middle aligned column" *ngIf="albireoUser && !isLoading">
+                    <div class="ui info message">
+                        <div class="header">
+                            旧账户关联
+                        </div>
+                        <p>点击下方按钮关联旧账户，将沿用您的旧用户名（<strong>{{albireoUser.name}}</strong>），email,level（<strong>{{albireoUser.level}}</strong>）</p>
+                    </div>
+                    <button class="ui primary button" (click)="linkAlbireoUser()">关联账户</button>
+                </div>
+                <div class="middle aligned column" *ngIf="!albireoUser && !isLoading">
+                    <app-login (loginSuccess)="onLoginSuccess()"></app-login>
+                </div>
+                <div class="middle aligned column" *ngIf="isLoading">
+                    <div class="ui active inverted dimmer">
+                        <div class="ui medium text loader">检查旧系统登录状态...</div>
+                    </div>
+                </div>
             </div>
-            <button class="ui button" (click)="submitInvitationCode()">提交</button>
-        </form>
+            <div class="ui vertical divider">
+                Or
+            </div>
+        </div>
     </div>
 </div>

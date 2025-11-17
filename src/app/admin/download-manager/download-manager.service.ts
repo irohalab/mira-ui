@@ -9,6 +9,7 @@ import { FileMapping } from '../../entity/FileMapping';
 import { Bangumi } from '../../entity';
 import { AdminService } from '../admin.service';
 import { TorrentFile } from '../../entity/TorrentFile';
+import { environment } from '../../../environments/environment';
 
 type ReqData = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -17,9 +18,11 @@ type ReqData = {
     params?: { [key: string]: string };
 }
 
+const baseUrl = `${environment.resourceProvider}/admin/download`;
+
 @Injectable()
 export class DownloadManagerService extends BaseService {
-    private _baseUrl = '/api/admin/download';
+    private _baseUrl = `${environment.resourceProvider}/admin/download`;
     private bangumiDict: { [bgmId: string]: Bangumi };
 
     constructor(private _httpClient: HttpClient, private _adminService: AdminService) {
@@ -28,7 +31,7 @@ export class DownloadManagerService extends BaseService {
     }
 
     private sendRequest<T>(reqData: ReqData): Observable<T> {
-        return this._httpClient.post<T>(`${this._baseUrl}/proxy`, reqData)
+        return this._httpClient.post<T>(`${baseUrl}/proxy`, reqData)
             .pipe(
                 catchError(this.handleError)
             );
@@ -97,7 +100,7 @@ export class DownloadManagerService extends BaseService {
     }
 
     public enhance_file_mapping(fileMapping: FileMapping[]): Observable<FileMapping[]> {
-        return this._httpClient.post<{ data: FileMapping[], total: number }>(`${this._baseUrl}/file-mapping`, fileMapping)
+        return this._httpClient.post<{ data: FileMapping[], total: number }>(`${baseUrl}/file-mapping`, fileMapping)
             .pipe(map(res => res.data),
                 catchError(this.handleError));
     }
@@ -136,7 +139,7 @@ export class DownloadManagerService extends BaseService {
             return !this.bangumiDict.hasOwnProperty(id);
         });
         if (nonCachedIds.length > 0) {
-            return this._httpClient.post<{ data: Bangumi[], total: number }>(`${this._baseUrl}/bangumi`, {
+            return this._httpClient.post<{ data: Bangumi[], total: number }>(`${baseUrl}/bangumi`, {
                 ids: nonCachedIds
             }).pipe(
                 map((res) => {

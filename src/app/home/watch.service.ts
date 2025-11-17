@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
 import { PersistStorage } from '../user-service';
 import { WatchProgress } from '../entity/watch-progress';
+import { environment } from '../../environments/environment';
 
 export const PREFIX = 'watch_history';
 
@@ -21,10 +22,10 @@ export interface WatchHistoryRecord {
     version: number;
 }
 
+const baseUrl = `${environment.resourceProvider}/episode`;
+
 @Injectable()
 export class WatchService extends BaseService {
-
-    private _baseUrl = '/api/watch';
 
     constructor(private http: HttpClient, private _persistStorage: PersistStorage) {
         super();
@@ -33,7 +34,7 @@ export class WatchService extends BaseService {
     }
 
     updateEpisodeWatchStatus(bangumiId: string, episodeId: string, watchStatus: number): Observable<WatchProgress> {
-        return this.http.post<any>('/api/episode/watch', {
+        return this.http.post<any>(`${baseUrl}/watch`, {
             bangumi: {id: bangumiId},
             episode: {id: episodeId},
             watchStatus,
@@ -41,19 +42,8 @@ export class WatchService extends BaseService {
             catchError(this.handleError),);
     }
 
-    episode_history(bangumiId: string, episodeId: string, lastWatchPosition: number, percentage: number, isFinished: boolean): Observable<any> {
-        return this.http.post<any>(`${this._baseUrl}/history/${episodeId}`, {
-            bangumiId: bangumiId,
-            lastWatchPosition: lastWatchPosition,
-            lastWatchTime: new Date().toISOString(),
-            isFinished: isFinished,
-            percentage: percentage
-        }).pipe(
-            catchError(this.handleError),)
-    }
-
     list_history(offset: number, limit: number): Observable<{data: WatchProgress[], total: number}> {
-        return this.http.get<{data: WatchProgress[], total: number}>('/api/episode/watch/history', {
+        return this.http.get<{data: WatchProgress[], total: number}>(`${baseUrl}/watch/history`, {
             params: {
                 offset,
                 limit
@@ -96,7 +86,7 @@ export class WatchService extends BaseService {
         if (watchHistoryRecords.length === 0) {
             return;
         }
-        this.http.post<any>('/api/episode/watch/sync', {
+        this.http.post<any>(`${baseUrl}/watch/sync`, {
             records: watchHistoryRecords
         }).pipe(
             catchError(this.handleError),)

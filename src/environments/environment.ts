@@ -15,9 +15,10 @@ export const environment = {
     authClientId: '79e0ed3b-5ecf-4589-94a2-c320704120fd',
     authShowDebugInformation: true,
     authRequireHttps: false,
-    resourceProvider: '/api',
+    resourceProvider: '/api/v2',
     resourceProviderClientId: '9e2b0512-c267-4b63-a1c1-0da5bfd33ed9',
-    bgmProviderBaseURL: 'http://box.moe:8080'
+    bgmProviderBaseURL: 'http://box.moe:8080',
+    legacyApiBaseURL: '/api'
 };
 
 /*

@@ -49,6 +49,7 @@ import { DarkThemeToggleComponent } from './dark-theme-toggle/dark-theme-toggle.
 import { MyHistoryComponent } from './my-history/my-history.component';
 import { HistoryCardComponent } from './my-history/history-card/history-card.component';
 import { FavoriteService } from './favorite.service';
+import { LoginComponent } from './user-center/login/login.component';
 
 
 @NgModule({
@@ -95,7 +96,7 @@ import { FavoriteService } from './favorite.service';
         AlertDialogModule,
         VideoPlayerModule,
         ConfirmDialogModule,
-        BrowserExtensionModule
+        BrowserExtensionModule, LoginComponent
     ],
     exports: [
         BangumiCard

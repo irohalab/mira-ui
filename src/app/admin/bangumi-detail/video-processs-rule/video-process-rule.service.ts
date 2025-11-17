@@ -5,6 +5,7 @@ import { VideoProcessRule } from '../../../entity/VideoProcessRule';
 import { catchError, map } from 'rxjs/operators';
 import { BaseService } from '../../../../helpers/base.service';
 import { VideoFile } from '../../../entity/video-file';
+import { environment } from '../../../../environments/environment';
 
 type ReqData = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -13,15 +14,17 @@ type ReqData = {
     params?: {[key: string]: string};
 }
 
+const convertUrl = `${environment.resourceProvider}/admin/video-process/proxy`;
+
 @Injectable()
 export class VideoProcessRuleService extends BaseService {
-    private _convertUrl = '/api/admin/video-process/proxy';
+
     constructor(private _httpClient: HttpClient) {
         super();
     }
 
     private sendRequest<T>(reqData: ReqData): Observable<T> {
-        return this._httpClient.post<T>(`${this._convertUrl}`, reqData)
+        return this._httpClient.post<T>(`${convertUrl}`, reqData)
             .pipe(
                 catchError(this.handleError)
             );

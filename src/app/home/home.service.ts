@@ -10,11 +10,12 @@ import { Announce } from '../entity/announce';
 import { WatchProgress } from "../entity/watch-progress";
 import { WatchService } from './watch.service';
 import { Favorite } from '../entity/Favorite';
+import { environment } from '../../environments/environment';
+
+const baseUrl = environment.resourceProvider;
 
 @Injectable()
 export class HomeService extends BaseService {
-
-    private _baseUrl = '/api/bangumi';
 
     constructor(private httpClient: HttpClient,
                 private router: Router,
@@ -57,40 +58,18 @@ export class HomeService extends BaseService {
     childRouteChanges: EventEmitter<any> = new EventEmitter();
 
     /**
-     * @Deprecated
-     */
-    activateChild(routeName: string) {
-        this.childRouteChanges.emit(routeName);
-    }
-
-    /**
-     * recently updated, not used
-     * @param {number} days
-     * @returns {Observable<Episode[]>}
-     */
-    recentEpisodes(days?: number): Observable<Episode[]> {
-        let queryUrl = this._baseUrl + '/recent';
-        if (days) {
-            queryUrl = queryUrl + '?days=' + days;
-        }
-        return this.httpClient.get<{ data: Episode[] }>(queryUrl).pipe(
-            map(res => res.data),
-            catchError(this.handleError),);
-    }
-
-    /**
      * All on air Bangumi
      * @param {number} type
      * @returns {Observable<Bangumi[]>}
      */
     onAir(type: string): Observable<Bangumi[]> {
-        return this.httpClient.get<{ data: Bangumi[] }>(`/api/bangumi/on-air?type=${type}`).pipe(
+        return this.httpClient.get<{ data: Bangumi[] }>(`${baseUrl}/bangumi/on-air?type=${type}`).pipe(
             map(res => res.data),
             catchError(this.handleError),);
     }
 
     episode_detail(episode_id: string): Observable<Episode> {
-        return this.httpClient.get<Episode>(`/api/episode/${episode_id}`, {
+        return this.httpClient.get<Episode>(`${baseUrl}/episode/${episode_id}`, {
             params: {loadBangumiEpisodes: true, loadFavorite: true}
         }).pipe(
             map(episode => this.synchronizeWatchProgressWithLocal(episode)),
@@ -98,7 +77,7 @@ export class HomeService extends BaseService {
     }
 
     bangumi_detail(bangumi_id: string): Observable<Bangumi> {
-        return this.httpClient.get<Bangumi>(`/api/bangumi/${bangumi_id}`).pipe(
+        return this.httpClient.get<Bangumi>(`${baseUrl}/bangumi/${bangumi_id}`).pipe(
             map(bangumi => {
                 if (bangumi.episodes && bangumi.episodes.length > 0) {
                     bangumi.episodes = bangumi.episodes.map(episode => this.synchronizeWatchProgressWithLocal(episode));
@@ -116,7 +95,7 @@ export class HomeService extends BaseService {
         if (type) {
             params.type = type;
         }
-        return this.httpClient.get<{data: string[]}>('/api/bangumi/timeline', {
+        return this.httpClient.get<{data: string[]}>(`${baseUrl}/bangumi/timeline`, {
             params
         }).pipe(map(res => res.data.map(date => new Date(date).valueOf())));
     }
@@ -130,25 +109,25 @@ export class HomeService extends BaseService {
         type?: string,
         subType?: string,
         eps?: number}): Observable<{ data: Bangumi[], total: number }> {
-        return this.httpClient.get<{ data: Bangumi[], total: number }>('/api/bangumi', {
+        return this.httpClient.get<{ data: Bangumi[], total: number }>(`${baseUrl}/bangumi`, {
             params
         }).pipe(
             catchError(this.handleError),);
     }
 
     myBangumi(status: string): Observable<{data: Favorite[], total: number}> {
-        return this.httpClient.get<{data: Favorite[], total: number}>('/api/favorite', {
+        return this.httpClient.get<{data: Favorite[], total: number}>(`${baseUrl}/favorite`, {
             params: { status, limit: -1 }
         });
     }
 
     listAnnounce(): Observable<Announce[]> {
-        return this.httpClient.get<Announce[]>('/api/announce').pipe(
+        return this.httpClient.get<Announce[]>(`${baseUrl}/announce`).pipe(
             catchError(this.handleError),);
     }
 
     sendFeedback(episode_id: string, video_file_id: string, message: string): Observable<any> {
-        return this.httpClient.post<any>(`${this._baseUrl}/feedback`, {
+        return this.httpClient.post<any>(`${baseUrl}/feedback`, {
             episode_id: episode_id,
             video_file_id: video_file_id,
             message: message

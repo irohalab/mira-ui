@@ -4,10 +4,13 @@ import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { BaseService } from '../../../helpers/base.service';
 import { Account } from '../../entity/Account';
+import { environment } from '../../../environments/environment';
+
+const baseUrl = `${environment.resourceProvider}/admin/account`;
 
 @Injectable()
 export class UserManagerSerivce extends BaseService {
-    private _baseUrl = '/api/admin/account';
+    private _baseUrl = `${environment.resourceProvider}/admin/account`;
 
     constructor(private _http: HttpClient) {
         super()
@@ -25,25 +28,25 @@ export class UserManagerSerivce extends BaseService {
         if (queryField && queryValue) {
             params['$filter'] = `${queryField} eq ${queryValue}`;
         }
-        return this._http.get<{data: Account[], total: number}>(this._baseUrl, {
+        return this._http.get<{data: Account[], total: number}>(baseUrl, {
             params
         }).pipe(
             catchError(this.handleError),);
     }
 
     promoteUser(accountId: string, role: string): Observable<any> {
-        return this._http.put<any>(`${this._baseUrl}/${accountId}`, { role }).pipe(
+        return this._http.put<any>(`${baseUrl}/${accountId}`, { role }).pipe(
             catchError(this.handleError),);
     }
 
     listUnusedInviteCode(): Observable<string[]> {
-        return this._http.get<{data: string[]}>(`${this._baseUrl}/invitation`).pipe(
+        return this._http.get<{data: string[]}>(`${baseUrl}/invitation`).pipe(
             map(res => res.data),
             catchError(this.handleError),);
     }
 
     createInviteCode(num: number = 1): Observable<string> {
-        return this._http.post<{data: string}>(`${this._baseUrl}/invitation`, null).pipe(
+        return this._http.post<{data: string}>(`${baseUrl}/invitation`, null).pipe(
             map(res => res.data),
             catchError(this.handleError),);
     }

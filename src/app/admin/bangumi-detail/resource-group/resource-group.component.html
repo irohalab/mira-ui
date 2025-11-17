@@ -1,0 +1,46 @@
+<div class="resource-group-container">
+    <div class="ui segment" *ngFor="let resourceGroup of resourceGroupList">
+        <form class="ui form" [formGroup]="rgFormDict[resourceGroup.id]" (submit)="updateResourceGroup(resourceGroup)">
+            <div class="fields">
+                <div class="inline field">
+                    <label>Name</label>
+                    <input type="text" placeholder="Type Resource Group name" formControlName="displayName" />
+                </div>
+                <div class="inline field">
+                    <label>报警超时值</label>
+                    <input type="number" formControlName="alertThresholdDay" step="1" />
+                </div>
+                <button type="submit" class="ui primary button" [disabled]="rgFormDict[resourceGroup.id].invalid || !rgFormDict[resourceGroup.id].dirty">Apply</button>
+                <button type="button" class="ui button" [disabled]="!rgFormDict[resourceGroup.id].dirty" (click)="resetForm(resourceGroup)">Reset</button>
+            </div>
+            <div class="ui divider"></div>
+            <h4 class="ui header">Scanner</h4>
+            <div class="scanner-list">
+                <a class="scanner-item" *ngFor="let scanner of resourceGroup.scanner" (click)="editScanner(scanner, resourceGroup)">
+                    <div class="feed"><span class="ui horizontal large label">{{scanner.feed}}</span></div>
+                    <div class="offset"><span class="ui teal horizontal large label">Offset: <span class="detail">{{scanner.offset || 0}}</span></span></div>
+                    <div class="criteria">
+                        <div class="ui horizontal large label">
+                            keyword
+                            <div class="detail">{{scanner.criteria}}</div>
+                        </div>
+                    </div>
+                    <div class="regex" *ngIf="scanner.matchRegex">
+                        <div class="ui horizontal basic teal label">
+                            Regex
+                            <div class="detail">{{scanner.matchRegex}}</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="add-scanner-button">
+                <a class="anchor-button add-universal-button"
+                   (click)="addScanner(resourceGroup)"><i class="plus icon"></i>添加来源</a>
+            </div>
+        </form>
+        <div class="episode-list">
+
+        </div>
+        <div class="ui bottom right attached label">#ID: {{resourceGroup.id}}</div>
+    </div>
+</div>

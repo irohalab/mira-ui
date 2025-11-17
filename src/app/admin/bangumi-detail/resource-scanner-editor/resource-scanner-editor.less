@@ -1,4 +1,4 @@
-.universal-builder-container {
+.resource-scanner-editor-container {
   text-align: left;
   @media(max-width: 767px) {
     width: 100%;
@@ -30,38 +30,53 @@
   border-radius: 4px;
   background-color: #fff;
   overflow: hidden;
-  padding-top: 4rem;
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
   .ui.dropdown .menu {
     z-index: 300;
   }
+
 }
-.search-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4rem;
-  border-bottom: 1px solid #cccccc;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+.scanner-form {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.5rem;
   align-items: center;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  .name {
+    grid-column: 1;
+    grid-row: 1;
+    width: 10rem;
+  }
+  .offset-field {
+    grid-column: 2;
+    grid-row: 1;
+    width: 12rem;
+    > input {
+      width: 6rem;
+    }
+  }
   .input-box-wrapper {
-    flex: 1 1 auto;
-    margin: 0 1rem;
+    grid-column: 3;
+    grid-row: 1;
   }
   .test-button {
-    margin: 0 1rem 0 0;
+    grid-column: 4;
+    grid-row: 1;
+  }
+  .regex-toggle {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .match-regex-input {
+    grid-column: 3;
+    grid-row: 2;
   }
 }
 .search-result-wrapper {
   position: relative;
-  height: 100%;
   width: 100%;
-  padding-bottom: 5rem;
   overflow-y: scroll;
   overflow-x: auto;
   .anchor-button {
@@ -69,7 +84,7 @@
   }
 }
 .no-result-wrapper,
-.searching-wrapper{
+.searching-wrapper {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -94,11 +109,8 @@
   color: #9f9f9f;
 }
 .footer {
-  position: absolute;
   width: 100%;
   height: 5rem;
-  left: 0;
-  bottom: 0;
   padding-right: 1rem;
   display: flex;
   flex-direction: row;

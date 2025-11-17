@@ -12,8 +12,8 @@ import { copyElementValueToClipboard } from '../../../../../helpers/clipboard';
     standalone: false
 })
 export class DownloadEditorComponent implements OnDestroy {
-    private _subscription = new Subscription();
-    private _toastRef: UIToastRef<UIToastComponent>;
+    private subscription = new Subscription();
+    private toastRef: UIToastRef<UIToastComponent>;
 
     torrentTitle: string;
     downloadUrl: string;
@@ -26,15 +26,15 @@ export class DownloadEditorComponent implements OnDestroy {
 
     @ViewChild('downloadUrlTextBox', {static: true}) _downloadUrlTextBoxRef: ElementRef;
 
-    constructor(private _adminService: AdminService,
-                private _dialogRef: UIDialogRef<DownloadEditorComponent>,
+    constructor(private adminService: AdminService,
+                private dialogRef: UIDialogRef<DownloadEditorComponent>,
                 toast: UIToast) {
-        this._toastRef = toast.makeText();
+        this.toastRef = toast.makeText();
     }
     copyDownloadUrlToClipboard(): void {
         const downloadUrlInput = this._downloadUrlTextBoxRef.nativeElement;
         copyElementValueToClipboard(downloadUrlInput)
-        this._toastRef.show('已经复制到剪贴板');
+        this.toastRef.show('已经复制到剪贴板');
     }
     download(): void {
         const result = [];
@@ -49,26 +49,26 @@ export class DownloadEditorComponent implements OnDestroy {
                 });
             }
         }
-        this._subscription.add(
-            this._adminService.downloadDirectly(
+        this.subscription.add(
+            this.adminService.downloadDirectly(
                 this.bangumi_id,
                 result)
                 .subscribe({
                     next: () => {
-                        this._dialogRef.close(true);
+                        this.dialogRef.close(true);
                     },
                     error: (error) => {
-                        this._toastRef.show(error?.message);
+                        this.toastRef.show(error?.message);
                     }
                 })
         );
     }
 
     cancel(): void {
-        this._dialogRef.close(false);
+        this.dialogRef.close(false);
     }
 
     ngOnDestroy(): void {
-        this._subscription.unsubscribe();
+        this.subscription.unsubscribe();
     }
 }
