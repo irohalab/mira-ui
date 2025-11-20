@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
-import { Subscription } from 'rxjs';
+import { forkJoin, of, Subscription } from 'rxjs';
 import { VideoFile } from '../../../entity/video-file';
 import { Episode } from '../../../entity';
 import { AdminService } from '../../admin.service';
@@ -8,10 +8,11 @@ import { BaseError } from '../../../../helpers/error';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { VideoProcessRule } from '../../../entity/VideoProcessRule';
 import { VideoProcessRuleService } from '../video-processs-rule/video-process-rule.service';
-import { filter, switchMap } from 'rxjs/operators';
+import { catchError, filter, switchMap } from 'rxjs/operators';
 import {
     VideoProcessRuleEditorComponent
 } from '../video-processs-rule/video-process-rule-editor/video-process-rule-editor.component';
+import { ResourceGroup } from '../../../entity/ResourceGroup';
 
 @Component({
     selector: 'video-file-modal',
@@ -26,6 +27,11 @@ export class VideoFileModal implements OnInit, OnDestroy {
 
     @Input()
     episode: Episode;
+
+    @Input()
+    resourceGroup: ResourceGroup;
+
+    resourceGroupDict: {[rgId: string]: ResourceGroup} = {};
 
     videoFileList: FormGroup[];
     ruleMap: { [videoId: string]: { isDirty: boolean, rule: VideoProcessRule } };
@@ -136,6 +142,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
             duration: null,
             label: null,
             blobStorageUrlV0: '',
+            resourceGroupId: null,
         });
         this.videoFileList.unshift(videoFileFormGroup);
     }
@@ -146,8 +153,17 @@ export class VideoFileModal implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this._subscription.add(
-            this._adminService.getEpisodeVideoFiles(this.episode.id)
-                .pipe(switchMap(videoFileList => {
+            forkJoin([
+                this._adminService.getEpisodeVideoFiles(this.episode.id, this.resourceGroup?.id),
+                this.resourceGroup ? of([this.resourceGroup]) : this._adminService.listResourceGroups(this.episode.bangumi.id, false).pipe(catchError((err) => {
+                    this._toastRef.show(err.message);
+                    return [];
+                }))
+            ])
+                .pipe(switchMap(([videoFileList, resourceGroupList]) => {
+                    for (const rg of resourceGroupList) {
+                        this.resourceGroupDict[rg.id] = rg;
+                    }
                     this.ruleMap = {};
                     this.videoFileList = [];
                     for (const videoFile of videoFileList) {
@@ -165,10 +181,14 @@ export class VideoFileModal implements OnInit, OnDestroy {
                             duration: videoFile.duration,
                             label: videoFile.label,
                             blobStorageUrlV0: videoFile.blobStorageUrlV0,
+                            resourceGroupId: videoFile.resourceGroup.id
                         }));
                     }
 
-                    return this._videoProcessRuleService.listRulesByBangumi(this.episode.bangumi.id);
+                    return this._videoProcessRuleService.listRulesByBangumi(this.episode.bangumi.id).pipe(catchError((error) => {
+                        this._toastRef.show(error.message);
+                        return [];
+                    }));
                 }))
                 .subscribe({
                     next: (ruleList: VideoProcessRule[]) => {

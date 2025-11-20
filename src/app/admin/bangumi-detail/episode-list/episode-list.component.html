@@ -38,7 +38,7 @@
                                 height: '3.375rem',
                                 originalWidth: episode.thumbnailImage.width,
                                 originalHeight: episode.thumbnailImage.height}"
-                        display="table" *ngIf="episode.status === 2 && !!episode.thumbnailImage"
+                        display="block" *ngIf="episode.status === 2 && !!episode.thumbnailImage"
                         [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
                 </td>
                 <td class="title">

@@ -22,7 +22,6 @@ const baseUrl = `${environment.resourceProvider}/admin/download`;
 
 @Injectable()
 export class DownloadManagerService extends BaseService {
-    private _baseUrl = `${environment.resourceProvider}/admin/download`;
     private bangumiDict: { [bgmId: string]: Bangumi };
 
     constructor(private _httpClient: HttpClient, private _adminService: AdminService) {
@@ -37,11 +36,11 @@ export class DownloadManagerService extends BaseService {
             );
     }
 
-    public list_jobs(status: DownloadJobStatus | 'all'): Observable<DownloadJob[]> {
+    public list_jobs(status: DownloadJobStatus | 'all', bangumiId?: string): Observable<DownloadJob[]> {
         const reqData: ReqData = {
             method: 'GET',
             url: '/download/job',
-            params: {status}
+            params: {status, bangumiId},
         };
         return this.sendRequest<{ data: DownloadJob[], total: number }>(reqData)
             .pipe(

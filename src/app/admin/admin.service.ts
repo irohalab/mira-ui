@@ -80,8 +80,12 @@ export class AdminService extends BaseService {
             catchError(this.handleError),)
     }
 
-    listResourceGroups(bangumiId: string): Observable<ResourceGroup[]> {
-        return this.http.get<ResourceGroup[]>(`${baseUrl}/bangumi/${bangumiId}/resource-group`).pipe(catchError(this.handleError));
+    listResourceGroups(bangumiId: string, populateVideoFiles: boolean): Observable<ResourceGroup[]> {
+        return this.http.get<ResourceGroup[]>(`${baseUrl}/bangumi/${bangumiId}/resource-group`, {
+            params: {
+                videoFiles: populateVideoFiles ? 'true' : undefined,
+            }
+        }).pipe(catchError(this.handleError));
     }
 
     addResourceGroup(resourceGroup: ResourceGroup): Observable<ResourceGroup> {
@@ -128,11 +132,13 @@ export class AdminService extends BaseService {
             catchError(this.handleError),)
     }
 
-    getEpisodeVideoFiles(episodeId: string): Observable<VideoFile[]> {
+    getEpisodeVideoFiles(episodeId: string, resourceGroupId?: string): Observable<VideoFile[]> {
+        const params: {[p: string]: string} = {episodeId};
+        if (resourceGroupId) {
+            params['resourceGroupId'] = resourceGroupId;
+        }
         return this.http.get<{data: VideoFile[]}>(`${baseUrl}/video-file`, {
-            params: {
-                episodeId
-            }
+            params
         }).pipe(
             map(res => res.data),
             catchError(this.handleError),);

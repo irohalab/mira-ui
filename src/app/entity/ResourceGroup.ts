@@ -12,4 +12,5 @@ export class ResourceGroup {
     bangumi!: Bangumi;
     scanner: ResourceScanner[] = [];
     videoFiles: VideoFile[] = [];
+    color!: string;
 }

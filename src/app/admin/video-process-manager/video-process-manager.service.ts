@@ -33,11 +33,11 @@ export class VideoProcessManagerService extends BaseService {
             );
     }
 
-    listJobs(status: VideoProcessJobStatus | 'all'): Observable<VideoProcessJob[]> {
+    listJobs(status: VideoProcessJobStatus | 'all', bangumiId?: string): Observable<VideoProcessJob[]> {
         const reqData: ReqData = {
             method: 'GET',
             url: '/job',
-            params: { status }
+            params: { status, bangumiId }
         };
         return this.sendRequest<{data: VideoProcessJob[]}>(reqData)
             .pipe(

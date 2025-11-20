@@ -1,0 +1,20 @@
+export const APP_COLORS = {
+    primary: '#2185d0',
+    secondary: '#1b1c1d',
+    red: '#db2828',
+    orange: '#f2711c',
+    yellow: '#fbbd08',
+    olive: '#b5cc18',
+    green: '#21ba45',
+    teal: '#00b5ad',
+    blue: '#2185d0',
+    violet: '#6435c9',
+    purple: '#a333c8',
+    pink: '#e03997',
+    brown: '#a5673f',
+    grey: '#767676',
+    black: '#1b1c1d',
+    white: '#ffffff',
+    defaultButtonBg: '#e0e1e2',
+    defaultButtonColor: 'rgba(0, 0, 0, 0.6)'
+};

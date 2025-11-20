@@ -1,5 +1,20 @@
+@import '../../../_color.less';
+
 .resource-group-container {
-  margin: 1rem;
+  margin: 1rem 1rem 10rem 1rem;
+}
+
+.float-action-buttons {
+  position: fixed;
+  bottom: 3rem;
+  right: 4rem;
+  z-index: 1000;
+
+  > button {
+    font-size: 1.4rem;
+    margin-left: 1rem;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.45);
+  }
 }
 
 .scanner-item {
@@ -8,29 +23,103 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.4rem;
+
   &:hover {
     background: #eff2f5;
     cursor: pointer;
   }
+
   .feed {
     width: 6em;
     text-align: right;
   }
+
   .offset {
     width: 8em;
   }
+
   .criteria {
 
   }
+
   .regex {
     grid-column: 3;
     grid-row: 2;
   }
 }
 
+.add-scanner-button {
+  margin: 1rem;
+}
+
+.episode-list {
+  margin: 2rem 0 4rem 0;
+
+  .notice {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    list-style: none;
+    margin: 1em 0 2em 0;
+    padding: 0;
+
+    > li {
+      margin-right: 1em;
+    }
+  }
+
+  .episode-video-file-status-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.8rem;
+    .episode-vf {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      flex: 0 1 auto;
+      line-height: 1.2;
+      cursor: pointer;
+      .episode-no {
+        font-weight: 500;
+        color: @default-button-color;
+        background-color: @default-button-bg-color;
+        padding: 0.4em 0.8em;
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+        &:last-child {
+          border-top-right-radius: 0.25rem;
+          border-bottom-right-radius: 0.25rem;
+        }
+      }
+      .video-file {
+        padding: 0.4em 0.5em;
+        color: @white-color;
+        &.pending {
+          background-color: @grey-color;
+        }
+        &.downloading {
+          background-color: @blue-color;
+        }
+        &.video-processing {
+          background-color: @teal-color;
+        }
+        &.downloaded {
+          background-color: @green-color;
+        }
+        &:last-child {
+          border-top-right-radius: 0.25rem;
+          border-bottom-right-radius: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
 .anchor-button {
   cursor: pointer;
   color: #9f9f9f;
+
   &:hover,
   &:focus {
     color: #5f94c5;

@@ -16,6 +16,9 @@ const EP_STATUS_TEXT = {
     [Episode.STATUS_DOWNLOADED]: '已下载'
 }
 
+/**
+ * List episodes, this component has a side effect that updates the bangumi of parent component.
+ */
 @Component({
     selector: 'app-episode-list',
     templateUrl: './episode-list.component.html',
@@ -25,11 +28,20 @@ const EP_STATUS_TEXT = {
 export class EpisodeListComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
     private toastRef: UIToastRef<UIToastComponent>;
+    private episodeList: Episode[];
 
     @Input()
     bangumi: Bangumi;
 
-    episodes: Episode[];
+    get episodes(): Episode[] {
+        return this.episodeList;
+    }
+
+    set episodes(v) {
+        this.episodeList = v;
+        this.bangumi.episodes = this.episodeList;
+    }
+
     isLoading: boolean = false;
 
     constructor(private adminService: AdminService,
@@ -41,6 +53,7 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
+
     ngOnInit(): void {
         this.subscription.add(
             this.adminService.listEpisode(this.bangumi.id)
@@ -54,7 +67,6 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
                 })
         );
     }
-
 
     editEpisode(episode?: Episode): void {
         let dialogRef = this.dialog.open(EpisodeDetail, {stickyDialog: true, backdrop: true});

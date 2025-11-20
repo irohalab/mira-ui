@@ -6,97 +6,106 @@
     <div class="control-bar">
         <a class="add-button" (click)="addVideoFile()"><i class="plus icon"></i>添加VideoFile</a>
     </div>
-    <div class="ui segment" *ngFor="let videoFileFormGroup of videoFileList">
-        <form class="ui form" [formGroup]="videoFileFormGroup">
-            <h4 class="ui horizontal divider header">
-                <i class="tag icon"></i>
-                Basic Info for Video file
-            </h4>
-            <div class="field">
-                <label>id</label>
-                <input type="text" formControlName="id" readonly>
-            </div>
-            <div class="two fields">
+
+    @for (videoFileFormGroup of videoFileList; track videoFileFormGroup) {
+        <div class="ui segment">
+            <form class="ui form" [formGroup]="videoFileFormGroup">
+
+                @let rg = resourceGroupDict[videoFileFormGroup.value['resourceGroupId']];
+                <h4 class="ui horizontal divider header">
+                    <i class="tag icon"></i>
+                    Basic Info for Video file
+                </h4>
                 <div class="field">
-                    <label>fileName</label>
-                    <input type="text" formControlName="fileName">
+                    <label>id</label>
+                    <input type="text" formControlName="id" readonly>
                 </div>
-                <div class="field">
-                    <label>label</label>
-                    <input type="text" formControlName="label">
+                <div class="two fields">
+                    <div class="field">
+                        <label>fileName</label>
+                        <input type="text" formControlName="fileName">
+                    </div>
+                    <div class="field">
+                        <label>label</label>
+                        <input type="text" formControlName="label">
+                    </div>
                 </div>
-            </div>
-            <div class="three fields">
-                <div class="field">
-                    <label>resolutionW</label>
-                    <input type="text" formControlName="resolutionW" [readonly]="!enableBlobStorageOptions">
-                </div>
-                <div class="field">
-                    <label>resolutionH</label>
-                    <input type="text" formControlName="resolutionH" [readonly]="!enableBlobStorageOptions">
-                </div>
-                <div class="field">
-                    <label>duration</label>
-                    <input type="text" formControlName="duration" [readonly]="!enableBlobStorageOptions">
-                </div>
-            </div>
-            <div class="field">
-                <label>downloadUrl</label>
-                <input type="text" placeholder="magnet或torrent文件的url" formControlName="downloadUrl">
-            </div>
-            <div class="field" *ngIf="enableBlobStorageOptions">
-                <label>blobStorageUrlV0</label>
-                <input type="text" placeholder="S3 存储 URL" formControlName="blobStorageUrlV0">
-            </div>
-            <div class="inline fields">
-                <label>状态</label>
-                <div class="field">
-                    <div class="ui radio checkbox">
-                        <input type="radio" name="status" formControlName="status" [value]="1">
-                        <label>PENDING</label>
+                <div class="three fields">
+                    <div class="field">
+                        <label>resolutionW</label>
+                        <input type="text" formControlName="resolutionW" [readonly]="!enableBlobStorageOptions">
+                    </div>
+                    <div class="field">
+                        <label>resolutionH</label>
+                        <input type="text" formControlName="resolutionH" [readonly]="!enableBlobStorageOptions">
+                    </div>
+                    <div class="field">
+                        <label>duration</label>
+                        <input type="text" formControlName="duration" [readonly]="!enableBlobStorageOptions">
                     </div>
                 </div>
                 <div class="field">
-                    <div class="ui radio checkbox">
-                        <input type="radio" name="status" formControlName="status" [value]="2">
-                        <label>DOWNLOADING</label>
+                    <label>downloadUrl</label>
+                    <input type="text" placeholder="magnet或torrent文件的url" formControlName="downloadUrl">
+                </div>
+                <div class="field" *ngIf="enableBlobStorageOptions">
+                    <label>blobStorageUrlV0</label>
+                    <input type="text" placeholder="S3 存储 URL" formControlName="blobStorageUrlV0">
+                </div>
+                <div class="inline fields">
+                    <label>状态</label>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="status" formControlName="status" [value]="1">
+                            <label>PENDING</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="status" formControlName="status" [value]="2">
+                            <label>DOWNLOADING</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="status" formControlName="status" [value]="3">
+                            <label>DOWNLOADED</label>
+                        </div>
                     </div>
                 </div>
+                <h4 class="ui horizontal divider header">
+                    <i class="bar chart icon"></i>
+                    Video Process Rule
+                </h4>
+                <section class="video-rule">
+                    <div class="section-title"></div>
+                    <div class="rule-list">
+                        <video-process-rule-item *ngIf="videoFileFormGroup.value.id && ruleMap[videoFileFormGroup.value.id] && ruleMap[videoFileFormGroup.value.id].rule"
+                                                 [rule]="ruleMap[videoFileFormGroup.value.id].rule" (delete)="deleteRule(videoFileFormGroup.value.id)">
+                        </video-process-rule-item>
+                    </div>
+                    <div class="add-rule-button" *ngIf="videoFileFormGroup.value.id && !ruleMap[videoFileFormGroup.value.id]">
+                        <a class="anchor-button" (click)="onAddRule(videoFileFormGroup)"><i class="plus icon"></i>Add Rule</a>
+                    </div>
+                </section>
                 <div class="field">
-                    <div class="ui radio checkbox">
-                        <input type="radio" name="status" formControlName="status" [value]="3">
-                        <label>DOWNLOADED</label>
-                    </div>
+                    <button class="ui red button" confirmDialog dialogTitle="确定删除吗，该操作无法撤销" (onConfirm)="deleteVideoFile(videoFileFormGroup)">删除</button>
+                    <button class="ui primary button" (click)="saveVideoFile(videoFileFormGroup)"
+                            [disabled]="!videoFileFormGroup.dirty && (!ruleMap[videoFileFormGroup.value.id] || !ruleMap[videoFileFormGroup.value.id].isDirty)">保存</button>
+                    <a class="anchor-button right-align" *ngIf="videoFileFormGroup.value.id && videoFileFormGroup.value.status === eVideoFileStatus.DOWNLOADED && ruleCount > 0 && !handlingConvert"
+                       title="Re-process All Episodes"
+                       confirmDialog
+                       dialogTitle="Re-process this VideoFile"
+                       dialogContent="Do you want to reprocess this videoFile?"
+                       (onConfirm)="convertVideoFile(videoFileFormGroup)"><i class="redo icon"></i>Re-process VideoFile</a>
                 </div>
-            </div>
-            <h4 class="ui horizontal divider header">
-                <i class="bar chart icon"></i>
-                Video Process Rule
-            </h4>
-            <section class="video-rule">
-                <div class="section-title"></div>
-                <div class="rule-list">
-                    <video-process-rule-item *ngIf="videoFileFormGroup.value.id && ruleMap[videoFileFormGroup.value.id] && ruleMap[videoFileFormGroup.value.id].rule"
-                                             [rule]="ruleMap[videoFileFormGroup.value.id].rule" (delete)="deleteRule(videoFileFormGroup.value.id)">
-                    </video-process-rule-item>
-                </div>
-                <div class="add-rule-button" *ngIf="videoFileFormGroup.value.id && !ruleMap[videoFileFormGroup.value.id]">
-                    <a class="anchor-button" (click)="onAddRule(videoFileFormGroup)"><i class="plus icon"></i>Add Rule</a>
-                </div>
-            </section>
-            <div class="field">
-                <button class="ui red button" confirmDialog dialogTitle="确定删除吗，该操作无法撤销" (onConfirm)="deleteVideoFile(videoFileFormGroup)">删除</button>
-                <button class="ui primary button" (click)="saveVideoFile(videoFileFormGroup)"
-                        [disabled]="videoFileFormGroup.pristine && (!ruleMap[videoFileFormGroup.value.id] || !ruleMap[videoFileFormGroup.value.id].isDirty)">保存</button>
-                <a class="anchor-button right-align" *ngIf="videoFileFormGroup.value.id && videoFileFormGroup.value.status === eVideoFileStatus.DOWNLOADED && ruleCount > 0 && !handlingConvert"
-                   title="Re-process All Episodes"
-                   confirmDialog
-                   dialogTitle="Re-process this VideoFile"
-                   dialogContent="Do you want to reprocess this videoFile?"
-                   (onConfirm)="convertVideoFile(videoFileFormGroup)"><i class="redo icon"></i>Re-process VideoFile</a>
-            </div>
-        </form>
-    </div>
+            </form>
+            <div class="ui bottom right attached label"
+                 [style.background-color]="rg?.color"
+                 [style.border-color]="rg?.color"
+                 [style.color]="rg?.color | contrastColor">RG: {{rg?.displayName || 'Undetermined RG' }}</div>
+        </div>
+    }
     <div class="footer">
         <ui-toggle text="(测试) 开启 S3 存储选项" [(ngModel)]="enableBlobStorageOptions"></ui-toggle>
         <p><i class="help circle icon"></i>替换已完成或下载中的VideoFile的方法，先删除要替换的VideoFile在新建VideoFile</p>

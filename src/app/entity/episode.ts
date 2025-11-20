@@ -30,6 +30,8 @@ export class Episode {
     // @Optional
     delete_eta: number;
 
+    sort: number;
+
     // optional
     watchProgress: WatchProgress;
 

@@ -1,5 +1,6 @@
 import { Bangumi } from './bangumi';
 import { Episode } from './episode';
+import { ResourceGroup } from './ResourceGroup';
 
 export class VideoFile {
     id: string;
@@ -23,6 +24,10 @@ export class VideoFile {
     kfFrameHeight?: number;
     kfImagePathList?: string;
     blobStorageUrlV0?: string;
+
+    resourceGroup: ResourceGroup;
+    // only for add video file request
+    resourceGroupId: string;
 
     static STATUS_DOWNLOAD_PENDING = 1;
     static STATUS_DOWNLOADING = 2;

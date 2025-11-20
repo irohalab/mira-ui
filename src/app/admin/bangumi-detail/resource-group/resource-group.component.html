@@ -38,9 +38,35 @@
                    (click)="addScanner(resourceGroup)"><i class="plus icon"></i>添加来源</a>
             </div>
         </form>
+        <div class="ui divider"></div>
         <div class="episode-list">
-
+            <h4 class="ui header">Video File Status</h4>
+            <ul class="notice">
+                <li><span class="ui grey horizontal tiny label">&nbsp;</span> = Pending</li>
+                <li><span class="ui blue horizontal tiny label">&nbsp;</span> = Downloading</li>
+                <li><span class="ui teal horizontal tiny label">&nbsp;</span> = Video Processing</li>
+                <li><span class="ui green horizontal tiny label">&nbsp;</span> = Downloaded</li>
+            </ul>
+            <div class="episode-video-file-status-list">
+                <div class="episode-vf" *ngFor="let evfs of episodeVideoFileStatus[resourceGroup.id]" (click)="viewEpisode(resourceGroup, evfs.episode)">
+                    <div class="episode-no">{{evfs.episode.sort}}</div>
+                    <div class="video-file" *ngFor="let vf of evfs.videoFiles" [ngClass]="{
+                    pending: vf.status === eVideoFileStatus.Pending,
+                    downloading: vf.status === eVideoFileStatus.Downloading && !vf.videoProcessJob,
+                    'video-processing': vf.status === eVideoFileStatus.Downloading && vf.videoProcessJob,
+                    downloaded: vf.status === eVideoFileStatus.Downloaded}">
+                        <i class="file video outline icon"></i>
+                        <span class="download-progress" *ngIf="vf.status === eVideoFileStatus.Downloading && vf.downloadJob && !vf.videoProcessJob">{{vf.downloadJob.status}} {{vf.downloadJob.progress + '%'}}</span>
+                        <span class="video-process-progress" *ngIf="vf.status === eVideoFileStatus.Downloading && vf.videoProcessJob">{{vf.videoProcessJob.status}}</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="ui bottom right attached label">#ID: {{resourceGroup.id}}</div>
+    </div>
+    <div class="float-action-buttons">
+        <button class="ui circular icon primary button" (click)="addResourceGroup()" title="Add Resource Group" type="button">
+            <i class="plus icon"></i>
+        </button>
     </div>
 </div>
