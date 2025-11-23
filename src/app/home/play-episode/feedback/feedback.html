@@ -1,5 +1,14 @@
 <form class="ui form" [formGroup]="feedbackForm" novalidate [ngClass]="{inverted: isDarkTheme}">
     <h4 class="header">反馈问题</h4>
+    <div class="ui message">
+        <div class="header">Collectd Device Basic Info</div>
+        <ul class="list">
+            <li>Browser: {{deviceInfo.browser.name + ' ' + deviceInfo.browser.version}}</li>
+            <li>Device Type: {{deviceInfo.deviceType}}</li>
+            <li>OS: {{deviceInfo.os}}</li>
+            <li>User Agent: {{deviceInfo.userAgent}}</li>
+        </ul>
+    </div>
     <div class="field">
         <div class="ui questions buttons">
             <button class="ui button"

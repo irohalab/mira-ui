@@ -1,7 +1,8 @@
 /*
  * Angular 2 decorators and services
  */
-import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { afterRender, Component, ViewEncapsulation, Inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavigationService } from './navigation.service';
@@ -36,8 +37,6 @@ export class App {
         }
     }
 
-    // This binds the returned object to the 'style' attribute of <app-root>
-    @HostBinding('style')
     get themeVariables() {
         return {
             '--primary-color': APP_COLORS.primary,
@@ -61,7 +60,11 @@ export class App {
         };
     }
 
-    constructor(router: Router, navigationService: NavigationService) {
+    constructor(
+        router: Router,
+        navigationService: NavigationService,
+        @Inject(DOCUMENT) private document: Document
+    ) {
         this.routeEventsSubscription = router.events
             .subscribe(
                 (event) => {
@@ -72,13 +75,15 @@ export class App {
             );
 
         navigationService.startSaveHistory();
+        afterRender(() => {
+            this.setThemeVariables();
+        });
+    }
+
+    private setThemeVariables() {
+        const body = this.document.body;
+        Object.entries(this.themeVariables).forEach(([key, value]) => {
+            body.style.setProperty(key, value);
+        });
     }
 }
-
-/*
- * Please review the https://github.com/AngularClass/angular2-examples/ repo for
- * more angular app examples that you may copy/paste
- * (The examples may not be updated as quickly. Please open an issue on github for us to update it)
- * For help or questions please contact us at @AngularClass on twitter
- * or our chat on Slack at https://AngularClass.com/slack-join
- */

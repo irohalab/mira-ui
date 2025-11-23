@@ -1,0 +1,13 @@
+<div class="message-notification-list-dropdown">
+    <h4 class="header-bar">
+        Notifications
+        <a class="anchor-button view-all-button" routerLink="/message" (click)="onClickViewAll()">View All</a>
+    </h4>
+    <div class="ui secondary pointer vertical compact menu">
+        <div class="item" *ngFor="let message of messageList" [ngClass]="{unread: !message.read}" (click)="onClickMessage(message)">
+            <div class="message-content">{{message.content}}</div>
+            <div class="date-time">{{message.createdTime}}</div>
+            <div class="unread-dot"></div>
+        </div>
+    </div>
+</div>

@@ -22,7 +22,9 @@ export class DownloadEditorComponent implements OnDestroy {
 
     eps_mapping: {eps_no: number, format: string, selected: boolean}[];
 
-    bangumi_id: string;
+    bangumiId: string;
+
+    resourceGroupId: string;
 
     @ViewChild('downloadUrlTextBox', {static: true}) _downloadUrlTextBoxRef: ElementRef;
 
@@ -51,7 +53,8 @@ export class DownloadEditorComponent implements OnDestroy {
         }
         this.subscription.add(
             this.adminService.downloadDirectly(
-                this.bangumi_id,
+                this.bangumiId,
+                this.resourceGroupId,
                 result)
                 .subscribe({
                     next: () => {

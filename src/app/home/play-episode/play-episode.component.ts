@@ -15,6 +15,7 @@ import { FeedbackComponent } from './feedback/feedback.component';
 import { environment } from '../../../environments/environment';
 import { PersistStorage } from '../../user-service';
 import { FavoriteService } from '../favorite.service';
+import { FeedbackPayload } from '../../entity/FeedbackPayload';
 
 export const MIN_WATCHED_PERCENTAGE = 0.95;
 
@@ -109,9 +110,12 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
         let dialogRef = this.dialogService.open(FeedbackComponent, {stickyDialog: true, backdrop: false});
         this._subscription.add(
             dialogRef.afterClosed().pipe(
-                filter(result => !!result),
+                filter((result: FeedbackPayload) => !!result),
                 mergeMap((result) => {
-                    return this.homeService.sendFeedback(this.episode.id, this.currentVideoFile.id, result);
+                    return this.homeService.sendFeedback(this.episode.id, {
+                        ... result,
+                        videoId: this.currentVideoFile.id,
+                    });
                 }),)
                 .subscribe(() => {
                     this._toastRef.show('已收到您的反馈');

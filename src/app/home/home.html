@@ -19,6 +19,7 @@
     </div>
     <div class="right-area">
         <dark-theme-toggle class="dark-theme-toggle"></dark-theme-toggle>
+        <app-message-notification *ngIf="isUserLogonObservable | async"></app-message-notification>
         <user-action *ngIf="isUserLogonObservable | async"></user-action>
         <button *ngIf="!(isUserLogonObservable | async)" class="ui basic tiny button" [ngClass]="{inverted: isDarkTheme}" (click)="login()">Login</button>
         <a class="search-toggle-button" (click)="toggleFloatSearchFrame()">

@@ -3,20 +3,49 @@
   display: block;
   box-sizing: border-box;
   text-align: left;
-  @media(max-width: 639px) and (min-height: 400px) {
-    width: 90%;
-    height: 360px;
-  }
-  @media(min-width: 640px) and (min-height: 400px) {
+
+  // Default dimensions
+  width: 600px;
+  height: 460px;
+
+  // Large desktop and tablet landscape (plenty of space)
+  @media(min-width: 768px) and (min-height: 600px) {
     width: 600px;
-    height: 300px;
+    height: 600px;
   }
-  @media(min-height: 400px) and (min-width: 425px) {
-    height: 300px;
+
+  // Tablet portrait and small laptop (constrained width)
+  @media(min-width: 640px) and (max-width: 767px) and (min-height: 460px) {
+    width: 600px;
+    height: 460px;
   }
-  @media(max-height: 399px) {
-    height: 90%;
+
+  // Mobile landscape (width constrained, but has some height)
+  @media(max-width: 639px) and (min-width: 568px) and (min-height: 460px) {
+    width: 90%;
+    max-width: 600px;
+    height: 460px;
   }
+
+  // Mobile portrait (width very constrained)
+  @media(max-width: 567px) and (min-height: 460px) {
+    width: 90%;
+    height: 460px;
+  }
+
+  // Extreme cases - very small screens (fallback to percentages)
+  @media(max-width: 639px) and (max-height: 459px) {
+    width: 95%;
+    height: 95%;
+    max-height: 460px;
+  }
+
+  // Ensure minimum dimensions are respected
+  min-width: min(600px, 90vw);
+  min-height: min(460px, 90vh);
+  max-width: 95vw;
+  max-height: 95vh;
+
   margin: auto;
   top: 0;
   left: 0;
