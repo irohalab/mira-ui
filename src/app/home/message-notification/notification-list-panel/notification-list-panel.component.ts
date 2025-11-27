@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { Message } from '../../../entity/Message';
 import { DARK_THEME, DarkThemeService, UIPopoverContent, UIPopoverRef } from '@irohalab/deneb-ui';
 import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
@@ -11,7 +11,7 @@ import { closest } from '../../../../helpers/dom';
     styleUrl: './notification-list-panel.component.less',
     standalone: false
 })
-export class NotificationListPanelComponent extends UIPopoverContent implements OnInit, OnDestroy {
+export class NotificationListPanelComponent extends UIPopoverContent implements AfterViewInit, OnInit, OnDestroy {
     private subscription = new Subscription();
 
     messageList: Message[];
@@ -26,14 +26,12 @@ export class NotificationListPanelComponent extends UIPopoverContent implements 
     }
 
     ngAfterViewInit() {
-        super.ngAfterViewInit();
         this.subscription.add(
             observableFromEvent(document.body, 'click').pipe(
                 skip(1),
                 filter((event) => {
                     const parent = closest(event.target, '.message-notification-list-dropdown');
                     return !parent;
-
                 }))
                 .subscribe(() => {
                     this.popoverRef.close(null);
