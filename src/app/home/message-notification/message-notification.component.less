@@ -1,0 +1,36 @@
+@import '../../_color.less';
+
+:host {
+  display: block;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.message-notification {
+  position: relative;
+  margin-right: 1rem;
+  .notification-button {
+    display: block;
+    font-size: inherit;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    &:focus,
+    &:hover {
+      color: #1e70bf;
+      text-decoration: none;
+    }
+    &.unread::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      background-color: @teal-color;
+      border-radius: 50%;
+    }
+  }
+}

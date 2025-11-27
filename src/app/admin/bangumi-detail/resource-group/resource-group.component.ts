@@ -210,6 +210,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         dialogRef.componentInstance.bangumi = this.bangumi;
         dialogRef.componentInstance.feedList = this.feedList;
         dialogRef.componentInstance.scanner = scanner;
+        dialogRef.componentInstance.resourceGroupId = group.id;
         const index = group.scanner.findIndex(sc => sc.id === scanner.id);
         dialogRef.componentInstance.scannerIndex = index >= 0 ? index : group.scanner.length;
         dialogRef.componentInstance.isEditing = isEditing;

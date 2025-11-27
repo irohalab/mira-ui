@@ -2,15 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Observable } from "rxjs";
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { BaseService } from "../../helpers/base.service";
-// import {homeRoutes} from './home.routes';
 import { Bangumi, Episode } from "../entity";
 import { Announce } from '../entity/announce';
 import { WatchProgress } from "../entity/watch-progress";
 import { WatchService } from './watch.service';
 import { Favorite } from '../entity/Favorite';
 import { environment } from '../../environments/environment';
+import { FeedbackPayload } from '../entity/FeedbackPayload';
 
 const baseUrl = environment.resourceProvider;
 
@@ -40,6 +40,10 @@ export class HomeService extends BaseService {
                         this.childRouteChanges.emit('Favorite');
                     } else if (urlSegements.paths[0] === 'history') {
                         this.childRouteChanges.emit('History');
+                    } else if (urlSegements.paths[0] === 'settings') {
+                        this.childRouteChanges.emit('Settings');
+                    } else if (urlSegements.paths[0] === 'message') {
+                        this.childRouteChanges.emit('Message');
                     }
                 }
             }
@@ -126,11 +130,10 @@ export class HomeService extends BaseService {
             catchError(this.handleError),);
     }
 
-    sendFeedback(episode_id: string, video_file_id: string, message: string): Observable<any> {
-        return this.httpClient.post<any>(`${baseUrl}/feedback`, {
-            episode_id: episode_id,
-            video_file_id: video_file_id,
-            message: message
+    sendFeedback(episodeId: string, payload: FeedbackPayload): Observable<any> {
+        return this.httpClient.post<any>(`${baseUrl}/episode/feedback/${episodeId}`, {
+            episodeId: episodeId,
+            ...payload,
         }).pipe(
             catchError(this.handleError),);
     }

@@ -50,6 +50,12 @@ import { MyHistoryComponent } from './my-history/my-history.component';
 import { HistoryCardComponent } from './my-history/history-card/history-card.component';
 import { FavoriteService } from './favorite.service';
 import { LoginComponent } from './user-center/login/login.component';
+import { MessageService } from './message-center/message.service';
+import { MessageCenterComponent } from './message-center/message-center.component';
+import { MessageNotificationComponent } from './message-notification/message-notification.component';
+import {
+    NotificationListPanelComponent
+} from './message-notification/notification-list-panel/notification-list-panel.component';
 
 
 @NgModule({
@@ -84,7 +90,10 @@ import { LoginComponent } from './user-center/login/login.component';
         RevealExtraComponent,
         DarkThemeToggleComponent,
         MyHistoryComponent,
-        HistoryCardComponent
+        HistoryCardComponent,
+        MessageCenterComponent,
+        MessageNotificationComponent,
+        NotificationListPanelComponent
     ],
     imports: [RouterModule.forChild(homeRoutes),
         BrowserModule,
@@ -107,6 +116,7 @@ import { LoginComponent } from './user-center/login/login.component';
         WatchService,
         ImageLoadingStrategy,
         BangumiListService,
+        MessageService,
         UserCenterService,
         SynchronizeService,
         provideHttpClient(withInterceptorsFromDi()),

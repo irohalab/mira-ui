@@ -1,0 +1,45 @@
+<div class="message-center-container ui container">
+    <div class="ui secondary pointing menu">
+        <a class="item" [ngClass]="{active: tabSelect === 'Inbox'}" (click)="changeTab('Inbox')">Inbox</a>
+        <a class="item" [ngClass]="{active: tabSelect === 'Sent'}" (click)="changeTab('Sent')">Sent</a>
+    </div>
+    <div class="content ui segment">
+        <div class="message-list-actions">
+            <div class="ui checkbox">
+                <input type="checkbox" [(ngModel)]="isAllChecked" (change)="toggleAllChecked()" [indeterminate]="indeterminateAllChecked">
+                <label></label>
+            </div>
+            <button class="ui basic tiny icon button" [disabled]="!isAllChecked && !indeterminateAllChecked" (click)="deleteMessages(false)"><i class="trash icon"></i></button>
+            <button class="ui basic tiny icon button" [disabled]="!isAllChecked && !indeterminateAllChecked" (click)="markAsRead(false)"><i class="envelope open icon"></i></button>
+        </div>
+        <div class="message-list">
+            <div class="item" *ngFor="let message of messageList" (click)="onMessageSelect($event, message)" [ngClass]="{read: message.read}">
+                <div class="checkbox-wrapper">
+                    <div class="ui checkbox">
+                        <input type="checkbox" [name]="'check_' + message.id" [(ngModel)]="checkDict[message.id]" (change)="onMessageChecked()">
+                        <label></label>
+                    </div>
+                </div>
+                <div class="account-name">{{tabSelect === 'Sent' ? message.sender?.nickName : message.recipient?.nickName || 'System'}}</div>
+                <div class="message-snip">{{message.content}}</div>
+                <div class="date-time">{{message.createdTime}}</div>
+            </div>
+        </div>
+        <div class="message-detail" *ngIf="selectedMessage">
+            <div class="account-info ui header">
+                <span>From: </span>
+                <span>{{tabSelect === 'Sent' ? selectedMessage.sender?.nickName : selectedMessage.recipient?.nickName || 'System'}}</span>
+            </div>
+            <div class="date-time">
+                {{selectedMessage.createdTime}}
+            </div>
+            <div class="message-content">
+                {{selectedMessage.content}}
+            </div>
+            <div class="message-actions">
+<!--                <button class="ui basic labeled icon button" (click)="markAsRead(true)"><i class="envelope open icon"></i>Done</button>-->
+                <button class="ui basic red labeled icon button" (click)="deleteMessages(true)"><i class="trash alternate outline icon"></i>Remove</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -10,6 +10,7 @@ import { PreviewVideoComponent } from './preview-video/preview-video.component';
 import { FavoriteListComponent } from './favorite-list/favorite-list.component';
 import { BangumiAccountBindingComponent } from './bangumi-account-binding/bangumi-account-binding.component';
 import { MyHistoryComponent } from './my-history/my-history.component';
+import { MessageCenterComponent } from './message-center/message-center.component';
 
 export const homeRoutes: Routes = [
     {
@@ -63,6 +64,10 @@ export const homeRoutes: Routes = [
             {
                 path: 'history',
                 component: MyHistoryComponent
+            },
+            {
+                path: 'message',
+                component: MessageCenterComponent
             }
         ]
     },

@@ -2,7 +2,7 @@ import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 
 import { skip } from 'rxjs/operators';
 import { DARK_THEME, DarkThemeService, UIPopoverContent, UIPopoverRef } from '@irohalab/deneb-ui';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../../entity';
 
 @Component({
@@ -11,7 +11,7 @@ import { User } from '../../../entity';
     styleUrls: ['./user-action-panel.less'],
     standalone: false
 })
-export class UserActionPanelComponent extends UIPopoverContent implements OnInit, OnDestroy {
+export class UserActionPanelComponent extends UIPopoverContent implements AfterViewInit, OnInit, OnDestroy {
     private subscription = new Subscription();
 
     @Input()
@@ -31,7 +31,6 @@ export class UserActionPanelComponent extends UIPopoverContent implements OnInit
     }
 
     ngAfterViewInit() {
-        super.ngAfterViewInit();
         this.subscription.add(
             observableFromEvent(document.body, 'click').pipe(
                 skip(1))

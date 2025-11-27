@@ -1,21 +1,11 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import {
-    UIDialog,
-    UIDialogModule,
-    UIDialogRef, UIDropdownModule,
-    UIToast,
-    UIToastComponent,
-    UIToastModule,
-    UIToastRef
-} from '@irohalab/deneb-ui';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Bangumi, Episode } from '../../../entity';
 import { Item } from '../../../entity/item';
 import { FeedService } from '../feed.service';
 import { DownloadEditorComponent } from './download-editor/download-editor.component';
-import { NgForOf, NgIf } from '@angular/common';
-import { ConfirmDialogDirective } from '../../../confirm-dialog';
 import { ResourceScanner } from '../../../entity/ResourceScanner';
 
 @Component({
@@ -42,6 +32,9 @@ export class ResourceScannerEditor implements OnInit, OnDestroy {
 
     @Input()
     isEditing: boolean;
+
+    @Input()
+    resourceGroupId: string;
 
     scannerForm!: FormGroup;
 
@@ -141,8 +134,9 @@ export class ResourceScannerEditor implements OnInit, OnDestroy {
             };
         });
         dialogRef.componentInstance.downloadUrl = item.magnet_uri;
-        dialogRef.componentInstance.bangumi_id = this.bangumi.id;
+        dialogRef.componentInstance.bangumiId = this.bangumi.id;
         dialogRef.componentInstance.torrentTitle = item.title;
+        dialogRef.componentInstance.resourceGroupId = this.resourceGroupId;
 
         this.subscription.add(dialogRef.afterClosed().subscribe({
             next: (result: boolean) => {

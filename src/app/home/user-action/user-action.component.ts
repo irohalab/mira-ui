@@ -1,6 +1,6 @@
 import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 
-import { filter, mergeMap } from 'rxjs/operators';
+import { filter, switchMap } from 'rxjs/operators';
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { User } from '../../entity';
 import { UserService } from '../../user-service';
@@ -43,7 +43,7 @@ export class UserActionComponent implements OnInit, OnDestroy, AfterViewInit {
         let userActionLinkElement = this.userActionLinkRef.nativeElement;
         this.subscription.add(
             observableFromEvent(userActionLinkElement, 'click').pipe(
-                mergeMap(() => {
+                switchMap(() => {
                     const popoverRef = this._popover.createPopover(userActionLinkElement, UserActionPanelComponent, 'bottom-end');
                     popoverRef.componentInstance.user = this.user;
                     return popoverRef.afterClosed();

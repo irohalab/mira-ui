@@ -18,6 +18,7 @@ import { OAuthStorage, provideOAuthClient } from 'angular-oauth2-oidc';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { storageAPI } from '../helpers/localstorage';
 import { environment } from '../environments/environment';
+import { DeviceDetectorService } from '../helpers/browser-detect';
 
 @NgModule({
     declarations: [
@@ -26,6 +27,7 @@ import { environment } from '../environments/environment';
         NotFoundComponent,
     ],
     providers: [
+        DeviceDetectorService,
         AnalyticsService,
         NavigationService,
         TaskService,

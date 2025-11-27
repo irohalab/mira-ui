@@ -3,7 +3,7 @@ import {fromEvent as observableFromEvent,  Subscription } from 'rxjs';
 
 import { filter } from 'rxjs/operators';
 import { UIPopoverContent, UIPopoverRef } from '@irohalab/deneb-ui';
-import { Component, ElementRef, OnDestroy, Self } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, Self } from '@angular/core';
 import { UserActionPanelComponent } from '../../../../home/user-action/user-action-panel/user-action-panel.component';
 import { Capture, CorePlayer, FloatPlayer, PlayList } from '../../../core/settings';
 import { PersistStorage } from '../../../../user-service';
@@ -14,7 +14,7 @@ import { PersistStorage } from '../../../../user-service';
     styleUrls: ['./config-panel.less'],
     standalone: false
 })
-export class VideoConfigPanelComponent extends UIPopoverContent implements OnDestroy {
+export class VideoConfigPanelComponent extends UIPopoverContent implements AfterViewInit, OnDestroy {
     private _subscription = new Subscription();
     private _directDownload: boolean;
     private _autoPlayNext: boolean;
@@ -84,7 +84,6 @@ export class VideoConfigPanelComponent extends UIPopoverContent implements OnDes
     }
 
     ngAfterViewInit() {
-        super.ngAfterViewInit();
         this._subscription.add(
             observableFromEvent<MouseEvent>(document.body, 'click').pipe(
                 filter((event: MouseEvent) => {

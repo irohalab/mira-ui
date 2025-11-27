@@ -22,7 +22,7 @@
                    title="在bgm.tv页面查看">
                     <i class="bgm-emo-47 bgm-link-icon"></i>
                 </a>
-                <a *ngIf="user.level >= 2" class="external-link" title="编辑" [routerLink]="['/admin/bangumi/', bangumi.id]">
+                <a *ngIf="user.role === User.ADMIN_ROLE || user.role === User.SUPER_ADMIN_ROLE" class="external-link" title="编辑" [routerLink]="['/admin/bangumi/', bangumi.id]">
                     <i class="edit icon"></i>
                 </a>
             </h2>

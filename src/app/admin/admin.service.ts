@@ -161,9 +161,11 @@ export class AdminService extends BaseService {
     }
 
     downloadDirectly(bangumiId: string,
+                     rgId: string,
                      urlEpsList: {downloadUrl: string, epsNo: number, filePath: string, fileName: string}[]): Observable<any> {
         return this.http.post<any>(`${baseUrl}/episode/download-directly`, {
             bangumiId,
+            rgId,
             urlEpsList
         }).pipe(catchError(this.handleError),);
     }
