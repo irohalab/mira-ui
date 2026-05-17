@@ -22,9 +22,7 @@ import { BangumiStatusNamePipe, VideoFileStatusNamePipe } from './bangumi-pipes/
 import { LibykPipe } from './bangumi-pipes/libyk-pipe';
 import { ParseJsonPipe } from './bangumi-pipes/parse-json.pipe';
 import { ConfirmDialogModule } from '../confirm-dialog';
-import { TaskManager } from './task-manager/task-manager.component';
 import { UserManager } from './user-manager/user-manager.component';
-import { TaskService } from './task-manager/task.service';
 import { UserManagerSerivce } from './user-manager/user-manager.service';
 import { UserPromoteModal } from './user-manager/user-promote-modal/user-promote-modal.component';
 import { DenebCommonPipes } from '../pipes';
@@ -83,7 +81,6 @@ import { EpisodeListComponent } from './bangumi-detail/episode-list/episode-list
         ParseJsonPipe,
         BangumiBasic,
         VideoFileStatusNamePipe,
-        TaskManager,
         UserManager,
         UserPromoteModal,
         VideoFileModal,
@@ -127,7 +124,6 @@ import { EpisodeListComponent } from './bangumi-detail/episode-list/episode-list
     providers: [
         AdminService,
         FeedService,
-        TaskService,
         UserManagerSerivce,
         AnnounceService,
         ListBangumiService,
