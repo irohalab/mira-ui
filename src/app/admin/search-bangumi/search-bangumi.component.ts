@@ -1,11 +1,10 @@
-import { fromEvent as observableFromEvent, Observable, Subscription } from 'rxjs';
+import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 
 import { distinctUntilChanged, map, debounceTime, takeWhile, mergeMap, tap, filter } from 'rxjs/operators';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { AdminService } from '../admin.service';
 import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
-import { BaseError } from '../../../helpers/error/BaseError';
-import { MainItem } from '../../entity/main-item';
+import { BaseError } from '../../../helpers/error';
 import { BangumiRaw } from '../../entity/BangumiRaw';
 
 // export const SEARCH_BAR_HEIGHT = 4.8;

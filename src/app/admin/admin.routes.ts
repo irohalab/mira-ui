@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { Admin } from './admin.component';
 import { BangumiDetail } from './bangumi-detail';
 import { ListBangumi } from './list-bangumi/list-bangumi.component';
-import { TaskManager } from './task-manager/task-manager.component';
 import { UserManager } from './user-manager/user-manager.component';
 import { AnnounceComponent } from './announce/announce.component';
 import { DownloadManagerComponent } from './download-manager/download-manager.component';
@@ -38,10 +37,6 @@ export const adminRoutes: Routes = [
             {
                 path: 'user',
                 component: UserManager
-            },
-            {
-                path: 'task',
-                component: TaskManager
             },
             {
                 path: 'announce',

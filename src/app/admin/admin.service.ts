@@ -1,13 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
 import { Bangumi, Episode, MainItem } from '../entity';
 import { VideoFile } from '../entity/video-file';
 import { BangumiRaw } from '../entity/BangumiRaw';
 import { environment } from '../../environments/environment';
 import { ResourceGroup } from '../entity/ResourceGroup';
+import dayjs from 'dayjs';
+
+// This is the same with backend. It should be retrieved from backend, but we hardcode this for convenient.
+const DELETE_DELAY_MINUTES = 10;
 
 const baseUrl = `${environment.resourceProvider}/admin`;
 
@@ -56,14 +60,28 @@ export class AdminService extends BaseService {
         type?: string,
         subType?: string}): Observable<{ data: BangumiRaw[], total: number }> {
         return this.http.get<{ data: BangumiRaw[], total: number }>(`${baseUrl}/bangumi`, {
-            params
+            params: {...params, includeDeleted: true},
         }).pipe(
+            tap(res => {
+                res.data.forEach(bangumi => {
+                    const deleteMarkDate = bangumi.deleteMark && dayjs(bangumi.deleteMark);
+                    if (deleteMarkDate && deleteMarkDate.isValid()) {
+                        bangumi.deleteEta = dayjs().to(deleteMarkDate.add(DELETE_DELAY_MINUTES, 'm'));
+                    }
+                });
+            }),
             catchError(this.handleError),);
     }
 
     getBangumi(id: string): Observable<Bangumi> {
         let queryUrl = baseUrl + '/bangumi/' + id;
         return this.http.get<Bangumi>(queryUrl).pipe(
+            tap(bangumi => {
+                const deleteMarkDate = bangumi.deleteMark && dayjs(bangumi.deleteMark);
+                if (deleteMarkDate && deleteMarkDate.isValid()) {
+                    bangumi.deleteEta = dayjs().to(deleteMarkDate.add(DELETE_DELAY_MINUTES, 'm'));
+                }
+            }),
             catchError(this.handleError),)
     }
 
@@ -74,10 +92,14 @@ export class AdminService extends BaseService {
             catchError(this.handleError),);
     }
 
-    deleteBangumi(bangumi_id: string): Observable<{delete_delay: number}> {
-        return this.http.delete<{ data: {delete_delay: number} }>(`${baseUrl}/bangumi/${bangumi_id}`).pipe(
-            map(res => res.data),
+    deleteBangumi(bangumi_id: string): Observable<never> {
+        return this.http.delete<never>(`${baseUrl}/bangumi/${bangumi_id}`).pipe(
             catchError(this.handleError),)
+    }
+
+    restorePendingDeleteBangumi(bangumiId: string): Observable<never> {
+        return this.http.post<never>(`${baseUrl}/bangumi/restore/${bangumiId}`, null)
+            .pipe(catchError(this.handleError));
     }
 
     listResourceGroups(bangumiId: string, populateVideoFiles: boolean): Observable<ResourceGroup[]> {

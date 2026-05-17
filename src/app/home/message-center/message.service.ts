@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { Message } from '../../entity/Message';
 import { catchError, map } from 'rxjs/operators';
 
-const baseUrl = `${environment.bgmProviderBaseURL}/message`;
+const baseUrl = `${environment.resourceProvider}/message`;
 
 @Injectable({
     providedIn: 'root'

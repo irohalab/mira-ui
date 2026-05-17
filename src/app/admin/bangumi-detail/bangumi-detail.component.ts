@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
-import { Subscription } from 'rxjs';
-import { filter, mergeMap } from 'rxjs/operators';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { filter, mergeMap, switchMap } from 'rxjs/operators';
 import { BaseError } from '../../../helpers/error';
 import { Bangumi } from '../../entity';
 import { Announce } from '../../entity/announce';
@@ -29,6 +29,8 @@ export enum AnnounceStatus {
 export class BangumiDetail implements OnInit, OnDestroy {
     private _subscription = new Subscription();
     private _toastRef: UIToastRef<UIToastComponent>;
+    private refreshSubject = new BehaviorSubject<number>(0); // value has no meaning.
+
     bangumi = <Bangumi>{};
 
     isLoading: boolean = false;
@@ -74,11 +76,13 @@ export class BangumiDetail implements OnInit, OnDestroy {
                 })
         );
         this._subscription.add(
-            this._route.params.pipe(
-                mergeMap((params) => {
-                    let id = params['id'];
-                    return this._adminService.getBangumi(id);
-                }))
+            this.refreshSubject
+                .pipe(
+                    switchMap(() => this._route.params),
+                    switchMap((params) => {
+                        let id = params['id'];
+                        return this._adminService.getBangumi(id);
+                    }))
                 .subscribe({
                     next: (bangumi: Bangumi) => {
                         this.bangumi = bangumi;
@@ -99,12 +103,32 @@ export class BangumiDetail implements OnInit, OnDestroy {
         this._subscription.add(
             this._adminService.deleteBangumi(this.bangumi.id)
                 .subscribe(
-                    ({delete_delay}) => {
-                        this._toastRef.show(`将在${delete_delay}分钟后删除，你可以在任务管理中取消删除`);
-                        this._router.navigate(['/admin/bangumi']);
-                    },
-                    (error: BaseError) => {
-                        this._toastRef.show(error.message);
+                    {
+                        next: () => {
+                            this._toastRef.show(`将在数分钟后删除，你可以在任务管理中取消删除`);
+                            this.activeTab('Overview');
+                            this.refreshSubject.next(1);
+                        },
+                        error: (error: BaseError) => {
+                            this._toastRef.show(error.message);
+                        }
+                    }
+                )
+        );
+    }
+
+    restoreBangumi() {
+        this._subscription.add(
+            this._adminService.restorePendingDeleteBangumi(this.bangumi.id)
+                .subscribe(
+                    {
+                        next: () => {
+                            this._toastRef.show(`已恢复`);
+                            this.refreshSubject.next(0);
+                        },
+                        error: (error: BaseError) => {
+                            this._toastRef.show(error.message);
+                        }
                     }
                 )
         );

@@ -30,7 +30,6 @@ import { DeviceDetectorService } from '../helpers/browser-detect';
         DeviceDetectorService,
         AnalyticsService,
         NavigationService,
-        TaskService,
         {
             provide: RouteReuseStrategy,
             useClass: RefreshSameRouteStrategy

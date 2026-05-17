@@ -85,17 +85,17 @@ export class EpisodeDetail implements OnInit, OnDestroy {
             saveObservable = this._adminService.addEpisode(episode);
         }
         this._subscription.add(saveObservable
-            .subscribe(
-                () => {
+            .subscribe({
+                next: () => {
                     this.busy = false;
                     this._toastRef.show(episode.id ? '添加成功' : '更新成功');
                     this._dialogRef.close(true);
                 },
-                (error: BaseError) => {
+                error: (error: BaseError) => {
                     this.busy = false;
                     this._toastRef.show(error.message);
                 }
-            )
+            })
         );
     }
 }

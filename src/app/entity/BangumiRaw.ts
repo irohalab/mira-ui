@@ -24,13 +24,13 @@ export class BangumiRaw {
     eps_no_offset!: number;
     // @Optional
     episodes!: Episode[];
-    delete_mark!: number;
+    deleteMark!: number;
 
     // @Optional
     favorite!: Favorite;
 
     // @Optional
-    delete_eta!: number;
+    deleteEta!: string;
 
     // @deprecated
     cover_color!: string;
