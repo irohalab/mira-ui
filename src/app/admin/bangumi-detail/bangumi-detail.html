@@ -1,21 +1,32 @@
 <admin-navbar navTitle="编辑新番" backLink="/admin/bangumi">
-    <div class="navbar-tab-menu action-item">
+    <div *ngIf="bangumi.deleteEta" class="delete-eta action-item">Delete {{bangumi.deleteEta}}</div>
+    <div class="navbar-tab-menu action-item" *ngIf="!bangumi.deleteMark">
         <a class="item" [ngClass]="{active: activatedTab === 'Overview'}" (click)="activeTab('Overview')">Overview</a>
         <a class="item" [ngClass]="{active: activatedTab === 'Episode'}" (click)="activeTab('Episode')">Episode</a>
         <a class="item" [ngClass]="{active: activatedTab === 'ResourceGroup'}" (click)="activeTab('ResourceGroup')">Resource Group</a>
         <a class="item" [ngClass]="{active: activatedTab === 'VideoProcess'}" (click)="activeTab('VideoProcess')">Video Process</a>
     </div>
-    <a class="accessory-action anchor-button" (click)="addOrEditAnnounce()">
+    <a *ngIf="!bangumi.deleteMark" class="accessory-action anchor-button" (click)="addOrEditAnnounce()">
         <i class="thumbs up icon" [ngClass]="{outline: announceStatus !== AnnounceStatus.ANNOUNCING}"></i>
         {{announceStatusText}}
     </a>
     <a class="accessory-action anchor-button"
+       *ngIf="!bangumi.deleteMark"
        title="删除番組"
        confirmDialog
        dialogTitle="确定删除番組么"
        dialogContent="删除该番組将删除与之有关的所有视频文件，torrent，用户收藏，观看进度等信息"
        (onConfirm)="deleteBangumi()">
         <i class="trash icon"></i> 删除番組
+    </a>
+    <a class="accessory-action anchor-button"
+       *ngIf="bangumi.deleteMark"
+       title="恢复番组"
+       confirmDialog
+       dialogTitle="确定恢复番组么"
+       dialogContent="恢复番组将立即生效"
+       (onConfirm)="restoreBangumi()">
+        <i class="undo icon"></i> 恢复番组
     </a>
 </admin-navbar>
 <div class="bangumi-detail-container" *ngIf="bangumi && adminList">

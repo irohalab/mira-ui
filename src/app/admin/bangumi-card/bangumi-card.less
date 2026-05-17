@@ -13,6 +13,11 @@ bangumi-card {
     &.inverted {
       .dark-bangumi-card();
     }
+
+    &.red .bangumi-title {
+      text-decoration-line: line-through;
+      color: lighten(rgba(0,0,0, 0.87), 30%);
+    }
   }
 }
 

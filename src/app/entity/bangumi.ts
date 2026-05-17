@@ -34,13 +34,13 @@ export class Bangumi {
     // @Optional
     eps_update_time!: number;
     // @Optional
-    delete_mark!: number;
+    deleteMark!: number;
 
     // @Optional
     favorite!: Favorite;
 
     // @Optional
-    delete_eta!: number;
+    deleteEta!: string;
 
     // @deprecated
     cover_color!: string;

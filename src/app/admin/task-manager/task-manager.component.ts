@@ -44,57 +44,57 @@ export class TaskManager implements OnInit, OnDestroy {
     refreshBangumiList() {
         this._subscription.add(
             this._taskService.listPendingDeleteBangumi()
-                .subscribe(
-                    (result) => {
+                .subscribe({
+                    next: (result) => {
                         this.pendingDeleteBangumi = result.data;
                         this.bangumiDeleteDelay = result.delete_delay;
                     },
-                    (error: BaseError) => {
+                    error: (error: BaseError) => {
                         this._toastRef.show(error.message);
                     }
-                )
+                })
         );
     }
 
     refreshEpisodeList() {
         this._subscription.add(
             this._taskService.listPendingDeleteEpisode()
-                .subscribe(
-                    (result) => {
+                .subscribe({
+                    next: (result) => {
                         this.pendingDeleteEpisode = result.data;
                         this.episodeDeleteDelay = result.delete_delay;
                     }
-                )
+                })
         )
     }
 
     restoreBangumi(bangumi_id: string) {
         this._subscription.add(
             this._taskService.restoreBangumi(bangumi_id)
-                .subscribe(
-                    () => {
+                .subscribe({
+                    next: () => {
                         this.refreshBangumiList();
                         this._toastRef.show('恢复成功');
                     },
-                    (error: BaseError) => {
+                    error: (error: BaseError) => {
                         this._toastRef.show(error.message);
                     }
-                )
+                })
         );
     }
 
     restoreEpisode(episode_id: string) {
         this._subscription.add(
             this._taskService.restoreEpisode(episode_id)
-                .subscribe(
-                    () => {
+                .subscribe({
+                    next: () => {
                         this.refreshEpisodeList();
                         this._toastRef.show('恢复成功');
                     },
-                    (error: BaseError) => {
+                    error: (error: BaseError) => {
                         this._toastRef.show(error.message);
                     }
-                )
+                })
         );
     }
 }

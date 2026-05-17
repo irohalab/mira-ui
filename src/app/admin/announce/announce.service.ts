@@ -6,7 +6,7 @@ import { BaseService } from '../../../helpers/base.service';
 import { Announce } from '../../entity/announce';
 import { environment } from '../../../environments/environment';
 
-const baseUrl = `${environment.resourceProvider}/announce`;
+const baseUrl = `${environment.resourceProvider}/admin/announce`;
 
 @Injectable()
 export class AnnounceService extends BaseService {
@@ -15,14 +15,9 @@ export class AnnounceService extends BaseService {
         super();
     }
 
-    listAnnounce(position: number, offset: number, count: number, content?: string): Observable<{data: Announce[], total: number}> {
+    listAnnounce(position: number, offset: number, limit: number, content?: string): Observable<{data: Announce[], total: number}> {
         return this._http.get<{data: Announce[], total: number}>(baseUrl, {
-            params: {
-                position: position + '',
-                offset: offset + '',
-                count: count + '',
-                content: content
-            }
+            params: { position, offset, limit, content }
         }).pipe(
             catchError(this.handleError),);
     }
