@@ -7,7 +7,6 @@ import { appRoutes } from './app.routes';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ErrorComponent } from './error/error.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TaskService } from './admin/task-manager/task.service';
 import { HomeModule } from './home';
 import { UserServiceModule } from './user-service';
 import { StaticContentModule } from './static-content/static-content.module';
@@ -19,6 +18,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { storageAPI } from '../helpers/localstorage';
 import { environment } from '../environments/environment';
 import { DeviceDetectorService } from '../helpers/browser-detect';
+import { BASE_PATH, MiraApiModule } from '@irohalab/mira-sdk-angular';
 
 @NgModule({
     declarations: [
@@ -37,13 +37,15 @@ import { DeviceDetectorService } from '../helpers/browser-detect';
         provideHttpClient(withFetch(), withInterceptorsFromDi()),
         provideOAuthClient({
             resourceServer: {
-                allowedUrls: [environment.resourceProvider],
+                allowedUrls: [environment.resourceProvider, environment.bgmProviderBaseURL],
                 sendAccessToken: true
             }
         }),
-        {provide: OAuthStorage, useFactory: () => storageAPI}
+        {provide: OAuthStorage, useFactory: () => storageAPI},
+        {provide: BASE_PATH, useValue: environment.bgmProviderBaseURL + '/api'}
     ],
     imports: [
+        MiraApiModule,
         RouterModule.forRoot(appRoutes, {
             useHash: false
         }),

@@ -13,8 +13,8 @@
                               (imageLoad)="onImageLoad()"
             ></ui-responsive-image>
             <div class="list-item-text">
-                <h4 class="bangumi-title">{{bangumi.nameCn || '暂无'}}</h4>
-                <h4 class="entry">
+                <h4 class="bangumi-title">{{bangumi.nameCn || bangumi.name}}</h4>
+                <h4 class="entry" *ngIf="bangumi.nameCn">
                     <span class="entry-key">日文名</span>
                     <span class="entry-value">{{bangumi.name || '暂无'}}</span>
                 </h4>

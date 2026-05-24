@@ -19,6 +19,7 @@ export class Bangumi {
     status!: number;
     createTime!: number;
     updateTime!: number;
+    itemId!: string;
     // @Optional
     eps_no_offset!: number;
     // @Optional

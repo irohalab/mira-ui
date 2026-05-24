@@ -3,12 +3,14 @@ import {UserLevelNamePipe} from './user-level-name.pipe';
 import {WeekdayPipe} from './weekday.pipe';
 import { ReadableUnit } from './readable-unit';
 import { ContrastColorPipe } from './contrast-color.pipe';
+import { FavoriteStatusTextPipe } from './favorite-status-text.pipe';
 
 export const PIPES = [
     UserLevelNamePipe,
     WeekdayPipe,
     ReadableUnit,
-    ContrastColorPipe
+    ContrastColorPipe,
+    FavoriteStatusTextPipe
 ];
 
 @NgModule({

@@ -7,16 +7,16 @@
         <div class="rating-star">
             <div class="rating-bar">
                 <i class="star icon" *ngFor="let s of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
-                   [ngClass]="{'outline': s > rating, 'half': s > rating && s - rating < 1}"></i>
+                   [ngClass]="{'outline': s > favorite.rating, 'half': s > favorite.rating && s - favorite.rating < 1}"></i>
             </div>
         </div>
     </div>
     <div class="review-comment-container">
-        <div class="review-text" *ngIf="!!comment" #reviewText>
-            {{comment}}
+        <div class="review-text" *ngIf="!!favorite.reviewComment" #reviewText>
+            {{favorite.reviewComment}}
             <div class="paragraph-light"></div>
         </div>
-        <div class="no-review-hint" *ngIf="!comment" [ngClass]="{'no-button': !!comment || !!rating}">
+        <div class="no-review-hint" *ngIf="!favorite.reviewComment" [ngClass]="{'no-button': !!favorite.reviewComment || !!favorite.rating}">
             <div class="hint-text">暂时还没有评论</div>
             <button type="button" class="ui basic tiny button" [ngClass]="{inverted: isDarkTheme}" (click)="onClickEditReview()">
                 <i class="edit icon"></i> 立即评价
@@ -25,7 +25,7 @@
     </div>
 </div>
 <div class="edit-button-group">
-    <a class="edit-button anchor-button" *ngIf="!!rating || !!comment" (click)="onClickEditReview()">
+    <a class="edit-button anchor-button" *ngIf="!!favorite.rating || !!favorite.reviewComment" (click)="onClickEditReview()">
         <i class="edit icon"></i> 编辑评价
     </a>
     <a class="expand-button anchor-button" (click)="toggleComment(true)" *ngIf="!expanded && needTrimText">

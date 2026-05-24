@@ -6,8 +6,9 @@ import { Subscription } from 'rxjs';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
-import { FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthError } from '../../../helpers/error';
+import { FavoriteService } from '../favorite.service';
 
 @Component({
     selector: 'user-center',
@@ -20,9 +21,7 @@ export class UserCenter implements OnInit, OnDestroy {
     private subscription = new Subscription();
 
     user!: User;
-
     albireoUser!: User;
-
     isSubmitting = false;
     isLoading = false;
 
@@ -30,16 +29,23 @@ export class UserCenter implements OnInit, OnDestroy {
     isDarkTheme!: boolean;
 
     invitationCode = new FormControl('', Validators.required);
-
     errorMessage!: string;
+    syncFormGroup!: FormGroup;
+
+    isSyncing = false;
 
     constructor(private userService: UserService,
                 private darkThemeService: DarkThemeService,
+                private favoriteService: FavoriteService,
+                private fb: FormBuilder,
                 titleService: Title,) {
         titleService.setTitle(`用户设置 - ${environment.siteTitle}`);
     }
 
     ngOnInit(): void {
+        this.syncFormGroup = this.fb.group({
+            overrideOnConflict: true,
+        })
         this.subscription.add(
             this.darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
@@ -102,6 +108,20 @@ export class UserCenter implements OnInit, OnDestroy {
 
     onLoginSuccess() {
         this.loadAlbireoUserInfo();
+    }
+
+    syncFavorite() {
+        this.isSyncing = true;
+        const { overrideOnConflict } = this.syncFormGroup.value;
+        this.favoriteService.syncFavorite(overrideOnConflict)
+            .subscribe({
+                next: () => {
+                    this.isSyncing = false;
+                },
+                error: (err) => {
+                    this.isSyncing = false;
+                }
+            })
     }
 
     private loadAlbireoUserInfo() {

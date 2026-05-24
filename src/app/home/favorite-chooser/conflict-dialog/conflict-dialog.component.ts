@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { UIDialogRef } from '@irohalab/deneb-ui';
+import { FavoriteStatus as ExternalFavoriteStatus } from '@irohalab/mira-sdk-angular';
 import { environment } from '../../../../environments/environment';
+import { FavoriteStatus } from '../../../entity/FavoriteStatus';
 
 @Component({
     selector: 'conflict-dialog',
@@ -11,16 +13,20 @@ import { environment } from '../../../../environments/environment';
 export class ConflictDialogComponent {
     siteTitle = environment.siteTitle;
 
-    STATUS_TEXT = ['', '想看', '看过', '在看', '搁置', '抛弃'];
-
     @Input()
     bangumiName: string;
 
     @Input()
-    siteStatus: number;
+    siteStatus: FavoriteStatus;
 
     @Input()
-    bgmStatus: number;
+    externalStatus: ExternalFavoriteStatus;
+
+    @Input()
+    siteProgress: number;
+
+    @Input()
+    externalProgress: number;
 
     constructor(private _dialogRef: UIDialogRef<ConflictDialogComponent>) {}
 

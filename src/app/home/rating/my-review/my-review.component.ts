@@ -11,6 +11,7 @@ import {
 import { RATING_COLOR, RATING_TEXT } from '../rating.component';
 import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
+import { Favorite } from '../../../entity/Favorite';
 
 @Component({
     selector: 'my-review',
@@ -25,10 +26,7 @@ export class MyReviewComponent implements AfterViewInit, OnChanges, OnInit, OnDe
     private _measured = false;
 
     @Input()
-    comment: string;
-
-    @Input()
-    rating: number;
+    favorite: Favorite;
 
     expanded = false;
     needTrimText = false;
@@ -42,27 +40,27 @@ export class MyReviewComponent implements AfterViewInit, OnChanges, OnInit, OnDe
     @ViewChild('reviewText', {static: false}) reviewTextRef: ElementRef;
 
     get ratingScore(): string {
-        if (!this.rating) {
+        if (!this.favorite.rating) {
             return '0.0';
         }
-        if (Math.floor(this.rating) === this.rating) {
-            return this.rating + '.0';
+        if (Math.floor(this.favorite.rating) === this.favorite.rating) {
+            return this.favorite.rating + '.0';
         }
-        return this.rating + '';
+        return this.favorite.rating + '';
     }
 
     get ratingColor(): string {
-        if (!this.rating) {
+        if (!this.favorite.rating) {
             return RATING_COLOR[0];
         }
-        return RATING_COLOR[this.rating];
+        return RATING_COLOR[this.favorite.rating];
     }
 
     get ratingText(): string {
-        if (!this.rating) {
+        if (!this.favorite.rating) {
             return RATING_TEXT[0];
         }
-        return RATING_TEXT[this.rating];
+        return RATING_TEXT[this.favorite.rating];
     }
 
     constructor(toast: UIToast, private _darkThemeService: DarkThemeService) {
@@ -89,13 +87,13 @@ export class MyReviewComponent implements AfterViewInit, OnChanges, OnInit, OnDe
     }
 
     ngAfterViewInit(): void {
-        if (this.comment) {
+        if (this.favorite.reviewComment) {
             this.measureCommentHeight();
         }
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if ('review' in changes && this._measured) {
+        if ('favorite' in changes && this._measured) {
             this.measureCommentHeight();
         }
     }

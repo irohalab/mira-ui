@@ -29,7 +29,7 @@
     </div>
 </div>
 <div class="search-result" *ngIf="!!name && !isLoading && bangumiList.length > 0" [ngClass]="{'dark-theme': isDarkTheme}">
-    <bangumi-card *ngFor="let bangumi of bangumiList" [bangumi]="bangumi"></bangumi-card>
+    <bangumi-card *ngFor="let bangumi of bangumiList; let idx = index;" [bangumi]="bangumi" [isInit]="true" [index]="idx"></bangumi-card>
 </div>
 <div class="no-result-container" *ngIf="!isLoading && (!bangumiList || bangumiList.length === 0)" [ngClass]="{'dark-theme': isDarkTheme}">
     <div class="no-result-tips"><i class="warning circle icon"></i>没有找到相关番组</div>

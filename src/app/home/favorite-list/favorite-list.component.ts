@@ -111,7 +111,7 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
                 }
                 return favorite.bangumi.type === this.type;
             })
-            .sort(this.sortFunc);
+            .sort(this.sortFunc.bind(this));
         this.timestampList = this._favoriteList
             .filter(fav => {
                 if (this.type === 'all') {
@@ -119,7 +119,7 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
                 }
                 return fav.bangumi.type === this.type;
             })
-            .sort(this.sortFunc)
+            .sort(this.sortFunc.bind(this))
             .map(fav => {
                 if (this.orderBy === 'airDate') {
                     return fav.bangumi.airDate ? Date.parse(fav.bangumi.airDate) : Date.now();

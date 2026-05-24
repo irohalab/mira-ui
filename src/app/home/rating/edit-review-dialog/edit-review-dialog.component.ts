@@ -4,6 +4,7 @@ import { DARK_THEME, DarkThemeService, UIDialogRef, UIToast, UIToastComponent, U
 import { Subscription } from 'rxjs';
 import { Bangumi } from '../../../entity';
 import { RATING_TEXT } from '../rating.component';
+import { FavoriteStatus } from '../../../entity/FavoriteStatus';
 
 @Component({
     selector: 'edit-review-dialog',
@@ -19,17 +20,9 @@ export class EditReviewDialogComponent implements OnInit, OnDestroy {
     @Input()
     bangumi: Bangumi;
 
-    @Input()
-    comment: string;
-
-    @Input()
-    rating: number;
-
-    @Input()
-    tags: string;
-
-    favorite_status: number;
-
+    eFavoriteStatus = FavoriteStatus;
+    favoriteStatus: FavoriteStatus;
+    rating!: number;
     hoverScore: number;
     isHovering: boolean;
 
@@ -63,8 +56,8 @@ export class EditReviewDialogComponent implements OnInit, OnDestroy {
         this.ratingText = RATING_TEXT[s];
     }
 
-    chooseFavoriteStatus(status: number) {
-        this.favorite_status = status;
+    chooseFavoriteStatus(status: FavoriteStatus) {
+        this.favoriteStatus = status;
     }
 
     onSubmit(event: Event) {
@@ -79,19 +72,10 @@ export class EditReviewDialogComponent implements OnInit, OnDestroy {
         this.isSaving = true;
         const comment = this.reviewForm.value.comment;
 
-        /**
-         * export interface FavoriteStatus {
-         *      interest: number;
-         *      rating: number;
-         *      tags: string;
-         *      comment: string;
-         * }
-         */
         this._dialogRef.close({
-            interest: this.favorite_status,
+            status: this.favoriteStatus,
             rating: this.rating,
-            tags: this.tags,
-            comment: comment
+            reviewComment: comment
         });
     }
 
@@ -104,21 +88,24 @@ export class EditReviewDialogComponent implements OnInit, OnDestroy {
             this._darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
         );
-        this.favorite_status = this.bangumi.favorite_status;
+        if (this.bangumi.favorite) {
+            this.favoriteStatus = this.bangumi.favorite.status;
+        }
         this.reviewForm = this._fb.group({
             comment: ['', Validators.maxLength(200)]
         });
-        if (this.comment) {
-            this.reviewForm.patchValue({comment: this.comment});
+        if (this.bangumi.favorite?.rating) {
+            this.rating = this.bangumi.favorite.rating;
         }
-
-        if (this.rating) {
-            this.ratingText = RATING_TEXT[this.rating];
+        if (this.bangumi.favorite?.reviewComment) {
+            this.reviewForm.patchValue({
+                comment: this.bangumi.favorite.reviewComment,
+            });
         }
+        this.ratingText = RATING_TEXT[this.bangumi.favorite?.rating || 0];
     }
 
     ngOnDestroy(): void {
-        console.log('destroyed');
         this._subscription.unsubscribe();
     }
 }

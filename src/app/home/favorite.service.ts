@@ -1,12 +1,27 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { FavoriteStatus } from '../entity/FavoriteStatus';
-import { Observable } from 'rxjs';
+import {
+    externalFavoriteStatusToNumber,
+    FavoriteStatus,
+    favoriteStatusToNumber, isStatusEqual,
+    NUMBER_TO_EXTERNAL_FAVORITE_STATUS,
+    NUMBER_TO_FAVORITE_STATUS
+} from '../entity/FavoriteStatus';
+import { EMPTY, forkJoin, Observable } from 'rxjs';
 import { Favorite } from '../entity/Favorite';
-import { tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import { Bangumi } from '../entity';
 import { VideoPlayerService } from '../video-player/video-player.service';
 import { environment } from '../../environments/environment';
+import {
+    DefaultMira,
+    Favorite as ExternalFavorite,
+    FavoriteStatus as ExternalFavoriteStatus, SubItem, SubItemFavorite
+} from '@irohalab/mira-sdk-angular';
+import { ConflictDialogComponent } from './favorite-chooser/conflict-dialog/conflict-dialog.component';
+import { UIDialog } from '@irohalab/deneb-ui';
+import { WatchProgress } from '../entity/watch-progress';
+import EpisodeTypeEnum = SubItem.EpisodeTypeEnum;
 
 export type FavoriteChangeEvent = {
     op: 'change' | 'remove';
@@ -18,10 +33,12 @@ const baseUrl = `${environment.resourceProvider}/favorite`;
 @Injectable()
 export class FavoriteService {
     constructor(private http: HttpClient,
+                private miraApiService: DefaultMira,
+                private dialog: UIDialog,
                 videoPlayerService: VideoPlayerService,) {
         videoPlayerService.onBangumiFavoriteChange
             .subscribe((bangumi) => {
-                this.changeFavorite(bangumi.favorite.status, bangumi).subscribe((favorite) => {console.log(favorite)});
+                this.changeFavorite(bangumi.favorite.status, bangumi.favorite.id, bangumi).subscribe((favorite) => {console.log(favorite)});
             });
     }
 
@@ -47,11 +64,23 @@ export class FavoriteService {
         });
     }
 
-    changeFavorite(status: string, bangumi: Bangumi): Observable<Favorite> {
-        return this.http.post<any>(baseUrl, null, {
+    addOrUpdateFavorite(changePayload: {bangumiId: string, status: FavoriteStatus, review: string, rating: number, syncToUpstream: boolean}, bangumi: Bangumi) {
+        return this.http.post<Favorite>(baseUrl, changePayload)
+            .pipe(tap((fav: Favorite) => {
+                fav.bangumi = Object.assign({}, bangumi);
+                fav.bangumi.favorite = null;
+                this.favoriteChanged.emit({
+                    op: 'change',
+                    favorite: fav
+                })
+            }));
+    }
+
+    changeFavorite(status: string, favoriteId: string, bangumi: Bangumi): Observable<Favorite> {
+        return this.http.put<any>(`${baseUrl}/${favoriteId}`, null, {
             params: {
-                bangumi_id: bangumi.id,
-                status
+                status,
+                syncToUpstream: true
             }
         })
             .pipe(tap((fav: Favorite) => {
@@ -71,5 +100,118 @@ export class FavoriteService {
                     favorite: {id: favoriteId}
                 });
             }));
+    }
+
+    syncFavorite(overrideOnConflict: boolean): Observable<any> {
+        return this.http.post(`${baseUrl}/sync`, null, {
+            params: {
+                overrideOnConflict: `${overrideOnConflict}`
+            }
+        })
+    }
+
+    updateEpisodeProgress(bangumiId: string, subItemFavoriteList: SubItemFavorite[]): Observable<any> {
+        return this.http.post<any>(`${baseUrl}/progress`, {
+            subItemFavorites: subItemFavoriteList,
+            bangumiId
+        });
+    }
+
+    resolveConflict(externalFavorite: ExternalFavorite, subItemFavoriteList: SubItemFavorite[], bangumi: Bangumi): Observable<any> {
+        if (bangumi.favorite) {
+            let localEpisodeProgress = 0;
+            const sortedEpisodes = bangumi.episodes.sort((ep1, ep2) => {
+                return ep1.sort - ep2.sort;
+            });
+            for (const eps of sortedEpisodes) {
+                if (eps.watchProgress && eps.watchProgress.watchStatus === WatchProgress.WATCHED) {
+                    localEpisodeProgress++;
+                } else {
+                    break;
+                }
+            }
+
+            if (externalFavorite) {
+                const sortedSubItemFavoriteList = subItemFavoriteList.filter(sf => sf.subItem.episodeType === EpisodeTypeEnum.Episode)
+                    .sort((sf1, sf2) => {
+                        return sf1.subItem.sort - sf2.subItem.sort;
+                    });
+
+                if (!isStatusEqual(externalFavorite.status, bangumi.favorite.status) || localEpisodeProgress !== sortedSubItemFavoriteList.length) {
+                    let conflictDialogRef = this.dialog.open(ConflictDialogComponent, {
+                        stickyDialog: true,
+                        backdrop: true
+                    });
+                    conflictDialogRef.componentInstance.bangumiName = bangumi.nameCn || bangumi.name;
+                    conflictDialogRef.componentInstance.siteStatus = bangumi.favorite.status;
+                    conflictDialogRef.componentInstance.externalStatus = externalFavorite.status;
+                    conflictDialogRef.componentInstance.siteProgress = localEpisodeProgress;
+                    conflictDialogRef.componentInstance.externalProgress = sortedSubItemFavoriteList.length;
+                    return conflictDialogRef.afterClosed()
+                        .pipe(switchMap((which: 'site' | 'external') => {
+                            if (which === 'site') {
+                                return this.miraApiService.patchFavorite(externalFavorite.id, {
+                                    status: NUMBER_TO_EXTERNAL_FAVORITE_STATUS[favoriteStatusToNumber(bangumi.favorite.status)] as ExternalFavoriteStatus
+                                }).pipe(
+                                    switchMap(() => {
+                                        return this.miraApiService.updateFavoriteProgress(bangumi.itemId, localEpisodeProgress, EpisodeTypeEnum.Episode);
+                                    }),
+                                    switchMap(()=> {
+                                        return this.miraApiService.listSubItemFavorites(bangumi.itemId, null, null, null, null, true);
+                                    }),
+                                    switchMap((res) => {
+                                        return this.updateEpisodeProgress(bangumi.id, res.data);
+                                    })
+                                );
+                            } else {
+                                return this.changeFavorite(NUMBER_TO_FAVORITE_STATUS[externalFavoriteStatusToNumber(externalFavorite.status)], bangumi.favorite.id, bangumi)
+                                    .pipe(
+                                        switchMap((favorite) => {
+                                            bangumi.favorite = favorite;
+                                            return this.updateEpisodeProgress(bangumi.id, subItemFavoriteList);
+                                        })
+                                    );
+                            }
+                        }));
+                }
+            } else {
+                return this.addOrUpdateFavorite({
+                    bangumiId: bangumi.id,
+                    status: bangumi.favorite.status,
+                    rating: bangumi.favorite.rating || 0,
+                    review: bangumi.favorite.reviewComment || '',
+                    syncToUpstream: true
+                }, bangumi)
+                    .pipe(
+                        switchMap((fav) => {
+                            bangumi.favorite = fav;
+                            return this.miraApiService.updateFavoriteProgress(bangumi.itemId, localEpisodeProgress, EpisodeTypeEnum.Episode);
+                        }),
+                        switchMap(()=> {
+                            return this.miraApiService.listSubItemFavorites(bangumi.itemId, null, null, null, null, true);
+                        }),
+                        switchMap((res) => {
+                            return this.updateEpisodeProgress(bangumi.id, res.data);
+                        })
+                    );
+            }
+        } else {
+            if (externalFavorite) {
+                return forkJoin([
+                    this.addOrUpdateFavorite({
+                        bangumiId: bangumi.id,
+                        status: NUMBER_TO_FAVORITE_STATUS[externalFavoriteStatusToNumber(externalFavorite.status)] as FavoriteStatus,
+                        rating: externalFavorite.rating || 0,
+                        review: externalFavorite.reviewComment || '',
+                        syncToUpstream: false
+                    }, bangumi),
+                    this.updateEpisodeProgress(bangumi.id, subItemFavoriteList)
+                ])
+                    .pipe(tap(([fav, _]) => {
+                        bangumi.favorite = fav;
+                    }));
+            }
+        }
+        return EMPTY;
     }
 }
