@@ -7,9 +7,9 @@ import {
     NUMBER_TO_EXTERNAL_FAVORITE_STATUS,
     NUMBER_TO_FAVORITE_STATUS
 } from '../entity/FavoriteStatus';
-import { EMPTY, forkJoin, Observable } from 'rxjs';
+import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { Favorite } from '../entity/Favorite';
-import { switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { Bangumi } from '../entity';
 import { VideoPlayerService } from '../video-player/video-player.service';
 import { environment } from '../../environments/environment';
@@ -76,7 +76,7 @@ export class FavoriteService {
             }));
     }
 
-    changeFavorite(status: string, favoriteId: string, bangumi: Bangumi): Observable<Favorite> {
+    changeFavorite(status: string, favoriteId: string, bangumi: Bangumi): Observable<any> {
         return this.http.put<any>(`${baseUrl}/${favoriteId}`, null, {
             params: {
                 status,
@@ -117,7 +117,13 @@ export class FavoriteService {
         });
     }
 
-    resolveConflict(externalFavorite: ExternalFavorite, subItemFavoriteList: SubItemFavorite[], bangumi: Bangumi): Observable<any> {
+    /**
+     * Sync between local backend and external backend, prompt user to choose side if conflict occurs. return boolean to indicate whether a reload episodes is needed.
+     * @param externalFavorite
+     * @param subItemFavoriteList
+     * @param bangumi
+     */
+    resolveConflict(externalFavorite: ExternalFavorite, subItemFavoriteList: SubItemFavorite[], bangumi: Bangumi): Observable<boolean> {
         if (bangumi.favorite) {
             let localEpisodeProgress = 0;
             const sortedEpisodes = bangumi.episodes.sort((ep1, ep2) => {
@@ -161,6 +167,9 @@ export class FavoriteService {
                                     }),
                                     switchMap((res) => {
                                         return this.updateEpisodeProgress(bangumi.id, res.data);
+                                    }),
+                                    map(() => {
+                                        return false;
                                     })
                                 );
                             } else {
@@ -169,6 +178,9 @@ export class FavoriteService {
                                         switchMap((favorite) => {
                                             bangumi.favorite = favorite;
                                             return this.updateEpisodeProgress(bangumi.id, subItemFavoriteList);
+                                        }),
+                                        map(() => {
+                                            return true;
                                         })
                                     );
                             }
@@ -192,6 +204,9 @@ export class FavoriteService {
                         }),
                         switchMap((res) => {
                             return this.updateEpisodeProgress(bangumi.id, res.data);
+                        }),
+                        map(() => {
+                            return false;
                         })
                     );
             }
@@ -207,11 +222,16 @@ export class FavoriteService {
                     }, bangumi),
                     this.updateEpisodeProgress(bangumi.id, subItemFavoriteList)
                 ])
-                    .pipe(tap(([fav, _]) => {
-                        bangumi.favorite = fav;
-                    }));
+                    .pipe(
+                        tap(([fav, _]) => {
+                            bangumi.favorite = fav;
+                        }),
+                        map(() => {
+                            return true;
+                        })
+                    );
             }
         }
-        return EMPTY;
+        return of(false);
     }
 }

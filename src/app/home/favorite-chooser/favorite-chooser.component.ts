@@ -162,8 +162,11 @@ export class FavoriteChooser implements OnInit, OnDestroy {
     resolveConflictAndUpdateFavorite(fav: ExternalFavorite, subItemFavoriteList: SubItemFavorite[], bangumi: Bangumi) {
         this.subscription.add(this.favoriteService.resolveConflict(fav, subItemFavoriteList, bangumi)
             .subscribe({
-                next: () => {
+                next: (needReloadEpisode) => {
                     this.bangumi.favorite = {...this.bangumi.favorite};
+                    if (needReloadEpisode) {
+                        this.reloadEpisodes.next(true);
+                    }
                 },
                 error: (err: HttpErrorResponse) => {
                     this._toastRef.show(extractErrorMessage(err));
