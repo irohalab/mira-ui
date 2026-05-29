@@ -11,12 +11,12 @@
     </div>
     <div class="bangumi-info-text">
         <h3 class="bangumi-title">
-            {{bangumi.nameCn || '暂无'}}
+            {{bangumi.nameCn || bangumi.name}}
             <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgmId" target="_blank" title="在bgm.tv页面查看">
                 <i class="bgm-emo-47 bgm-link-icon"></i>
             </a>
         </h3>
-        <h4 class="entry">
+        <h4 class="entry" *ngIf="bangumi.nameCn">
             <span class="entry-key">日文名</span>
             <span class="entry-value">{{bangumi.name || '暂无'}}</span>
         </h4>

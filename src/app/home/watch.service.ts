@@ -72,7 +72,7 @@ export class WatchService extends BaseService {
         return null;
     }
 
-    private synchronizeWatchProgress(): void {
+    synchronizeWatchProgress(): void {
         let iterator = this._persistStorage.iterator();
         let watchHistoryRecords: WatchHistoryRecord[] = [];
         for (const item of iterator) {

@@ -10,17 +10,18 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^19.0.3",
+    "@angular/animations": "^19.2.22",
     "@angular/cdk": "^18.1.0",
-    "@angular/common": "^19.0.3",
-    "@angular/compiler": "^19.0.3",
-    "@angular/core": "^19.0.3",
-    "@angular/forms": "^19.0.3",
-    "@angular/platform-browser": "^19.0.3",
-    "@angular/platform-browser-dynamic": "^19.0.3",
-    "@angular/router": "^19.0.3",
+    "@angular/common": "^19.2.22",
+    "@angular/compiler": "^19.2.22",
+    "@angular/core": "^19.2.22",
+    "@angular/forms": "^19.2.22",
+    "@angular/platform-browser": "^19.2.22",
+    "@angular/platform-browser-dynamic": "^19.2.22",
+    "@angular/router": "^19.2.22",
     "@egjs/agent": "^2.4.0",
     "@irohalab/deneb-ui": "^4.7.1",
+    "@irohalab/mira-sdk-angular": "^1.15.0",
     "@irohalab/semantic-ui": "^2.4.1",
     "@swimlane/ngx-graph": "^8.4.0",
     "angular-oauth2-oidc": "^19.0.0",
@@ -41,9 +42,9 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.0.4",
+    "@angular-devkit/build-angular": "^19.2.26",
     "@angular/cli": "~19.0.4",
-    "@angular/compiler-cli": "^19.0.3",
+    "@angular/compiler-cli": "^19.2.22",
     "@types/chrome": "^0.0.58",
     "@types/d3-dispatch": "^3.0.1",
     "@types/d3-drag": "^3.0.1",
@@ -58,7 +59,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
-    "lodash": "^4.17.21",
+    "lodash": "4.18.0",
     "typescript": "~5.6.3"
   }
 }

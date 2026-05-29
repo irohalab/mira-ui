@@ -60,4 +60,16 @@
             </div>
         </div>
     </div>
+    <div class="ui segment basic-info" [ngClass]="{inverted: isDarkTheme}">
+        <h4>收藏与进度同步</h4>
+        <div class="ui message">
+            <p>与box.moe同步你的收藏和观看进度。如果你的box.moe关联了其他平台账号也会将收藏和进度同步到对应平台。</p>
+        </div>
+        <form class="ui form" [formGroup]="syncFormGroup">
+            <div class="field">
+                <ui-toggle formControlName="overrideOnConflict">冲突时覆盖box.moe的收藏</ui-toggle>
+            </div>
+            <button class="ui primary button" [disabled]="isSyncing" (click)="syncFavorite()">开始同步</button>
+        </form>
+    </div>
 </div>

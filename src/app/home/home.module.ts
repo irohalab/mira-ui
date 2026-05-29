@@ -56,6 +56,7 @@ import { MessageNotificationComponent } from './message-notification/message-not
 import {
     NotificationListPanelComponent
 } from './message-notification/notification-list-panel/notification-list-panel.component';
+import { FavoriteStatusTextPipe } from '../pipes/favorite-status-text.pipe';
 
 
 @NgModule({

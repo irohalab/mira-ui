@@ -4,18 +4,20 @@
         同步 <strong>{{bangumiName}}</strong> 收藏状态时发现冲突
     </div>
     <div class="formatted content">
-        <p>发现{{siteTitle}}的状态与Bangumi的状态不同，请选择保留何种状态</p>
+        <p>发现{{siteTitle}}的状态与box.moe的状态不同，请选择保留何种状态</p>
         <div class="diff">
-            <div class="diff-item site-status">{{siteTitle}}的收藏状态：<strong>{{STATUS_TEXT[siteStatus]}}</strong></div>
-            <div class="diff-item bgm-status">Bangumi的收藏状态：<strong>{{STATUS_TEXT[bgmStatus]}}</strong></div>
+            <div class="diff-item site-status">{{siteTitle}}的收藏状态：<strong>{{siteStatus | favoriteStatusText}}</strong></div>
+            <div class="diff-item external-status">box.moe的收藏状态：<strong>{{externalStatus | favoriteStatusText:'external'}}</strong></div>
+            <div class="diff-item site-progress">{{siteTitle}}的进度: <strong>{{siteProgress}}</strong></div>
+            <div class="diff-item external-progress">box.moe的进度: <strong>{{externalProgress}}</strong></div>
         </div>
     </div>
     <div class="actions">
         <div class="ui red basic cancel inverted button" (click)="chooseStatus('site')">
             使用{{siteTitle}}的状态
         </div>
-        <div class="ui green ok inverted button" (click)="chooseStatus('bgm')">
-            使用Bangumi的状态
+        <div class="ui green ok inverted button" (click)="chooseStatus('external')">
+            使用box.moe的状态
         </div>
     </div>
 </div>

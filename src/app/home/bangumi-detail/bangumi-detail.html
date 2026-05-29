@@ -17,7 +17,7 @@
         </div>
         <div class="bangumi-base-info">
             <h2 class="bangumi-title name-cn">
-                {{bangumi.nameCn}}
+                {{bangumi.nameCn || bangumi.name}}
                 <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgmId" target="_blank"
                    title="在bgm.tv页面查看">
                     <i class="bgm-emo-47 bgm-link-icon"></i>
@@ -26,7 +26,7 @@
                     <i class="edit icon"></i>
                 </a>
             </h2>
-            <h3 class="bangumi-title name">
+            <h3 class="bangumi-title name" *ngIf="bangumi.nameCn">
                 <span class="tip">日文名:</span><span class="name-text">{{bangumi.name}}</span>
             </h3>
             <favorite-chooser *ngIf="user && user.id !== User.ID_INITIAL_USER && user.role !== User.GUEST_ROLE" [bangumi]="bangumi" [loadBgmInfo]="true" (reloadEpisodes)="reloadEpisodes()"></favorite-chooser>

@@ -135,7 +135,8 @@ import { EpisodeListComponent } from './bangumi-detail/episode-list/episode-list
     ],
     exports: [
         BangumiStatusNamePipe,
-        BangumiTypeNamePipe
+        BangumiTypeNamePipe,
+        BangumiCard
     ]
 })
 export class AdminModule {
