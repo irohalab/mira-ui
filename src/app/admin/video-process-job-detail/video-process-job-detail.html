@@ -1,85 +1,102 @@
 <admin-navbar navTitle="Video Process Job" backLink="/admin/video-manager?status=Running">
+  @if (job && (job.status === eJobStatus.Running || job.status === eJobStatus.Queueing)) {
     <a class="accessory-action anchor-button"
-       title="Cancel"
-       *ngIf="job && (job.status === eJobStatus.Running || job.status === eJobStatus.Queueing)"
-       confirmDialog
-       dialogTitle="Do you want to cancel the job"
-       dialogContent="It may take a while when to actually cancel all vertices"
-       (onConfirm)="cancelJob()">
-        <i class="minus circle icon"></i> Cancel Job
+      title="Cancel"
+      confirmDialog
+      dialogTitle="Do you want to cancel the job"
+      dialogContent="It may take a while when to actually cancel all vertices"
+      (onConfirm)="cancelJob()">
+      <i class="minus circle icon"></i> Cancel Job
     </a>
+  }
+  @if (job && job.status === eJobStatus.Running) {
     <a class="accessory-action anchor-button"
-       title="Pause"
-       *ngIf="job && job.status === eJobStatus.Running"
-       confirmDialog
-       dialogTitle="Do you want to pause the job"
-       dialogContent="It may take a while to pause the job."
-       (onConfirm)="pauseJob()">
-        <i class="pause circle icon"></i> Pause Job
+      title="Pause"
+      confirmDialog
+      dialogTitle="Do you want to pause the job"
+      dialogContent="It may take a while to pause the job."
+      (onConfirm)="pauseJob()">
+      <i class="pause circle icon"></i> Pause Job
     </a>
+  }
+  @if (job && job.status === eJobStatus.Pause) {
     <a class="accessory-action anchor-button"
-       title="Resume"
-       *ngIf="job && job.status === eJobStatus.Pause"
-       confirmDialog
-       dialogTitle="Do you want to resume the job"
-       dialogContent="Job will resume to re-queue"
-       (onConfirm)="resumeJob()">
-        <i class="pause circle icon"></i> Resume Job
+      title="Resume"
+      confirmDialog
+      dialogTitle="Do you want to resume the job"
+      dialogContent="Job will resume to re-queue"
+      (onConfirm)="resumeJob()">
+      <i class="pause circle icon"></i> Resume Job
     </a>
+  }
 </admin-navbar>
 <div class="job-detail-container">
-    <div class="ui segment section-card" *ngIf="job && bangumi">
-        <div class="ui header">Job Info</div>
-        <table class="ui table">
-            <tbody>
-            <tr>
-                <td>Id:</td>
-                <td>{{job.id}}</td>
-                <td>Status: </td>
-                <td>{{job.status}}</td>
-            </tr>
-            <tr>
-                <td>Bangumi:</td>
-                <td><a [routerLink]="['/admin/bangumi', bangumi.id]">{{bangumi.name}}</a></td>
-                <td>Create Time: </td>
-                <td>{{job.createTime}}</td>
-            </tr>
-            <tr>
-                <td>VideoId:</td>
-                <td>{{job.jobMessage.videoId}}</td>
-                <td>Start Time: </td>
-                <td>{{job.startTime || 'N/A'}}</td>
-            </tr>
-            <tr>
-                <td>Episode:</td>
-                <td>{{episode ? episode.episodeNo + '(' + episode.id + ')' : 'Loading...'}}</td>
-                <td>Finished Time: </td>
-                <td>{{job.finishedTime || 'N/A'}}</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="ui segment section-card" *ngIf="job && job.status === eJobStatus.UnrecoverableError ">
-        <div class="ui header">Error Info</div>
-        <div class="error-info" *ngIf="errorInfo">
-            <div class="error-type ui orange label">{{errorInfo.errorType}}</div>
-            <div class="error-message ui basic label">Message: <div class="detail">{{errorInfo.message}}</div></div>
-            <div class="error-vertex-id ui label">Vertex Id: <div class="detail">{{errorInfo.vertexId}}</div></div>
-            <pre class="error-stack" *ngIf="errorInfo.stack">{{errorInfo.stack}}</pre>
-        </div>
-    </div>
+  @if (job && bangumi) {
     <div class="ui segment section-card">
-        <div class="ui header">Vertex Info</div>
-        <vertex-graph *ngIf="vertices" [vertices]="vertices" (nodeSelected)="openVertexDetail($event)"></vertex-graph>
+      <div class="ui header">Job Info</div>
+      <table class="ui table">
+        <tbody>
+          <tr>
+            <td>Id:</td>
+            <td>{{job.id}}</td>
+            <td>Status: </td>
+            <td>{{job.status}}</td>
+          </tr>
+          <tr>
+            <td>Bangumi:</td>
+            <td><a [routerLink]="['/admin/bangumi', bangumi.id]">{{bangumi.name}}</a></td>
+            <td>Create Time: </td>
+            <td>{{job.createTime}}</td>
+          </tr>
+          <tr>
+            <td>VideoId:</td>
+            <td>{{job.jobMessage.videoId}}</td>
+            <td>Start Time: </td>
+            <td>{{job.startTime || 'N/A'}}</td>
+          </tr>
+          <tr>
+            <td>Episode:</td>
+            <td>{{episode ? episode.episodeNo + '(' + episode.id + ')' : 'Loading...'}}</td>
+            <td>Finished Time: </td>
+            <td>{{job.finishedTime || 'N/A'}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  }
+  @if (job && job.status === eJobStatus.UnrecoverableError ) {
     <div class="ui segment section-card">
-        <div class="ui header">Job Log</div>
-        <div class="job-log-action" *ngIf="!shouldShowJobLog">
-            <button class="ui button" (click)="showJobLog()">Show Job Log</button>
+      <div class="ui header">Error Info</div>
+      @if (errorInfo) {
+        <div class="error-info">
+          <div class="error-type ui orange label">{{errorInfo.errorType}}</div>
+          <div class="error-message ui basic label">Message: <div class="detail">{{errorInfo.message}}</div></div>
+          <div class="error-vertex-id ui label">Vertex Id: <div class="detail">{{errorInfo.vertexId}}</div></div>
+          @if (errorInfo.stack) {
+            <pre class="error-stack">{{errorInfo.stack}}</pre>
+          }
         </div>
-        <div class="job-log-container" #jobLogContainer>
-            <stream-log-viewer class="job-log-viewer" *ngIf="shouldShowJobLog"
-                               [logLineSource]="jobLogLines"></stream-log-viewer>
-        </div>
+      }
     </div>
+  }
+  <div class="ui segment section-card">
+    <div class="ui header">Vertex Info</div>
+    @if (vertices) {
+      <vertex-graph [vertices]="vertices" (nodeSelected)="openVertexDetail($event)"></vertex-graph>
+    }
+  </div>
+  <div class="ui segment section-card">
+    <div class="ui header">Job Log</div>
+    @if (!shouldShowJobLog) {
+      <div class="job-log-action">
+        <button class="ui button" (click)="showJobLog()">Show Job Log</button>
+      </div>
+    }
+    <div class="job-log-container" #jobLogContainer>
+      @if (shouldShowJobLog) {
+        <stream-log-viewer class="job-log-viewer"
+        [logLineSource]="jobLogLines"></stream-log-viewer>
+      }
+    </div>
+  </div>
 </div>

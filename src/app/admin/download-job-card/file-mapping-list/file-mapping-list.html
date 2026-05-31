@@ -1,22 +1,26 @@
 <div class="file-mapping-list-modal">
-    <div class="modal-header">
-        <h4>File Mapping of Job {{jobId}}</h4>
-        <a class="close-button" (click)="close()"><i class="remove icon"></i></a>
-    </div>
+  <div class="modal-header">
+    <h4>File Mapping of Job {{jobId}}</h4>
+    <a class="close-button" (click)="close()"><i class="remove icon"></i></a>
+  </div>
 
-    <div class="modal-content">
-        <div class="ui relaxed divided list">
-            <div class="item" *ngFor="let entry of fileMapping">
-                <i class="large file alternative middle aligned icon"></i>
-                <div class="content">
-                    <span class="header">
-                        VideoId:
-                        {{entry.videoId}}
-                        <span *ngIf="fileMappingEnhanced">(Episode: {{entry.episode.episodeNo}})</span>
-                    </span>
-                    <div class="description">{{entry.filePath}}</div>
-                </div>
-            </div>
+  <div class="modal-content">
+    <div class="ui relaxed divided list">
+      @for (entry of fileMapping; track entry) {
+        <div class="item">
+          <i class="large file alternative middle aligned icon"></i>
+          <div class="content">
+            <span class="header">
+              VideoId:
+              {{entry.videoId}}
+              @if (fileMappingEnhanced) {
+                <span>(Episode: {{entry.episode.episodeNo}})</span>
+              }
+            </span>
+            <div class="description">{{entry.filePath}}</div>
+          </div>
         </div>
+      }
     </div>
+  </div>
 </div>

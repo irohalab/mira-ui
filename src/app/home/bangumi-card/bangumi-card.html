@@ -1,43 +1,46 @@
-<div class="ui container" *ngIf="isInit">
+@if (isInit) {
+  <div class="ui container">
     <a class="ui segment" [routerLink]="['/bangumi', bangumi.id]" [ngClass]="{inverted: isDarkTheme}">
-        <div class="bangumi-list-item">
-            <ui-responsive-image class="cover-wrapper"
-                              [src]="imageUrl"
+      <div class="bangumi-list-item">
+        <ui-responsive-image class="cover-wrapper"
+          [src]="imageUrl"
                               [size]="{
                                 width: '10rem',
                                 height: '100%',
                                 originalWidth: bangumi.coverImage.width,
                                 originalHeight: bangumi.coverImage.height
                               }"
-                              [background]="bangumi.coverImage.dominantColor"
-                              (imageLoad)="onImageLoad()"
-            ></ui-responsive-image>
-            <div class="list-item-text">
-                <h4 class="bangumi-title">{{bangumi.nameCn || bangumi.name}}</h4>
-                <h4 class="entry" *ngIf="bangumi.nameCn">
-                    <span class="entry-key">日文名</span>
-                    <span class="entry-value">{{bangumi.name || '暂无'}}</span>
-                </h4>
-                <p class="entry">
-                    <span class="entry-key">简介</span>
-                    <span class="entry-value">{{bangumi.summary || '暂无'}}</span>
-                </p>
-                <p class="entry">
-                    <span class="entry-key">放送开始</span>
-                    <span class="entry-value">{{bangumi.airDate || '未知'}}</span>
-                </p>
-                <p class="entry">
-                    <span class="entry-key">放送星期</span>
-                    <span class="entry-value">{{bangumi.airWeekday || '未知'}}</span>
-                </p>
-                <p class="entry">
-                    <span class="entry-key">话数</span>
-                    <span class="entry-value">{{bangumi.eps || '0'}}</span>
-                </p>
-            </div>
+          [background]="bangumi.coverImage.dominantColor"
+          (imageLoad)="onImageLoad()"
+        ></ui-responsive-image>
+        <div class="list-item-text">
+          <h4 class="bangumi-title">{{bangumi.nameCn || bangumi.name}}</h4>
+          @if (bangumi.nameCn) {
+            <h4 class="entry">
+              <span class="entry-key">日文名</span>
+              <span class="entry-value">{{bangumi.name || '暂无'}}</span>
+            </h4>
+          }
+          <p class="entry">
+            <span class="entry-key">简介</span>
+            <span class="entry-value">{{bangumi.summary || '暂无'}}</span>
+          </p>
+          <p class="entry">
+            <span class="entry-key">放送开始</span>
+            <span class="entry-value">{{bangumi.airDate || '未知'}}</span>
+          </p>
+          <p class="entry">
+            <span class="entry-key">放送星期</span>
+            <span class="entry-value">{{bangumi.airWeekday || '未知'}}</span>
+          </p>
+          <p class="entry">
+            <span class="entry-key">话数</span>
+            <span class="entry-value">{{bangumi.eps || '0'}}</span>
+          </p>
         </div>
-        <!-- TODO: comment out because currently we don't support favorite for bangumi list -->
-<!--        <div *ngIf="bangumi.favorite_status" class="ui right ribbon label"-->
+      </div>
+      <!-- TODO: comment out because currently we don't support favorite for bangumi list -->
+      <!--        <div *ngIf="bangumi.favorite_status" class="ui right ribbon label"-->
 <!--            [ngClass]="{-->
 <!--            orange: bangumi.favorite_status === 1,-->
 <!--            olive: bangumi.favorite_status === 2,-->
@@ -49,7 +52,9 @@
 <!--        </div>-->
     </a>
 </div>
-<div class="ui container" *ngIf="!isInit">
+}
+@if (!isInit) {
+<div class="ui container">
     <div class="ui segment">
         <div class="bangumi-list-item">
             <div class="cover-wrapper ui placeholder">
@@ -73,3 +78,4 @@
         </div>
     </div>
 </div>
+}

@@ -31,7 +31,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
     @Input()
     resourceGroup: ResourceGroup;
 
-    resourceGroupDict: {[rgId: string]: ResourceGroup} = {};
+    resourceGroupDict: { [rgId: string]: ResourceGroup } = {};
 
     videoFileList: FormGroup[];
     ruleMap: { [videoId: string]: { isDirty: boolean, rule: VideoProcessRule } };
@@ -155,10 +155,11 @@ export class VideoFileModal implements OnInit, OnDestroy {
         this._subscription.add(
             forkJoin([
                 this._adminService.getEpisodeVideoFiles(this.episode.id, this.resourceGroup?.id),
-                this.resourceGroup ? of([this.resourceGroup]) : this._adminService.listResourceGroups(this.episode.bangumi.id, false).pipe(catchError((err) => {
-                    this._toastRef.show(err.message);
-                    return [];
-                }))
+                this.resourceGroup ? of([this.resourceGroup]) : this._adminService.listResourceGroups(this.episode.bangumi.id, false)
+                    .pipe(catchError((err) => {
+                        this._toastRef.show(err.message);
+                        return of([] as ResourceGroup[]);
+                    }))
             ])
                 .pipe(switchMap(([videoFileList, resourceGroupList]) => {
                     for (const rg of resourceGroupList) {
@@ -185,10 +186,12 @@ export class VideoFileModal implements OnInit, OnDestroy {
                         }));
                     }
 
-                    return this._videoProcessRuleService.listRulesByBangumi(this.episode.bangumi.id).pipe(catchError((error) => {
-                        this._toastRef.show(error.message);
-                        return [];
-                    }));
+                    return this._videoProcessRuleService.listRulesByBangumi(this.episode.bangumi.id)
+                        .pipe(
+                            catchError((error) => {
+                                this._toastRef.show(error.message);
+                                return of([] as VideoProcessRule[]);
+                            }));
                 }))
                 .subscribe({
                     next: (ruleList: VideoProcessRule[]) => {

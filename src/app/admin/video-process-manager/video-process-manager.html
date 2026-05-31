@@ -1,34 +1,36 @@
 <admin-navbar navTitle="视频管理">
-    <div class="ui icon input action-item search-action">
-        <input type="text" placeholder="Search Download Job" #searchBox>
-        <i class="search icon"></i>
-    </div>
-    <ui-toggle class="action-item show-meta-jobs-toggle" text="Show Meta Jobs"
-               [(ngModel)]="isShowMetaJobs" name="isShowMetaJobs" (ngModelChange)="filterJob()"></ui-toggle>
+  <div class="ui icon input action-item search-action">
+    <input type="text" placeholder="Search Download Job" #searchBox>
+    <i class="search icon"></i>
+  </div>
+  <ui-toggle class="action-item show-meta-jobs-toggle" text="Show Meta Jobs"
+  [(ngModel)]="isShowMetaJobs" name="isShowMetaJobs" (ngModelChange)="filterJob()"></ui-toggle>
 </admin-navbar>
 <div class="sub-menu">
-    <div class="ui secondary vertical pointing menu">
-        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: 'all'}">Recent Jobs</div>
-        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Queueing}">Queueing</div>
-        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Running}">Running</div>
-        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Finished}">Finished</div>
-        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.UnrecoverableError}">UnrecoverableError</div>
-        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Pause}">Pause</div>
-        <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Canceled}">Canceled</div>
-    </div>
+  <div class="ui secondary vertical pointing menu">
+    <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: 'all'}">Recent Jobs</div>
+    <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Queueing}">Queueing</div>
+    <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Running}">Running</div>
+    <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Finished}">Finished</div>
+    <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.UnrecoverableError}">UnrecoverableError</div>
+    <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Pause}">Pause</div>
+    <div class="item" routerLinkActive="active" [routerLink]="['/admin/video-manager']" [queryParams]="{status: eJobStatus.Canceled}">Canceled</div>
+  </div>
 </div>
 <div class="content-area">
-    <div class="table-header">
-        <div class="job-id">Job ID</div>
-        <div class="bangumi-id">Bangumi ID</div>
-        <div class="create-time">Create Time</div>
-        <div class="start-time">Start Time</div>
-        <div class="finished-time">Finished Time</div>
+  <div class="table-header">
+    <div class="job-id">Job ID</div>
+    <div class="bangumi-id">Bangumi ID</div>
+    <div class="create-time">Create Time</div>
+    <div class="start-time">Start Time</div>
+    <div class="finished-time">Finished Time</div>
+  </div>
+  @if (!isLoading && jobList && jobList.length > 0) {
+    <div class="job-container">
+      <infinite-list [rowHeight]="cardHeight">
+        <video-process-job-card  *infiniteFor="let job of jobList" [job]="job">
+        </video-process-job-card>
+      </infinite-list>
     </div>
-    <div class="job-container" *ngIf="!isLoading && jobList && jobList.length > 0">
-        <infinite-list [rowHeight]="cardHeight">
-            <video-process-job-card  *infiniteFor="let job of jobList" [job]="job">
-            </video-process-job-card>
-        </infinite-list>
-    </div>
+  }
 </div>

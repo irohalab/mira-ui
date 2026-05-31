@@ -1,15 +1,25 @@
 <div class="header">
-    我在看的番組
+  我在看的番組
 </div>
-<div class="menu favorite-list" *ngIf="favoriteList && favoriteList.length > 0">
-    <a class="item favorite-item" *ngFor="let fav of favoriteList" [routerLink]="['/bangumi', fav.bangumi.id]">
+@if (favoriteList && favoriteList.length > 0) {
+  <div class="menu favorite-list">
+    @for (fav of favoriteList; track fav) {
+      <a class="item favorite-item" [routerLink]="['/bangumi', fav.bangumi.id]">
         <span class="bangumi-name">
-            {{fav.bangumi.nameCn}}
+          {{fav.bangumi.nameCn}}
         </span>
-        <span *ngIf="fav.unwatchedCount && fav.checkTime < fav.epsUpdateTime" class="ui orange small label">{{fav.unwatchedCount}}</span>
-        <span *ngIf="fav.unwatchedCount && fav.checkTime >= fav.epsUpdateTime" class="ui small undecorated label">{{fav.unwatchedCount}}</span>
-    </a>
-</div>
-<div class="empty-placeholder" *ngIf="favoriteList && favoriteList.length === 0">
+        @if (fav.unwatchedCount && fav.checkTime < fav.epsUpdateTime) {
+          <span class="ui orange small label">{{fav.unwatchedCount}}</span>
+        }
+        @if (fav.unwatchedCount && fav.checkTime >= fav.epsUpdateTime) {
+          <span class="ui small undecorated label">{{fav.unwatchedCount}}</span>
+        }
+      </a>
+    }
+  </div>
+}
+@if (favoriteList && favoriteList.length === 0) {
+  <div class="empty-placeholder">
     还没有在看的番組
-</div>
+  </div>
+}

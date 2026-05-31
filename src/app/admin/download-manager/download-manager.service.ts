@@ -65,7 +65,7 @@ export class DownloadManagerService extends BaseService {
                 }),
                 catchError((err) => {
                     console.log(err);
-                    return [];
+                    return of([] as DownloadJob[]);
                 }));
     }
 

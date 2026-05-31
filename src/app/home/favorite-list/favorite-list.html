@@ -1,52 +1,58 @@
 <div class="favorite-list-container" [ngClass]="{'dark-theme': isDarkTheme}">
-    <div class="filter-container" (click)="onClickFilterContainer()">
-        <div class="ui container">
-            <div class="ui secondary pointing menu" [ngClass]="{inverted: isDarkTheme}">
-                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.WISH}" (click)="onStatusChange(eFavoriteStatus.WISH)">想看</a>
-                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.WATCHING}" (click)="onStatusChange(eFavoriteStatus.WATCHING)">在看</a>
-                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.WATCHED}" (click)="onStatusChange(eFavoriteStatus.WATCHED)">看过</a>
-                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.PAUSE}" (click)="onStatusChange(eFavoriteStatus.PAUSE)">搁置</a>
-                <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.ABANDONED}" (click)="onStatusChange(eFavoriteStatus.ABANDONED)">抛弃</a>
-                <div class="right menu">
-                    <div class="ui item inline dropdown" uiDropdown="click" [stopPropagation]="true">
-                        <div class="text">{{sortFieldLabel[orderBy]}}</div>
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            <div class="item" (click)="onSortFieldChange('favorite_update_time')">按我修改的时间</div>
-                            <div class="item" (click)="onSortFieldChange('eps_update_time')">按最近更新的时间</div>
-                            <div class="item" (click)="onSortFieldChange('air_date')">按开播时间</div>
-                        </div>
-                    </div>
-                    <a class="ui item sort-button anchor-button" (click)="onOrderChange($event)"
-                       [title]="sort === 'desc' ? '降序': '升序'">
-                        <i class="sort content icon"
-                           [ngClass]="{ascending: sort === 'asc', descending: sort === 'desc'}"></i>
-                    </a>
-                    <div class="ui item inline dropdown" uiDropdown="click" [stopPropagation]="true">
-                        <div class="text">{{typeMenuLabel[type]}}</div>
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            <div class="item" (click)="onTypeChange('all')">全部</div>
-                            <div class="item" (click)="onTypeChange('anime')">动画</div>
-                            <div class="item" (click)="onTypeChange('real')">电视剧</div>
-                        </div>
-                    </div>
-                </div>
+  <div class="filter-container" (click)="onClickFilterContainer()">
+    <div class="ui container">
+      <div class="ui secondary pointing menu" [ngClass]="{inverted: isDarkTheme}">
+        <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.WISH}" (click)="onStatusChange(eFavoriteStatus.WISH)">想看</a>
+        <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.WATCHING}" (click)="onStatusChange(eFavoriteStatus.WATCHING)">在看</a>
+        <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.WATCHED}" (click)="onStatusChange(eFavoriteStatus.WATCHED)">看过</a>
+        <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.PAUSE}" (click)="onStatusChange(eFavoriteStatus.PAUSE)">搁置</a>
+        <a class="item" [ngClass]="{active: favoriteStatus === eFavoriteStatus.ABANDONED}" (click)="onStatusChange(eFavoriteStatus.ABANDONED)">抛弃</a>
+        <div class="right menu">
+          <div class="ui item inline dropdown" uiDropdown="click" [stopPropagation]="true">
+            <div class="text">{{sortFieldLabel[orderBy]}}</div>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <div class="item" (click)="onSortFieldChange('favorite_update_time')">按我修改的时间</div>
+              <div class="item" (click)="onSortFieldChange('eps_update_time')">按最近更新的时间</div>
+              <div class="item" (click)="onSortFieldChange('air_date')">按开播时间</div>
             </div>
+          </div>
+          <a class="ui item sort-button anchor-button" (click)="onOrderChange($event)"
+            [title]="sort === 'desc' ? '降序': '升序'">
+            <i class="sort content icon"
+            [ngClass]="{ascending: sort === 'asc', descending: sort === 'desc'}"></i>
+          </a>
+          <div class="ui item inline dropdown" uiDropdown="click" [stopPropagation]="true">
+            <div class="text">{{typeMenuLabel[type]}}</div>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <div class="item" (click)="onTypeChange('all')">全部</div>
+              <div class="item" (click)="onTypeChange('anime')">动画</div>
+              <div class="item" (click)="onTypeChange('real')">电视剧</div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-    <div class="timeline-container" *ngIf="!isLoading && !!favoriteList && favoriteList.length > 0">
-        <ui-timeline-meter [rowHeight]="cardHeight" [timestampList]="timestampList">
-            <infinite-list [rowHeight]="cardHeight" [newScrollPosition]="lastScrollPosition"
-                           (scrollPosition)="onScrollPositionChange($event)">
-                <bangumi-card *infiniteFor="let favorite of favoriteList" [bangumi]="favorite.bangumi" [isInit]="true"></bangumi-card>
-            </infinite-list>
-        </ui-timeline-meter>
+  </div>
+  @if (!isLoading && !!favoriteList && favoriteList.length > 0) {
+    <div class="timeline-container">
+      <ui-timeline-meter [rowHeight]="cardHeight" [timestampList]="timestampList">
+        <infinite-list [rowHeight]="cardHeight" [newScrollPosition]="lastScrollPosition"
+          (scrollPosition)="onScrollPositionChange($event)">
+          <bangumi-card *infiniteFor="let favorite of favoriteList" [bangumi]="favorite.bangumi" [isInit]="true"></bangumi-card>
+        </infinite-list>
+      </ui-timeline-meter>
     </div>
-    <div class="no-result-container" *ngIf="!isLoading && (!favoriteList || favoriteList.length === 0)">
-        <div class="no-result-tips"><i class="warning circle icon"></i>还没有内容</div>
+  }
+  @if (!isLoading && (!favoriteList || favoriteList.length === 0)) {
+    <div class="no-result-container">
+      <div class="no-result-tips"><i class="warning circle icon"></i>还没有内容</div>
     </div>
-    <div class="loading-container" *ngIf="isLoading">
-        <div class="ui inverted massive text active loader">Loading...</div>
+  }
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="ui inverted massive text active loader">Loading...</div>
     </div>
+  }
 </div>

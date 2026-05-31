@@ -1,66 +1,77 @@
-<div class="ui segment" [ngClass]="{inverted: isDarkTheme, red: !!bangumi.deleteMark}" *ngIf="isInit">
+@if (isInit) {
+  <div class="ui segment" [ngClass]="{inverted: isDarkTheme, red: !!bangumi.deleteMark}">
     <div class="bangumi-list-item">
+      @if (!!bangumi.coverImage) {
         <ui-responsive-image class="cover-wrapper"
-                          *ngIf="!!bangumi.coverImage"
-                          [src]="imageUrl"
+          [src]="imageUrl"
                           [size]="{
                             width: '10rem',
                             height: '100%',
                             originalWidth: bangumi.coverImage.width,
                             originalHeight: bangumi.coverImage.height}"
-                          [background]="bangumi.coverImage.dominantColor"
-                          (imageLoad)="onImageLoad()">
+          [background]="bangumi.coverImage.dominantColor"
+          (imageLoad)="onImageLoad()">
         </ui-responsive-image>
-        <div class="cover-wrapper" *ngIf="!!bangumi.image && !bangumi.coverImage">
-            <img [src]="bangumi.image" alt="image" class="bangumi-image">
+      }
+      @if (!!bangumi.image && !bangumi.coverImage) {
+        <div class="cover-wrapper">
+          <img [src]="bangumi.image" alt="image" class="bangumi-image">
         </div>
-        <div class="list-item-text">
-            <h4 class="bangumi-title">{{bangumi.nameCn || '暂无'}}<span class="ui teal small label" *ngIf="bangumi.id && showAddedTag">已添加</span></h4>
-            <h4 class="entry">
-                <span class="entry-key">日文名</span>
-                <span class="entry-value">{{bangumi.name || '暂无'}}</span>
-            </h4>
-            <p class="entry">
-                <span class="entry-key">简介</span>
-                <span class="entry-value">{{bangumi.summary || '暂无'}}</span>
-            </p>
-            <p class="entry">
-                <span class="entry-key">放送开始</span>
-                <span class="entry-value">{{bangumi.airDate || '未知'}}</span>
-            </p>
-<!--            <p class="entry">-->
-<!--                <span class="entry-key">放送星期</span>-->
-<!--                <span class="entry-value">{{bangumi.airWeekday || '未知'}}</span>-->
-<!--            </p>-->
-            <p class="entry">
-                <span class="entry-key">话数</span>
-                <span class="entry-value">{{bangumi.eps || '0'}}</span>
-            </p>
-        </div>
+      }
+      <div class="list-item-text">
+        <h4 class="bangumi-title">{{bangumi.nameCn || '暂无'}}@if (bangumi.id && showAddedTag) {
+          <span class="ui teal small label">已添加</span>
+        }</h4>
+        <h4 class="entry">
+          <span class="entry-key">日文名</span>
+          <span class="entry-value">{{bangumi.name || '暂无'}}</span>
+        </h4>
+        <p class="entry">
+          <span class="entry-key">简介</span>
+          <span class="entry-value">{{bangumi.summary || '暂无'}}</span>
+        </p>
+        <p class="entry">
+          <span class="entry-key">放送开始</span>
+          <span class="entry-value">{{bangumi.airDate || '未知'}}</span>
+        </p>
+        <!--            <p class="entry">-->
+        <!--                <span class="entry-key">放送星期</span>-->
+        <!--                <span class="entry-value">{{bangumi.airWeekday || '未知'}}</span>-->
+      <!--            </p>-->
+      <p class="entry">
+        <span class="entry-key">话数</span>
+        <span class="entry-value">{{bangumi.eps || '0'}}</span>
+      </p>
     </div>
-    <div *ngIf="bangumi.deleteMark" class="ui bottom right attached label">Delete ETA: {{bangumi.deleteEta}}</div>
+  </div>
+  @if (bangumi.deleteMark) {
+    <div class="ui bottom right attached label">Delete ETA: {{bangumi.deleteEta}}</div>
+  }
 </div>
-<div class="ui container" *ngIf="!isInit">
+}
+@if (!isInit) {
+  <div class="ui container">
     <div class="ui segment">
-        <div class="bangumi-list-item">
-            <div class="cover-wrapper ui placeholder">
-                <div class="image"></div>
-            </div>
-            <div class="list-item-text ui placeholder">
-                <div class="header">
-                    <div class="short title line"></div>
-                </div>
-                <div class="line">
-                </div>
-                <div class="line">
-                </div>
-                <div class="line">
-                </div>
-                <div class="line">
-                </div>
-                <div class="line">
-                </div>
-            </div>
+      <div class="bangumi-list-item">
+        <div class="cover-wrapper ui placeholder">
+          <div class="image"></div>
         </div>
+        <div class="list-item-text ui placeholder">
+          <div class="header">
+            <div class="short title line"></div>
+          </div>
+          <div class="line">
+          </div>
+          <div class="line">
+          </div>
+          <div class="line">
+          </div>
+          <div class="line">
+          </div>
+          <div class="line">
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+}

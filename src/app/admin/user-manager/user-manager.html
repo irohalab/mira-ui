@@ -1,72 +1,82 @@
 <admin-navbar navTitle="用户管理"></admin-navbar>
 <div class="content-area">
-    <div class="ui segment">
-        <h4>用户列表</h4>
-        <form (submit)="getUserList(page)">
-            <div class="ui compact selection dropdown" uiDropdown="click">
-                <div class="text">{{availableField[queryField]}}</div>
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <div class="item" *ngFor="let field of availableField | keyvalue" (click)="changeQueryField(field.key)">{{field.value}}</div>
-                </div>
-            </div>
-            <div class="ui action input">
-                <input type="text" placeholder="输入过滤内容" name="query_value" [(ngModel)]="queryValue">
-                <button type="submit" class="ui button">查询</button>
-            </div>
-        </form>
-        <table class="ui very basic table">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>名字</th>
-                <th>Email</th>
-                <th>activateTime</th>
-                <th>updateTime</th>
-                <th>操作</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let account of accountList">
-                <td>{{account.id}}</td>
-                <td>{{account.nickName}}</td>
-                <td>{{account.email}}</td>
-                <td>{{account.activateTime}}</td>
-                <td>{{account.updateTime}}</td>
-                <td>
-                    <a *ngIf="currentAdmin.level >= 3" class="anchor-button" title="修改用户等级" (click)="promoteUser(account)"><i class="wizard icon"></i></a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <div class="pagination-container" *ngIf="total > limit">
-            <ui-pagination [currentPage]="page" [total]="total" [countPerPage]="limit" [max]="6" (pageChange)="getUserList($event)"></ui-pagination>
+  <div class="ui segment">
+    <h4>用户列表</h4>
+    <form (submit)="getUserList(page)">
+      <div class="ui compact selection dropdown" uiDropdown="click">
+        <div class="text">{{availableField[queryField]}}</div>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          @for (field of availableField | keyvalue; track field) {
+            <div class="item" (click)="changeQueryField(field.key)">{{field.value}}</div>
+          }
         </div>
+      </div>
+      <div class="ui action input">
+        <input type="text" placeholder="输入过滤内容" name="query_value" [(ngModel)]="queryValue">
+        <button type="submit" class="ui button">查询</button>
+      </div>
+    </form>
+    <table class="ui very basic table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>名字</th>
+          <th>Email</th>
+          <th>activateTime</th>
+          <th>updateTime</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (account of accountList; track account) {
+          <tr>
+            <td>{{account.id}}</td>
+            <td>{{account.nickName}}</td>
+            <td>{{account.email}}</td>
+            <td>{{account.activateTime}}</td>
+            <td>{{account.updateTime}}</td>
+            <td>
+              @if (currentAdmin.level >= 3) {
+                <a class="anchor-button" title="修改用户等级" (click)="promoteUser(account)"><i class="wizard icon"></i></a>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (total > limit) {
+      <div class="pagination-container">
+        <ui-pagination [currentPage]="page" [total]="total" [countPerPage]="limit" [max]="6" (pageChange)="getUserList($event)"></ui-pagination>
+      </div>
+    }
+  </div>
+  <div class="ui segment">
+    <h4>未使用的邀请码</h4>
+    <div class="ui action input">
+      <input type="number" placeholder="生成邀请码数量" [value]="1" [min]="1" #inviteCodeNumInput (change)="changeInviteCodeNumber(inviteCodeNumInput.value)">
+      <button class="ui button" (click)="generateInviteCode()">生成{{inviteCodeNum}}个邀请码</button>
     </div>
-    <div class="ui segment">
-        <h4>未使用的邀请码</h4>
-        <div class="ui action input">
-            <input type="number" placeholder="生成邀请码数量" [value]="1" [min]="1" #inviteCodeNumInput (change)="changeInviteCodeNumber(inviteCodeNumInput.value)">
-            <button class="ui button" (click)="generateInviteCode()">生成{{inviteCodeNum}}个邀请码</button>
-        </div>
-        <table class="ui very basic table">
-            <thead>
-            <tr>
-                <th>Code</th>
-                <th>操作</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let code of inviteCodeList">
-                <td>
-                    {{code}}
-                </td>
-                <td>
-                    <a class="anchor-button" title="分享" (click)="shareCode(code)"><i class="share alternate icon"></i></a>
-                    <!--<a class="anchor-button" title=""></a>-->
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+    <table class="ui very basic table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (code of inviteCodeList; track code) {
+          <tr>
+            <td>
+              {{code}}
+            </td>
+            <td>
+              <a class="anchor-button" title="分享" (click)="shareCode(code)"><i class="share alternate icon"></i></a>
+              <!--<a class="anchor-button" title=""></a>-->
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </div>

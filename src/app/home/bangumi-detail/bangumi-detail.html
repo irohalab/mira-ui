@@ -1,112 +1,148 @@
-<div class="loading-wrapper" *ngIf="!bangumi">
+@if (!bangumi) {
+  <div class="loading-wrapper">
     <div class="ui active medium loader"></div>
-</div>
-<div class="ui container bangumi-default-container" *ngIf="bangumi" [ngClass]="{'dark-theme': isDarkTheme}">
+  </div>
+}
+@if (bangumi) {
+  <div class="ui container bangumi-default-container" [ngClass]="{'dark-theme': isDarkTheme}">
     <div class="bangumi-info">
-        <div #bangumiCover class="bangumi-cover" *ngIf="bangumi.coverImage">
-            <ui-responsive-image [src]="bangumi.coverImage.url"
+      @if (bangumi.coverImage) {
+        <div #bangumiCover class="bangumi-cover">
+          <ui-responsive-image [src]="bangumi.coverImage.url"
                               [size]="{
                                 width: '100%',
                                 ratio: bangumi.coverImage.height / bangumi.coverImage.width,
                                 originalWidth: bangumi.coverImage.width,
                                 originalHeight: bangumi.coverImage.height}"
-                              [background]="bangumi.coverImage.dominantColor"></ui-responsive-image>
-            <bangumi-staff-info *ngIf="!!extraInfo && !!extraInfo.staff" [staffList]="extraInfo.staff"></bangumi-staff-info>
+          [background]="bangumi.coverImage.dominantColor"></ui-responsive-image>
+          @if (!!extraInfo && !!extraInfo.staff) {
+            <bangumi-staff-info [staffList]="extraInfo.staff"></bangumi-staff-info>
+          }
         </div>
-        <div class="bangumi-cover-revealer" [style.height]="coverRevealerHeight" (click)="toggleCover()">
+      }
+      <div class="bangumi-cover-revealer" [style.height]="coverRevealerHeight" (click)="toggleCover()">
+      </div>
+      <div class="bangumi-base-info">
+        <h2 class="bangumi-title name-cn">
+          {{bangumi.nameCn || bangumi.name}}
+          <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgmId" target="_blank"
+            title="在bgm.tv页面查看">
+            <i class="bgm-emo-47 bgm-link-icon"></i>
+          </a>
+          @if (user.role === User.ADMIN_ROLE || user.role === User.SUPER_ADMIN_ROLE) {
+            <a class="external-link" title="编辑" [routerLink]="['/admin/bangumi/', bangumi.id]">
+              <i class="edit icon"></i>
+            </a>
+          }
+        </h2>
+        @if (bangumi.nameCn) {
+          <h3 class="bangumi-title name">
+            <span class="tip">日文名:</span><span class="name-text">{{bangumi.name}}</span>
+          </h3>
+        }
+        @if (user && user.id !== User.ID_INITIAL_USER && user.role !== User.GUEST_ROLE) {
+          <favorite-chooser [bangumi]="bangumi" [loadBgmInfo]="true" (reloadEpisodes)="reloadEpisodes()"></favorite-chooser>
+        }
+        @if (isExtraInfoEnabled && !!extraInfo && !!extraInfo.rating) {
+          <div class="rating facade-item">
+            <bangumi-rating [rating]="extraInfo.rating"></bangumi-rating>
+          </div>
+        }
+        <div class="summary facade-item">
+          {{bangumi.summary}}
         </div>
-        <div class="bangumi-base-info">
-            <h2 class="bangumi-title name-cn">
-                {{bangumi.nameCn || bangumi.name}}
-                <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgmId" target="_blank"
-                   title="在bgm.tv页面查看">
-                    <i class="bgm-emo-47 bgm-link-icon"></i>
-                </a>
-                <a *ngIf="user.role === User.ADMIN_ROLE || user.role === User.SUPER_ADMIN_ROLE" class="external-link" title="编辑" [routerLink]="['/admin/bangumi/', bangumi.id]">
-                    <i class="edit icon"></i>
-                </a>
-            </h2>
-            <h3 class="bangumi-title name" *ngIf="bangumi.nameCn">
-                <span class="tip">日文名:</span><span class="name-text">{{bangumi.name}}</span>
-            </h3>
-            <favorite-chooser *ngIf="user && user.id !== User.ID_INITIAL_USER && user.role !== User.GUEST_ROLE" [bangumi]="bangumi" [loadBgmInfo]="true" (reloadEpisodes)="reloadEpisodes()"></favorite-chooser>
-            <div class="rating facade-item" *ngIf="isExtraInfoEnabled && !!extraInfo && !!extraInfo.rating">
-                <bangumi-rating [rating]="extraInfo.rating"></bangumi-rating>
-            </div>
-            <div class="summary facade-item">
-                {{bangumi.summary}}
-            </div>
-            <div class="on-air-info facade-item">
-                <span class="key">放送开始：</span>
-                <span class="value">{{bangumi.airDate}}</span>
-                <span class="key">放送星期：</span>
-                <span class="value">{{bangumi.airWeekday | weekday}}</span>
-            </div>
-            <bangumi-character *ngIf="!!extraInfo && !!extraInfo.crt" [bangumi]="bangumi" [characterList]="extraInfo.crt"></bangumi-character>
+        <div class="on-air-info facade-item">
+          <span class="key">放送开始：</span>
+          <span class="value">{{bangumi.airDate}}</span>
+          <span class="key">放送星期：</span>
+          <span class="value">{{bangumi.airWeekday | weekday}}</span>
         </div>
+        @if (!!extraInfo && !!extraInfo.crt) {
+          <bangumi-character [bangumi]="bangumi" [characterList]="extraInfo.crt"></bangumi-character>
+        }
+      </div>
     </div>
-    <div class="episode-list" *ngIf="episodeList && episodeList.length > 0">
+    @if (episodeList && episodeList.length > 0) {
+      <div class="episode-list">
         <h4 class="episode-list-heading">各话列表</h4>
         <div class="episode-layout-button-groups">
-            <a class="layout-button sort-button" [title]="sortOrder === 'desc' ? '最早在前，显示所有' : '最新在前，仅显示可观看'" (click)="toggleSortOrder()">
-                <i class="ui sort numeric icon" [ngClass]="{up: sortOrder === 'asc', down: sortOrder === 'desc'}"></i>
-            </a>
-            <a class="layout-button" title="网格视图" (click)="changeLayoutType(eLayoutTypes.GRID)"><i class="ui th icon"></i></a>
-            <a class="layout-button" title="列表视图" (click)="changeLayoutType(eLayoutTypes.LIST)"><i class="ui th list icon"></i></a>
+          <a class="layout-button sort-button" [title]="sortOrder === 'desc' ? '最早在前，显示所有' : '最新在前，仅显示可观看'" (click)="toggleSortOrder()">
+            <i class="ui sort numeric icon" [ngClass]="{up: sortOrder === 'asc', down: sortOrder === 'desc'}"></i>
+          </a>
+          <a class="layout-button" title="网格视图" (click)="changeLayoutType(eLayoutTypes.GRID)"><i class="ui th icon"></i></a>
+          <a class="layout-button" title="列表视图" (click)="changeLayoutType(eLayoutTypes.LIST)"><i class="ui th list icon"></i></a>
         </div>
         <div class="ui divider"></div>
-        <div *ngIf="layoutType === eLayoutTypes.LIST" class="episode-list-view ui stackable two column grid">
-            <div class="column" *ngFor="let episode of episodeList">
+        @if (layoutType === eLayoutTypes.LIST) {
+          <div class="episode-list-view ui stackable two column grid">
+            @for (episode of episodeList; track episode) {
+              <div class="column">
                 <div class="ui segment episode-list-view-item">
-                    <div class="image" *ngIf="episode.status!==2">
-                        <div class="image-wrapper">
-                            <div class="image-fallback">
-                                <h4 class="ui icon film icon-holder">
-                                    <i class="film icon"></i>
-                                </h4>
-                            </div>
+                  @if (episode.status!==2) {
+                    <div class="image">
+                      <div class="image-wrapper">
+                        <div class="image-fallback">
+                          <h4 class="ui icon film icon-holder">
+                            <i class="film icon"></i>
+                          </h4>
                         </div>
+                      </div>
                     </div>
-                    <div *ngIf="episode.status!==2" class="content unfinished">
-                        <div class="content-heading">
-                            <span class="eps-no">第{{episode.episodeNo}}话</span>
-                            <span *ngIf="episode.nameCn || episode.name">{{episode.nameCn || episode.name}}</span>
-                        </div>
-                        <div class="extra-info">
-                            <span>时长:&nbsp;{{episode.duration}}</span>
-                            <span>更新时间:{{episode.airdate}}</span>
-                            <span class="ui tiny teal label" *ngIf="sortOrder === 'desc' && episode.status !== 2">即将播出</span>
-                        </div>
+                  }
+                  @if (episode.status!==2) {
+                    <div class="content unfinished">
+                      <div class="content-heading">
+                        <span class="eps-no">第{{episode.episodeNo}}话</span>
+                        @if (episode.nameCn || episode.name) {
+                          <span>{{episode.nameCn || episode.name}}</span>
+                        }
+                      </div>
+                      <div class="extra-info">
+                        <span>时长:&nbsp;{{episode.duration}}</span>
+                        <span>更新时间:{{episode.airdate}}</span>
+                        @if (sortOrder === 'desc' && episode.status !== 2) {
+                          <span class="ui tiny teal label">即将播出</span>
+                        }
+                      </div>
                     </div>
-                    <a *ngIf="episode.status===2" class="image" [routerLink]="['/play', episode.id]">
-                        <ui-responsive-image [src]="episode.thumbnailImage.url"
+                  }
+                  @if (episode.status===2) {
+                    <a class="image" [routerLink]="['/play', episode.id]">
+                      <ui-responsive-image [src]="episode.thumbnailImage.url"
                                           [size]="{
                                         width: '100%',
                                         ratio: 0.5625,
                                         originalWidth: episode.thumbnailImage.width,
                                         originalHeight: episode.thumbnailImage.height}"
-                                          [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
+                      [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
                     </a>
-                    <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">
-                        <div class="content-heading">
-                            <span class="eps-no">第{{episode.episodeNo}}话</span>
-                            <span *ngIf="episode.nameCn || episode.name">{{episode.nameCn || episode.name}}</span>
-                        </div>
-                        <div class="extra-info">
-                            <span>时长:&nbsp;{{episode.duration}}</span>
-                            <span>更新时间:{{episode.airdate}}</span>
-                            <span class="ui tiny teal label" *ngIf="sortOrder === 'desc' && episode.status !== 2">即将播出</span>
-                        </div>
+                  }
+                  @if (episode.status===2) {
+                    <a class="content" [routerLink]="['/play', episode.id]">
+                      <div class="content-heading">
+                        <span class="eps-no">第{{episode.episodeNo}}话</span>
+                        @if (episode.nameCn || episode.name) {
+                          <span>{{episode.nameCn || episode.name}}</span>
+                        }
+                      </div>
+                      <div class="extra-info">
+                        <span>时长:&nbsp;{{episode.duration}}</span>
+                        <span>更新时间:{{episode.airdate}}</span>
+                        @if (sortOrder === 'desc' && episode.status !== 2) {
+                          <span class="ui tiny teal label">即将播出</span>
+                        }
+                      </div>
                     </a>
-                    <div class="ui dropdown extend-menu-button" uiDropdown="click" [stopPropagation]="false">
-                        <div class="text"><i class="ellipsis vertical icon"></i></div>
-                        <div class="left menu">
-                            <div class="item" (click)="changeEpStatus(episode, 2)">看过</div>
-                            <div class="item" (click)="changeEpStatus(episode, 3)">在看</div>
-                        </div>
+                  }
+                  <div class="ui dropdown extend-menu-button" uiDropdown="click" [stopPropagation]="false">
+                    <div class="text"><i class="ellipsis vertical icon"></i></div>
+                    <div class="left menu">
+                      <div class="item" (click)="changeEpStatus(episode, 2)">看过</div>
+                      <div class="item" (click)="changeEpStatus(episode, 3)">在看</div>
                     </div>
+                  </div>
+                  @if (episode.watchProgress && episode.watchProgress.percentage) {
                     <div class="ui bottom attached progress"
-                         *ngIf="episode.watchProgress && episode.watchProgress.percentage"
                          [ngClass]="{
                      orange: episode.watchProgress.watchStatus === 1,
                      olive: episode.watchProgress.watchStatus === 2,
@@ -114,40 +150,57 @@
                      brown: episode.watchProgress.watchStatus === 4,
                      grey: episode.watchProgress.watchStatus === 5
                      }">
-                        <div class="bar" [style.width]="episode.watchProgress.percentage * 100 + '%'"></div>
+                      <div class="bar" [style.width]="episode.watchProgress.percentage * 100 + '%'"></div>
                     </div>
+                  }
                 </div>
-            </div>
-        </div>
-        <div *ngIf="layoutType === eLayoutTypes.GRID" class="ui six doubling cards">
-            <div class="card episode-card" *ngFor="let episode of episodeList">
-                <div class="image" *ngIf="episode.status!==2">
+              </div>
+            }
+          </div>
+        }
+        @if (layoutType === eLayoutTypes.GRID) {
+          <div class="ui six doubling cards">
+            @for (episode of episodeList; track episode) {
+              <div class="card episode-card">
+                @if (episode.status!==2) {
+                  <div class="image">
                     <div class="image-wrapper">
-                        <div class="image-fallback">
-                            <h4 class="ui icon film icon-holder">
-                                <i class="film icon"></i>
-                            </h4>
-                        </div>
+                      <div class="image-fallback">
+                        <h4 class="ui icon film icon-holder">
+                          <i class="film icon"></i>
+                        </h4>
+                      </div>
                     </div>
-                </div>
-                <div *ngIf="episode.status!==2" class="content unfinished">
-                    <span class="episode-title" *ngIf="episode.nameCn || episode.name">{{episode.nameCn || episode.name}}</span>
-                </div>
-                <a *ngIf="episode.status===2" class="image" [routerLink]="['/play', episode.id]">
+                  </div>
+                }
+                @if (episode.status!==2) {
+                  <div class="content unfinished">
+                    @if (episode.nameCn || episode.name) {
+                      <span class="episode-title">{{episode.nameCn || episode.name}}</span>
+                    }
+                  </div>
+                }
+                @if (episode.status===2) {
+                  <a class="image" [routerLink]="['/play', episode.id]">
                     <ui-responsive-image [src]="episode.thumbnailImage.url"
                                       [size]="{
                                         width: '100%',
                                         ratio: 0.5625,
                                         originalWidth: episode.thumbnailImage.width,
                                         originalHeight: episode.thumbnailImage.height}"
-                                      [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
-                </a>
+                    [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
+                  </a>
+                }
                 <span class="episode-number">{{episode.episodeNo}}</span>
-                <a *ngIf="episode.status===2" class="content" [routerLink]="['/play', episode.id]">
-                    <span class="episode-title" *ngIf="episode.nameCn || episode.name">{{episode.nameCn || episode.name}}</span>
-                </a>
-                <div class="ui bottom attached progress"
-                     *ngIf="episode.watchProgress && episode.watchProgress.percentage"
+                @if (episode.status===2) {
+                  <a class="content" [routerLink]="['/play', episode.id]">
+                    @if (episode.nameCn || episode.name) {
+                      <span class="episode-title">{{episode.nameCn || episode.name}}</span>
+                    }
+                  </a>
+                }
+                @if (episode.watchProgress && episode.watchProgress.percentage) {
+                  <div class="ui bottom attached progress"
                      [ngClass]="{
                      orange: episode.watchProgress.watchStatus === 1,
                      olive: episode.watchProgress.watchStatus === 2,
@@ -156,8 +209,13 @@
                      grey: episode.watchProgress.watchStatus === 5
                      }">
                     <div class="bar" [style.width]="episode.watchProgress.percentage * 100 + '%'"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
