@@ -39,7 +39,7 @@
         </div>
         <div class="field" [ngClass]="{error: announceFormErrors.start_time.length > 0}">
             <label>开始时间</label>
-            <dp-date-picker formControlName="start_time" theme="dp-material"></dp-date-picker>
+            <ngxsmk-datepicker formControlName="start_time" mode="single"></ngxsmk-datepicker>
             <!--<input type="number" formControlName="start_time">-->
         </div>
         <div class="ui error message" *ngIf="announceFormErrors.start_time.length > 0">
@@ -49,7 +49,7 @@
         </div>
         <div class="field" [ngClass]="{error: announceFormErrors.end_time.length > 0}">
             <label>结束时间</label>
-            <dp-date-picker formControlName="end_time" theme="dp-material"></dp-date-picker>
+            <ngxsmk-datepicker formControlName="end_time" mode="single"></ngxsmk-datepicker>
             <!--<input type="number" formControlName="end_time">-->
         </div>
         <div class="ui error message" *ngIf="announceFormErrors.end_time.length > 0">
