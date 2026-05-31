@@ -3,6 +3,7 @@ import { FileMapping } from '../../../entity/FileMapping';
 import { DownloadManagerService } from '../../download-manager/download-manager.service';
 import { Subscription } from 'rxjs';
 import { UIDialogRef } from '@irohalab/deneb-ui';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
     selector: 'file-mapping-list',
@@ -14,8 +15,9 @@ export class FileMappingListComponent implements OnInit, OnDestroy {
 
     fileMappingEnhanced = false;
 
-    constructor(private _downloadManagerService: DownloadManagerService,
-                private _dialogRef: UIDialogRef<FileMappingListComponent>) {
+    constructor(private downloadManagerService: DownloadManagerService,
+                private dialogRef: UIDialogRef<FileMappingListComponent>,
+                private formBuilder: FormBuilder) {
     }
 
     @Input()
@@ -24,9 +26,16 @@ export class FileMappingListComponent implements OnInit, OnDestroy {
     @Input()
     jobId: string;
 
+    fileMappingFormGroup!: FormGroup;
+
     public ngOnInit(): void {
+        this.fileMappingFormGroup = this.formBuilder.group(this.fileMapping.reduce((prev, curr) => {
+            prev[curr.videoId] = curr.filePath;
+            return prev;
+        }, {} as {[id: string]: string}));
+
         this._subscription.add(
-            this._downloadManagerService.enhance_file_mapping(this.fileMapping)
+            this.downloadManagerService.enhance_file_mapping(this.fileMapping)
                 .subscribe((newMapping) => {
                     this.fileMappingEnhanced = true;
                     this.fileMapping = newMapping;
@@ -39,6 +48,6 @@ export class FileMappingListComponent implements OnInit, OnDestroy {
     }
 
     close(): void {
-        this._dialogRef.close();
+        this.dialogRef.close();
     }
 }

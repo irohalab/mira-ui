@@ -5,18 +5,15 @@
     </div>
 
     <div class="modal-content">
-        <div class="ui relaxed divided list">
-            <div class="item" *ngFor="let entry of fileMapping">
-                <i class="large file alternative middle aligned icon"></i>
-                <div class="content">
-                    <span class="header">
-                        VideoId:
-                        {{entry.videoId}}
-                        <span *ngIf="fileMappingEnhanced">(Episode: {{entry.episode.episode_no}})</span>
-                    </span>
-                    <div class="description">{{entry.filePath}}</div>
-                </div>
+        <form class="ui form" [formGroup]="fileMappingFormGroup">
+            <div class="field" *ngFor="let entry of fileMapping">
+                <label>
+                    VideoId:
+                    {{entry.videoId}}
+                    <span *ngIf="fileMappingEnhanced">(Episode: {{entry.episode.episode_no}})</span>
+                </label>
+                <input type="text" [formControlName]="entry.videoId">
             </div>
-        </div>
+        </form>
     </div>
 </div>
