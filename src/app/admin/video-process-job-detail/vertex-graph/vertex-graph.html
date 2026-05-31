@@ -20,6 +20,7 @@
                *ngIf="nodes && edges && graphViewDimension"
                [view]="graphViewDimension"
                [showMiniMap]="true"
+               [autoCenter]="true"
                [links]="edges" [nodes]="nodes"
                (click)="unselectAnything()">
         <ng-template #defsTemplate>

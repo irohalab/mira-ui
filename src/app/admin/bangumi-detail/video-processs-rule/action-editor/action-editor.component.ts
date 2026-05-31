@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Edge, Node } from '@swimlane/ngx-graph';
+import { Subject } from 'rxjs';
 import { Action } from '../../../../entity/action';
 import { ActionType } from '../../../../entity/action-type';
 import { ConvertAction } from '../../../../entity/ConvertAction';
@@ -34,6 +35,8 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
     readonly eLinkMode = LinkMode;
 
     graphViewDimension: [number, number];
+
+    graphUpdate$ = new Subject<void>();
 
     nodes: Node[];
     edges: Edge[];
@@ -177,6 +180,7 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
         }
         this.actions[action.id] = action;
         this.nodes = this.nodes.concat([this.actionToNode(action)]);
+        setTimeout(() => this.graphUpdate$.next());
         this.selectNode(action.id)
     }
 

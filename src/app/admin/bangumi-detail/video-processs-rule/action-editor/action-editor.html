@@ -3,6 +3,8 @@
                *ngIf="nodes && edges && graphViewDimension"
                [view]="graphViewDimension"
                [showMiniMap]="true"
+               [autoCenter]="true"
+               [update$]="graphUpdate$"
                [links]="edges"
                [nodes]="nodes"
                (click)="unselectAnything()">
