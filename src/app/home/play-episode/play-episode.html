@@ -95,12 +95,36 @@
                     <a class="ui segment episode-link" [title]="eps.nameCn || eps.name || ''" [routerLink]="['/play', eps.id]" [ngClass]="{'dark-panel': isDarkTheme}">
                       <span class="eps-no">第{{eps.episodeNo}}话</span>
                       <span class="eps-title">{{eps.nameCn || eps.name || ''}}</span>
+                      @if (eps.watchProgress && eps.watchProgress.percentage) {
+                        <div class="ui bottom attached progress"
+                             [ngClass]="{
+                           orange: eps.watchProgress.watchStatus === 1,
+                           olive: eps.watchProgress.watchStatus === 2,
+                           blue: eps.watchProgress.watchStatus === 3,
+                           brown: eps.watchProgress.watchStatus === 4,
+                           grey: eps.watchProgress.watchStatus === 5
+                        }">
+                          <div class="bar" [style.width]="eps.watchProgress.percentage * 100 + '%'"></div>
+                        </div>
+                      }
                     </a>
                   }
                   @if (eps.status!==2) {
                     <a class="ui disabled segment episode-link" [title]="eps.nameCn || eps.name || ''" [ngClass]="{inverted: isDarkTheme}">
                       <span class="eps-no">第{{eps.episodeNo}}话</span>
                       <span class="eps-title">{{eps.nameCn || eps.name || ''}}</span>
+                      @if (eps.watchProgress && eps.watchProgress.percentage) {
+                        <div class="ui bottom attached progress"
+                             [ngClass]="{
+                           orange: eps.watchProgress.watchStatus === 1,
+                           olive: eps.watchProgress.watchStatus === 2,
+                           blue: eps.watchProgress.watchStatus === 3,
+                           brown: eps.watchProgress.watchStatus === 4,
+                           grey: eps.watchProgress.watchStatus === 5
+                        }">
+                          <div class="bar" [style.width]="eps.watchProgress.percentage * 100 + '%'"></div>
+                        </div>
+                      }
                     </a>
                   }
                 </div>
