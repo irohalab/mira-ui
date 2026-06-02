@@ -21,7 +21,7 @@
     "@angular/router": "^20.3.23",
     "@egjs/agent": "^2.4.0",
     "@irohalab/deneb-ui": "^5.0.1",
-    "@irohalab/mira-sdk-angular": "^2.0.0",
+    "@irohalab/mira-sdk-angular": "^4.1.0",
     "@irohalab/semantic-ui": "^2.4.1",
     "@swimlane/ngx-graph": "^12.0.0-alpha.2",
     "angular-oauth2-oidc": "^20.0.2",
