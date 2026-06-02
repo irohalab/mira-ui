@@ -1,45 +1,67 @@
 <admin-navbar navTitle="编辑新番" backLink="/admin/bangumi">
-    <div *ngIf="bangumi.deleteEta" class="delete-eta action-item">Delete {{bangumi.deleteEta}}</div>
-    <div class="navbar-tab-menu action-item" *ngIf="!bangumi.deleteMark">
-        <a class="item" [ngClass]="{active: activatedTab === 'Overview'}" (click)="activeTab('Overview')">Overview</a>
-        <a class="item" [ngClass]="{active: activatedTab === 'Episode'}" (click)="activeTab('Episode')">Episode</a>
-        <a class="item" [ngClass]="{active: activatedTab === 'ResourceGroup'}" (click)="activeTab('ResourceGroup')">Resource Group</a>
-        <a class="item" [ngClass]="{active: activatedTab === 'VideoProcess'}" (click)="activeTab('VideoProcess')">Video Process</a>
+  @if (bangumi.deleteEta) {
+    <div class="delete-eta action-item">Delete {{bangumi.deleteEta}}</div>
+  }
+  @if (!bangumi.deleteMark) {
+    <div class="navbar-tab-menu action-item">
+      <a class="item" [ngClass]="{active: activatedTab === 'Overview'}" (click)="activeTab('Overview')">Overview</a>
+      <a class="item" [ngClass]="{active: activatedTab === 'Episode'}" (click)="activeTab('Episode')">Episode</a>
+      <a class="item" [ngClass]="{active: activatedTab === 'ResourceGroup'}" (click)="activeTab('ResourceGroup')">Resource Group</a>
+      <a class="item" [ngClass]="{active: activatedTab === 'VideoProcess'}" (click)="activeTab('VideoProcess')">Video Process</a>
     </div>
-    <a *ngIf="!bangumi.deleteMark" class="accessory-action anchor-button" (click)="addOrEditAnnounce()">
-        <i class="thumbs up icon" [ngClass]="{outline: announceStatus !== AnnounceStatus.ANNOUNCING}"></i>
-        {{announceStatusText}}
+  }
+  @if (!bangumi.deleteMark) {
+    <a class="accessory-action anchor-button" (click)="addOrEditAnnounce()">
+      <i class="thumbs up icon" [ngClass]="{outline: announceStatus !== AnnounceStatus.ANNOUNCING}"></i>
+      {{announceStatusText}}
     </a>
+  }
+  @if (!bangumi.deleteMark) {
     <a class="accessory-action anchor-button"
-       *ngIf="!bangumi.deleteMark"
-       title="删除番組"
-       confirmDialog
-       dialogTitle="确定删除番組么"
-       dialogContent="删除该番組将删除与之有关的所有视频文件，torrent，用户收藏，观看进度等信息"
-       (onConfirm)="deleteBangumi()">
-        <i class="trash icon"></i> 删除番組
+      title="删除番組"
+      confirmDialog
+      dialogTitle="确定删除番組么"
+      dialogContent="删除该番組将删除与之有关的所有视频文件，torrent，用户收藏，观看进度等信息"
+      (onConfirm)="deleteBangumi()">
+      <i class="trash icon"></i> 删除番組
     </a>
+  }
+  @if (bangumi.deleteMark) {
     <a class="accessory-action anchor-button"
-       *ngIf="bangumi.deleteMark"
-       title="恢复番组"
-       confirmDialog
-       dialogTitle="确定恢复番组么"
-       dialogContent="恢复番组将立即生效"
-       (onConfirm)="restoreBangumi()">
-        <i class="undo icon"></i> 恢复番组
+      title="恢复番组"
+      confirmDialog
+      dialogTitle="确定恢复番组么"
+      dialogContent="恢复番组将立即生效"
+      (onConfirm)="restoreBangumi()">
+      <i class="undo icon"></i> 恢复番组
     </a>
+  }
 </admin-navbar>
-<div class="bangumi-detail-container" *ngIf="bangumi && adminList">
-    <app-bangumi-overview *ngIf="activatedTab === 'Overview'" [bangumi]="bangumi"></app-bangumi-overview>
-    <app-episode-list *ngIf="activatedTab === 'Episode'" [bangumi]="bangumi"></app-episode-list>
-    <app-resource-group *ngIf="activatedTab === 'ResourceGroup'" [bangumi]="bangumi"></app-resource-group>
-    <video-process-rule *ngIf="activatedTab === 'VideoProcess'" [bangumi]="bangumi"></video-process-rule>
-</div>
-<div class="initial-placeholder" *ngIf="!bangumi && !adminList">
+@if (bangumi && adminList) {
+  <div class="bangumi-detail-container">
+    @if (activatedTab === 'Overview') {
+      <app-bangumi-overview [bangumi]="bangumi"></app-bangumi-overview>
+    }
+    @if (activatedTab === 'Episode') {
+      <app-episode-list [bangumi]="bangumi"></app-episode-list>
+    }
+    @if (activatedTab === 'ResourceGroup') {
+      <app-resource-group [bangumi]="bangumi"></app-resource-group>
+    }
+    @if (activatedTab === 'VideoProcess') {
+      <video-process-rule [bangumi]="bangumi"></video-process-rule>
+    }
+  </div>
+}
+@if (!bangumi && !adminList) {
+  <div class="initial-placeholder">
     <div class="placeholder-text">加载中...</div>
-</div>
-<div class="loading-container" *ngIf="isLoading">
+  </div>
+}
+@if (isLoading) {
+  <div class="loading-container">
     <div class="ui inverted dimmer active">
-        <div class="ui large loader"></div>
+      <div class="ui large loader"></div>
     </div>
-</div>
+  </div>
+}

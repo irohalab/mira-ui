@@ -6,8 +6,12 @@ import { Subscription } from 'rxjs';
     selector: 'dark-theme-toggle',
     template: `
         <a class="toggle-button" [ngClass]="{dark: isDarkTheme}" (click)="changeTheme()" title="Dark Mode">
-            <i class="moon icon" *ngIf="!isDarkTheme"></i>
-            <i class="sun icon" *ngIf="isDarkTheme"></i>
+          @if (!isDarkTheme) {
+            <i class="moon icon"></i>
+          }
+          @if (isDarkTheme) {
+            <i class="sun icon"></i>
+          }
         </a>`,
     styles: [`
         @import '../../_dark-theme-helpers';

@@ -163,14 +163,20 @@
 
   .episode-list-view {
     .episode-link {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      display: flex;
+      align-items: baseline;
       .eps-no {
-        display: inline-block;
+        flex: 0 0 auto;
         margin-right: 2em;
         color: #a6a6a6;
         font-weight: 600;
+      }
+      .eps-title {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }

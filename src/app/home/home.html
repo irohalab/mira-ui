@@ -1,68 +1,87 @@
 <nav class="navbar">
-    <a class="sidebar-toggle" (click)="toggleSidebar($event)">
-        <i class="icon sidebar"></i>
+  <a class="sidebar-toggle" (click)="toggleSidebar($event)">
+    <i class="icon sidebar"></i>
+  </a>
+  <a class="brand" [routerLink]="['/']">
+    <h2>{{siteTitle}}</h2>
+  </a>
+  <!--<div class="christmas-tree">-->
+  <!--<img src="/assets/img/christmas-tree.svg" alt="">-->
+<!--</div>-->
+<!--<div class="new-year">-->
+<!--<img src="/assets/img/newyear2018.png" alt="" title="Happy New Year 2018!">-->
+<!--</div>-->
+<div class="ui static-search small action input">
+  <input type="text" placeholder="Search..." #staticSearch (keyup.enter)="searchBangumi(staticSearch.value)">
+  <button class="ui basic icon button" [ngClass]="{inverted: isDarkTheme}" (click)="searchBangumi(staticSearch.value)">
+    <i class="search icon"></i>
+  </button>
+</div>
+<div class="right-area">
+  <dark-theme-toggle class="dark-theme-toggle"></dark-theme-toggle>
+  @if (isUserLogonObservable | async) {
+    <app-message-notification></app-message-notification>
+  }
+  @if (isUserLogonObservable | async) {
+    <user-action></user-action>
+  }
+  @if (!(isUserLogonObservable | async)) {
+    <button class="ui basic tiny button" [ngClass]="{inverted: isDarkTheme}" (click)="login()">Login</button>
+  }
+  <a class="search-toggle-button" (click)="toggleFloatSearchFrame()">
+    <i class="search icon"></i>
+  </a>
+</div>
+@if (showFloatSearchFrame) {
+  <div class="float-search-frame">
+    <a class="close-button" (click)="toggleFloatSearchFrame()">
+      <i class="close icon"></i>
     </a>
-    <a class="brand" [routerLink]="['/']">
-        <h2>{{siteTitle}}</h2>
-    </a>
-    <!--<div class="christmas-tree">-->
-        <!--<img src="/assets/img/christmas-tree.svg" alt="">-->
-    <!--</div>-->
-    <!--<div class="new-year">-->
-        <!--<img src="/assets/img/newyear2018.png" alt="" title="Happy New Year 2018!">-->
-    <!--</div>-->
-    <div class="ui static-search small action input">
-        <input type="text" placeholder="Search..." #staticSearch (keyup.enter)="searchBangumi(staticSearch.value)">
-        <button class="ui basic icon button" [ngClass]="{inverted: isDarkTheme}" (click)="searchBangumi(staticSearch.value)">
-          <i class="search icon"></i>
-        </button>
+    <div class="ui float-search transparent icon input">
+      <input type="text" placeholder="Search..." #floatSearch (keyup.enter)="searchBangumi(floatSearch.value)">
+      <i class="search icon"></i>
     </div>
-    <div class="right-area">
-        <dark-theme-toggle class="dark-theme-toggle"></dark-theme-toggle>
-        <app-message-notification *ngIf="isUserLogonObservable | async"></app-message-notification>
-        <user-action *ngIf="isUserLogonObservable | async"></user-action>
-        <button *ngIf="!(isUserLogonObservable | async)" class="ui basic tiny button" [ngClass]="{inverted: isDarkTheme}" (click)="login()">Login</button>
-        <a class="search-toggle-button" (click)="toggleFloatSearchFrame()">
-            <i class="search icon"></i>
-        </a>
-    </div>
-    <div class="float-search-frame" *ngIf="showFloatSearchFrame">
-        <a class="close-button" (click)="toggleFloatSearchFrame()">
-            <i class="close icon"></i>
-        </a>
-        <div class="ui float-search transparent icon input">
-            <input type="text" placeholder="Search..." #floatSearch (keyup.enter)="searchBangumi(floatSearch.value)">
-            <i class="search icon"></i>
-        </div>
-    </div>
+  </div>
+}
 </nav>
-<div class="sidebar-overlay-backdrop"
-     *ngIf="sidebarOverlap && sidebarActive === 'active'"
-     (click)="onClickSidebarBackdrop($event)"></div>
+@if (sidebarOverlap && sidebarActive === 'active') {
+  <div class="sidebar-overlay-backdrop"
+  (click)="onClickSidebarBackdrop($event)"></div>
+}
 <div class="ui sidebar visible ui vertical menu home-sidebar" [ngClass]="{inverted: isDarkTheme}" (click)="onClickSidebar($event)" [@sidebarActive]="sidebarActive">
-    <a class="item" [routerLink]="['/']">首页</a>
-    <a class="item" [routerLink]="['/bangumi']">所有番组</a>
-    <a class="item" [routerLink]="['/history']" *ngIf="isUserActivated | async">观看历史</a>
-    <a class="item" [routerLink]="['/favorite']" *ngIf="isUserActivated | async">我的收藏</a>
-    <a class="item" [routerLink]="['/admin']" *ngIf="(isShowAdminLink | async)">Management</a>
-    <div class="item" *ngIf="isUserActivated | async">
-        <my-bangumi></my-bangumi>
+  <a class="item" [routerLink]="['/']">首页</a>
+  <a class="item" [routerLink]="['/bangumi']">所有番组</a>
+  @if (isUserActivated | async) {
+    <a class="item" [routerLink]="['/history']">观看历史</a>
+  }
+  @if (isUserActivated | async) {
+    <a class="item" [routerLink]="['/favorite']">我的收藏</a>
+  }
+  @if ((isShowAdminLink | async)) {
+    <a class="item" [routerLink]="['/admin']">Management</a>
+  }
+  @if (isUserActivated | async) {
+    <div class="item">
+      <my-bangumi></my-bangumi>
     </div>
+  }
 </div>
 <main class="home-content" [ngClass]="currentRouteName + (sidebarActive === 'active' ? ' sidebar-active': '')">
-    <router-outlet></router-outlet>
+  <router-outlet></router-outlet>
 </main>
 
-<footer id="page-footer" [ngClass]="currentRouteName + (sidebarActive === 'active' ? ' sidebar-active': '')"
-        *ngIf="currentRouteName !== 'Bangumi' && currentRouteName !== 'Favorite' && currentRouteName !== 'History'">
+@if (currentRouteName !== 'Bangumi' && currentRouteName !== 'Favorite' && currentRouteName !== 'History') {
+  <footer id="page-footer" [ngClass]="currentRouteName + (sidebarActive === 'active' ? ' sidebar-active': '')"
+    >
     <div class="copyright-content">&copy;2020 - {{today | date:'y'}} Iroha Lab, All rights reserved.</div>
     <div class="credits">Powered By <a target="_blank" href="https://github.com/irohalab/Albireo">Project Mira</a></div>
     <div class="ui horizontal bulleted link list" [ngClass]="{inverted: isDarkTheme}">
-        <a routerLink="/about/tos" class="item">Terms and Conditions</a>
-        <a routerLink="/about/privacy" class="item">Privacy Policy</a>
-        <a routerLink="/about/developers" class="item">Developers</a>
-        <a routerLink="/about/apps" class="item">Apps</a>
+      <a routerLink="/about/tos" class="item">Terms and Conditions</a>
+      <a routerLink="/about/privacy" class="item">Privacy Policy</a>
+      <a routerLink="/about/developers" class="item">Developers</a>
+      <a routerLink="/about/apps" class="item">Apps</a>
     </div>
-</footer>
+  </footer>
+}
 
 <bottom-float-banner></bottom-float-banner>

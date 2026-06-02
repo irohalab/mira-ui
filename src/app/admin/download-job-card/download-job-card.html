@@ -1,20 +1,26 @@
 <div class="ui segment" (click)="onClickCard($event)">
-    <div class="card-content">
-        <div class="job-id">{{job.id}}</div>
-        <div class="progress">{{job.progress + '%'}}</div>
-        <div class="download-speed">{{job.downloadSpeed | readableUnit: 'byte': 1}}/s</div>
-        <div class="size">{{job.size | readableUnit: 'byte': 1}}</div>
-        <div class="bangumi-name">
-            <a class="bangumi-link" *ngIf="job.bangumi" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
-        </div>
-        <div class="torrent-name">{{job.torrentName}}</div>
-        <div class="create-time">{{job.createTime}}</div>
-        <div class="end-time">{{job.endTime}}</div>
-        <div class="eta">{{job.eta | readableUnit: 'second': 1}}</div>
-        <a class="anchor-button" (click)="onViewDetail($event)">View Job Details</a>
-        <a *ngIf="job.bangumi" class="file-mapping anchor-button" (click)="onViewFileMapping($event)">View FileMapping</a>
-        <a *ngIf="job.status === mJobStatus.Complete && debugUtil" class="anchor-button" (click)="resendCompleteMessage($event)">Resend Complete Message</a>
+  <div class="card-content">
+    <div class="job-id">{{job.id}}</div>
+    <div class="progress">{{job.progress + '%'}}</div>
+    <div class="download-speed">{{job.downloadSpeed | readableUnit: 'byte': 1}}/s</div>
+    <div class="size">{{job.size | readableUnit: 'byte': 1}}</div>
+    <div class="bangumi-name">
+      @if (job.bangumi) {
+        <a class="bangumi-link" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
+      }
     </div>
+    <div class="torrent-name">{{job.torrentName}}</div>
+    <div class="create-time">{{job.createTime}}</div>
+    <div class="end-time">{{job.endTime}}</div>
+    <div class="eta">{{job.eta | readableUnit: 'second': 1}}</div>
+    <a class="anchor-button" (click)="onViewDetail($event)">View Job Details</a>
+    @if (job.bangumi) {
+      <a class="file-mapping anchor-button" (click)="onViewFileMapping($event)">View FileMapping</a>
+    }
+    @if (job.status === mJobStatus.Complete && debugUtil) {
+      <a class="anchor-button" (click)="resendCompleteMessage($event)">Resend Complete Message</a>
+    }
+  </div>
     <div class="ui bottom attached progress" [ngClass]="{
         success: job.status === mJobStatus.Complete,
         'blue active': job.status === mJobStatus.Downloading,
@@ -22,6 +28,6 @@
         warning: job.status === mJobStatus.Paused,
         error: job.status === mJobStatus.Error,
         disabled: job.status === mJobStatus.Removed}">
-        <div class="bar" [style.width]="job.progress + '%'"></div>
-    </div>
+    <div class="bar" [style.width]="job.progress + '%'"></div>
+  </div>
 </div>

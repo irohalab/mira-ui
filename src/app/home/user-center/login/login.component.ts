@@ -2,16 +2,15 @@ import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/cor
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { UserService } from '../../../user-service';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { AuthError } from '../../../../helpers/error';
 
 @Component({
   selector: 'app-login',
     imports: [
-        ReactiveFormsModule,
-        NgClass,
-        NgIf
-    ],
+    ReactiveFormsModule,
+    NgClass
+],
   templateUrl: './login.component.html',
   styleUrl: './login.component.less'
 })

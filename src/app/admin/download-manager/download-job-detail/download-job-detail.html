@@ -1,107 +1,119 @@
 <div class="job-detail-container">
-    <div class="header-bar">
-        <a class="close-button" (click)="closePanel()">
-            <i class="chevron left icon"></i>
-        </a>
-        <div class="panel-title">Download Job {{job.progress + '%'}}</div>
-    </div>
-    <div class="job-basic-info">
-        <div class="job-id">Job Id: {{job.id}}</div>
-        <div class="bangumi-name" *ngIf="!!job.bangumi">
-            Bangumi:
-            <a class="bangumi-link" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
+  <div class="header-bar">
+    <a class="close-button" (click)="closePanel()">
+      <i class="chevron left icon"></i>
+    </a>
+    <div class="panel-title">Download Job {{job.progress + '%'}}</div>
+  </div>
+  <div class="job-basic-info">
+    <div class="job-id">Job Id: {{job.id}}</div>
+    @if (!!job.bangumi) {
+      <div class="bangumi-name">
+        Bangumi:
+        <a class="bangumi-link" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
+      </div>
+    }
+  </div>
+  <div class="job-summary">
+    <table class="job-info-table ui table">
+      <tbody>
+        <tr>
+          <td style="width: 15em;">Create Time</td>
+          <td>{{job.createTime}}</td>
+        </tr>
+        <tr>
+          <td>End Time</td>
+          <td>{{job.endTime}}</td>
+        </tr>
+        <tr>
+          <td>Download Speed</td>
+          <td>{{job.downloadSpeed}}</td>
+        </tr>
+        <tr>
+          <td>Seeds(Total seeds)</td>
+          <td>{{job.connectedSeeds}}({{job.seeds}})</td>
+        </tr>
+        <tr>
+          <td>Leechers(Total Leechers)</td>
+          <td>{{job.connectedLeechers}}({{job.leechers}})</td>
+        </tr>
+        <tr>
+          <td>Torrent Name</td>
+          <td>{{job.torrentName}}</td>
+        </tr>
+        <tr>
+          <td>Torrent URL</td>
+          <td>{{job.torrentUrl}}</td>
+        </tr>
+        <tr>
+          <td>Torrent Hash</td>
+          <td>{{job.torrentId}}</td>
+        </tr>
+        @if (job.videoId) {
+          <tr>
+            <td>VideoId</td>
+            <td>{{job.videoId}}</td>
+          </tr>
+        }
+        <tr>
+          <td>ETA</td>
+          <td>{{job.eta}}</td>
+        </tr>
+        <tr>
+          <td>Availability</td>
+          <td>{{job.availability}}</td>
+        </tr>
+        <tr>
+          <td>Priority</td>
+          <td>{{job.priority}}</td>
+        </tr>
+        <tr>
+          <td>Downloaded</td>
+          <td>{{job.downloaded}}</td>
+        </tr>
+        <tr>
+          <td>AmountLeft</td>
+          <td>{{job.amountLeft}}</td>
+        </tr>
+        <tr>
+          <td>ActiveTime</td>
+          <td>{{job.activeTime}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  @if (job.errorInfo) {
+    <div class="job-error">
+      <div class="section-header">Error Info</div>
+      @if (job.errorInfo.message) {
+        <div class="ui message">{{job.errorInfo.message}}</div>
+      }
+      @if (job.errorInfo.stack) {
+        <div class="error-stack">
+          <pre>{{job.errorInfo.stack}}</pre>
         </div>
+      }
     </div>
-    <div class="job-summary">
-        <table class="job-info-table ui table">
-            <tbody>
-            <tr>
-                <td style="width: 15em;">Create Time</td>
-                <td>{{job.createTime}}</td>
-            </tr>
-            <tr>
-                <td>End Time</td>
-                <td>{{job.endTime}}</td>
-            </tr>
-            <tr>
-                <td>Download Speed</td>
-                <td>{{job.downloadSpeed}}</td>
-            </tr>
-            <tr>
-                <td>Seeds(Total seeds)</td>
-                <td>{{job.connectedSeeds}}({{job.seeds}})</td>
-            </tr>
-            <tr>
-                <td>Leechers(Total Leechers)</td>
-                <td>{{job.connectedLeechers}}({{job.leechers}})</td>
-            </tr>
-            <tr>
-                <td>Torrent Name</td>
-                <td>{{job.torrentName}}</td>
-            </tr>
-            <tr>
-                <td>Torrent URL</td>
-                <td>{{job.torrentUrl}}</td>
-            </tr>
-            <tr>
-                <td>Torrent Hash</td>
-                <td>{{job.torrentId}}</td>
-            </tr>
-            <tr *ngIf="job.videoId">
-                <td>VideoId</td>
-                <td>{{job.videoId}}</td>
-            </tr>
-            <tr>
-                <td>ETA</td>
-                <td>{{job.eta}}</td>
-            </tr>
-            <tr>
-                <td>Availability</td>
-                <td>{{job.availability}}</td>
-            </tr>
-            <tr>
-                <td>Priority</td>
-                <td>{{job.priority}}</td>
-            </tr>
-            <tr>
-                <td>Downloaded</td>
-                <td>{{job.downloaded}}</td>
-            </tr>
-            <tr>
-                <td>AmountLeft</td>
-                <td>{{job.amountLeft}}</td>
-            </tr>
-            <tr>
-                <td>ActiveTime</td>
-                <td>{{job.activeTime}}</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="job-error" *ngIf="job.errorInfo">
-        <div class="section-header">Error Info</div>
-        <div class="ui message" *ngIf="job.errorInfo.message">{{job.errorInfo.message}}</div>
-        <div class="error-stack" *ngIf="job.errorInfo.stack">
-            <pre>{{job.errorInfo.stack}}</pre>
-        </div>
-    </div>
-    <div class="job-content">
-        <div class="section-header">Content</div>
-        <table class="file-list-table ui table">
-            <thead>
-            <tr>
-                <th>Path</th>
-                <th>Size</th>
-                <th>Progress</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let torrentFile of jobContent">
-                <td>{{torrentFile.name}}</td>
-                <td>{{torrentFile.size | readableUnit:'byte':1}}</td>
-                <td>{{torrentFile.progress | percent}}</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+  }
+  <div class="job-content">
+    <div class="section-header">Content</div>
+    <table class="file-list-table ui table">
+      <thead>
+        <tr>
+          <th>Path</th>
+          <th>Size</th>
+          <th>Progress</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (torrentFile of jobContent; track torrentFile) {
+          <tr>
+            <td>{{torrentFile.name}}</td>
+            <td>{{torrentFile.size | readableUnit:'byte':1}}</td>
+            <td>{{torrentFile.progress | percent}}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </div>

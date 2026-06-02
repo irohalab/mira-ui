@@ -1,109 +1,164 @@
-<div class="loading-wrapper" *ngIf="!episode">
+@if (!episode) {
+  <div class="loading-wrapper">
     <div class="ui active medium loader"></div>
-</div>
+  </div>
+}
 <div class="theater-backdrop" (click)="focusVideoPlayer($event)" #videoPlayerContainer>
-    <!-- video player will be here -->
+  <!-- video player will be here -->
 </div>
-<div class="ui container video-file-picker-container" *ngIf="!!episode && episode.videoFiles.length > 1">
+@if (!!episode && episode.videoFiles.length > 1) {
+  <div class="ui container video-file-picker-container">
     <div class="video-file-picker dropdown-picker">
-        <span>选择视频源：</span>
-        <div class="ui inline dropdown" uiDropdown="click" [stopPropagation]="true">
-            <div class="text">{{currentVideoFile.label || currentVideoFile.fileName}}</div>
-            <i class="dropdown icon"></i>
-            <div class="menu">
-                <div class="item" *ngFor="let videoFile of episode.videoFiles" (click)="onVideoFileChange(videoFile)">{{videoFile.label || videoFile.fileName}}</div>
-            </div>
+      <span>选择视频源：</span>
+      <div class="ui inline dropdown" uiDropdown="click" [stopPropagation]="true">
+        <div class="text">{{currentVideoFile.label || currentVideoFile.fileName}}</div>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          @for (videoFile of episode.videoFiles; track videoFile) {
+            <div class="item" (click)="onVideoFileChange(videoFile)">{{videoFile.label || videoFile.fileName}}</div>
+          }
         </div>
+      </div>
     </div>
     <div class="video-file-picker label-picker">
-        <span>选择视频源：</span>
+      <span>选择视频源：</span>
+      @for (videoFile of episode.videoFiles; track videoFile) {
         <a class="ui label"
-           *ngFor="let videoFile of episode.videoFiles"
-           [ngClass]="{'blue': videoFile.id === currentVideoFile.id}"
-           (click)="onVideoFileChange(videoFile)">
-            {{videoFile.label || videoFile.fileName}}
+          [ngClass]="{'blue': videoFile.id === currentVideoFile.id}"
+          (click)="onVideoFileChange(videoFile)">
+          {{videoFile.label || videoFile.fileName}}
         </a>
+      }
     </div>
-</div>
-<div class="ui container episode-info-container" *ngIf="!!episode">
+  </div>
+}
+@if (!!episode) {
+  <div class="ui container episode-info-container">
     <h3 class=episode-title>
-        <span class="bangumi-name">{{episode.bangumi.nameCn}}</span>
-        <span class="episode-no">{{episode.episodeNo}}</span>
-        <span class="episode-name" *ngIf="!!episode.nameCn || !!episode.name">{{episode.nameCn || episode.name}}</span>
+      <span class="bangumi-name">{{episode.bangumi.nameCn}}</span>
+      <span class="episode-no">{{episode.episodeNo}}</span>
+      @if (!!episode.nameCn || !!episode.name) {
+        <span class="episode-name">{{episode.nameCn || episode.name}}</span>
+      }
     </h3>
     <button class="feedback-button ui small basic button" [ngClass]="{inverted: isDarkTheme}" (click)="feedback()" title="报告错误"><i class="icon flag"></i>报告错误</button>
     <div class="ui divider">
     </div>
     <div class="bangumi-info">
-        <div class="bangumi-cover">
-            <ui-responsive-image [src]="episode.bangumi.coverImage.url"
+      <div class="bangumi-cover">
+        <ui-responsive-image [src]="episode.bangumi.coverImage.url"
                               [size]="{
                             width: '100%',
                             height: 'auto',
                             originalWidth: episode.bangumi.coverImage.width,
                             originalHeight: episode.bangumi.coverImage.height}"
-                              [background]="episode.bangumi.coverImage.dominantColor"></ui-responsive-image>
+        [background]="episode.bangumi.coverImage.dominantColor"></ui-responsive-image>
+      </div>
+      <div class="bangumi-basic-info">
+        <h2 class="bangumi-title name-cn">
+          <a [routerLink]="['/bangumi', episode.bangumi.id]">
+            {{episode.bangumi.nameCn}}
+          </a>
+          <a class="external-link" [href]="'https://bgm.tv/subject/' + episode.bangumi.bgmId" target="_blank"
+            title="在bgm.tv页面查看">
+            <i class="bgm-emo-47 bgm-link-icon"></i>
+          </a>
+        </h2>
+        <h4 class="bangumi-title name">{{episode.bangumi.name}}</h4>
+        <favorite-chooser [bangumi]="episode.bangumi"></favorite-chooser>
+        <div class="summary">
+          {{episode.bangumi.summary}}
         </div>
-        <div class="bangumi-basic-info">
-            <h2 class="bangumi-title name-cn">
-                <a [routerLink]="['/bangumi', episode.bangumi.id]">
-                    {{episode.bangumi.nameCn}}
-                </a>
-                <a class="external-link" [href]="'https://bgm.tv/subject/' + episode.bangumi.bgmId" target="_blank"
-                   title="在bgm.tv页面查看">
-                    <i class="bgm-emo-47 bgm-link-icon"></i>
-                </a>
-            </h2>
-            <h4 class="bangumi-title name">{{episode.bangumi.name}}</h4>
-            <favorite-chooser [bangumi]="episode.bangumi"></favorite-chooser>
-            <div class="summary">
-                {{episode.bangumi.summary}}
+        <reveal-extra [bangumi]="episode.bangumi"></reveal-extra>
+        <div class="episode-list-container">
+          <h4>
+            各话列表
+          </h4>
+          <div class="episode-layout-button-groups">
+            <a class="layout-button sort-button" [title]="sortOrder === 'desc' ? '最早在前，显示所有' : '最新在前，仅显示可观看'" (click)="toggleSortOrder()">
+              <i class="ui sort numeric icon" [ngClass]="{up: sortOrder === 'asc', down: sortOrder === 'desc'}"></i>
+            </a>
+            <a class="layout-button" title="网格视图" (click)="changeLayoutType(eLayoutTypes.GRID)"><i class="ui th icon"></i></a>
+            <a class="layout-button" title="列表视图" (click)="changeLayoutType(eLayoutTypes.LIST)"><i class="ui th list icon"></i></a>
+          </div>
+          <div class="ui divider"></div>
+          @if (!episode.bangumi.episodes) {
+            <div class="episode-list-loading-wrapper">
+              <div class="ui active medium loader"></div>
             </div>
-            <reveal-extra [bangumi]="episode.bangumi"></reveal-extra>
-            <div class="episode-list-container">
-                <h4>
-                    各话列表
-                </h4>
-                <div class="episode-layout-button-groups">
-                    <a class="layout-button sort-button" [title]="sortOrder === 'desc' ? '最早在前，显示所有' : '最新在前，仅显示可观看'" (click)="toggleSortOrder()">
-                        <i class="ui sort numeric icon" [ngClass]="{up: sortOrder === 'asc', down: sortOrder === 'desc'}"></i>
+          }
+          @if (episode.bangumi.episodes && layoutType === eLayoutTypes.LIST) {
+            <div class="episode-list-view ui stackable two column grid" [ngClass]="{inverted: isDarkTheme}">
+              @for (eps of episodeList; track eps) {
+                <div class="column">
+                  @if (eps.status===2) {
+                    <a class="ui segment episode-link" [title]="eps.nameCn || eps.name || ''" [routerLink]="['/play', eps.id]" [ngClass]="{'dark-panel': isDarkTheme}">
+                      <span class="eps-no">第{{eps.episodeNo}}话</span>
+                      <span class="eps-title">{{eps.nameCn || eps.name || ''}}</span>
+                      @if (eps.watchProgress && eps.watchProgress.percentage) {
+                        <div class="ui bottom attached progress"
+                             [ngClass]="{
+                           orange: eps.watchProgress.watchStatus === 1,
+                           olive: eps.watchProgress.watchStatus === 2,
+                           blue: eps.watchProgress.watchStatus === 3,
+                           brown: eps.watchProgress.watchStatus === 4,
+                           grey: eps.watchProgress.watchStatus === 5
+                        }">
+                          <div class="bar" [style.width]="eps.watchProgress.percentage * 100 + '%'"></div>
+                        </div>
+                      }
                     </a>
-                    <a class="layout-button" title="网格视图" (click)="changeLayoutType(eLayoutTypes.GRID)"><i class="ui th icon"></i></a>
-                    <a class="layout-button" title="列表视图" (click)="changeLayoutType(eLayoutTypes.LIST)"><i class="ui th list icon"></i></a>
+                  }
+                  @if (eps.status!==2) {
+                    <a class="ui disabled segment episode-link" [title]="eps.nameCn || eps.name || ''" [ngClass]="{inverted: isDarkTheme}">
+                      <span class="eps-no">第{{eps.episodeNo}}话</span>
+                      <span class="eps-title">{{eps.nameCn || eps.name || ''}}</span>
+                      @if (eps.watchProgress && eps.watchProgress.percentage) {
+                        <div class="ui bottom attached progress"
+                             [ngClass]="{
+                           orange: eps.watchProgress.watchStatus === 1,
+                           olive: eps.watchProgress.watchStatus === 2,
+                           blue: eps.watchProgress.watchStatus === 3,
+                           brown: eps.watchProgress.watchStatus === 4,
+                           grey: eps.watchProgress.watchStatus === 5
+                        }">
+                          <div class="bar" [style.width]="eps.watchProgress.percentage * 100 + '%'"></div>
+                        </div>
+                      }
+                    </a>
+                  }
                 </div>
-                <div class="ui divider"></div>
-                <div class="episode-list-loading-wrapper" *ngIf="!episode.bangumi.episodes">
-                    <div class="ui active medium loader"></div>
-                </div>
-                <div class="episode-list-view ui stackable two column grid" *ngIf="episode.bangumi.episodes && layoutType === eLayoutTypes.LIST" [ngClass]="{inverted: isDarkTheme}">
-                    <div class="column" *ngFor="let eps of episodeList">
-                        <a class="ui segment episode-link" [title]="eps.nameCn || eps.name || ''" *ngIf="eps.status===2" [routerLink]="['/play', eps.id]" [ngClass]="{'dark-panel': isDarkTheme}">
-                            <span class="eps-no">第{{eps.episodeNo}}话</span>
-                            <span class="eps-title">{{eps.nameCn || eps.name || ''}}</span>
-                        </a>
-                        <a class="ui disabled segment episode-link" [title]="eps.nameCn || eps.name || ''" *ngIf="eps.status!==2" [ngClass]="{inverted: isDarkTheme}">
-                            <span class="eps-no">第{{eps.episodeNo}}话</span>
-                            <span class="eps-title">{{eps.nameCn || eps.name || ''}}</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="episode-grid-view ui eight column doubling grid" *ngIf="episode.bangumi.episodes && layoutType === eLayoutTypes.GRID" [ngClass]="{inverted: isDarkTheme}">
-                    <div class="column" *ngFor="let eps of episodeList">
-                        <a class="ui segment episode-link" *ngIf="eps.status===2" [routerLink]="['/play', eps.id]" [ngClass]="{'dark-panel': isDarkTheme}">
-                            {{eps.episodeNo}}
-                        </a>
-                        <a class="ui disabled segment episode-link" *ngIf="eps.status!==2" [ngClass]="{inverted: isDarkTheme}">
-                            {{eps.episodeNo}}
-                        </a>
-                    </div>
-                </div>
+              }
             </div>
+          }
+          @if (episode.bangumi.episodes && layoutType === eLayoutTypes.GRID) {
+            <div class="episode-grid-view ui eight column doubling grid" [ngClass]="{inverted: isDarkTheme}">
+              @for (eps of episodeList; track eps) {
+                <div class="column">
+                  @if (eps.status===2) {
+                    <a class="ui segment episode-link" [routerLink]="['/play', eps.id]" [ngClass]="{'dark-panel': isDarkTheme}">
+                      {{eps.episodeNo}}
+                    </a>
+                  }
+                  @if (eps.status!==2) {
+                    <a class="ui disabled segment episode-link" [ngClass]="{inverted: isDarkTheme}">
+                      {{eps.episodeNo}}
+                    </a>
+                  }
+                </div>
+              }
+            </div>
+          }
         </div>
+      </div>
     </div>
-</div>
-<div class="comment-section" *ngIf="!!episode && commentEnabled">
+  </div>
+}
+@if (!!episode && commentEnabled) {
+  <div class="comment-section">
     <div class="ui container">
-        <bangumi-comment [bgmEpsId]="episode.bgmEpsId"></bangumi-comment>
+      <bangumi-comment [bgmEpsId]="episode.bgmEpsId"></bangumi-comment>
     </div>
-</div>
+  </div>
+}
 

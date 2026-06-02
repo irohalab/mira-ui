@@ -86,7 +86,6 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
                 private titleService: Title,
                 private activatedRoute: ActivatedRoute,
                 private router: Router,
-                private chromeExtensionService: ChromeExtensionService,
                 private dialogService: UIDialog,
                 private videoPlayerService: VideoPlayerService,
                 private persistStorage: PersistStorage,
@@ -199,21 +198,21 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
                 })
         );
 
-        this._subscription.add(
-            this.chromeExtensionService.isEnabled.pipe(
-                filter(enabled => enabled === ENABLED_STATUS.TRUE),
-                switchMap(() => {
-                    return this.chromeExtensionService.authInfo;
-                }),
-                filter(authInfo => !!authInfo),
-                switchMap(() => {
-                    return this.chromeExtensionService.isBgmTvLogon;
-                }),
-                filter(isLogon => isLogon === LOGON_STATUS.TRUE),)
-                .subscribe(() => {
-                    this.commentEnabled = true;
-                })
-        );
+        // this._subscription.add(
+        //     this.chromeExtensionService.isEnabled.pipe(
+        //         filter(enabled => enabled === ENABLED_STATUS.TRUE),
+        //         switchMap(() => {
+        //             return this.chromeExtensionService.authInfo;
+        //         }),
+        //         filter(authInfo => !!authInfo),
+        //         switchMap(() => {
+        //             return this.chromeExtensionService.isBgmTvLogon;
+        //         }),
+        //         filter(isLogon => isLogon === LOGON_STATUS.TRUE),)
+        //         .subscribe(() => {
+        //             this.commentEnabled = true;
+        //         })
+        // );
 
         this.isPortrait = VideoPlayerHelpers.isPortrait();
     }

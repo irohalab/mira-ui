@@ -1,8 +1,8 @@
 /*
  * Angular 2 decorators and services
  */
-import { afterRender, Component, ViewEncapsulation, Inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { afterEveryRender, Component, ViewEncapsulation, Inject, DOCUMENT } from '@angular/core';
+
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavigationService } from './navigation.service';
@@ -75,7 +75,7 @@ export class App {
             );
 
         navigationService.startSaveHistory();
-        afterRender(() => {
+        afterEveryRender(() => {
             this.setThemeVariables();
         });
     }

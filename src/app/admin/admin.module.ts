@@ -32,7 +32,7 @@ import { EditAnnounceComponent } from './announce/edit-announce/edit-announce.co
 import { AnnounceService } from './announce/announce.service';
 import { ListBangumiService } from './list-bangumi/list-bangumi.service';
 import { UserServiceModule } from '../user-service';
-import { DpDatePickerModule } from 'ng2-date-picker';
+import { NgxsmkDatepickerModule } from 'ngxsmk-datepicker';
 import { NyaaPipe } from './bangumi-pipes/nyaa-pipe';
 import { EditBangumiRecommendComponent } from './announce/edit-bangumi-recommend/edit-bangumi-recommend.component';
 import { VideoProcessRuleComponent } from './bangumi-detail/video-processs-rule/video-process-rule.component';
@@ -118,7 +118,7 @@ import { EpisodeListComponent } from './bangumi-detail/episode-list/episode-list
         ConfirmDialogModule,
         DenebCommonPipes,
         UserServiceModule,
-        DpDatePickerModule,
+        NgxsmkDatepickerModule,
         NgxGraphModule
     ],
     providers: [

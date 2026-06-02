@@ -1,277 +1,355 @@
 <div class="action-editor-container" #actionEditorContainer xmlns:svg="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  @if (nodes && edges && graphViewDimension) {
     <ngx-graph class="action-graph-container"
-               *ngIf="nodes && edges && graphViewDimension"
-               [view]="graphViewDimension"
-               [showMiniMap]="true"
-               [links]="edges"
-               [nodes]="nodes"
-               (click)="unselectAnything()">
-        <ng-template #defsTemplate>
-            <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4" orient="auto">
-                <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
-            </svg:marker>
+      [view]="graphViewDimension"
+      [showMiniMap]="true"
+      [autoCenter]="true"
+      [update$]="graphUpdate$"
+      [links]="edges"
+      [nodes]="nodes"
+      (click)="unselectAnything()">
+      <ng-template #defsTemplate>
+        <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4" orient="auto">
+          <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
+          </svg:marker>
         </ng-template>
-
         <ng-template #nodeTemplate let-node>
-            <svg:g class="node">
-                <svg:foreignObject width="200" [attr.height]="nodeHeightDict[node.data.type]">
-                    <xhtml:div class="action-card" [ngClass]="node.data.type" (click)="selectNode(node.id, $event, node.meta)">
-                        <xhtml:div class="action-label"><xhtml:i class="icon" [ngClass]="nodeIconClassDict[node.data.type]"></xhtml:i>{{node.label}}</xhtml:div>
-                        <xhtml:div *ngIf="node.data.type === eActionType.Convert" class="action-properties">
-                            <xhtml:div class="convert-profile"><xhtml:span class="property-name">profile:</xhtml:span>{{node.data.profile}}</xhtml:div>
-                            <xhtml:div class="font"><xhtml:span class="property-name">forceFontName:</xhtml:span>{{node.data.forceFontName}}</xhtml:div>
-                            <xhtml:div class="profile-extra"><xhtml:span class="property-name">profileExtraData:</xhtml:span>{{node.data.profileExtraData}}</xhtml:div>
-                        </xhtml:div>
-                        <xhtml:div *ngIf="node.data.type === eActionType.Extract" class="action-properties">
-                            <xhtml:div class="extractor-id"><xhtml:span class="property-name">extractorId:</xhtml:span>{{node.data.extractorId}}</xhtml:div>
-                            <xhtml:div class="extract-source" *ngIf="!!node.data.extractFrom"><xhtml:span class="property-name">extractFrom:</xhtml:span>{{node.data.extractFrom}}</xhtml:div>
-                            <xhtml:div class="extract-target" *ngIf="!!node.data.extractTarget"><xhtml:span class="property-name">extractTarget:</xhtml:span>{{node.data.extractTarget}}</xhtml:div>
-                            <xhtml:div class="outputExtname" *ngIf="!!node.data.outputExtname"><xhtml:span class="property-name">outputExtname:</xhtml:span>{{node.data.outputExtname}}</xhtml:div>
-                            <xhtml:div class="extractRegex" *ngIf="!!node.data.extractRegex"><xhtml:span class="property-name">extractRegex:</xhtml:span>{{node.data.extractRegex}}</xhtml:div>
-                            <xhtml:div class="extraData" *ngIf="!!node.data.extraData && !!node.data.extraData.propertyName">
-                                <xhtml:span class="property-name">extraData.propertyName:</xhtml:span>{{node.data.extraData.propertyName}}</xhtml:div>
-                            <xhtml:div class="extraData" *ngIf="!!node.data.extraData && !!node.data.extraData.propertyValueRegex">
-                                <xhtml:span class="property-name">extraData.propertyValueRegex:</xhtml:span>{{node.data.extraData.propertyValueRegex}}</xhtml:div>
-                            <xhtml:div class="extraData" *ngIf="!!node.data.extraData && node.data.extractorId === 'Audio'">
-                                <xhtml:span class="property-name">extraData.selectDefault:</xhtml:span>{{node.data.extraData.selectDefault}}</xhtml:div>
-                        </xhtml:div>
-                    </xhtml:div>
-                </svg:foreignObject>
-                <svg:rect width="200" [attr.height]="nodeHeightDict[node.data.type]"
-                          fill="#ffffff" fill-opacity="0.4" *ngIf="node.meta.disabled"></svg:rect>
-                <g
-                    transform="translate(198, 0)"
-                    *ngIf="selectedActionId === node.id && linkMode == eLinkMode.None && node.meta.allowInput"
-                    (click)="addUpstreamAction($event)">
-                    <ellipse
-                        style="fill:white;fill-opacity:1;stroke:#5178c5;stroke-width:4;stroke-dasharray:none;stroke-opacity:1"
-                        cx="10"
-                        cy="10"
-                        rx="6"
-                        ry="6" ></ellipse>
-                    <path
-                        style="fill:#b87fe1;fill-opacity:1;stroke-width:0"
-                        d="M 10 10 L 20 0 L 20 20 z" ></path>
-                    <rect
-                        style="fill:#b87fe1;fill-opacity:1;stroke-width:0"
-                        width="14"
-                        height="10"
-                        x="16"
-                        y="5" ></rect>
-                </g>
-                <g
-                    transform="translate(198, 60)"
-                    *ngIf="selectedActionId === node.id && linkMode == eLinkMode.None && node.meta.allowOutput"
-                    (click)="addDownstreamAction($event)">
-                    <ellipse
-                        style="fill:white;fill-opacity:1;stroke:#5178c5;stroke-width:4;stroke-dasharray:none;stroke-opacity:1"
-                        cx="10"
-                        cy="10"
-                        rx="6"
-                        ry="6" ></ellipse>
-                    <rect
-                        style="fill:#2fa350;fill-opacity:1;stroke-width:0"
-                        width="14"
-                        height="10"
-                        x="10"
-                        y="5" ></rect>
-                    <path
-                        style="fill:#2fa350;fill-opacity:1;stroke-width:0"
-                        d="M 20 0 L 30 10 L 20 20 z" ></path>
-
-                </g>
-            </svg:g>
-        </ng-template>
-
-        <ng-template #linkTemplate let-link>
-            <svg:g class="edge">
-                <svg:path class="line" stroke-width="4" marker-end="url(#arrow)"
-                          [ngClass]="{selected: selectedLinkId === link.id}"
-                          (click)="selectLink($event, link.id)"></svg:path>
-            </svg:g>
-        </ng-template>
-    </ngx-graph>
-    <div class="node-editor-container" *ngIf="editMode">
-        <div class="toolbar">
-            <div class="toolbar-section">
-                <div class="toolbar-section-header">Actions</div>
-                <button class="ui mini button" (click)="addNode(eActionType.Extract)">
-                    <i class="envelope open outline icon"></i>
-                    Extract
-                </button>
-                <button class="ui mini button" (click)="addNode(eActionType.Convert)">
-                    <i class="cogs icon"></i>
-                    Convert
-                </button>
-            </div>
-        </div>
-        <div class="property-card ui segment" *ngIf="selectedActionId && selectedNodeIndex !== -1">
-            <h5 class="ui header">Action: {{nodes[selectedNodeIndex].label}}</h5>
-            <div class="ui mini form" *ngIf="actions[selectedActionId].type === eActionType.Convert">
-                <div class="field">
-                    <label>profile</label>
-                    <div class="ui selection dropdown" uiDropdown="click">
-                        <i class="dropdown icon"></i>
-                        <div class="text default" *ngIf="!$any(actions[selectedActionId]).profile">Select Profile</div>
-                        <div class="text" *ngIf="$any(actions[selectedActionId]).profile">{{$any(actions[selectedActionId]).profile | ProfileType}}</div>
-                        <div class="menu">
-                            <div class="item" (click)="updateActionProfile(eProfileType.Default)">Default</div>
-                            <div class="item" (click)="updateActionProfile(eProfileType.SoundOnly)">Sound Only</div>
-                            <div class="item" (click)="updateActionProfile(eProfileType.VideoOnly)">Video Only</div>
-                            <div class="item" (click)="updateActionProfile(eProfileType.ContainerOnly)">Container Only</div>
-                            <!--                            <div class="item" (click)="$any(action).profile = eProfileType.Custom">Custom</div>-->
-                        </div>
-                    </div>
-                </div>
-                <div class="field" *ngIf="fontList.length > 0">
-                    <label>Font Name</label>
-                    <div class="ui selection dropdown" uiDropdown="click">
-                        <i class="dropdown icon"></i>
-                        <div class="text default" *ngIf="!$any(actions[selectedActionId]).forceFontName">Select Profile</div>
-                        <div class="text" *ngIf="$any(actions[selectedActionId]).forceFontName">{{$any(actions[selectedActionId]).forceFontName}}</div>
-                        <div class="menu">
-                            <div class="item" *ngFor="let font of fontList" (click)="updateFontName(font)">{{font}}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="field" *ngIf="$any(actions[selectedActionId]).profile === eProfileType.SoundOnly">
-                    <input type="text"
-                           [(ngModel)]="$any(actions[selectedActionId]).profileExtraData"
-                           (ngModelChange)="updateNode()"
-                           [ngModelOptions]="{updateOn: 'blur'}"
-                           name="preferredTrack"
-                           placeholder="Preferred Track"/>
-                </div>
-                <button class="ui icon button" (click)="removeSelectedNode()"><i class="trash alternate icon"></i></button>
-            </div>
-            <div class="ui mini form" *ngIf="actions[selectedActionId].type === eActionType.Extract">
-                <div class="field">
-                    <label>extractorId</label>
-                    <div class="ui selection dropdown" uiDropdown="click">
-                        <i class="dropdown icon"></i>
-                        <div class="text default" *ngIf="!$any(actions[selectedActionId]).extractorId">Select ExtractorId</div>
-                        <div class="text" *ngIf="$any(actions[selectedActionId]).extractorId">{{$any(actions[selectedActionId]).extractorId}}</div>
-                        <div class="menu">
-                            <div class="item" *ngFor="let extractorId of extractorIdList" (click)="updateActionExtractorId(extractorId)">{{extractorId}}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'File'">
-                    <label>extractFrom</label>
-                    <div class="ui selection dropdown" uiDropdown="click">
-                        <i class="dropdown icon"></i>
-                        <div class="text default" *ngIf="!$any(actions[selectedActionId]).extractFrom">Select Source</div>
-                        <div class="text" *ngIf="$any(actions[selectedActionId]).extractFrom">{{$any(actions[selectedActionId]).extractFrom}}</div>
-                        <div class="menu">
-                            <div class="item" (click)="updateActionExtractSource(eExtractSource.VideoFile)">{{eExtractSource.VideoFile}}</div>
-                            <div class="item" (click)="updateActionExtractSource(eExtractSource.Archive)">{{eExtractSource.Archive}}</div>
-                            <div class="item" (click)="updateActionExtractSource(eExtractSource.OtherFiles)">{{eExtractSource.OtherFiles}}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'File'">
-                    <label>extractTarget</label>
-                    <div class="ui selection dropdown" uiDropdown="click">
-                        <i class="dropdown icon"></i>
-                        <div class="text default" *ngIf="!$any(actions[selectedActionId]).extractTarget">Select Target</div>
-                        <div class="text" *ngIf="$any(actions[selectedActionId]).extractTarget">{{$any(actions[selectedActionId]).extractTarget}}</div>
-                        <div class="menu">
-                            <div class="item" (click)="updateActionExtractTarget(eExtractTarget.KeepContainer)">{{eExtractTarget.KeepContainer}}</div>
-                            <div class="item" (click)="updateActionExtractTarget(eExtractTarget.AudioStream)">{{eExtractTarget.AudioStream}}</div>
-                            <div class="item" (click)="updateActionExtractTarget(eExtractTarget.Subtitle)">{{eExtractTarget.Subtitle}}</div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Below is optional -->
-                <div class="field">
-                    <label>outputExtname (no ".")</label>
-                    <input type="text"
-                           [(ngModel)]="$any(actions[selectedActionId]).outputExtname"
-                           (ngModelChange)="updateNode()"
-                           [ngModelOptions]="{updateOn: 'blur'}"
-                           name="outputExtname"
-                           placeholder="extension name of output"/>
-                </div>
-                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Default'">
-                    <label>extractRegex</label>
-                    <input type="text"
-                           [(ngModel)]="$any(actions[selectedActionId]).extractRegex"
-                           (ngModelChange)="updateNode()"
-                           [ngModelOptions]="{updateOn: 'blur'}"
-                           name="extractRegex"
-                           placeholder="regex to match file/track"/>
-                </div>
-                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio'">
-                    <label>extraData.propertyName</label>
-                    <input type="text"
-                           [(ngModel)]="$any(actions[selectedActionId]).extraData.propertyName"
-                           (ngModelChange)="updateNode()"
-                           [ngModelOptions]="{updateOn: 'blur'}"
-                           name="propertyName"
-                           placeholder="property name of the stream info to match"/>
-                </div>
-                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio'">
-                    <label>extraData.propertyValueRegex</label>
-                    <input type="text"
-                           [(ngModel)]="$any(actions[selectedActionId]).extraData.propertyValueRegex"
-                           (ngModelChange)="updateNode()"
-                           [ngModelOptions]="{updateOn: 'blur'}"
-                           name="propertyValueRegex"
-                           placeholder="regular expression of the property of stream info"/>
-                </div>
-                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'Audio'">
-                    <label>extraData.selectDefault</label>
-                    <input type="text"
-                           [(ngModel)]="$any(actions[selectedActionId]).extraData.selectDefault"
-                           (ngModelChange)="updateNode()"
-                           [ngModelOptions]="{updateOn: 'blur'}"
-                           name="selectDefault"
-                           placeholder="if select the default stream"/>
-                </div>
-                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'File' && $any(actions[selectedActionId]).extractTarget === eExtractTarget.Subtitle">
-                    <label>extraData.fileNameHint (case-insensitive)</label>
-                    <input type="text"
-                           [(ngModel)]="$any(actions[selectedActionId]).extraData.fileNameHint"
-                           (ngModelChange)="updateNode()"
-                           [ngModelOptions]="{updateOn: 'blur'}"
-                           name="fileNameHint"
-                           placeholder="Regex to match filename (optional)">
-                    <small>Use EPS_NO as named capture to capture episode number</small>
-                </div>
-                <div class="field" *ngIf="$any(actions[selectedActionId]).extractorId === 'File' && $any(actions[selectedActionId]).extractFrom === eExtractSource.Archive">
-                    <label>extraData.archiveFileNameHint (case-insensitive)</label>
-                    <input type="text"
-                           [(ngModel)]="$any(actions[selectedActionId]).extraData.archiveFileNameHint"
-                           (ngModelChange)="updateNode()"
-                           [ngModelOptions]="{updateOn: 'blur'}"
-                           name="archiveFileNameHint"
-                           placeholder="Regex to match archive filename">
-                </div>
-                <!-- extractorId is not supported currently -->
-                <button class="ui icon button" (click)="removeSelectedNode()"><i class="trash alternate icon"></i></button>
-            </div>
-            <!-- for debug only, hide in production -->
-<!--            <div class="ui mini form">-->
-<!--                <div class="field" *ngFor="let actId of actions[selectedActionId].upstreamActionIds">-->
-<!--                    <label>Upstream Action Id</label>-->
-<!--                    <input type="text" [value]="actId" readonly>-->
-<!--                </div>-->
-<!--                <div class="field" *ngFor="let actId of actions[selectedActionId].downstreamIds">-->
-<!--                    <label>Downstream Action Id</label>-->
-<!--                    <input type="text" [value]="actId" readonly>-->
-<!--                </div>-->
-<!--            </div>-->
-        </div>
-        <div class="link-card ui segment" *ngIf="selectedLinkId && selectedLinkIndex !== -1">
-            <span>Link: </span>
-            <span>{{edges[selectedLinkIndex].source}}</span>
-            <i class="small arrow right icon"></i>
-            <span>{{edges[selectedLinkIndex].target}}</span>
-            <button class="ui mini icon button" (click)="removeLink()"><i class="trash alternate icon"></i></button>
-        </div>
-    </div>
-    <div class="interaction-lock-overlay"
-         title="Click to interact"
-         (click)="unlockInteraction()"
-         *ngIf="interactionLocked && graphViewDimension" [style.width]="graphViewDimension[0] + 'px'" [style.height]="graphViewDimension[1] + 'px'"></div>
-</div>
+          <svg:g class="node">
+            <svg:foreignObject width="200" [attr.height]="nodeHeightDict[node.data.type]">
+              <xhtml:div class="action-card" [ngClass]="node.data.type" (click)="selectNode(node.id, $event, node.meta)">
+                <xhtml:div class="action-label"><xhtml:i class="icon" [ngClass]="nodeIconClassDict[node.data.type]"></xhtml:i>{{node.label}}</xhtml:div>
+                  @if (node.data.type === eActionType.Convert) {
+                    <xhtml:div class="action-properties">
+                      <xhtml:div class="convert-profile"><xhtml:span class="property-name">profile:</xhtml:span>{{node.data.profile}}</xhtml:div>
+                        <xhtml:div class="font"><xhtml:span class="property-name">forceFontName:</xhtml:span>{{node.data.forceFontName}}</xhtml:div>
+                          <xhtml:div class="profile-extra"><xhtml:span class="property-name">profileExtraData:</xhtml:span>{{node.data.profileExtraData}}</xhtml:div>
+                            </xhtml:div>
+                          }
+                          @if (node.data.type === eActionType.Extract) {
+                            <xhtml:div class="action-properties">
+                              <xhtml:div class="extractor-id"><xhtml:span class="property-name">extractorId:</xhtml:span>{{node.data.extractorId}}</xhtml:div>
+                                @if (!!node.data.extractFrom) {
+                                  <xhtml:div class="extract-source"><xhtml:span class="property-name">extractFrom:</xhtml:span>{{node.data.extractFrom}}</xhtml:div>
+                                  }
+                                  @if (!!node.data.extractTarget) {
+                                    <xhtml:div class="extract-target"><xhtml:span class="property-name">extractTarget:</xhtml:span>{{node.data.extractTarget}}</xhtml:div>
+                                    }
+                                    @if (!!node.data.outputExtname) {
+                                      <xhtml:div class="outputExtname"><xhtml:span class="property-name">outputExtname:</xhtml:span>{{node.data.outputExtname}}</xhtml:div>
+                                      }
+                                      @if (!!node.data.extractRegex) {
+                                        <xhtml:div class="extractRegex"><xhtml:span class="property-name">extractRegex:</xhtml:span>{{node.data.extractRegex}}</xhtml:div>
+                                        }
+                                        @if (!!node.data.extraData && !!node.data.extraData.propertyName) {
+                                          <xhtml:div class="extraData">
+                                            <xhtml:span class="property-name">extraData.propertyName:</xhtml:span>{{node.data.extraData.propertyName}}</xhtml:div>
+                                            }
+                                            @if (!!node.data.extraData && !!node.data.extraData.propertyValueRegex) {
+                                              <xhtml:div class="extraData">
+                                                <xhtml:span class="property-name">extraData.propertyValueRegex:</xhtml:span>{{node.data.extraData.propertyValueRegex}}</xhtml:div>
+                                                }
+                                                @if (!!node.data.extraData && node.data.extractorId === 'Audio') {
+                                                  <xhtml:div class="extraData">
+                                                    <xhtml:span class="property-name">extraData.selectDefault:</xhtml:span>{{node.data.extraData.selectDefault}}</xhtml:div>
+                                                    }
+                                                    </xhtml:div>
+                                                  }
+                                                  </xhtml:div>
+                                                  </svg:foreignObject>
+                                                  @if (node.meta.disabled) {
+                                                    <svg:rect width="200" [attr.height]="nodeHeightDict[node.data.type]"
+                                                      fill="#ffffff" fill-opacity="0.4"></svg:rect>
+                                                    }
+                                                    @if (selectedActionId === node.id && linkMode == eLinkMode.None && node.meta.allowInput) {
+                                                      <g
+                                                        transform="translate(198, 0)"
+                                                        (click)="addUpstreamAction($event)">
+                                                        <ellipse
+                                                          style="fill:white;fill-opacity:1;stroke:#5178c5;stroke-width:4;stroke-dasharray:none;stroke-opacity:1"
+                                                          cx="10"
+                                                          cy="10"
+                                                          rx="6"
+                                                        ry="6" ></ellipse>
+                                                        <path
+                                                          style="fill:#b87fe1;fill-opacity:1;stroke-width:0"
+                                                        d="M 10 10 L 20 0 L 20 20 z" ></path>
+                                                        <rect
+                                                          style="fill:#b87fe1;fill-opacity:1;stroke-width:0"
+                                                          width="14"
+                                                          height="10"
+                                                          x="16"
+                                                        y="5" ></rect>
+                                                      </g>
+                                                    }
+                                                    @if (selectedActionId === node.id && linkMode == eLinkMode.None && node.meta.allowOutput) {
+                                                      <g
+                                                        transform="translate(198, 60)"
+                                                        (click)="addDownstreamAction($event)">
+                                                        <ellipse
+                                                          style="fill:white;fill-opacity:1;stroke:#5178c5;stroke-width:4;stroke-dasharray:none;stroke-opacity:1"
+                                                          cx="10"
+                                                          cy="10"
+                                                          rx="6"
+                                                        ry="6" ></ellipse>
+                                                        <rect
+                                                          style="fill:#2fa350;fill-opacity:1;stroke-width:0"
+                                                          width="14"
+                                                          height="10"
+                                                          x="10"
+                                                        y="5" ></rect>
+                                                        <path
+                                                          style="fill:#2fa350;fill-opacity:1;stroke-width:0"
+                                                        d="M 20 0 L 30 10 L 20 20 z" ></path>
+                                                      </g>
+                                                    }
+                                                    </svg:g>
+                                                  </ng-template>
+                                                  <ng-template #linkTemplate let-link>
+                                                    <svg:g class="edge">
+                                                      <svg:path class="line" stroke-width="4" marker-end="url(#arrow)"
+                                                        [ngClass]="{selected: selectedLinkId === link.id}"
+                                                        (click)="selectLink($event, link.id)"></svg:path>
+                                                        </svg:g>
+                                                      </ng-template>
+                                                    </ngx-graph>
+                                                  }
+                                                  @if (editMode) {
+                                                    <div class="node-editor-container">
+                                                      <div class="toolbar">
+                                                        <div class="toolbar-section">
+                                                          <div class="toolbar-section-header">Actions</div>
+                                                          <button class="ui mini button" (click)="addNode(eActionType.Extract)">
+                                                            <i class="envelope open outline icon"></i>
+                                                            Extract
+                                                          </button>
+                                                          <button class="ui mini button" (click)="addNode(eActionType.Convert)">
+                                                            <i class="cogs icon"></i>
+                                                            Convert
+                                                          </button>
+                                                        </div>
+                                                      </div>
+                                                      @if (selectedActionId && selectedNodeIndex !== -1) {
+                                                        <div class="property-card ui segment">
+                                                          <h5 class="ui header">Action: {{nodes[selectedNodeIndex].label}}</h5>
+                                                          @if (actions[selectedActionId].type === eActionType.Convert) {
+                                                            <div class="ui mini form">
+                                                              <div class="field">
+                                                                <label>profile</label>
+                                                                <div class="ui selection dropdown" uiDropdown="click">
+                                                                  <i class="dropdown icon"></i>
+                                                                  @if (!$any(actions[selectedActionId]).profile) {
+                                                                    <div class="text default">Select Profile</div>
+                                                                  }
+                                                                  @if ($any(actions[selectedActionId]).profile) {
+                                                                    <div class="text">{{$any(actions[selectedActionId]).profile | ProfileType}}</div>
+                                                                  }
+                                                                  <div class="menu">
+                                                                    <div class="item" (click)="updateActionProfile(eProfileType.Default)">Default</div>
+                                                                    <div class="item" (click)="updateActionProfile(eProfileType.SoundOnly)">Sound Only</div>
+                                                                    <div class="item" (click)="updateActionProfile(eProfileType.VideoOnly)">Video Only</div>
+                                                                    <div class="item" (click)="updateActionProfile(eProfileType.ContainerOnly)">Container Only</div>
+                                                                    <!--                            <div class="item" (click)="$any(action).profile = eProfileType.Custom">Custom</div>-->
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                              @if (fontList.length > 0) {
+                                                                <div class="field">
+                                                                  <label>Font Name</label>
+                                                                  <div class="ui selection dropdown" uiDropdown="click">
+                                                                    <i class="dropdown icon"></i>
+                                                                    @if (!$any(actions[selectedActionId]).forceFontName) {
+                                                                      <div class="text default">Select Profile</div>
+                                                                    }
+                                                                    @if ($any(actions[selectedActionId]).forceFontName) {
+                                                                      <div class="text">{{$any(actions[selectedActionId]).forceFontName}}</div>
+                                                                    }
+                                                                    <div class="menu">
+                                                                      @for (font of fontList; track font) {
+                                                                        <div class="item" (click)="updateFontName(font)">{{font}}</div>
+                                                                      }
+                                                                    </div>
+                                                                  </div>
+                                                                </div>
+                                                              }
+                                                              @if ($any(actions[selectedActionId]).profile === eProfileType.SoundOnly) {
+                                                                <div class="field">
+                                                                  <input type="text"
+                                                                    [(ngModel)]="$any(actions[selectedActionId]).profileExtraData"
+                                                                    (ngModelChange)="updateNode()"
+                                                                    [ngModelOptions]="{updateOn: 'blur'}"
+                                                                    name="preferredTrack"
+                                                                    placeholder="Preferred Track"/>
+                                                                </div>
+                                                              }
+                                                              <button class="ui icon button" (click)="removeSelectedNode()"><i class="trash alternate icon"></i></button>
+                                                            </div>
+                                                          }
+                                                          @if (actions[selectedActionId].type === eActionType.Extract) {
+                                                            <div class="ui mini form">
+                                                              <div class="field">
+                                                                <label>extractorId</label>
+                                                                <div class="ui selection dropdown" uiDropdown="click">
+                                                                  <i class="dropdown icon"></i>
+                                                                  @if (!$any(actions[selectedActionId]).extractorId) {
+                                                                    <div class="text default">Select ExtractorId</div>
+                                                                  }
+                                                                  @if ($any(actions[selectedActionId]).extractorId) {
+                                                                    <div class="text">{{$any(actions[selectedActionId]).extractorId}}</div>
+                                                                  }
+                                                                  <div class="menu">
+                                                                    @for (extractorId of extractorIdList; track extractorId) {
+                                                                      <div class="item" (click)="updateActionExtractorId(extractorId)">{{extractorId}}</div>
+                                                                    }
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                              @if ($any(actions[selectedActionId]).extractorId === 'File') {
+                                                                <div class="field">
+                                                                  <label>extractFrom</label>
+                                                                  <div class="ui selection dropdown" uiDropdown="click">
+                                                                    <i class="dropdown icon"></i>
+                                                                    @if (!$any(actions[selectedActionId]).extractFrom) {
+                                                                      <div class="text default">Select Source</div>
+                                                                    }
+                                                                    @if ($any(actions[selectedActionId]).extractFrom) {
+                                                                      <div class="text">{{$any(actions[selectedActionId]).extractFrom}}</div>
+                                                                    }
+                                                                    <div class="menu">
+                                                                      <div class="item" (click)="updateActionExtractSource(eExtractSource.VideoFile)">{{eExtractSource.VideoFile}}</div>
+                                                                      <div class="item" (click)="updateActionExtractSource(eExtractSource.Archive)">{{eExtractSource.Archive}}</div>
+                                                                      <div class="item" (click)="updateActionExtractSource(eExtractSource.OtherFiles)">{{eExtractSource.OtherFiles}}</div>
+                                                                    </div>
+                                                                  </div>
+                                                                </div>
+                                                              }
+                                                              @if ($any(actions[selectedActionId]).extractorId === 'File') {
+                                                                <div class="field">
+                                                                  <label>extractTarget</label>
+                                                                  <div class="ui selection dropdown" uiDropdown="click">
+                                                                    <i class="dropdown icon"></i>
+                                                                    @if (!$any(actions[selectedActionId]).extractTarget) {
+                                                                      <div class="text default">Select Target</div>
+                                                                    }
+                                                                    @if ($any(actions[selectedActionId]).extractTarget) {
+                                                                      <div class="text">{{$any(actions[selectedActionId]).extractTarget}}</div>
+                                                                    }
+                                                                    <div class="menu">
+                                                                      <div class="item" (click)="updateActionExtractTarget(eExtractTarget.KeepContainer)">{{eExtractTarget.KeepContainer}}</div>
+                                                                      <div class="item" (click)="updateActionExtractTarget(eExtractTarget.AudioStream)">{{eExtractTarget.AudioStream}}</div>
+                                                                      <div class="item" (click)="updateActionExtractTarget(eExtractTarget.Subtitle)">{{eExtractTarget.Subtitle}}</div>
+                                                                    </div>
+                                                                  </div>
+                                                                </div>
+                                                              }
+                                                              <!-- Below is optional -->
+                                                              <div class="field">
+                                                                <label>outputExtname (no ".")</label>
+                                                                <input type="text"
+                                                                  [(ngModel)]="$any(actions[selectedActionId]).outputExtname"
+                                                                  (ngModelChange)="updateNode()"
+                                                                  [ngModelOptions]="{updateOn: 'blur'}"
+                                                                  name="outputExtname"
+                                                                  placeholder="extension name of output"/>
+                                                              </div>
+                                                              @if ($any(actions[selectedActionId]).extractorId === 'Default') {
+                                                                <div class="field">
+                                                                  <label>extractRegex</label>
+                                                                  <input type="text"
+                                                                    [(ngModel)]="$any(actions[selectedActionId]).extractRegex"
+                                                                    (ngModelChange)="updateNode()"
+                                                                    [ngModelOptions]="{updateOn: 'blur'}"
+                                                                    name="extractRegex"
+                                                                    placeholder="regex to match file/track"/>
+                                                                </div>
+                                                              }
+                                                              @if ($any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio') {
+                                                                <div class="field">
+                                                                  <label>extraData.propertyName</label>
+                                                                  <input type="text"
+                                                                    [(ngModel)]="$any(actions[selectedActionId]).extraData.propertyName"
+                                                                    (ngModelChange)="updateNode()"
+                                                                    [ngModelOptions]="{updateOn: 'blur'}"
+                                                                    name="propertyName"
+                                                                    placeholder="property name of the stream info to match"/>
+                                                                </div>
+                                                              }
+                                                              @if ($any(actions[selectedActionId]).extractorId === 'Subtitle' || $any(actions[selectedActionId]).extractorId === 'Audio') {
+                                                                <div class="field">
+                                                                  <label>extraData.propertyValueRegex</label>
+                                                                  <input type="text"
+                                                                    [(ngModel)]="$any(actions[selectedActionId]).extraData.propertyValueRegex"
+                                                                    (ngModelChange)="updateNode()"
+                                                                    [ngModelOptions]="{updateOn: 'blur'}"
+                                                                    name="propertyValueRegex"
+                                                                    placeholder="regular expression of the property of stream info"/>
+                                                                </div>
+                                                              }
+                                                              @if ($any(actions[selectedActionId]).extractorId === 'Audio') {
+                                                                <div class="field">
+                                                                  <label>extraData.selectDefault</label>
+                                                                  <input type="text"
+                                                                    [(ngModel)]="$any(actions[selectedActionId]).extraData.selectDefault"
+                                                                    (ngModelChange)="updateNode()"
+                                                                    [ngModelOptions]="{updateOn: 'blur'}"
+                                                                    name="selectDefault"
+                                                                    placeholder="if select the default stream"/>
+                                                                </div>
+                                                              }
+                                                              @if ($any(actions[selectedActionId]).extractorId === 'File' && $any(actions[selectedActionId]).extractTarget === eExtractTarget.Subtitle) {
+                                                                <div class="field">
+                                                                  <label>extraData.fileNameHint (case-insensitive)</label>
+                                                                  <input type="text"
+                                                                    [(ngModel)]="$any(actions[selectedActionId]).extraData.fileNameHint"
+                                                                    (ngModelChange)="updateNode()"
+                                                                    [ngModelOptions]="{updateOn: 'blur'}"
+                                                                    name="fileNameHint"
+                                                                    placeholder="Regex to match filename (optional)">
+                                                                  <small>Use EPS_NO as named capture to capture episode number</small>
+                                                                </div>
+                                                              }
+                                                              @if ($any(actions[selectedActionId]).extractorId === 'File' && $any(actions[selectedActionId]).extractFrom === eExtractSource.Archive) {
+                                                                <div class="field">
+                                                                  <label>extraData.archiveFileNameHint (case-insensitive)</label>
+                                                                  <input type="text"
+                                                                    [(ngModel)]="$any(actions[selectedActionId]).extraData.archiveFileNameHint"
+                                                                    (ngModelChange)="updateNode()"
+                                                                    [ngModelOptions]="{updateOn: 'blur'}"
+                                                                    name="archiveFileNameHint"
+                                                                    placeholder="Regex to match archive filename">
+                                                                </div>
+                                                              }
+                                                              <!-- extractorId is not supported currently -->
+                                                              <button class="ui icon button" (click)="removeSelectedNode()"><i class="trash alternate icon"></i></button>
+                                                            </div>
+                                                          }
+                                                          <!-- for debug only, hide in production -->
+                                                          <!--            <div class="ui mini form">-->
+                                                          <!--                <div class="field" *ngFor="let actId of actions[selectedActionId].upstreamActionIds">-->
+                                                          <!--                    <label>Upstream Action Id</label>-->
+                                                          <!--                    <input type="text" [value]="actId" readonly>-->
+                                                        <!--                </div>-->
+                                                        <!--                <div class="field" *ngFor="let actId of actions[selectedActionId].downstreamIds">-->
+                                                        <!--                    <label>Downstream Action Id</label>-->
+                                                        <!--                    <input type="text" [value]="actId" readonly>-->
+                                                      <!--                </div>-->
+                                                    <!--            </div>-->
+                                                  </div>
+                                                }
+                                                @if (selectedLinkId && selectedLinkIndex !== -1) {
+                                                  <div class="link-card ui segment">
+                                                    <span>Link: </span>
+                                                    <span>{{edges[selectedLinkIndex].source}}</span>
+                                                    <i class="small arrow right icon"></i>
+                                                    <span>{{edges[selectedLinkIndex].target}}</span>
+                                                    <button class="ui mini icon button" (click)="removeLink()"><i class="trash alternate icon"></i></button>
+                                                  </div>
+                                                }
+                                              </div>
+                                            }
+                                            @if (interactionLocked && graphViewDimension) {
+                                              <div class="interaction-lock-overlay"
+                                                title="Click to interact"
+                                                (click)="unlockInteraction()"
+                                              [style.width]="graphViewDimension[0] + 'px'" [style.height]="graphViewDimension[1] + 'px'"></div>
+                                            }
+                                          </div>

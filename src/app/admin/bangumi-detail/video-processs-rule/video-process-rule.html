@@ -1,17 +1,24 @@
-<div class="video-process section-card" *ngIf="bangumi && bangumi.id">
+@if (bangumi && bangumi.id) {
+  <div class="video-process section-card">
     <h4 class="section-header">后期处理</h4>
     <div class="rule-list">
-        <video-process-rule-item *ngFor="let videoProcessRule of videoProcessRuleList" [rule]="videoProcessRule" (delete)="refreshList()">
+      @for (videoProcessRule of videoProcessRuleList; track videoProcessRule) {
+        <video-process-rule-item [rule]="videoProcessRule" (delete)="refreshList()">
         </video-process-rule-item>
+      }
     </div>
     <div class="buttons-container">
-        <a class="anchor-button" (click)="onAddRule()"><i class="plus icon"></i>Add Rule</a>
+      <a class="anchor-button" (click)="onAddRule()"><i class="plus icon"></i>Add Rule</a>
+      @if (!isWorkingOnReprocess) {
         <a class="anchor-button"
-           *ngIf="!isWorkingOnReprocess"
-           title="Re-process All Episodes"
-           confirmDialog
-           dialogTitle="Re-process All Episodes' VideoFiles"
-           dialogContent="This will re-process all VideoFiles if there is any rule applied!" (onConfirm)="reprocessAll()"><i class="redo icon"></i>Re-process All</a>
-        <span *ngIf="isWorkingOnReprocess">Working on...</span>
+          title="Re-process All Episodes"
+          confirmDialog
+          dialogTitle="Re-process All Episodes' VideoFiles"
+          dialogContent="This will re-process all VideoFiles if there is any rule applied!" (onConfirm)="reprocessAll()"><i class="redo icon"></i>Re-process All</a>
+        }
+        @if (isWorkingOnReprocess) {
+          <span>Working on...</span>
+        }
+      </div>
     </div>
-</div>
+  }

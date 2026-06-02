@@ -157,7 +157,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                 return {
                     episode,
                     videoFiles: []
-                }
+                } as EpisodeVideoFileStatus;
             })
         }
     }

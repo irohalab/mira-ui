@@ -1,82 +1,100 @@
 <div class="vertex-info-container">
-    <div class="header-bar">
-        <a class="close-button" (click)="closePanel()">
-            <i class="chevron left icon"></i>
-        </a>
-        <div class="panel-title">Vertex Info</div>
+  <div class="header-bar">
+    <a class="close-button" (click)="closePanel()">
+      <i class="chevron left icon"></i>
+    </a>
+    <div class="panel-title">Vertex Info</div>
+  </div>
+  <div class="vertex-summary section-container">
+    <table class="ui table">
+      <tbody>
+        <tr>
+          <td>Id</td>
+          <td colspan="3">{{vertex.id}}</td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td>{{vertex.status}}</td>
+          <td style="width: 13em">Action Type</td>
+          <td>{{vertex.actionType}}</td>
+        </tr>
+        <tr>
+          <td>outputPath</td>
+          <td colspan="3">{{vertex.outputPath || 'N/A'}}</td>
+        </tr>
+        <tr>
+          <td>Start Time</td>
+          <td>{{vertex.startTime}}</td>
+          <td>Finished time</td>
+          <td>{{vertex.finishedTime || 'N/A'}}</td>
+        </tr>
+        @if (vertex.actionType === eActionType.Convert) {
+          <tr>
+            <td>profile</td>
+            <td>{{$any(vertex.action).profile}}</td>
+            <td>profileExtraData</td>
+            <td>{{$any(vertex.action).profileExtraData}}</td>
+          </tr>
+        }
+        @if (vertex.actionType === eActionType.Convert) {
+          <tr>
+            <td>forceFontName</td>
+            <td colspan="3">{{$any(vertex.action).forceFontName}}</td>
+          </tr>
+        }
+        @if (vertex.actionType === eActionType.Extract && ($any(vertex.action).extractorId==='Default' || $any(vertex.action).extractorId==='File')) {
+          <tr>
+            <td>extractFrom</td>
+            <td>{{$any(vertex.action).extractFrom}}</td>
+            <td>extractTarget</td>
+            <td>{{$any(vertex.action).extractTarget}}</td>
+          </tr>
+        }
+        @if (vertex.actionType === eActionType.Extract) {
+          <tr>
+            <td>outputExtname</td>
+            <td>{{$any(vertex.action).outputExtname || 'N/A'}}</td>
+            <td>extractorId</td>
+            <td>{{$any(vertex.action).extractorId}}</td>
+          </tr>
+        }
+        @if (vertex.actionType === eActionType.Extract && $any(vertex.action).extractorId==='Default') {
+          <tr>
+            <td>extractRegex</td>
+            <td colspan="3">{{$any(vertex.action).extractRegex || 'N/A'}}</td>
+          </tr>
+        }
+        @if (vertex.actionType === eActionType.Extract && ($any(vertex.action).extractorId==='Subtitle' || $any(vertex.action).extractorId==='Audio')) {
+          <tr>
+            <td>extraData.propertyName</td>
+            <td>{{$any(vertex.action).extraData.propertyName}}</td>
+            <td>extraData.propertyValueRegex</td>
+            <td>{{$any(vertex.action).extraData.propertyValueRegex}}</td>
+          </tr>
+        }
+        @if (vertex.actionType === eActionType.Extract && $any(vertex.action).extractorId==='Audio') {
+          <tr>
+            <td>extraData.selectDefault</td>
+            <td colspan="3">{{$any(vertex.action).extraData.selectDefault}}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="vertex-log-container section-container">
+    <div class="ui header">Vertex Log</div>
+    @if (!shouldShowVertexLog) {
+      <div class="vertex-log-action">
+        <button class="ui button" (click)="showLog()">Show Vertex Log</button>
+      </div>
+    }
+    <div class="log-wrapper" #vertexLogWrapper>
+      @if (shouldShowVertexLog) {
+        <stream-log-viewer [logLineSource]="vertexLogLines"></stream-log-viewer>
+      }
     </div>
-    <div class="vertex-summary section-container">
-        <table class="ui table">
-            <tbody>
-            <tr>
-                <td>Id</td>
-                <td colspan="3">{{vertex.id}}</td>
-            </tr>
-            <tr>
-                <td>Status</td>
-                <td>{{vertex.status}}</td>
-                <td style="width: 13em">Action Type</td>
-                <td>{{vertex.actionType}}</td>
-            </tr>
-            <tr>
-                <td>outputPath</td>
-                <td colspan="3">{{vertex.outputPath || 'N/A'}}</td>
-            </tr>
-            <tr>
-                <td>Start Time</td>
-                <td>{{vertex.startTime}}</td>
-                <td>Finished time</td>
-                <td>{{vertex.finishedTime || 'N/A'}}</td>
-            </tr>
-            <tr *ngIf="vertex.actionType === eActionType.Convert">
-                <td>profile</td>
-                <td>{{$any(vertex.action).profile}}</td>
-                <td>profileExtraData</td>
-                <td>{{$any(vertex.action).profileExtraData}}</td>
-            </tr>
-            <tr *ngIf="vertex.actionType === eActionType.Convert">
-                <td>forceFontName</td>
-                <td colspan="3">{{$any(vertex.action).forceFontName}}</td>
-            </tr>
-            <tr *ngIf="vertex.actionType === eActionType.Extract && ($any(vertex.action).extractorId==='Default' || $any(vertex.action).extractorId==='File')">
-                <td>extractFrom</td>
-                <td>{{$any(vertex.action).extractFrom}}</td>
-                <td>extractTarget</td>
-                <td>{{$any(vertex.action).extractTarget}}</td>
-            </tr>
-            <tr *ngIf="vertex.actionType === eActionType.Extract">
-                <td>outputExtname</td>
-                <td>{{$any(vertex.action).outputExtname || 'N/A'}}</td>
-                <td>extractorId</td>
-                <td>{{$any(vertex.action).extractorId}}</td>
-            </tr>
-            <tr *ngIf="vertex.actionType === eActionType.Extract && $any(vertex.action).extractorId==='Default'">
-                <td>extractRegex</td>
-                <td colspan="3">{{$any(vertex.action).extractRegex || 'N/A'}}</td>
-            </tr>
-            <tr *ngIf="vertex.actionType === eActionType.Extract && ($any(vertex.action).extractorId==='Subtitle' || $any(vertex.action).extractorId==='Audio')">
-                <td>extraData.propertyName</td>
-                <td>{{$any(vertex.action).extraData.propertyName}}</td>
-                <td>extraData.propertyValueRegex</td>
-                <td>{{$any(vertex.action).extraData.propertyValueRegex}}</td>
-            </tr>
-            <tr *ngIf="vertex.actionType === eActionType.Extract && $any(vertex.action).extractorId==='Audio'">
-                <td>extraData.selectDefault</td>
-                <td colspan="3">{{$any(vertex.action).extraData.selectDefault}}</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="vertex-log-container section-container">
-        <div class="ui header">Vertex Log</div>
-        <div class="vertex-log-action" *ngIf="!shouldShowVertexLog">
-            <button class="ui button" (click)="showLog()">Show Vertex Log</button>
-        </div>
-        <div class="log-wrapper" #vertexLogWrapper>
-            <stream-log-viewer *ngIf="shouldShowVertexLog" [logLineSource]="vertexLogLines"></stream-log-viewer>
-        </div>
-    </div>
-    <div class="panel-action-container">
-        <button class="ui primary button" (click)="closePanel()">Close</button>
-    </div>
+  </div>
+  <div class="panel-action-container">
+    <button class="ui primary button" (click)="closePanel()">Close</button>
+  </div>
 </div>

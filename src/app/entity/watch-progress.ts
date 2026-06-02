@@ -10,6 +10,7 @@ export class WatchProgress {
   lastWatchPosition: number;
   lastWatchTime: string;
   percentage: number;
+  subItemId: string;
 
   episode?: Episode;
   bangumi?: Bangumi;

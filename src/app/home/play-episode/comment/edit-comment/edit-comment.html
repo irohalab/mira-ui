@@ -1,18 +1,20 @@
 <div class="user-avatar">
-    <img [src]="avatar" alt="avatar">
+  <img [src]="avatar" alt="avatar">
 </div>
 <form class="ui form" [formGroup]="editCommentForm" (submit)="preventSubmit($event)" [ngClass]="{inverted: isDarkTheme}">
-    <div class="field">
-        <textarea name="content" cols="30" rows="5" formControlName="content"></textarea>
-    </div>
-    <div class="buttons field">
-        <button class="ui button" [ngClass]="{inverted: isDarkTheme}" type="button" (click)="cancelEdit()">取消</button>
-        <button class="ui blue labeled submit icon button" [ngClass]="{inverted: isDarkTheme}" type="button"
-                [disabled]="editCommentForm.invalid" (click)="updateComment()">
-            <i class="icon edit"></i> 更新
-        </button>
-    </div>
+  <div class="field">
+    <textarea name="content" cols="30" rows="5" formControlName="content"></textarea>
+  </div>
+  <div class="buttons field">
+    <button class="ui button" [ngClass]="{inverted: isDarkTheme}" type="button" (click)="cancelEdit()">取消</button>
+    <button class="ui blue labeled submit icon button" [ngClass]="{inverted: isDarkTheme}" type="button"
+      [disabled]="editCommentForm.invalid" (click)="updateComment()">
+      <i class="icon edit"></i> 更新
+    </button>
+  </div>
 </form>
-<div class="ui dimmer active" *ngIf="isLoading" [ngClass]="{inverted: !isDarkTheme}">
+@if (isLoading) {
+  <div class="ui dimmer active" [ngClass]="{inverted: !isDarkTheme}">
     <div class="ui loader"></div>
-</div>
+  </div>
+}
