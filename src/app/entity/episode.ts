@@ -2,11 +2,10 @@ import {Bangumi} from './bangumi';
 import {WatchProgress} from './watch-progress';
 import {VideoFile} from './video-file';
 import { Image } from './image';
+import { SubItem } from '@irohalab/mira-sdk-angular';
+import EpisodeTypeEnum = SubItem.EpisodeTypeEnum;
 
 export class Episode {
-
-    static EPISODE_TYPE_NORMAL: number = 0;
-    static EPISODE_TYPE_SPECIAL: number = 1;
 
     id: string;
     bangumi: Bangumi;
@@ -18,6 +17,8 @@ export class Episode {
     duration: string;
     airdate: string;
     status: number;
+    subItemId: string;
+    type: EpisodeTypeEnum;
     torrent_id: string;
     create_time: number;
     update_time: number;
