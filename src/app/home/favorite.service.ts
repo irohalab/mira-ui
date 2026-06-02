@@ -125,25 +125,30 @@ export class FavoriteService {
      */
     resolveConflict(externalFavorite: ExternalFavorite, subItemFavoriteList: SubItemFavorite[], bangumi: Bangumi): Observable<boolean> {
         if (bangumi.favorite) {
-            let localEpisodeProgress = 0;
-            const sortedEpisodes = bangumi.episodes.sort((ep1, ep2) => {
-                return ep1.sort - ep2.sort;
-            });
-            for (const eps of sortedEpisodes) {
-                if (eps.watchProgress && eps.watchProgress.watchStatus === WatchProgress.WATCHED) {
-                    localEpisodeProgress++;
-                } else {
-                    break;
-                }
-            }
-
             if (externalFavorite) {
-                const sortedSubItemFavoriteList = subItemFavoriteList.filter(sf => sf.subItem.episodeType === EpisodeTypeEnum.Episode)
-                    .sort((sf1, sf2) => {
-                        return sf1.subItem.sort - sf2.subItem.sort;
-                    });
+                const sfSet = new Set<string>(subItemFavoriteList
+                    .filter(sf => sf.subItem.episodeType === EpisodeTypeEnum.Episode).map(sf => sf.subItem.id));
 
-                if (!isStatusEqual(externalFavorite.status, bangumi.favorite.status) || localEpisodeProgress !== sortedSubItemFavoriteList.length) {
+                let localEpisodeProgress = 0;
+                const subItemStatusMapping: {[subItemId: string]: boolean} = {};
+                let episodeStatusDifferent = false;
+                for (const episode of bangumi.episodes) {
+                    const watchProgress = episode.watchProgress;
+                    if (watchProgress && watchProgress.watchStatus === WatchProgress.WATCHED) {
+                        localEpisodeProgress++;
+                        subItemStatusMapping[episode.subItemId] = true;
+                        if (!sfSet.has(episode.subItemId)) {
+                            episodeStatusDifferent = true;
+                        }
+                    } else {
+                        subItemStatusMapping[episode.subItemId] = false;
+                        if (sfSet.has(episode.subItemId)) {
+                            episodeStatusDifferent = true;
+                        }
+                    }
+                }
+
+                if (!isStatusEqual(externalFavorite.status, bangumi.favorite.status) || episodeStatusDifferent) {
                     let conflictDialogRef = this.dialog.open(ConflictDialogComponent, {
                         stickyDialog: true,
                         backdrop: true
@@ -152,7 +157,7 @@ export class FavoriteService {
                     conflictDialogRef.componentInstance.siteStatus = bangumi.favorite.status;
                     conflictDialogRef.componentInstance.externalStatus = externalFavorite.status;
                     conflictDialogRef.componentInstance.siteProgress = localEpisodeProgress;
-                    conflictDialogRef.componentInstance.externalProgress = sortedSubItemFavoriteList.length;
+                    conflictDialogRef.componentInstance.externalProgress = sfSet.size;
                     return conflictDialogRef.afterClosed()
                         .pipe(switchMap((which: 'site' | 'external') => {
                             if (which === 'site') {
@@ -160,10 +165,9 @@ export class FavoriteService {
                                     status: NUMBER_TO_EXTERNAL_FAVORITE_STATUS[favoriteStatusToNumber(bangumi.favorite.status)] as ExternalFavoriteStatus
                                 }).pipe(
                                     switchMap(() => {
-                                        return this.miraApiService.updateFavoriteProgress(bangumi.itemId, localEpisodeProgress, EpisodeTypeEnum.Episode);
-                                    }),
-                                    switchMap(()=> {
-                                        return this.miraApiService.listSubItemFavorites(bangumi.itemId, null, null, null, null, true);
+                                        return this.miraApiService.syncSubItemFavoritesByFavoriteId(externalFavorite.id, {
+                                            subItemStatusMapping
+                                        })
                                     }),
                                     switchMap((res) => {
                                         return this.updateEpisodeProgress(bangumi.id, res.data);
@@ -197,10 +201,11 @@ export class FavoriteService {
                     .pipe(
                         switchMap((fav) => {
                             bangumi.favorite = fav;
-                            return this.miraApiService.updateFavoriteProgress(bangumi.itemId, localEpisodeProgress, EpisodeTypeEnum.Episode);
-                        }),
-                        switchMap(()=> {
-                            return this.miraApiService.listSubItemFavorites(bangumi.itemId, null, null, null, null, true);
+                            return this.miraApiService.createSubItemFavorites({
+                                subItemIdList: bangumi.episodes.filter(ep => {
+                                    return ep.type === EpisodeTypeEnum.Episode && ep.watchProgress?.watchStatus === WatchProgress.WATCHED;
+                                }).map(ep => ep.subItemId)
+                            });
                         }),
                         switchMap((res) => {
                             return this.updateEpisodeProgress(bangumi.id, res.data);
