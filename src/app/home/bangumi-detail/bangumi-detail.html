@@ -3,7 +3,7 @@
 </div>
 <div class="ui container bangumi-default-container" *ngIf="bangumi" [ngClass]="{'dark-theme': isDarkTheme}">
     <div class="bangumi-info">
-        <div #bangumiCover class="bangumi-cover" *ngIf="bangumi.cover">
+        <div #bangumiCover class="bangumi-cover" *ngIf="bangumi.cover_image">
             <ui-responsive-image [src]="bangumi.cover_image.url"
                               [size]="{
                                 width: '100%',
