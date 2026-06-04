@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthError } from '../../../helpers/error';
 import { FavoriteService } from '../favorite.service';
+import { extractErrorMessage } from '../../../helpers/http-error-helper';
 
 @Component({
     selector: 'user-center',
@@ -19,6 +20,8 @@ import { FavoriteService } from '../favorite.service';
 export class UserCenter implements OnInit, OnDestroy {
 
     private subscription = new Subscription();
+
+    eUser = User;
 
     user!: User;
     albireoUser!: User;
@@ -31,6 +34,7 @@ export class UserCenter implements OnInit, OnDestroy {
     invitationCode = new FormControl('', Validators.required);
     errorMessage!: string;
     syncFormGroup!: FormGroup;
+    legacyUsername!: string;
 
     isSyncing = false;
 
@@ -57,6 +61,9 @@ export class UserCenter implements OnInit, OnDestroy {
                 .subscribe(
                     user => {
                         this.user = user;
+                        if (user.role !== User.GUEST_ROLE) {
+                            this.loadLegacyUserName();
+                        }
                     }
                 )
         );
@@ -145,5 +152,17 @@ export class UserCenter implements OnInit, OnDestroy {
                     }
                 })
         );
+    }
+
+    private loadLegacyUserName(): void {
+        this.subscription.add(this.userService.getLegacyUserName()
+            .subscribe({
+                next: (name) => {
+                    this.legacyUsername = name;
+                },
+                error: (err) => {
+                    this.errorMessage = extractErrorMessage(err);
+                }
+            }));
     }
 }

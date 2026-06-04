@@ -123,6 +123,11 @@ export class UserService extends BaseService {
         }).pipe(map((result) => result.data), catchError(this.handleError));
     }
 
+    getLegacyUserName(): Observable<string> {
+        return this.httpClient.get<{data: string}>(`${baseUrl}/legacy/name`)
+            .pipe(map((res) => res.data));
+    }
+
     private updateUser(userProfile: User, account: Account): void {
         this._userInfoSubject.next(new User(
             userProfile.sub,

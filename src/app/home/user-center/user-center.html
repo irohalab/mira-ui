@@ -67,9 +67,23 @@
           }
         </div>
         <div class="ui vertical divider">
-          Or
         </div>
       </div>
+    </div>
+  } @else {
+    <div class="ui segment basic-info">
+      <h4>实验性功能</h4>
+      @if (!legacyUsername) {
+        <div class="ui success message">
+          <header>您已成功激活了邀请码</header>
+          <p>没有检测到旧账号绑定，如果需要绑定旧帐号需要重新注册box.moe账号再绑定</p>
+        </div>
+      } @else {
+        <div class="ui success message">
+          <header>你已经绑定了旧账号</header>
+          <p>已经与<strong>{{legacyUsername}}</strong>绑定</p>
+        </div>
+      }
     </div>
   }
   <div class="ui segment basic-info" [ngClass]="{inverted: isDarkTheme}">

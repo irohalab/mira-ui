@@ -173,6 +173,9 @@ export class ListBangumi implements OnDestroy, OnInit {
             keyword: this.name,
             type: this.type,
         }
+        if (eps !== -1) {
+            options.eps = eps;
+        }
         this._subscription.add(
             this.adminService.listBangumi(options)
                 .subscribe({
