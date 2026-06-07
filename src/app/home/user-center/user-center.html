@@ -84,4 +84,16 @@
       <button class="ui primary button" [disabled]="isSyncing" (click)="syncFavorite()">开始同步</button>
     </form>
   </div>
+  @if (user.role === 'Invited') {
+    <div class="ui segment basic-info" [ngClass]="{inverted: isDarkTheme}">
+      <h4>切换回旧版</h4>
+      <div class="ui warning message">
+        <div class="header">不建议切换回旧版</div>
+        <p>
+          切换回旧版可能让某些功能失效或数据损坏。如果遇到bug，<a href="https://github.com/irohalab/mira-ui/issues">请报告</a>
+        </p>
+      </div>
+      <button class="ui warning button" (click)="switchToV2()">切换回旧版</button>
+    </div>
+  }
 </div>

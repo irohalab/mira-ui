@@ -124,6 +124,22 @@ export class UserCenter implements OnInit, OnDestroy {
             })
     }
 
+    switchToV2() {
+        // Remove the `mira_ui_version` cookie if it exists so the app falls back to the old version.
+        this.removeCookie('mira_ui_version');
+        // Force the browser to load a fresh (non-cached) index.html instead of using the SPA router.
+        const url = new URL(window.location.origin);
+        url.searchParams.set('_', Date.now().toString());
+        window.location.href = url.toString();
+    }
+
+    private removeCookie(name: string): void {
+        const expires = 'expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        // Clear the cookie on the current path and the root path to cover where it may have been set.
+        document.cookie = `${name}=; ${expires}; path=/`;
+        document.cookie = `${name}=; ${expires}; path=${window.location.pathname}`;
+    }
+
     private loadAlbireoUserInfo() {
         this.isLoading = true;
         this.subscription.add(
