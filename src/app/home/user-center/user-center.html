@@ -141,6 +141,16 @@
             <button class="ui button" [ngClass]="{inverted: isDarkTheme}" type="button" (click)="updateChromeExtensionId()">更新</button>
         </form>
     </div>
+    <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
+        <h4>切换到新版</h4>
+        <div class="ui info message" [ngClass]="{black: isDarkTheme}">
+            <div class="header">体验新版界面</div>
+            <p>
+                切换到新版后将加载全新的界面。如果遇到bug，<a href="https://github.com/irohalab/mira-ui/issues" target="_blank">请报告</a>
+            </p>
+        </div>
+        <button type="button" class="ui primary button" [ngClass]="{inverted: isDarkTheme}" (click)="switchToNext()">切换到新版</button>
+    </div>
     <div class="ui active dimmer" *ngIf="isAddingWebHook">
         <div class="ui large text loader">
             正在添加Web Hook

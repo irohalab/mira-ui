@@ -247,6 +247,21 @@ export class UserCenter implements OnInit, OnDestroy {
         );
     }
 
+    switchToNext() {
+        // Set the `mira_ui_version` cookie to `next` so the server serves the new version of the app.
+        this.setCookie('mira_ui_version', 'next');
+        // Force the browser to load a fresh (non-cached) index.html instead of using the SPA router.
+        const url = new URL(window.location.origin);
+        url.searchParams.set('_', Date.now().toString());
+        window.location.href = url.toString();
+    }
+
+    private setCookie(name: string, value: string): void {
+        // Persist the cookie for a year on the root path so it applies to all routes.
+        const maxAge = 60 * 60 * 24 * 365;
+        document.cookie = `${name}=${value}; path=/; max-age=${maxAge}`;
+    }
+
     onFormChanged(errors: any, errorMessages: any, form: FormGroup) {
         for (const field in errors) {
             // clear previous error message array
