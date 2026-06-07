@@ -3,14 +3,16 @@ import { ErrorComponent } from './error/error.component';
 import { Routes } from '@angular/router';
 import { staticContentRoutes } from './static-content/static-content.routes';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { roleGuard } from './user-service';
+import { User } from './entity';
 
 
 export const appRoutes: Routes = [
     ...homeRoutes,
     {
         path: 'admin',
-        data: {level: 2},
-        // canActivate: [Authentication], // TODO: need route guard with new auth method
+        data: {minRole: User.ADMIN_ROLE},
+        canActivate: [roleGuard],
         loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
     },
     {

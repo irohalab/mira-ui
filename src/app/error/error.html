@@ -1,2 +1,9 @@
-<div>this is an error</div>
-<div>{{errorStatus}}</div><div>{{errorMessage}}</div>
+@if (isLoginRequired) {
+  <div class="login-required">
+    <div>请先登录后再访问此页面。</div>
+    <button type="button" class="ui primary button" (click)="login()">登录</button>
+  </div>
+} @else {
+  <div>this is an error</div>
+  <div>{{errorStatus}}</div><div>{{errorMessage}}</div>
+}

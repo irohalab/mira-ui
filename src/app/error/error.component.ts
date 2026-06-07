@@ -3,6 +3,7 @@ import {Component, OnInit, OnDestroy} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {ActivatedRoute} from '@angular/router';
 import {Subscription} from 'rxjs';
+import {UserService} from '../user-service';
 
 
 @Component({
@@ -12,7 +13,7 @@ import {Subscription} from 'rxjs';
 })
 export class ErrorComponent implements OnInit, OnDestroy {
 
-  constructor(titleService: Title, private route: ActivatedRoute) {
+  constructor(titleService: Title, private route: ActivatedRoute, private userService: UserService) {
     titleService.setTitle('出错了!');
   }
 
@@ -21,6 +22,14 @@ export class ErrorComponent implements OnInit, OnDestroy {
   errorStatus: string;
 
   private routeParamsSubscription: Subscription;
+
+  get isLoginRequired(): boolean {
+    return this.errorStatus === '401';
+  }
+
+  login(): void {
+    this.userService.login();
+  }
 
   ngOnInit(): any {
     this.routeParamsSubscription = this.route.params.subscribe(

@@ -5,19 +5,19 @@ import { PlayEpisode } from './play-episode/play-episode.component';
 import { BangumiList } from './bangumi-list/bangumi-list.component';
 import { BangumiDetail } from './bangumi-detail/bangumi-detail.components';
 import { UserCenter } from './user-center/user-center.component';
-import { WebHookComponent } from './web-hook/web-hook.component';
+// import { WebHookComponent } from './web-hook/web-hook.component';
 import { PreviewVideoComponent } from './preview-video/preview-video.component';
 import { FavoriteListComponent } from './favorite-list/favorite-list.component';
-import { BangumiAccountBindingComponent } from './bangumi-account-binding/bangumi-account-binding.component';
+// import { BangumiAccountBindingComponent } from './bangumi-account-binding/bangumi-account-binding.component';
 import { MyHistoryComponent } from './my-history/my-history.component';
 import { MessageCenterComponent } from './message-center/message-center.component';
+import { authGuard, roleGuard } from '../user-service';
+import { User } from '../entity';
 
 export const homeRoutes: Routes = [
     {
         path: '',
         component: Home,
-        data: {level: 0},
-        // canActivate: [Authentication], // TODO: need route guard with new auth method
         children: [
             {
                 path: '',
@@ -27,8 +27,10 @@ export const homeRoutes: Routes = [
                 path: 'play/:episode_id',
                 component: PlayEpisode,
                 data: {
-                    refresh: false
-                }
+                    refresh: false,
+                    minRole: User.INVITED_ROLE
+                },
+                canActivate: [roleGuard]
             },
             {
                 path: 'bangumi/:bangumi_id',
@@ -43,31 +45,48 @@ export const homeRoutes: Routes = [
             },
             {
                 path: 'settings/user',
-                component: UserCenter
+                component: UserCenter,
+                canActivate: [authGuard]
             },
-            {
-                path: 'settings/web-hook',
-                component: WebHookComponent
-            },
-            {
-                path: 'settings/bangumi',
-                component: BangumiAccountBindingComponent
-            },
+            // {
+            //     path: 'settings/web-hook',
+            //     component: WebHookComponent
+            // },
+            // {
+            //     path: 'settings/bangumi',
+            //     component: BangumiAccountBindingComponent
+            // },
             {
                 path: 'pv',
-                component: PreviewVideoComponent
+                component: PreviewVideoComponent,
+                data: {
+                    minRole: User.INVITED_ROLE
+                },
+                canActivate: [roleGuard]
             },
             {
                 path: 'favorite',
-                component: FavoriteListComponent
+                component: FavoriteListComponent,
+                data: {
+                    minRole: User.INVITED_ROLE
+                },
+                canActivate: [roleGuard]
             },
             {
                 path: 'history',
-                component: MyHistoryComponent
+                component: MyHistoryComponent,
+                data: {
+                    minRole: User.INVITED_ROLE
+                },
+                canActivate: [roleGuard]
             },
             {
                 path: 'message',
-                component: MessageCenterComponent
+                component: MessageCenterComponent,
+                data: {
+                    minRole: User.INVITED_ROLE
+                },
+                canActivate: [roleGuard]
             }
         ]
     },
