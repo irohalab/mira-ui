@@ -26,4 +26,22 @@ export class User {
     static ADMIN_ROLE = 'Admin';
     static SUPER_ADMIN_ROLE = 'SuperAdmin';
     static ID_INITIAL_USER = 'InitialUserId';
+
+    // Role hierarchy used by route guards. Higher number means more privilege.
+    static ROLE_RANK: { [role: string]: number } = {
+        [User.GUEST_ROLE]: 0,
+        [User.INVITED_ROLE]: 1,
+        [User.ADMIN_ROLE]: 2,
+        [User.SUPER_ADMIN_ROLE]: 3,
+    };
+
+    static isLoggedIn(user: User | null): boolean {
+        return !!user && user.id !== User.ID_INITIAL_USER;
+    }
+
+    static satisfiesRole(role: string, minRole: string): boolean {
+        const have = User.ROLE_RANK[role] ?? -1;
+        const need = User.ROLE_RANK[minRole] ?? 0;
+        return have >= need;
+    }
 }

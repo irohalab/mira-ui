@@ -17,6 +17,9 @@ export class AuthError extends BaseError {
 
   static PERMISSION_DENIED = 'permission denied';
 
+  // login required (not authenticated)
+  static LOGIN_REQUIRED = 'login required';
+
   constructor(
     public message: string,
     public status: number) {
