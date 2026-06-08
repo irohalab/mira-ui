@@ -320,7 +320,9 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                         }
                         if (epvfs) {
                             const vf = epvfs.videoFiles.find(vf => vf.id === videoFile.id);
-                            vf.status = videoFile.status;
+                            if (vf) {
+                                vf.status = videoFile.status;
+                            }
                         }
                     }
                 }
