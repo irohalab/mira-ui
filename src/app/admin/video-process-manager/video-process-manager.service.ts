@@ -19,7 +19,9 @@ type ReqData = {
 
 const baseUrl = `${environment.resourceProvider}/admin/video-process/proxy`;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class VideoProcessManagerService extends BaseService {
     private _sessionId: string;
     constructor(private _httpClient: HttpClient) {

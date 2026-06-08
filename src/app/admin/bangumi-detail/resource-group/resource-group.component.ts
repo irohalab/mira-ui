@@ -9,13 +9,14 @@ import { FeedService } from '../feed.service';
 import { ResourceScanner } from '../../../entity/ResourceScanner';
 import { filter, repeat, switchMap } from 'rxjs/operators';
 import { nanoid } from 'nanoid';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VideoFile } from '../../../entity/video-file';
 import { VideoProcessManagerService } from '../../video-process-manager/video-process-manager.service';
 import { VideoProcessJob } from '../../../entity/VideoProcessJob';
 import { DownloadJob } from '../../../entity/DownloadJob';
 import { DownloadManagerService } from '../../download-manager/download-manager.service';
 import { VideoFileModal } from '../video-file-modal/video-file-modal.component';
+import { NgClass } from '@angular/common';
 
 const REFRESH_INTERVAL = 5000;
 
@@ -33,7 +34,7 @@ interface EpisodeVideoFileStatus {
     selector: 'app-resource-group',
     templateUrl: './resource-group.component.html',
     styleUrl: './resource-group.component.less',
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, NgClass]
 })
 export class ResourceGroupComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();

@@ -4,12 +4,14 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { Message } from '../../entity/Message';
 import { switchMap } from 'rxjs/operators';
 import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-message-center',
     templateUrl: './message-center.component.html',
     styleUrl: './message-center.component.less',
-    standalone: false
+    imports: [NgClass, FormsModule]
 })
 export class MessageCenterComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();

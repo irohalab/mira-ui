@@ -2,12 +2,14 @@ import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { PrivacyComponent } from './privacy/privacy.component';
 
 @Component({
     selector: 'static-content',
     templateUrl: './static-content.html',
     styleUrls: ['./static-content.less'],
-    standalone: false
+    imports: [RouterLink, RouterOutlet]
 })
 export class StaticContentComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

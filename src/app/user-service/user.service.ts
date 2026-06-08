@@ -20,7 +20,9 @@ const legacyBaseUrl = environment.legacyApiBaseURL;
 // so we keep the original one around to use as the logout hint.
 const ORIGINAL_ID_TOKEN_KEY = 'original_id_token';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class UserService extends BaseService {
 
     private _userInfoSubject = new BehaviorSubject(new User(

@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DARK_THEME, DarkThemeService, LIGHT_THEME } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'dark-theme-toggle',
@@ -34,7 +35,7 @@ import { Subscription } from 'rxjs';
             }
         }
     `],
-    standalone: false
+    imports: [NgClass]
 })
 export class DarkThemeToggleComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

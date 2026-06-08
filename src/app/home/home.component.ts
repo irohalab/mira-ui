@@ -3,12 +3,18 @@ import { Component, EventEmitter, HostBinding, OnDestroy, OnInit } from '@angula
 import { Title } from '@angular/platform-browser';
 import { HomeService } from './home.service';
 import { Bangumi, User } from '../entity';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { DARK_THEME, DarkThemeService, UIDialog } from '@irohalab/deneb-ui';
 import { UserService } from '../user-service';
 import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
+import { NgClass, AsyncPipe, DatePipe } from '@angular/common';
+import { DarkThemeToggleComponent } from './dark-theme-toggle/dark-theme-toggle.component';
+import { MessageNotificationComponent } from './message-notification/message-notification.component';
+import { UserActionComponent } from './user-action/user-action.component';
+import { MyBangumiComponent } from './my-bangumi/my-bangumi.component';
+import { BottomFloatBannerComponent } from './bottom-float-banner/bottom-float-banner.component';
 
 const BREAK_POINT = 1330;
 
@@ -28,7 +34,7 @@ const BREAK_POINT = 1330;
             transition('active => inactive', animate('100ms ease-out'))
         ])
     ],
-    standalone: false
+    imports: [RouterLink, NgClass, DarkThemeToggleComponent, MessageNotificationComponent, UserActionComponent, MyBangumiComponent, RouterOutlet, BottomFloatBannerComponent, AsyncPipe, DatePipe]
 })
 export class Home implements OnInit, OnDestroy {
 

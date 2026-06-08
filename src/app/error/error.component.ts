@@ -8,8 +8,7 @@ import {UserService} from '../user-service';
 
 @Component({
     selector: 'error-page',
-    templateUrl: './error.html',
-    standalone: false
+    templateUrl: './error.html'
 })
 export class ErrorComponent implements OnInit, OnDestroy {
 

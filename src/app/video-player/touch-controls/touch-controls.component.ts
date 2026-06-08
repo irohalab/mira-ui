@@ -7,6 +7,9 @@ import { Subscription ,  Subject } from 'rxjs';
 import * as Hammer from 'hammerjs';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import {closest} from "../../../helpers/dom";
+import { VideoFullscreenButton } from '../controls/fullscreen-button/fullscreen-button.component';
+import { VideoPlayButton } from '../controls/play-button/play-button.component';
+import { VideoPlayerScrubBar } from '../controls/scrub-bar/scrub-bar.component';
 
 @Component({
     selector: 'video-touch-controls',
@@ -24,7 +27,7 @@ import {closest} from "../../../helpers/dom";
             transition('hide => show', animate('200ms ease-in'))
         ])
     ],
-    standalone: false
+    imports: [VideoFullscreenButton, VideoPlayButton, VideoPlayerScrubBar]
 })
 export class VideoTouchControls implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();

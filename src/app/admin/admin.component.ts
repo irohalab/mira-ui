@@ -4,12 +4,13 @@ import { User } from '../entity/user';
 import { Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { DownloadJobStatus } from '../entity/DownloadJobStatus';
+import { RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
     selector: 'admin',
     templateUrl: './admin.html',
     styleUrls: ['./admin.less'],
-    standalone: false
+    imports: [RouterLink, RouterOutlet]
 })
 export class Admin implements OnDestroy {
     private _subscription = new Subscription();

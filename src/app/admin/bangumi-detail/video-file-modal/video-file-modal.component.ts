@@ -1,11 +1,11 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIToggle } from '@irohalab/deneb-ui';
 import { forkJoin, of, Subscription } from 'rxjs';
 import { VideoFile } from '../../../entity/video-file';
 import { Episode } from '../../../entity';
 import { AdminService } from '../../admin.service';
 import { BaseError } from '../../../../helpers/error';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VideoProcessRule } from '../../../entity/VideoProcessRule';
 import { VideoProcessRuleService } from '../video-processs-rule/video-process-rule.service';
 import { catchError, filter, switchMap } from 'rxjs/operators';
@@ -13,12 +13,15 @@ import {
     VideoProcessRuleEditorComponent
 } from '../video-processs-rule/video-process-rule-editor/video-process-rule-editor.component';
 import { ResourceGroup } from '../../../entity/ResourceGroup';
+import { VideoProcessRuleItemComponent } from '../video-processs-rule/video-process-rule-item/video-process-rule-item.component';
+import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
+import { ContrastColorPipe } from '../../../pipes/contrast-color.pipe';
 
 @Component({
     selector: 'video-file-modal',
     templateUrl: './video-file-modal.html',
     styleUrls: ['./video-file-list.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, VideoProcessRuleItemComponent, ConfirmDialogDirective, UIToggle, ContrastColorPipe]
 })
 export class VideoFileModal implements OnInit, OnDestroy {
     private _subscription = new Subscription();

@@ -4,12 +4,14 @@ import { DARK_THEME, DarkThemeService, UIPopoverContent, UIPopoverRef } from '@i
 import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 import { filter, skip } from 'rxjs/operators';
 import { closest } from '../../../../helpers/dom';
+import { RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'app-notification-list-panel',
     templateUrl: './notification-list-panel.component.html',
     styleUrl: './notification-list-panel.component.less',
-    standalone: false
+    imports: [RouterLink, NgClass]
 })
 export class NotificationListPanelComponent extends UIPopoverContent implements AfterViewInit, OnInit, OnDestroy {
     private subscription = new Subscription();

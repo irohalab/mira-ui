@@ -1,14 +1,16 @@
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { DARK_THEME, DarkThemeService, UIDialogRef } from '@irohalab/deneb-ui';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DeviceDetectorService, DeviceInfo } from '../../../../helpers/browser-detect';
+import { NgClass } from '@angular/common';
+import { Home } from '../../home.component';
 
 @Component({
     selector: 'feedback-dialog',
     templateUrl: './feedback.html',
     styleUrls: ['./feedback.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, NgClass]
 })
 export class FeedbackComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

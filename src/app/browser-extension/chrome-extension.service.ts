@@ -34,7 +34,9 @@ export enum ENABLED_STATUS {
 }
 
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class ChromeExtensionService {
 
     private _authInfo = new BehaviorSubject<AuthInfo>(INITIAL_STATE_VALUE);

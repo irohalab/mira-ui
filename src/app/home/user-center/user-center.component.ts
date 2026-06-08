@@ -3,18 +3,22 @@ import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../entity';
 import { UserService } from '../../user-service';
 import { Subscription } from 'rxjs';
-import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToggle } from '@irohalab/deneb-ui';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthError } from '../../../helpers/error';
 import { FavoriteService } from '../favorite.service';
+import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { LoginComponent } from './login/login.component';
+import { Home } from '../home.component';
 
 @Component({
     selector: 'user-center',
     templateUrl: './user-center.html',
     styleUrls: ['./user-center.less'],
-    standalone: false
+    imports: [NgClass, RouterLink, FormsModule, ReactiveFormsModule, LoginComponent, UIToggle]
 })
 export class UserCenter implements OnInit, OnDestroy {
 

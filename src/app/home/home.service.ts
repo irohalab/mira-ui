@@ -14,7 +14,9 @@ import { FeedbackPayload } from '../entity/FeedbackPayload';
 
 const baseUrl = environment.resourceProvider;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class HomeService extends BaseService {
 
     constructor(private httpClient: HttpClient,

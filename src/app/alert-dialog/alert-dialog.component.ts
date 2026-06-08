@@ -12,8 +12,7 @@ import { UIDialogRef } from '@irohalab/deneb-ui';
             width: 100%;
             height: 100%;
         }
-    `],
-    standalone: false
+    `]
 })
 export class AlertDialog {
     @Input()

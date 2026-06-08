@@ -1,5 +1,6 @@
 import {Component, HostListener, Input} from '@angular/core';
 import {VideoPlayer} from '../../video-player.component';
+import { NgClass } from '@angular/common';
 @Component({
     selector: 'video-fullscreen-button',
     template: `<i class="icon" [ngClass]="{expand: !isFullscreen, compress: isFullscreen}"></i>`,
@@ -15,7 +16,7 @@ import {VideoPlayer} from '../../video-player.component';
             line-height: 1;
         }
     `],
-    standalone: false
+    imports: [NgClass]
 })
 export class VideoFullscreenButton {
 

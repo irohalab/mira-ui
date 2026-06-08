@@ -4,14 +4,20 @@ import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HomeChild, HomeService } from "../home.service";
 import { Bangumi, Episode, User } from "../../entity";
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { PersistStorage, UserService } from '../../user-service';
-import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper, UIDropdown } from '@irohalab/deneb-ui';
 import { AuthError } from '../../../helpers/error';
 import { WatchService } from '../watch.service';
 import { environment } from '../../../environments/environment';
 import { FavoriteService } from '../favorite.service';
+import { NgClass } from '@angular/common';
+import { BangumiStaffInfoComponent } from '../bangumi-extra-info/bangumi-staff-info/bangumi-staff-info.component';
+import { FavoriteChooser } from '../favorite-chooser/favorite-chooser.component';
+import { RatingComponent } from '../rating/rating.component';
+import { BangumiCharacterComponent } from '../bangumi-extra-info/bangumi-character/bangumi-character.component';
+import { WeekdayPipe } from '../../pipes/weekday.pipe';
 
 const LAYOUT_TYPE: string = 'layout_type';
 const LAYOUT_TYPES = {
@@ -25,7 +31,7 @@ const SORT_ORDER: string = 'bangumi_detail_eps_sort_order';
     selector: 'view-bangumi-detail',
     templateUrl: './bangumi-detail.html',
     styleUrls: ['./bangumi-detail.less'],
-    standalone: false
+    imports: [NgClass, UIResponsiveImageWrapper, BangumiStaffInfoComponent, RouterLink, FavoriteChooser, RatingComponent, BangumiCharacterComponent, UIDropdown, WeekdayPipe]
 })
 export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
     private _toastRef: UIToastRef<UIToastComponent>;

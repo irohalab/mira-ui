@@ -6,12 +6,15 @@ import { DownloadManagerService } from '../download-manager.service';
 import { switchMap, takeWhile } from 'rxjs/operators';
 import { DownloadJobStatus } from '../../../entity/DownloadJobStatus';
 import { TorrentFile } from '../../../entity/TorrentFile';
+import { RouterLink } from '@angular/router';
+import { PercentPipe } from '@angular/common';
+import { ReadableUnit } from '../../../pipes/readable-unit';
 
 @Component({
     selector: 'download-job-detail',
     templateUrl: './download-job-detail.html',
     styleUrls: ['./download-job-detail.less'],
-    standalone: false
+    imports: [RouterLink, PercentPipe, ReadableUnit]
 })
 export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

@@ -6,8 +6,7 @@ import { Component } from '@angular/core';
     styles: [`
         @import "../static-content.dark.less";
         .parent-dark-theme();
-    `],
-    standalone: false
+    `]
 })
 export class PrivacyComponent {
 }

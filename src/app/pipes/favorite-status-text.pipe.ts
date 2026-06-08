@@ -4,10 +4,7 @@ import { FavoriteStatus as ExternalFavoriteStatus } from '@irohalab/mira-sdk-ang
 
 const NUMBER_TO_TEXT = ['', '想看','看过','在看','搁置', '抛弃'];
 
-@Pipe({
-    name: 'favoriteStatusText',
-    standalone: false
-})
+@Pipe({ name: 'favoriteStatusText' })
 export class FavoriteStatusTextPipe implements PipeTransform {
     transform(value: string, ...args: string[]): unknown {
         let result: string;

@@ -5,26 +5,20 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HomeChild, HomeService } from '../home.service';
 import { Bangumi } from '../../entity';
 import { ActivatedRoute } from '@angular/router';
-import {
-    DARK_THEME,
-    DarkThemeService,
-    InfiniteDataBucketsStub,
-    InfiniteList,
-    UIToast,
-    UIToastComponent,
-    UIToastRef
-} from '@irohalab/deneb-ui';
-import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
+import { DARK_THEME, DarkThemeService, InfiniteDataBucketsStub, InfiniteList, UIToast, UIToastComponent, UIToastRef, UIToggle, UIDropdown, UITimeLineMeter, InfiniteForOf } from '@irohalab/deneb-ui';
+import { CARD_HEIGHT_REM, BangumiCard } from '../bangumi-card/bangumi-card.component';
 import { getRemPixel } from '../../../helpers/dom';
 import { Home } from '../home.component';
 import { BangumiListService } from './bangumi-list.service';
 import { groupByQuarters } from '../../../helpers/TimelineListHelpers';
+import { NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'bangumi-list',
     templateUrl: './bangumi-list.html',
     styleUrls: ['./bangumi-list.less'],
-    standalone: false
+    imports: [NgClass, FormsModule, UIToggle, UIDropdown, UITimeLineMeter, InfiniteList, InfiniteForOf, BangumiCard]
 })
 export class BangumiList extends HomeChild implements OnInit, OnDestroy {
 

@@ -2,13 +2,15 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AdminService } from '../../admin.service';
 import { Bangumi, Episode } from '../../../entity';
 import { EMPTY, forkJoin, Subscription } from 'rxjs';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper } from '@irohalab/deneb-ui';
 import { EpisodeDetail } from '../episode-detail/episode-detail.component';
 import { filter, mergeMap, take } from 'rxjs/operators';
 import { BaseError } from '../../../../helpers/error';
 import { ConfirmDialogModal } from '../../../confirm-dialog/confirm-dialog-modal.component';
 import { AlertDialog } from '../../../alert-dialog/alert-dialog.component';
 import { VideoFileModal } from '../video-file-modal/video-file-modal.component';
+import { NgClass } from '@angular/common';
+import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
 
 const EP_STATUS_TEXT = {
     [Episode.STATUS_NOT_DOWNLOADED]: '未下载',
@@ -23,7 +25,7 @@ const EP_STATUS_TEXT = {
     selector: 'app-episode-list',
     templateUrl: './episode-list.component.html',
     styleUrl: './episode-list.component.less',
-    standalone: false
+    imports: [NgClass, UIResponsiveImageWrapper, ConfirmDialogDirective]
 })
 export class EpisodeListComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();

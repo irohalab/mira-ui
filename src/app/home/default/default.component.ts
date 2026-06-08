@@ -5,10 +5,12 @@ import { FAVORITE_LABEL } from '../../entity/constants';
 import { Subscription } from 'rxjs';
 import { Announce } from '../../entity/announce';
 import { PersistStorage } from '../../user-service';
-import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIResponsiveImageWrapper } from '@irohalab/deneb-ui';
 import { UserService } from '../../user-service';
 import { filter, switchMap } from 'rxjs/operators';
 import { User } from '../../entity';
+import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 const BANGUMI_TYPE_KEY = 'default_bangumi_type_2';
 
@@ -16,7 +18,7 @@ const BANGUMI_TYPE_KEY = 'default_bangumi_type_2';
     selector: 'default-component',
     templateUrl: './default.html',
     styleUrls: ['./default.less'],
-    standalone: false
+    imports: [NgClass, RouterLink, UIResponsiveImageWrapper]
 })
 export class DefaultComponent extends HomeChild implements OnInit, OnDestroy {
     private _subscription = new Subscription();

@@ -3,7 +3,7 @@
  */
 import { afterEveryRender, Component, ViewEncapsulation, Inject, DOCUMENT } from '@angular/core';
 
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavigationService } from './navigation.service';
 import { APP_COLORS } from '../helpers/color';
@@ -19,7 +19,7 @@ import { APP_COLORS } from '../helpers/color';
         </router-outlet>
     `,
     encapsulation: ViewEncapsulation.None,
-    standalone: false
+    imports: [RouterOutlet]
 })
 export class App {
 

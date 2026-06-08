@@ -20,7 +20,9 @@ type ReqData = {
 
 const baseUrl = `${environment.resourceProvider}/admin/download`;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class DownloadManagerService extends BaseService {
     private bangumiDict: { [bgmId: string]: Bangumi };
 

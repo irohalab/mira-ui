@@ -4,8 +4,8 @@ import { map, mergeMap, take } from 'rxjs/operators';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HomeService } from '../home.service';
 import { Home } from '../home.component';
-import { DARK_THEME, DarkThemeService, InfiniteList, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
-import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
+import { DARK_THEME, DarkThemeService, InfiniteList, UIToast, UIToastComponent, UIToastRef, UIDropdown, UITimeLineMeter, InfiniteForOf } from '@irohalab/deneb-ui';
+import { CARD_HEIGHT_REM, BangumiCard } from '../bangumi-card/bangumi-card.component';
 import { getRemPixel } from '../../../helpers/dom';
 import { BaseError } from '../../../helpers/error';
 import { Title } from '@angular/platform-browser';
@@ -13,6 +13,7 @@ import { environment } from '../../../environments/environment';
 import { FavoriteStatus } from '../../entity/FavoriteStatus';
 import { Favorite } from '../../entity/Favorite';
 import { FavoriteService } from '../favorite.service';
+import { NgClass } from '@angular/common';
 
 let lastType: string;
 let lastScrollPosition: number = 0;
@@ -24,7 +25,7 @@ let lastSortField: string;
     selector: 'favorite-list',
     templateUrl: './favorite-list.html',
     styleUrls: ['./favorite-list.less'],
-    standalone: false
+    imports: [NgClass, UIDropdown, UITimeLineMeter, InfiniteList, InfiniteForOf, BangumiCard]
 })
 export class FavoriteListComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

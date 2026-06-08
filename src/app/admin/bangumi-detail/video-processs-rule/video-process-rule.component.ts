@@ -8,12 +8,14 @@ import { from, Subscription } from 'rxjs';
 import { AdminService } from '../../admin.service';
 import { Bangumi } from '../../../entity';
 import { VideoFile } from '../../../entity/video-file';
+import { VideoProcessRuleItemComponent } from './video-process-rule-item/video-process-rule-item.component';
+import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
 
 @Component({
     selector: 'video-process-rule',
     templateUrl: './video-process-rule.html',
     styleUrls: ['./video-process-rule.less'],
-    standalone: false
+    imports: [VideoProcessRuleItemComponent, ConfirmDialogDirective]
 })
 export class VideoProcessRuleComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();

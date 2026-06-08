@@ -22,8 +22,7 @@ import { VideoPlayerHelpers } from '../../core/helpers';
             cursor: default;
             font-family: "Segoe UI", sans-serif;
         }
-    `],
-    standalone: false
+    `]
 })
 export class VideoTimeIndicator implements OnInit, OnDestroy {
     private _subscription = new Subscription();

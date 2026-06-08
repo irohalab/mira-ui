@@ -24,7 +24,9 @@ export interface WatchHistoryRecord {
 
 const baseUrl = `${environment.resourceProvider}/episode`;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class WatchService extends BaseService {
 
     constructor(private http: HttpClient, private _persistStorage: PersistStorage) {

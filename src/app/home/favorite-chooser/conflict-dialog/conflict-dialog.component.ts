@@ -3,12 +3,13 @@ import { UIDialogRef } from '@irohalab/deneb-ui';
 import { FavoriteStatus as ExternalFavoriteStatus } from '@irohalab/mira-sdk-angular';
 import { environment } from '../../../../environments/environment';
 import { FavoriteStatus } from '../../../entity/FavoriteStatus';
+import { FavoriteStatusTextPipe } from '../../../pipes/favorite-status-text.pipe';
 
 @Component({
     selector: 'conflict-dialog',
     templateUrl: './conflict-dialog.html',
     styleUrls: ['./conflict-dialog.less'],
-    standalone: false
+    imports: [FavoriteStatusTextPipe]
 })
 export class ConflictDialogComponent {
     siteTitle = environment.siteTitle;

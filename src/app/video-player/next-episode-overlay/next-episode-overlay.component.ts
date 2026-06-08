@@ -10,8 +10,7 @@ export const countDownTimer = 8; // unit second
 @Component({
     selector: 'next-episode-overlay',
     templateUrl: './next-episode-overlay.html',
-    styleUrls: ['./next-episode-overlay.less'],
-    standalone: false
+    styleUrls: ['./next-episode-overlay.less']
 })
 export class VideoNextEpisodeOverlay implements OnInit, OnDestroy {
     private _subscription = new Subscription();

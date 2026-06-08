@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { WatchProgress } from '../../../entity/watch-progress';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { getRemPixel } from '../../../../helpers/dom';
+import { NgClass, DatePipe } from '@angular/common';
 
 export const CARD_HEIGHT_REM = 16;
 
@@ -16,7 +17,7 @@ const THUMBNAIL_HEIGHT = 4.5;
     styleUrls: ['./history-card.less'],
     encapsulation: ViewEncapsulation.Emulated,
     changeDetection: ChangeDetectionStrategy.Default,
-    standalone: false
+    imports: [RouterLink, NgClass, DatePipe]
 })
 export class HistoryCardComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

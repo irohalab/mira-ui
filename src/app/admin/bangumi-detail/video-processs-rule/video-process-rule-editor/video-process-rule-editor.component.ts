@@ -1,12 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {
-    AbstractControl,
-    AsyncValidatorFn,
-    FormBuilder,
-    FormControl,
-    FormGroup,
-    ValidationErrors
-} from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormBuilder, FormControl, FormGroup, ValidationErrors, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VideoProcessRuleService } from '../video-process-rule.service';
 import { ActionType } from '../../../../entity/action-type';
 import { ProfileType } from '../../../../entity/ProfileType';
@@ -16,12 +9,13 @@ import { VideoProcessRule } from '../../../../entity/VideoProcessRule';
 import { map } from 'rxjs/operators';
 import { ActionMap } from '../../../../entity/action-map';
 import { ActionEditorComponent } from '../action-editor/action-editor.component';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'video-process-rule-editor',
     templateUrl: './video-process-rule-editor.html',
     styleUrls: ['./video-process-rule-editor.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, NgClass, ActionEditorComponent]
 })
 export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

@@ -1,14 +1,15 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ChromeExtensionService } from '../../../../browser-extension/chrome-extension.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'bangumi-edit-comment',
     templateUrl: './edit-comment.html',
     styleUrls: ['./edit-comment.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, NgClass]
 })
 export class EditCommentComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

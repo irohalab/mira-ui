@@ -1,9 +1,11 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UIDialogRef } from '@irohalab/deneb-ui';
 import { Announce } from '../../../entity/announce';
 import { Subscription } from 'rxjs';
 import dayjs from 'dayjs';
+import { NgClass } from '@angular/common';
+import { NgxsmkDatepickerComponent } from 'ngxsmk-datepicker';
 
 export function rangeLimit(group: FormGroup) {
     let start_time = group.get('start_time').value;
@@ -16,7 +18,7 @@ export function rangeLimit(group: FormGroup) {
     selector: 'admin-edit-announce',
     templateUrl: './edit-announce.html',
     styleUrls: ['./edit-announce.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, NgClass, NgxsmkDatepickerComponent]
 })
 export class EditAnnounceComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

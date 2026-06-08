@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Edge, Node } from '@swimlane/ngx-graph';
+import { Edge, Node, GraphComponent } from '@swimlane/ngx-graph';
 import { Subject } from 'rxjs';
 import { Action } from '../../../../entity/action';
 import { ActionType } from '../../../../entity/action-type';
@@ -11,6 +11,10 @@ import { ExtractTarget } from '../../../../entity/ExtractTarget';
 import { ActionMap } from '../../../../entity/action-map';
 import { getRemPixel } from '../../../../../helpers/dom';
 import { isCyclicGraph } from './action-graph-utils';
+import { NgClass } from '@angular/common';
+import { UIDropdown } from '@irohalab/deneb-ui';
+import { FormsModule } from '@angular/forms';
+import { ProfileTypePipe } from '../profile-type.pipe';
 
 enum LinkMode {
     LinkUpstream = 'LinkUpstream',
@@ -24,7 +28,7 @@ const NODE_EDITOR_WIDTH = 20; //unit rem;
     selector: 'action-editor',
     templateUrl: './action-editor.html',
     styleUrls: ['./action-editor.less'],
-    standalone: false
+    imports: [GraphComponent, NgClass, UIDropdown, FormsModule, ProfileTypePipe]
 })
 export class ActionEditorComponent implements OnInit, AfterViewInit {
 

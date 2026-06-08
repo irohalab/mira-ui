@@ -13,7 +13,7 @@ export const appRoutes: Routes = [
         path: 'admin',
         data: {minRole: User.ADMIN_ROLE},
         canActivate: [roleGuard],
-        loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
+        loadChildren: () => import('./admin/admin.routes').then(m => m.adminRoutes)
     },
     {
         path: 'error',

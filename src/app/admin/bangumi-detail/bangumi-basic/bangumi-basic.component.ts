@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Bangumi } from '../../../entity';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UIDialogRef } from '@irohalab/deneb-ui';
 import { Account } from '../../../entity/Account';
 
@@ -8,7 +8,7 @@ import { Account } from '../../../entity/Account';
     selector: 'bangumi-basic',
     templateUrl: './bangumi-basic.html',
     styleUrls: ['./bangumi-basic.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule]
 })
 export class BangumiBasic implements OnInit {
 

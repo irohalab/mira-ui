@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef, UIDropdown, UIResponsiveImageWrapper } from '@irohalab/deneb-ui';
 import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 
 import { filter, mergeMap, switchMap, tap } from 'rxjs/operators';
@@ -16,6 +16,11 @@ import { environment } from '../../../environments/environment';
 import { PersistStorage } from '../../user-service';
 import { FavoriteService } from '../favorite.service';
 import { FeedbackPayload } from '../../entity/FeedbackPayload';
+import { NgClass } from '@angular/common';
+import { FavoriteChooser } from '../favorite-chooser/favorite-chooser.component';
+import { RevealExtraComponent } from './reveal-extra/reveal-extra.component';
+import { CommentComponent } from './comment/comment.component';
+import { Home } from '../home.component';
 
 export const MIN_WATCHED_PERCENTAGE = 0.95;
 
@@ -30,7 +35,7 @@ const SORT_ORDER: string = 'play_episode_eps_sort_order';
     selector: 'play-episode',
     templateUrl: './play-episode.html',
     styleUrls: ['./play-episode.less'],
-    standalone: false
+    imports: [UIDropdown, NgClass, UIResponsiveImageWrapper, RouterLink, FavoriteChooser, RevealExtraComponent, CommentComponent]
 })
 export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();

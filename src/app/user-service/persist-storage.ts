@@ -65,7 +65,9 @@ export class PersistStorageIterator implements IterableIterator<PersistEntry> {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class PersistStorage {
     private user!: User;
 

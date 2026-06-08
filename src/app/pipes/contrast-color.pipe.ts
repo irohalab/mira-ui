@@ -1,10 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { APP_COLORS } from '../../helpers/color';
 
-@Pipe({
-    name: 'contrastColor',
-    standalone: false
-})
+@Pipe({ name: 'contrastColor' })
 export class ContrastColorPipe implements PipeTransform {
 
     transform(hexColor: string | null | undefined): string {

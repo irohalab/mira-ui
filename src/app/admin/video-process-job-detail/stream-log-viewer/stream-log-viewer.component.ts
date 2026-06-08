@@ -13,12 +13,14 @@ import { LogType } from '../../video-process-manager/LogType';
 import { VideoProcessManagerService } from '../../video-process-manager/video-process-manager.service';
 import { auditTime, delay, fromEvent, Observable, Subject, Subscription } from 'rxjs';
 import { filter, tap } from 'rxjs/operators';
+import { InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'stream-log-viewer',
     templateUrl: './stream-log.html',
     styleUrls: ['./stream-log.less'],
-    standalone: false
+    imports: [InfiniteList, InfiniteForOf, NgClass]
 })
 export class StreamLogViewerComponent implements AfterViewInit, OnInit, OnDestroy {
     private _subscription = new Subscription();

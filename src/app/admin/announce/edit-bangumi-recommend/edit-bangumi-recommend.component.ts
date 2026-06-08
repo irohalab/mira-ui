@@ -1,10 +1,12 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UIDialogRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Bangumi } from '../../../entity';
 import { Announce } from '../../../entity/announce';
 import dayjs from 'dayjs';
+import { NgClass } from '@angular/common';
+import { NgxsmkDatepickerComponent } from 'ngxsmk-datepicker';
 
 export const MAX_DATE_RANGE = 7; // days
 
@@ -21,7 +23,7 @@ export function rangeLimitWithMaxRange(group: FormGroup) {
     selector: 'edit-bangumi-recommend',
     templateUrl: './edit-bangumi-recommend.html',
     styleUrls: ['./edit-bangumi-recommend.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, NgClass, NgxsmkDatepickerComponent]
 })
 export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

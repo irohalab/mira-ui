@@ -8,7 +8,9 @@ import { environment } from '../../../environments/environment';
 
 const baseUrl = `${environment.resourceProvider}/admin/feed`;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class FeedService extends BaseService {
 
   constructor(private http: HttpClient) {

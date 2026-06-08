@@ -7,12 +7,15 @@ import { map } from 'rxjs/operators';
 import { ChromeExtensionService, ENABLED_STATUS } from '../../browser-extension/chrome-extension.service';
 import { PERM_NAME, WebHook } from '../../entity/web-hook';
 import { environment } from '../../../environments/environment';
+import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { Home } from '../home.component';
 
 @Component({
     selector: 'web-hook',
     templateUrl: './web-hook.html',
     styleUrls: ['./web-hook.less'],
-    standalone: false
+    imports: [NgClass, RouterLink, Home]
 })
 export class WebHookComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

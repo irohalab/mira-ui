@@ -11,6 +11,9 @@ import { DefaultMira, Favorite as ExternalFavorite, SubItem, SubItemFavorite } f
 import { filter, map, switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { extractErrorMessage } from '../../../helpers/http-error-helper';
+import { NgClass } from '@angular/common';
+import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.directive';
+import { MyReviewComponent } from '../rating/my-review/my-review.component';
 import EpisodeTypeEnum = SubItem.EpisodeTypeEnum;
 
 @Component({
@@ -18,7 +21,7 @@ import EpisodeTypeEnum = SubItem.EpisodeTypeEnum;
     templateUrl: './favorite-chooser.html',
     styleUrls: ['./favorite-chooser.less'],
     encapsulation: ViewEncapsulation.None,
-    standalone: false
+    imports: [NgClass, ConfirmDialogDirective, MyReviewComponent]
 })
 export class FavoriteChooser implements OnInit, OnDestroy {
     private subscription = new Subscription();

@@ -1,18 +1,20 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIDropdown, UIToggle } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Bangumi, Episode } from '../../../entity';
 import { Item } from '../../../entity/item';
 import { FeedService } from '../feed.service';
 import { DownloadEditorComponent } from './download-editor/download-editor.component';
 import { ResourceScanner } from '../../../entity/ResourceScanner';
+import { NgClass } from '@angular/common';
+import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
 
 @Component({
     selector: 'resource-scanner-editor',
     templateUrl: './resource-scanner-editor.html',
     styleUrls: ['./resource-scanner-editor.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, UIDropdown, UIToggle, NgClass, ConfirmDialogDirective]
 })
 export class ResourceScannerEditor implements OnInit, OnDestroy {
     private subscription = new Subscription();

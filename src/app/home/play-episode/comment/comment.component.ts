@@ -14,6 +14,11 @@ import { filter, mergeMap } from 'rxjs/operators';
 import { ChromeExtensionService, IAuthInfo } from '../../../browser-extension/chrome-extension.service';
 import { PersistStorage } from '../../../user-service';
 import { DARK_THEME, DarkThemeService, UIResponsiveService } from '@irohalab/deneb-ui';
+import { NgClass, DatePipe } from '@angular/common';
+import { CommentFormComponent } from './comment-form/comment-form.component';
+import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
+import { EditCommentComponent } from './edit-comment/edit-comment.component';
+import { Home } from '../../home.component';
 
 export interface PostUser {
     uid: string;
@@ -60,7 +65,7 @@ export const COMMENT_SORT_ORDER = 'comment_sort_order';
     templateUrl: './comment.html',
     styleUrls: ['./comment.less'],
     encapsulation: ViewEncapsulation.None,
-    standalone: false
+    imports: [NgClass, CommentFormComponent, ConfirmDialogDirective, EditCommentComponent, DatePipe]
 })
 export class CommentComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
     private _subscription = new Subscription();

@@ -6,27 +6,23 @@ import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { AdminService } from '../admin.service';
 import { getRemPixel } from '../../../helpers/dom';
-import {
-    DARK_THEME,
-    DarkThemeService,
-    InfiniteDataBucketsStub,
-    UIDialog,
-    UIToast,
-    UIToastComponent,
-    UIToastRef
-} from '@irohalab/deneb-ui';
-import { CARD_HEIGHT_REM } from '../bangumi-card/bangumi-card.component';
+import { DARK_THEME, DarkThemeService, InfiniteDataBucketsStub, UIDialog, UIToast, UIToastComponent, UIToastRef, UIToggle, UIDropdown, UITimeLineMeter, InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
+import { CARD_HEIGHT_REM, BangumiCard } from '../bangumi-card/bangumi-card.component';
 import { SearchBangumi } from '../search-bangumi';
 import { ListBangumiService } from './list-bangumi.service';
 import { environment } from '../../../environments/environment';
 import { BangumiRaw } from '../../entity/BangumiRaw';
 import { groupByQuarters } from '../../../helpers/TimelineListHelpers';
+import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
+import { NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Admin } from '../admin.component';
 
 @Component({
     selector: 'list-bangumi',
     templateUrl: './list-bangumi.html',
     styleUrls: ['./list-bangumi.less'],
-    standalone: false
+    imports: [AdminNavbar, NgClass, FormsModule, UIToggle, UIDropdown, UITimeLineMeter, InfiniteList, InfiniteForOf, BangumiCard]
 })
 export class ListBangumi implements OnDestroy, OnInit {
     private _subscription = new Subscription();
