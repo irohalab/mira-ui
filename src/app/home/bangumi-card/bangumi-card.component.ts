@@ -11,9 +11,11 @@ import {
 } from '@angular/core';
 import { Bangumi } from '../../entity/bangumi';
 import { FAVORITE_LABEL } from '../../entity/constants';
-import { DARK_THEME, DarkThemeService, InfiniteList, SCROLL_STATE } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, InfiniteList, SCROLL_STATE, UIResponsiveImageWrapper } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { ImageLoadingStrategy } from './image-loading-strategy.service';
+import { RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
 
 export const CARD_HEIGHT_REM = 16;
 
@@ -25,7 +27,7 @@ export const IMAGE_LOAD_DELAY = 1000;
     styleUrls: ['./bangumi-card.less'],
     encapsulation: ViewEncapsulation.Emulated,
     changeDetection: ChangeDetectionStrategy.Default,
-    standalone: false
+    imports: [RouterLink, NgClass, UIResponsiveImageWrapper]
 })
 export class BangumiCard implements OnInit, OnDestroy, OnChanges {
     private _subscription = new Subscription();

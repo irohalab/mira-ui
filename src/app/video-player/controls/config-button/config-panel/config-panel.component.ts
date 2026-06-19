@@ -2,17 +2,18 @@
 import {fromEvent as observableFromEvent,  Subscription } from 'rxjs';
 
 import { filter } from 'rxjs/operators';
-import { UIPopoverContent, UIPopoverRef } from '@irohalab/deneb-ui';
+import { UIPopoverContent, UIPopoverRef, UIToggle } from '@irohalab/deneb-ui';
 import { AfterViewInit, Component, ElementRef, OnDestroy, Self } from '@angular/core';
 import { UserActionPanelComponent } from '../../../../home/user-action/user-action-panel/user-action-panel.component';
 import { Capture, CorePlayer, FloatPlayer, PlayList } from '../../../core/settings';
 import { PersistStorage } from '../../../../user-service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'video-config-panel',
     templateUrl: './config-panel.html',
     styleUrls: ['./config-panel.less'],
-    standalone: false
+    imports: [FormsModule, UIToggle]
 })
 export class VideoConfigPanelComponent extends UIPopoverContent implements AfterViewInit, OnDestroy {
     private _subscription = new Subscription();

@@ -4,12 +4,14 @@ import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/de
 import { Subscription } from 'rxjs';
 import { AdminService } from '../../../admin.service';
 import { copyElementValueToClipboard } from '../../../../../helpers/clipboard';
+import { FormsModule } from '@angular/forms';
+import { ReadableUnit } from '../../../../pipes/readable-unit';
 
 @Component({
     selector: 'download-editor',
     templateUrl: './download-editor.html',
     styleUrls: ['./download-editor.less'],
-    standalone: false
+    imports: [FormsModule, ReadableUnit]
 })
 export class DownloadEditorComponent implements OnDestroy {
     private subscription = new Subscription();

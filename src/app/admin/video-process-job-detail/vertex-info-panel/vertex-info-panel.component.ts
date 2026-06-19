@@ -9,12 +9,13 @@ import {
 } from '../stream-log-viewer/stream-log-helper';
 import { ActionType } from '../../../entity/action-type';
 import { UIDialogRef } from '@irohalab/deneb-ui';
+import { StreamLogViewerComponent } from '../stream-log-viewer/stream-log-viewer.component';
 
 @Component({
     selector: 'vertex-info-panel',
     templateUrl: './vertex-info-panel.html',
     styleUrls: ['./vertex-info-panel.less'],
-    standalone: false
+    imports: [StreamLogViewerComponent]
 })
 export class VertexInfoPanelComponent implements OnDestroy {
     private _subscription = new Subscription();

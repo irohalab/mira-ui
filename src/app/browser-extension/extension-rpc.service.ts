@@ -41,7 +41,9 @@ class MessageStub {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class ExtensionRpcService {
     get extensionId(): any {
         return this._extensionId;

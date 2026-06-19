@@ -2,6 +2,8 @@ import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core'
 import { Rating } from '../../entity/rating';
 import { Subscription } from 'rxjs';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
+import { NgClass } from '@angular/common';
+import { Home } from '../home.component';
 
 export const RATING_TEXT = ['无评分', '不忍直视', '很差', '差', '较差', '不过不失', '还行', '推荐', '力荐', '神作', '超神作'];
 export const RATING_COLOR = [
@@ -22,7 +24,7 @@ export const RATING_COLOR = [
     selector: 'bangumi-rating',
     templateUrl: './rating.html',
     styleUrls: ['./rating.less'],
-    standalone: false
+    imports: [NgClass]
 })
 export class RatingComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

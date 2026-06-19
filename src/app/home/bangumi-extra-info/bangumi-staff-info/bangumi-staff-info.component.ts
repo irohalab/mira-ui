@@ -2,12 +2,12 @@ import { Component, HostBinding, Input, OnInit } from '@angular/core';
 import { Staff } from '../interfaces';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
+import { Home } from '../../home.component';
 
 @Component({
     selector: 'bangumi-staff-info',
     templateUrl: './bangumi-staff-info.html',
-    styleUrls: ['./bangumi-staff-info.less'],
-    standalone: false
+    styleUrls: ['./bangumi-staff-info.less']
 })
 export class BangumiStaffInfoComponent implements OnInit {
     private _subscription = new Subscription();

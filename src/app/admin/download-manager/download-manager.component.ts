@@ -6,11 +6,16 @@ import { interval, Subscription } from 'rxjs';
 import { DownloadManagerService } from './download-manager.service';
 import { filter, switchMap } from 'rxjs/operators';
 import { AdminService } from '../admin.service';
-import { UIDialog } from '@irohalab/deneb-ui';
+import { UIDialog, UIDropdown, UIToggle, InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
 import { DownloadJobDetailComponent } from './download-job-detail/download-job-detail.component';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLinkActive, RouterLink } from '@angular/router';
+import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
+import { NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DownloadJobCardComponent } from '../download-job-card/download-job-card.component';
+import { Admin } from '../admin.component';
 
 const JOB_CARD_HEIGHT_REM = 4.2;
 
@@ -20,7 +25,7 @@ type SearchType = 'Job ID' | 'Bangumi ID' | 'Bangumi Name';
     selector: 'download-manager',
     templateUrl: './download-manager.html',
     styleUrls: ['./download-manager.less'],
-    standalone: false
+    imports: [AdminNavbar, UIDropdown, NgClass, UIToggle, FormsModule, RouterLinkActive, RouterLink, InfiniteList, InfiniteForOf, DownloadJobCardComponent]
 })
 export class DownloadManagerComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

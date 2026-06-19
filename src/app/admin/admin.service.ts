@@ -15,7 +15,9 @@ const DELETE_DELAY_MINUTES = 10;
 
 const baseUrl = `${environment.resourceProvider}/admin`;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class AdminService extends BaseService {
 
     constructor(private http: HttpClient) {

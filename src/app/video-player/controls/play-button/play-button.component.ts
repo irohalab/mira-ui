@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { filter, merge } from 'rxjs/operators';
 import { PlayState } from '../../core/state';
 import { VideoPlayer } from '../../video-player.component';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'video-play-button',
@@ -21,7 +22,7 @@ import { VideoPlayer } from '../../video-player.component';
             line-height: 1;
         }
     `],
-    standalone: false
+    imports: [NgClass]
 })
 export class VideoPlayButton implements OnInit, OnDestroy {
     private _subscription = new Subscription();

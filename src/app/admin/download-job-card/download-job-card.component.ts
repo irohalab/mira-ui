@@ -5,13 +5,16 @@ import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb
 import { FileMappingListComponent } from './file-mapping-list/file-mapping-list.component';
 import { DownloadManagerService } from '../download-manager/download-manager.service';
 import { Subscription } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
+import { ReadableUnit } from '../../pipes/readable-unit';
 
 @Component({
     selector: 'download-job-card',
     templateUrl: './download-job-card.html',
     styleUrls: ['./download-job-card.less'],
     encapsulation: ViewEncapsulation.None,
-    standalone: false
+    imports: [RouterLink, NgClass, ReadableUnit]
 })
 export class DownloadJobCardComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

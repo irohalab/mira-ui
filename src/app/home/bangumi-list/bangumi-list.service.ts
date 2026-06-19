@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { InfiniteDataBucketsStub } from '@irohalab/deneb-ui';
 import { Bangumi } from '../../entity';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class BangumiListService {
     scrollPosition = 0;
     sort = 'desc';

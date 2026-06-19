@@ -40,6 +40,7 @@ import { VideoPlayerHelpDialog } from './help-dialog/help-dialog.component';
 import { VideoTouchControls } from './touch-controls/touch-controls.component';
 import { PersistStorage } from '../user-service';
 import { CorePlayer } from './core/settings';
+import { NgClass } from '@angular/common';
 
 let nextId = 0;
 
@@ -55,7 +56,7 @@ export const FLOAT_PLAYER_SCALE_RATIO = 0.4;
     host: {
         'tabindex': '0'
     },
-    standalone: false
+    imports: [NgClass]
 })
 export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges {
     private _subscription = new Subscription();

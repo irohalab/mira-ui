@@ -8,12 +8,13 @@ import {
 } from '@angular/core';
 import { VideoPlayerHelpers } from '../../core/helpers';
 import { VideoPlayer } from '../../video-player.component';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'video-volume-control',
     templateUrl: './volume-control.html',
     styleUrls: ['./volume-control.less'],
-    standalone: false
+    imports: [NgClass]
 })
 export class VideoVolumeControl implements AfterViewInit, OnInit, OnDestroy {
     private _subscription = new Subscription();

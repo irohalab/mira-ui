@@ -7,8 +7,12 @@ import { getRemPixel } from '../../../helpers/dom';
 import { filter, switchMap } from 'rxjs/operators';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLinkActive, RouterLink } from '@angular/router';
 import { JobType } from '../../entity/JobType';
+import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
+import { UIToggle, InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
+import { FormsModule } from '@angular/forms';
+import { VideoProcessJobCardComponent } from '../video-process-job-card/video-process-job-card.component';
 
 const JOB_CARD_HEIGHT_REM = 4.5;
 
@@ -16,7 +20,7 @@ const JOB_CARD_HEIGHT_REM = 4.5;
     selector: 'video-process-manager',
     templateUrl: './video-process-manager.html',
     styleUrls: ['./video-process-manager.less'],
-    standalone: false
+    imports: [AdminNavbar, UIToggle, FormsModule, RouterLinkActive, RouterLink, InfiniteList, InfiniteForOf, VideoProcessJobCardComponent]
 })
 export class VideoProcessManagerComponent implements OnInit, OnDestroy {
     private _jobListSub = new Subscription();

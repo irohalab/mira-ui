@@ -2,17 +2,18 @@ import {
     AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output,
     ViewChild
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChromeExtensionService } from '../../../../browser-extension/chrome-extension.service';
 import { Post } from '../comment.component';
 import { Subscription } from 'rxjs';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'bangumi-comment-form',
     templateUrl: './comment-form.html',
     styleUrls: ['./comment-form.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, NgClass]
 })
 export class CommentFormComponent implements OnInit, AfterViewInit, OnDestroy {
     private _subscription = new Subscription();

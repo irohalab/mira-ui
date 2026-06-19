@@ -1,5 +1,5 @@
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { filter, mergeMap } from 'rxjs/operators';
@@ -10,12 +10,16 @@ import {
     LOGON_STATUS
 } from '../../browser-extension/chrome-extension.service';
 import { Title } from '@angular/platform-browser';
+import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.directive';
+import { Home } from '../home.component';
 
 @Component({
     selector: 'bangumi-account-binding',
     templateUrl: './bangumi-account-binding.html',
     styleUrls: ['./bangumi-account-binding.less'],
-    standalone: false
+    imports: [NgClass, RouterLink, ConfirmDialogDirective, FormsModule, ReactiveFormsModule, Home]
 })
 export class BangumiAccountBindingComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

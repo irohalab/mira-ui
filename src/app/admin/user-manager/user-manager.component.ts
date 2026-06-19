@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIDropdown, UIPagination } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { filter, mergeMap } from 'rxjs/operators';
 import { BaseError } from '../../../helpers/error';
@@ -11,12 +11,15 @@ import { UserManagerSerivce } from './user-manager.service';
 import { UserPromoteModal } from './user-promote-modal/user-promote-modal.component';
 import { environment } from '../../../environments/environment';
 import { Account } from '../../entity/Account';
+import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
+import { FormsModule } from '@angular/forms';
+import { KeyValuePipe } from '@angular/common';
 
 @Component({
     selector: 'user-manager',
     templateUrl: './user-manager.html',
     styleUrls: ['./user-manager.less'],
-    standalone: false
+    imports: [AdminNavbar, FormsModule, UIDropdown, UIPagination, KeyValuePipe]
 })
 export class UserManager implements OnInit, OnDestroy {
     private _subscription = new Subscription();

@@ -6,8 +6,7 @@ import { isChrome, isEdge, isFirefox } from '../../../../helpers/browser-detect'
 @Component({
     selector: 'chrome-extension-tip',
     templateUrl: './browser-extension-tip.html',
-    styleUrls: ['./browser-extension-tip.less'],
-    standalone: false
+    styleUrls: ['./browser-extension-tip.less']
 })
 export class BrowserExtensionTipComponent extends UIPopoverContent implements OnDestroy {
     private _subscription = new Subscription();

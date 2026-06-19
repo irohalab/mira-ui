@@ -5,10 +5,7 @@ export const BANGUMI_TYPES: {[key: number]: string} = {
     6: '电视剧'
 };
 
-@Pipe({
-    name: 'bangumiTypeName',
-    standalone: false
-})
+@Pipe({ name: 'bangumiTypeName' })
 export class BangumiTypeNamePipe implements PipeTransform {
 
     transform(value: number | string): any {

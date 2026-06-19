@@ -13,6 +13,13 @@ import { EditBangumiRecommendComponent } from '../announce/edit-bangumi-recommen
 import { UserManagerSerivce } from '../user-manager/user-manager.service';
 import { environment } from '../../../environments/environment';
 import { Account } from '../../entity/Account';
+import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
+import { NgClass } from '@angular/common';
+import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.directive';
+import { BangumiOverviewComponent } from './bangumi-overview/bangumi-overview.component';
+import { EpisodeListComponent } from './episode-list/episode-list.component';
+import { ResourceGroupComponent } from './resource-group/resource-group.component';
+import { VideoProcessRuleComponent } from './video-processs-rule/video-process-rule.component';
 
 type TabName =  'Overview' | 'Episode' | 'ResourceGroup' | 'VideoProcess';
 
@@ -24,7 +31,7 @@ export enum AnnounceStatus {
     selector: 'bangumi-detail',
     templateUrl: './bangumi-detail.html',
     styleUrls: ['./bangumi-detail.less'],
-    standalone: false
+    imports: [AdminNavbar, NgClass, ConfirmDialogDirective, BangumiOverviewComponent, EpisodeListComponent, ResourceGroupComponent, VideoProcessRuleComponent]
 })
 export class BangumiDetail implements OnInit, OnDestroy {
     private _subscription = new Subscription();

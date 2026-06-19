@@ -15,6 +15,8 @@ import { filter, retry, tap, timeout } from 'rxjs/operators';
 import { CONTROL_FADE_OUT_TIME, VideoPlayerHelpers } from '../core/helpers';
 import { VideoPlayer } from '../video-player.component';
 import { VideoPlayerService } from '../video-player.service';
+import { VideoPlayButton } from '../controls/play-button/play-button.component';
+import { NonInteractiveProgressBarComponent } from './non-interactive-progress-bar/non-interactive-progress-bar.component';
 
 @Component({
     selector: 'video-player-float-controls',
@@ -32,7 +34,7 @@ import { VideoPlayerService } from '../video-player.service';
             transition('hide => show', animate('200ms ease-in'))
         ])
     ],
-    standalone: false
+    imports: [VideoPlayButton, NonInteractiveProgressBarComponent]
 })
 export class FloatControlsComponent implements OnInit, AfterViewInit, OnDestroy {
     private _subscription = new Subscription();

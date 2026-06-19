@@ -8,7 +8,9 @@ import { environment } from '../../../environments/environment';
 
 const baseUrl = `${environment.resourceProvider}/admin/announce`;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class AnnounceService extends BaseService {
 
     constructor(private _http: HttpClient) {

@@ -9,7 +9,9 @@ import { Bangumi } from '../entity';
 /**
  * Synchronize with bgm.tv, need browser extension support
  */
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class SynchronizeService {
 
     private _cache = new Map<string, any>();

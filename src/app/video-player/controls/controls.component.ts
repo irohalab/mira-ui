@@ -18,6 +18,18 @@ import { CONTROL_FADE_OUT_TIME } from '../core/helpers';
 import { PlayList } from "../core/settings";
 import { PlayState } from '../core/state';
 import { VideoPlayer } from '../video-player.component';
+import { NgClass } from '@angular/common';
+import { CapturedFrameList } from './captured-frame-list/captured-frame-list.component';
+import { VideoNextEpisodeOverlay } from '../next-episode-overlay/next-episode-overlay.component';
+import { LastPositionOverlayComponent } from '../last-position-overlay/last-position-overlay.component';
+import { VideoPlayerScrubBar } from './scrub-bar/scrub-bar.component';
+import { VideoPlayButton } from './play-button/play-button.component';
+import { VideoVolumeControl } from './volume-control/volume-control.component';
+import { VideoTimeIndicator } from './time-indicator/time-indicator.component';
+import { VideoPlayerHelpButton } from './help-button/help-button.component';
+import { VideoPlayerConfigButton } from './config-button/config-button.component';
+import { VideoCaptureButton } from './capture-button/capture-button.component';
+import { VideoFullscreenButton } from './fullscreen-button/fullscreen-button.component';
 
 @Component({
     selector: 'video-controls',
@@ -56,7 +68,7 @@ import { VideoPlayer } from '../video-player.component';
     host: {
         '[class.hide-cursor]': '!showControls'
     },
-    standalone: false
+    imports: [NgClass, CapturedFrameList, VideoNextEpisodeOverlay, LastPositionOverlayComponent, VideoPlayerScrubBar, VideoPlayButton, VideoVolumeControl, VideoTimeIndicator, VideoPlayerHelpButton, VideoPlayerConfigButton, VideoCaptureButton, VideoFullscreenButton]
 })
 export class VideoControls implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();

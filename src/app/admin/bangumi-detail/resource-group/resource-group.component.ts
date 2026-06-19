@@ -9,15 +9,17 @@ import { FeedService } from '../feed.service';
 import { ResourceScanner } from '../../../entity/ResourceScanner';
 import { filter, repeat, switchMap } from 'rxjs/operators';
 import { nanoid } from 'nanoid';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VideoFile } from '../../../entity/video-file';
 import { VideoProcessManagerService } from '../../video-process-manager/video-process-manager.service';
 import { VideoProcessJob } from '../../../entity/VideoProcessJob';
 import { DownloadJob } from '../../../entity/DownloadJob';
 import { DownloadManagerService } from '../../download-manager/download-manager.service';
 import { VideoFileModal } from '../video-file-modal/video-file-modal.component';
+import { NgClass } from '@angular/common';
 
 const REFRESH_INTERVAL = 5000;
+const REFRESH_RG_INTERVAL = 60 * 1000;
 
 interface EpisodeVideoFileStatus {
     episode: Episode;
@@ -33,7 +35,7 @@ interface EpisodeVideoFileStatus {
     selector: 'app-resource-group',
     templateUrl: './resource-group.component.html',
     styleUrl: './resource-group.component.less',
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, NgClass]
 })
 export class ResourceGroupComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
@@ -59,7 +61,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
 
     @Output()
     episodeChanged = new EventEmitter<string>();
-
+    pauseRefreshRG = false;
     episodeVideoFileStatus: { [rgId: string]: EpisodeVideoFileStatus[] } = {};
 
     get hasDownloadingVideoFiles(): boolean {
@@ -123,6 +125,10 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                             this.refreshVideoJob();
                             this.refreshDownloadJob();
                         }
+
+                        setTimeout(() => {
+                            this.refreshResourceGroup();
+                        }, REFRESH_INTERVAL);
                     }
                 })
         );
@@ -158,7 +164,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                     episode,
                     videoFiles: []
                 } as EpisodeVideoFileStatus;
-            })
+            });
         }
     }
 
@@ -187,6 +193,48 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         )
     }
 
+    refreshResourceGroup(): void {
+        this.subscription.add(
+            of(this.pauseRefreshRG)
+                .pipe(
+                    filter((pause) => !pause),
+                    switchMap(() => {
+                        return this.adminService.listResourceGroups(this.bangumi.id, true)
+                    }),
+                    repeat({delay: REFRESH_RG_INTERVAL}))
+                .subscribe({
+                    next: (resourceGroups: ResourceGroup[]) => {
+                        for (const resourceGroup of resourceGroups) {
+                            const epvfsList = this.episodeVideoFileStatus[resourceGroup.id]
+                            if (epvfsList) {
+                                for (const videoFile of resourceGroup.videoFiles) {
+                                    const epVfS = epvfsList.find(epvfs => epvfs.episode.id === videoFile.episode.id);
+                                    if (epVfS) {
+                                        const epVf = epVfS.videoFiles.find(vf => vf.id === videoFile.id);
+                                        if (!epVf) {
+                                            epVfS.videoFiles.push({
+                                                id: videoFile.id,
+                                                status: videoFile.status
+                                            });
+                                        } else {
+                                            epVf.status = videoFile.status;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (this.hasDownloadingVideoFiles) {
+                            this.refreshVideoJob();
+                            this.refreshDownloadJob();
+                        }
+                    },
+                    error: (error) => {
+                        this.toastRef.show(error.message);
+                    }
+                })
+        );
+    }
+
     resetForm(resourceGroup: ResourceGroup): void {
         this.rgFormDict[resourceGroup.id].patchValue({
             displayName: resourceGroup.displayName,
@@ -206,6 +254,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     }
 
     editScanner(scanner: ResourceScanner, group: ResourceGroup, isEditing: boolean = true): void {
+        this.pauseRefreshRG = true;
         let dialogRef = this.uiDialog.open(ResourceScannerEditor, {stickyDialog: true, backdrop: true});
         dialogRef.componentInstance.bangumi = this.bangumi;
         dialogRef.componentInstance.feedList = this.feedList;
@@ -241,10 +290,12 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                 }),)
                 .subscribe({
                     next: () => {
+                        this.pauseRefreshRG = false;
                         this.scannerLoadingState = false;
                         this.toastRef.show('更新成功');
                     },
                     error: (error) => {
+                        this.pauseRefreshRG = false;
                         this.scannerLoadingState = false;
                         this.toastRef.show(error.message);
                     }
@@ -302,6 +353,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     }
 
     viewEpisode(resourceGroup: ResourceGroup, episode: Episode): void {
+        this.pauseRefreshRG = true;
         const dialogRef = this.uiDialog.open(VideoFileModal, {stickyDialog: true, backdrop: true});
         dialogRef.componentInstance.episode = episode;
         dialogRef.componentInstance.resourceGroup = resourceGroup;
@@ -319,10 +371,13 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                         }
                         if (epvfs) {
                             const vf = epvfs.videoFiles.find(vf => vf.id === videoFile.id);
-                            vf.status = videoFile.status;
+                            if (vf) {
+                                vf.status = videoFile.status;
+                            }
                         }
                     }
+                    this.pauseRefreshRG = false;
                 }
-            })
+            });
     }
 }

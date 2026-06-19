@@ -4,12 +4,14 @@ import { skip } from 'rxjs/operators';
 import { DARK_THEME, DarkThemeService, UIPopoverContent, UIPopoverRef } from '@irohalab/deneb-ui';
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../../entity';
+import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'user-action-panel',
     templateUrl: './user-action-panel.html',
     styleUrls: ['./user-action-panel.less'],
-    standalone: false
+    imports: [NgClass, RouterLink]
 })
 export class UserActionPanelComponent extends UIPopoverContent implements AfterViewInit, OnInit, OnDestroy {
     private subscription = new Subscription();

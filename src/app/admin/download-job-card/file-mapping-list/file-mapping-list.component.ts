@@ -7,8 +7,7 @@ import { UIDialogRef } from '@irohalab/deneb-ui';
 @Component({
     selector: 'file-mapping-list',
     templateUrl: './file-mapping-list.html',
-    styleUrls: ['./file-mapping-list.less'],
-    standalone: false
+    styleUrls: ['./file-mapping-list.less']
 })
 export class FileMappingListComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

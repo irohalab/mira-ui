@@ -1,11 +1,11 @@
 import {Component, Input} from '@angular/core';
-import {UIDialogRef} from '@irohalab/deneb-ui';
+import { UIDialogRef, UIDropdown } from '@irohalab/deneb-ui';
 
 @Component({
     selector: 'user-promote-modal',
     templateUrl: './user-promote-modal.html',
     styleUrls: ['./user-promote-modal.less'],
-    standalone: false
+    imports: [UIDropdown]
 })
 export class UserPromoteModal {
 

@@ -3,15 +3,17 @@ import { WatchProgress } from '../../entity/watch-progress';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Home } from '../home.component';
-import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef, UIPagination } from '@irohalab/deneb-ui';
 import { Title } from '@angular/platform-browser';
 import { WatchService } from '../watch.service';
+import { NgClass } from '@angular/common';
+import { HistoryCardComponent } from './history-card/history-card.component';
 
 @Component({
     selector: 'my-history',
     templateUrl: './my-history.html',
     styleUrls: ['./my-history.less'],
-    standalone: false
+    imports: [NgClass, HistoryCardComponent, UIPagination]
 })
 export class MyHistoryComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

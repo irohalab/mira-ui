@@ -12,12 +12,14 @@ import { RATING_COLOR, RATING_TEXT } from '../rating.component';
 import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Favorite } from '../../../entity/Favorite';
+import { NgClass } from '@angular/common';
+import { Home } from '../../home.component';
 
 @Component({
     selector: 'my-review',
     templateUrl: './my-review.html',
     styleUrls: ['./my-review.less'],
-    standalone: false
+    imports: [NgClass]
 })
 export class MyReviewComponent implements AfterViewInit, OnChanges, OnInit, OnDestroy {
     private _subscription = new Subscription();

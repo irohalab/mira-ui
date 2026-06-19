@@ -10,8 +10,7 @@ import { UserActionPanelComponent } from './user-action-panel/user-action-panel.
 @Component({
     selector: 'user-action',
     templateUrl: './user-action.html',
-    styleUrls: ['./user-action.less'],
-    standalone: false
+    styleUrls: ['./user-action.less']
 })
 export class UserActionComponent implements OnInit, OnDestroy, AfterViewInit {
     private subscription = new Subscription();

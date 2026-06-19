@@ -30,7 +30,9 @@ export type FavoriteChangeEvent = {
 
 const baseUrl = `${environment.resourceProvider}/favorite`;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class FavoriteService {
     constructor(private http: HttpClient,
                 private miraApiService: DefaultMira,

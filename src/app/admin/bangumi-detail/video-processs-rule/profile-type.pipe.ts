@@ -7,10 +7,7 @@ const profileTypeMapping: {[key: string]: string} = {
     'custom': 'Custom'
 };
 
-@Pipe({
-    name: 'ProfileType',
-    standalone: false
-})
+@Pipe({ name: 'ProfileType' })
 export class ProfileTypePipe implements PipeTransform {
     transform(value: any, ...args: any[]): any {
         return profileTypeMapping[value] || value;

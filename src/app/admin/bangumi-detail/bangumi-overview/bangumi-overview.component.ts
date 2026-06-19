@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper } from '@irohalab/deneb-ui';
 import { Bangumi, Episode } from '../../../entity';
 import { BangumiBasic } from '../bangumi-basic/bangumi-basic.component';
 import { filter, mergeMap, take } from 'rxjs/operators';
@@ -8,12 +8,14 @@ import { EMPTY, forkJoin, Subscription } from 'rxjs';
 import { Account } from '../../../entity/Account';
 import { UserManagerSerivce } from '../../user-manager/user-manager.service';
 import { AdminService } from '../../admin.service';
+import { DatePipe } from '@angular/common';
+import { BangumiTypeNamePipe } from '../../bangumi-pipes/type-name-pipe';
 
 @Component({
     selector: 'app-bangumi-overview',
     templateUrl: './bangumi-overview.component.html',
     styleUrl: './bangumi-overview.component.less',
-    standalone: false
+    imports: [UIResponsiveImageWrapper, DatePipe, BangumiTypeNamePipe]
 })
 export class BangumiOverviewComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();

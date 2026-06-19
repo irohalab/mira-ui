@@ -3,12 +3,14 @@ import { ChromeExtensionService, ENABLED_STATUS } from '../../../browser-extensi
 import { Subscription } from 'rxjs';
 import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { Bangumi } from '../../../entity';
+import { NgClass } from '@angular/common';
+import { BangumiCharacterComponent } from '../../bangumi-extra-info/bangumi-character/bangumi-character.component';
 
 @Component({
     selector: 'reveal-extra',
     templateUrl: './reveal-extra.html',
     styleUrls: ['./reveal-extra.less'],
-    standalone: false
+    imports: [NgClass, BangumiCharacterComponent]
 })
 export class RevealExtraComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

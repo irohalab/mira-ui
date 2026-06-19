@@ -7,8 +7,7 @@ import { environment } from '../../../environments/environment';
     styles: [`
         @import "../static-content.dark.less";
         .parent-dark-theme();
-    `],
-    standalone: false
+    `]
 })
 export class TosComponent {
     siteName = environment.siteTitle;

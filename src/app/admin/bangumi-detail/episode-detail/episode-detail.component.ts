@@ -1,16 +1,17 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Episode } from '../../../entity';
 import { AdminService } from '../../admin.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { BaseError } from '../../../../helpers/error';
 import { Subscription } from 'rxjs';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'episode-detail',
     templateUrl: './episode-detail.html',
     styleUrls: ['./episode-detail.less'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, NgClass]
 })
 export class EpisodeDetail implements OnInit, OnDestroy {
 

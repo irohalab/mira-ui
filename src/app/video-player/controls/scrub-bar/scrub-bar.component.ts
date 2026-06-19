@@ -15,12 +15,13 @@ import {
 import { VideoPlayerHelpers } from '../../core/helpers';
 import { VideoPlayer } from '../../video-player.component';
 import { getRemPixel } from '../../../../helpers/dom';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'video-player-scrub-bar',
     templateUrl: './scrub-bar.html',
     styleUrls: ['./scrub-bar.less'],
-    standalone: false
+    imports: [NgClass]
 })
 export class VideoPlayerScrubBar implements AfterViewInit, OnInit, OnDestroy {
     private _subscription = new Subscription();

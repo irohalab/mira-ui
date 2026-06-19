@@ -11,12 +11,14 @@ import { WatchService } from '../watch.service';
 import { FavoriteService } from '../favorite.service';
 import { UserService } from '../../user-service';
 import { User } from '../../entity';
+import { RouterLink } from '@angular/router';
+import { Home } from '../home.component';
 
 @Component({
     selector: 'my-bangumi',
     templateUrl: './my-bangumi.html',
     styleUrls: ['./my-bangumi.less'],
-    standalone: false
+    imports: [RouterLink]
 })
 export class MyBangumiComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();

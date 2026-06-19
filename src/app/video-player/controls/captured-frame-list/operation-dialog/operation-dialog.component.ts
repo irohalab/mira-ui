@@ -1,9 +1,10 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { IMAGE_PROPERTY_NAME } from '../../../core/video-capture.service';
-import { UIDialogRef } from '@irohalab/deneb-ui';
+import { UIDialogRef, UIToggle } from '@irohalab/deneb-ui';
 import { PersistStorage } from '../../../../user-service';
 import { Capture } from '../../../core/settings';
 import download from 'downloadjs';
+import { FormsModule } from '@angular/forms';
 
 export const RESULT_TWITTER = 'twitter';
 export const RESULT_DOWNLOAD = 'download';
@@ -13,7 +14,7 @@ export const RESULT_TRASH = 'trash';
     selector: 'captured-image-operation-dialog',
     templateUrl: './operation-dialog.html',
     styleUrls: ['./operation-dialog.less'],
-    standalone: false
+    imports: [FormsModule, UIToggle]
 })
 export class CapturedImageOperationDialog implements AfterViewInit {
     private _autoRemove: boolean;

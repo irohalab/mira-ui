@@ -6,12 +6,15 @@ import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb
 import { VideoProcessRuleEditorComponent } from '../video-process-rule-editor/video-process-rule-editor.component';
 import { filter } from 'rxjs/operators';
 import { ProfileType } from '../../../../entity/ProfileType';
+import { NgClass } from '@angular/common';
+import { ActionEditorComponent } from '../action-editor/action-editor.component';
+import { ConfirmDialogDirective } from '../../../../confirm-dialog/confirm-dialog.directive';
 
 @Component({
     selector: 'video-process-rule-item',
     templateUrl: './video-process-rule-item.html',
     styleUrls: ['./video-process-rule-item.less'],
-    standalone: false
+    imports: [NgClass, ActionEditorComponent, ConfirmDialogDirective]
 })
 export class VideoProcessRuleItemComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

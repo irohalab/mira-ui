@@ -4,12 +4,14 @@ import { Subscription } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
+import { NgClass } from '@angular/common';
+import { PrivacyComponent } from '../privacy/privacy.component';
 
 @Component({
     selector: 'apps-guide',
     templateUrl: './apps.html',
     styleUrls: ['./apps.less'],
-    standalone: false
+    imports: [NgClass]
 })
 export class AppsComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

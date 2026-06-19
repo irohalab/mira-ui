@@ -16,7 +16,9 @@ export interface PreviewContainer {
     addImage(dataURI: string, params: PreviewImageParams): void;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class VideoCapture {
 
     imageFormat: string = 'png';

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIPagination } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { filter, mergeMap } from 'rxjs/operators';
 import { Announce } from '../../entity/announce';
@@ -8,13 +8,16 @@ import { AnnounceService } from './announce.service';
 import { EditAnnounceComponent } from './edit-announce/edit-announce.component';
 import { EditBangumiRecommendComponent } from './edit-bangumi-recommend/edit-bangumi-recommend.component';
 import { environment } from '../../../environments/environment';
+import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
+import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.directive';
+import { DatePipe } from '@angular/common';
 
 
 @Component({
     selector: 'admin-announce',
     templateUrl: './announce.html',
     styleUrls: ['./announce.less'],
-    standalone: false
+    imports: [AdminNavbar, ConfirmDialogDirective, UIPagination, DatePipe]
 })
 export class AnnounceComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

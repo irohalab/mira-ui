@@ -1,11 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { BangumiRaw } from '../../../entity/BangumiRaw';
+import { NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'result-detail',
     templateUrl: './result-detail.html',
     styleUrls: ['./result-detail.less'],
-    standalone: false
+    imports: [NgClass, FormsModule]
 })
 export class ResultDetail {
 

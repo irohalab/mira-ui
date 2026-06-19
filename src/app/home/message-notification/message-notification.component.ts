@@ -5,12 +5,13 @@ import { Message } from '../../entity/Message';
 import { UIPopover, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { mergeMap, switchMap } from 'rxjs/operators';
 import { NotificationListPanelComponent } from './notification-list-panel/notification-list-panel.component';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'app-message-notification',
     templateUrl: './message-notification.component.html',
     styleUrl: './message-notification.component.less',
-    standalone: false
+    imports: [NgClass]
 })
 export class MessageNotificationComponent implements OnInit, OnDestroy, AfterViewInit {
     private subscription = new Subscription();

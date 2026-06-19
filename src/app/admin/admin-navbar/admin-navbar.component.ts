@@ -3,13 +3,14 @@ import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { NavigationService } from '../../navigation.service';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'admin-navbar',
     templateUrl: './admin-navbar.html',
     styleUrls: ['./admin-navbar.less'],
     encapsulation: ViewEncapsulation.None,
-    standalone: false
+    imports: [NgClass]
 })
 export class AdminNavbar implements OnInit, OnDestroy {
     private _subscription = new Subscription();

@@ -3,9 +3,13 @@ import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 import { distinctUntilChanged, map, debounceTime, takeWhile, mergeMap, tap, filter } from 'rxjs/operators';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { AdminService } from '../admin.service';
-import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIPagination } from '@irohalab/deneb-ui';
 import { BaseError } from '../../../helpers/error';
 import { BangumiRaw } from '../../entity/BangumiRaw';
+import { NgClass } from '@angular/common';
+import { BangumiCard } from '../bangumi-card/bangumi-card.component';
+import { ResultDetail } from './result-detail/result-detail.component';
+import { BangumiTypeNamePipe } from '../bangumi-pipes/type-name-pipe';
 
 // export const SEARCH_BAR_HEIGHT = 4.8;
 
@@ -13,7 +17,7 @@ import { BangumiRaw } from '../../entity/BangumiRaw';
     selector: 'search-bangumi',
     templateUrl: './search-bangumi.html',
     styleUrls: ['./search-bangumi.less'],
-    standalone: false
+    imports: [NgClass, BangumiCard, UIPagination, ResultDetail, BangumiTypeNamePipe]
 })
 export class SearchBangumi implements AfterViewInit {
     private _subscription = new Subscription();

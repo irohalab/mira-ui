@@ -8,7 +8,9 @@ import { environment } from '../../../environments/environment';
 
 const baseUrl = `${environment.resourceProvider}/admin/account`;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class UserManagerSerivce extends BaseService {
     private _baseUrl = `${environment.resourceProvider}/admin/account`;
 

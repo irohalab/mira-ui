@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { VideoProcessManagerService } from '../video-process-manager/video-process-manager.service';
 import { combineLatestWith, delay, interval, Subject, Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { switchMap, takeWhile, tap } from 'rxjs/operators';
 import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { VideoProcessJob } from '../../entity/VideoProcessJob';
@@ -18,12 +18,16 @@ import { VertexInfoPanelComponent } from './vertex-info-panel/vertex-info-panel.
 import { VertexStatus } from '../../entity/VertexStatus';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
+import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
+import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.directive';
+import { VertexGraphComponent } from './vertex-graph/vertex-graph.component';
+import { StreamLogViewerComponent } from './stream-log-viewer/stream-log-viewer.component';
 
 @Component({
     selector: 'video-process-job-detail',
     templateUrl: './video-process-job-detail.html',
     styleUrls: ['./video-process-job-detail.less'],
-    standalone: false
+    imports: [AdminNavbar, ConfirmDialogDirective, RouterLink, VertexGraphComponent, StreamLogViewerComponent]
 })
 export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();

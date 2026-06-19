@@ -1,16 +1,18 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DARK_THEME, DarkThemeService, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DARK_THEME, DarkThemeService, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Bangumi } from '../../../entity';
 import { RATING_TEXT } from '../rating.component';
 import { FavoriteStatus } from '../../../entity/FavoriteStatus';
+import { NgClass } from '@angular/common';
+import { Home } from '../../home.component';
 
 @Component({
     selector: 'edit-review-dialog',
     templateUrl: './edit-review-dialog.html',
     styleUrls: ['./edit-review-dialog.less'],
-    standalone: false
+    imports: [UIResponsiveImageWrapper, FormsModule, ReactiveFormsModule, NgClass]
 })
 export class EditReviewDialogComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();

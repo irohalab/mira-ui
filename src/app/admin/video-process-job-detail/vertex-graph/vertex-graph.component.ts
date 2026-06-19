@@ -9,13 +9,14 @@ import {
     Output, SimpleChanges,
     ViewChild
 } from '@angular/core';
-import { Edge, Node } from '@swimlane/ngx-graph';
+import { Edge, Node, GraphComponent } from '@swimlane/ngx-graph';
 import { ActionType } from '../../../entity/action-type';
 import { ProfileType } from '../../../entity/ProfileType';
 import { ExtractSource } from '../../../entity/ExtractSource';
 import { ExtractTarget } from '../../../entity/ExtractTarget';
 import { getRemPixel } from '../../../../helpers/dom';
 import { Vertex } from '../../../entity/Vertex';
+import { NgClass } from '@angular/common';
 
 const GRAPH_HEIGHT = getRemPixel(30);
 
@@ -23,7 +24,7 @@ const GRAPH_HEIGHT = getRemPixel(30);
     selector: 'vertex-graph',
     templateUrl: './vertex-graph.html',
     styleUrls: ['./vertex-graph.less'],
-    standalone: false
+    imports: [GraphComponent, NgClass]
 })
 export class VertexGraphComponent implements AfterViewInit, OnInit, OnChanges {
     readonly eActionType = ActionType;

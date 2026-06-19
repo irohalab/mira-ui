@@ -14,7 +14,9 @@ const PERMISSION_INFO = {
     [WebHook.PERMISSION_EMAIL]: '用户的邮箱地址'
 };
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class UserCenterService extends BaseService {
 
     constructor(private _http: HttpClient,
