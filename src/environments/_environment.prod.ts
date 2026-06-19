@@ -5,6 +5,7 @@ export const environment = {
     firefoxExtensionId: '<%= FIREFOX_EXTENSION_ID %>',
     firefoxExtensionUrl: '<%= FIREFOX_EXTENSION_URL %>',
     edgeExtensionId: '<%= EDGE_EXTENSION_ID %>',
+    authAudience: '<%= AUTH_AUDIENCE %>',
     authIssuer: 'https://authorization.box.moe',
     authRedirectUri: '<%= AUTH_REDIRECT_URI %>',
     authClientId: '<%= AUTH_CLIENT_ID %>',
@@ -12,6 +13,7 @@ export const environment = {
     authRequireHttps: true,
     resourceProvider: '<%= RESOURCE_PROVIDER %>',
     resourceProviderClientId: '<%= RESOURCE_PROVIDER_CLIENT_ID %>',
-    bgmProviderBaseURL: 'https://box.moe'
+    bgmProviderBaseURL: 'https://box.moe',
+    legacyApiBaseURL: '/api'
 };
 
