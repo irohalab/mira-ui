@@ -13,6 +13,7 @@ import { storageAPI } from './helpers/localstorage';
 import { provideApi } from '@irohalab/mira-sdk-angular';
 import { ResponsiveGenerateSrcService, SRC_GENERATOR_SERVICE } from '@irohalab/deneb-ui';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { LayoutService } from '@swimlane/ngx-graph';
 import { appRoutes } from './app/app.routes';
 import { App } from './app/app.component';
 
@@ -41,6 +42,7 @@ bootstrapApplication(App, {
         }),
         { provide: OAuthStorage, useFactory: () => storageAPI },
         { provide: SRC_GENERATOR_SERVICE, useClass: ResponsiveGenerateSrcService },
+        LayoutService,
         provideRouter(appRoutes)
     ]
 })
