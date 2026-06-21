@@ -42,7 +42,6 @@
     <a class="item" [routerLink]="['/bangumi']">所有番组</a>
     <a class="item" [routerLink]="['/history']">观看历史</a>
     <a class="item" [routerLink]="['/favorite']">我的收藏</a>
-    <a class="item" [routerLink]="['/admin']" *ngIf="user && user.level >= 2">Management</a>
     <div class="item">
         <my-bangumi></my-bangumi>
     </div>
