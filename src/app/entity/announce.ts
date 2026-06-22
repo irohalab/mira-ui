@@ -4,11 +4,11 @@ export class Announce {
     id?: string;
     content: string;
     bangumi?: Bangumi;
-    image_url?: string;
+    imageUrl?: string;
     position: number;
-    sort_order: number;
-    start_time: number;
-    end_time: number;
+    sortOrder: number;
+    startTime: number;
+    endTime: number;
 
     static POSITION_BANNER = 1;
     static POSITION_BANGUMI = 2;

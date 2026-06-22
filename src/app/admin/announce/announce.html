@@ -17,11 +17,11 @@
       <tbody>
         @for (row of announceList; track row) {
           <tr>
-            <td>{{row.sort_order}}</td>
-            <td>{{row.start_time | date:"mediumDate":"+0000"}}</td>
-            <td>{{row.end_time | date:"mediumDate":"+0000"}}</td>
+            <td>{{row.sortOrder}}</td>
+            <td>{{row.startTime | date:"mediumDate":"+0000"}}</td>
+            <td>{{row.endTime | date:"mediumDate":"+0000"}}</td>
             <td>{{row.content}}</td>
-            <td>{{row.image_url}}</td>
+            <td>{{row.imageUrl}}</td>
             <td>
               <a class="anchor-button" (click)="editAnnounce(row)"><i class="edit icon"></i></a>
               <a class="anchor-button"
@@ -55,9 +55,9 @@
         <tbody>
           @for (row of recommendList; track row) {
             <tr>
-              <td>{{row.sort_order}}</td>
-              <td>{{row.start_time | date:"mediumDate":"+0000"}}</td>
-              <td>{{row.end_time | date:"mediumDate":"+0000"}}</td>
+              <td>{{row.sortOrder}}</td>
+              <td>{{row.startTime | date:"mediumDate":"+0000"}}</td>
+              <td>{{row.endTime | date:"mediumDate":"+0000"}}</td>
               <td>{{row.bangumi.name}}</td>
               <td>
                 <a class="anchor-button" (click)="editRecommend(row)"><i class="edit icon"></i></a>

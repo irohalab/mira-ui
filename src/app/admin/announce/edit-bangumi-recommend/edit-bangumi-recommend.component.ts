@@ -7,6 +7,7 @@ import { Announce } from '../../../entity/announce';
 import dayjs from 'dayjs';
 import { NgClass } from '@angular/common';
 import { NgxsmkDatepickerComponent } from 'ngxsmk-datepicker';
+import { ErrorMessageDict, ValidateMessageDict } from '../types';
 
 export const MAX_DATE_RANGE = 7; // days
 
@@ -36,14 +37,14 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
 
     recommendForm: FormGroup;
 
-    validationMessages: {[key: string]: {[k: string]: string}} = {
-        sort_order: {
+    validationMessages: ValidateMessageDict = {
+        sortOrder: {
             'required': 'sort order不能为空'
         },
-        start_time: {
+        startTime: {
             'required': '开始时间不能为空',
         },
-        end_time: {
+        endTime: {
             'required': '开始时间不能为空'
         },
         dateRange: {
@@ -52,11 +53,11 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
         }
     };
 
-    recommendFormErrors: any = {
-        sort_order: [],
-        image_url: [],
-        start_time: [],
-        end_time: []
+    recommendFormErrors: ErrorMessageDict = {
+        sortOrder: [],
+        imageUrl: [],
+        startTime: [],
+        endTime: []
     };
 
     constructor(private _fb: FormBuilder,
@@ -75,8 +76,8 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
         let result = this.recommendForm.value;
         result.content = this.bangumi.id;
         result.position = Announce.POSITION_BANGUMI;
-        result.start_time = dayjs(result.start_time).valueOf();
-        result.end_time = dayjs(result.end_time).valueOf();
+        result.startTime = dayjs(result.startTime).valueOf();
+        result.endTime = dayjs(result.endTime).valueOf();
         this._dialogRef.close(result);
     }
 
@@ -96,15 +97,15 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.recommendForm = this._fb.group({
-            sort_order: [0, Validators.required],
-            start_time: [dayjs(), Validators.required],
-            end_time: [dayjs().add(7, 'day'), Validators.required]
+            sortOrder: [0, Validators.required],
+            startTime: [dayjs(), Validators.required],
+            endTime: [dayjs().add(7, 'day'), Validators.required]
         },{validator: rangeLimitWithMaxRange});
         if (this.announce) {
             this.bangumi = this.announce.bangumi;
-            this.recommendForm.get('sort_order').patchValue(this.announce.sort_order);
-            this.recommendForm.get('start_time').patchValue(dayjs(this.announce.start_time));
-            this.recommendForm.get('end_time').patchValue(dayjs(this.announce.end_time));
+            this.recommendForm.get('sortOrder').patchValue(this.announce.sortOrder);
+            this.recommendForm.get('startTime').patchValue(dayjs(this.announce.startTime));
+            this.recommendForm.get('endTime').patchValue(dayjs(this.announce.endTime));
         }
 
         this.onFormChanged(this.recommendFormErrors, this.validationMessages, this.recommendForm);
