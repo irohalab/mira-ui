@@ -1,3 +1,5 @@
+@import "../_dark-theme-helpers";
+
 .sub-menu {
   position: fixed;
   top: 4.8rem;
@@ -13,6 +15,24 @@
     height: 100%;
     > .item {
       cursor: pointer;
+    }
+  }
+}
+
+.sub-menu-dark() {
+  background-color: @darkBackground;
+  border-right: 1px solid @darkBorderColor;
+  .ui.secondary.pointing.menu {
+    border-color: @darkBorderColor;
+    > .item {
+      color: darken(@darkForeground, 15%);
+      &:hover {
+        color: @darkLinkHoverColor;
+      }
+      &.active {
+        color: @darkForeground;
+        border-color: @darkForeground;
+      }
     }
   }
 }

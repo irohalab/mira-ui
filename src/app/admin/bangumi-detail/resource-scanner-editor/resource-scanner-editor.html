@@ -1,4 +1,4 @@
-<div class="resource-scanner-editor-container">
+<div class="resource-scanner-editor-container" [ngClass]="{'dark-theme': isDarkTheme}">
   <form class="scanner-form" [formGroup]="scannerForm">
     <div class="name">
       <div class="ui large label">
@@ -31,7 +31,7 @@
   </form>
   <div class="search-result-wrapper">
     @if (itemList && itemList.length > 0) {
-      <table class="search-result ui striped table">
+      <table class="search-result ui striped table" [ngClass]="{inverted: isDarkTheme}">
         <thead>
           <tr>
             <th>时间</th>

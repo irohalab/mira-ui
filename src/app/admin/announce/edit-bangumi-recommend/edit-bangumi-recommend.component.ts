@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UIDialogRef } from '@irohalab/deneb-ui';
+import { UIDialogRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Bangumi } from '../../../entity';
 import { Announce } from '../../../entity/announce';
@@ -28,6 +28,9 @@ export function rangeLimitWithMaxRange(group: FormGroup) {
 })
 export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     @Input()
     announce: Announce;
@@ -61,6 +64,7 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
     };
 
     constructor(private _fb: FormBuilder,
+                private _darkThemeService: DarkThemeService,
                 private _dialogRef: UIDialogRef<EditBangumiRecommendComponent>) {
 
     }
@@ -96,6 +100,10 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.recommendForm = this._fb.group({
             sortOrder: [0, Validators.required],
             startTime: [dayjs(), Validators.required],

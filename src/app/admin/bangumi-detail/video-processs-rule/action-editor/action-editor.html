@@ -1,4 +1,4 @@
-<div class="action-editor-container" #actionEditorContainer xmlns:svg="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<div class="action-editor-container" [ngClass]="{'dark-theme': isDarkTheme}" #actionEditorContainer xmlns:svg="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   @if (nodes && edges && graphViewDimension) {
     <ngx-graph class="action-graph-container"
       [view]="graphViewDimension"

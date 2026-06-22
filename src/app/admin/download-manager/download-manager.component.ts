@@ -1,12 +1,12 @@
 import { DownloadJobStatus } from '../../entity/DownloadJobStatus';
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DownloadJob } from '../../entity/DownloadJob';
 import { getRemPixel } from '../../../helpers/dom';
 import { interval, Subscription } from 'rxjs';
 import { DownloadManagerService } from './download-manager.service';
 import { filter, switchMap } from 'rxjs/operators';
 import { AdminService } from '../admin.service';
-import { UIDialog, UIDropdown, UIToggle, InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIDropdown, UIToggle, InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
 import { DownloadJobDetailComponent } from './download-job-detail/download-job-detail.component';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
@@ -42,6 +42,9 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
     selectedJobId: string;
     isDebugUtilityEnabled: boolean = false;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     cardHeight: number;
 
     @ViewChild('searchBox') searchBox: ElementRef;
@@ -65,6 +68,7 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
                 private _adminService: AdminService,
                 private _dialog: UIDialog,
                 private _route: ActivatedRoute,
+                private _darkThemeService: DarkThemeService,
                 titleService: Title) {
         titleService.setTitle(`下载管理 - ${environment.siteTitle}`);
         if (window) {
@@ -78,6 +82,10 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._route.queryParams
                 .pipe(

@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIPagination } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIPagination, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { filter, mergeMap } from 'rxjs/operators';
 import { Announce } from '../../entity/announce';
@@ -10,18 +10,21 @@ import { EditBangumiRecommendComponent } from './edit-bangumi-recommend/edit-ban
 import { environment } from '../../../environments/environment';
 import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
 import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.directive';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 
 
 @Component({
     selector: 'admin-announce',
     templateUrl: './announce.html',
     styleUrls: ['./announce.less'],
-    imports: [AdminNavbar, ConfirmDialogDirective, UIPagination, DatePipe]
+    imports: [AdminNavbar, ConfirmDialogDirective, UIPagination, DatePipe, NgClass]
 })
 export class AnnounceComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
     private _toastRef: UIToastRef<UIToastComponent>;
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     announceList: Announce[];
     recommendList: Announce[];
@@ -36,6 +39,7 @@ export class AnnounceComponent implements OnInit, OnDestroy {
 
     constructor(private _announceService: AnnounceService,
                 private _dialog: UIDialog,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast,
                 titleService: Title) {
         titleService.setTitle(`公告管理 - ${environment.siteTitle}`);
@@ -131,6 +135,10 @@ export class AnnounceComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.refreshAnnounce(this.announcePage);
         this.refreshRecommend(this.recommendPage);
     }

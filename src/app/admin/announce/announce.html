@@ -1,9 +1,9 @@
 <admin-navbar navTitle="公告管理"></admin-navbar>
 <div class="content-area">
-  <div class="ui segment">
+  <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
     <h4>Banner位公告</h4>
     <button class="ui button" (click)="addAnnounce()">添加公告</button>
-    <table class="ui very basic table">
+    <table class="ui very basic table" [ngClass]="{inverted: isDarkTheme}">
       <thead>
         <tr>
           <th style="width: 3rem;">顺序</th>
@@ -40,9 +40,9 @@
         </div>
       }
     </div>
-    <div class="ui segment">
+    <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
       <h4>推荐番組</h4>
-      <table class="ui very basic table">
+      <table class="ui very basic table" [ngClass]="{inverted: isDarkTheme}">
         <thead>
           <tr>
             <th style="width: 3rem;">顺序</th>

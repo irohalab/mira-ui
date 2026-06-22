@@ -1,0 +1,14 @@
+@import "../../_dark-theme-helpers";
+
+:host.dark-theme {
+  color: @darkForeground;
+  .sub-menu {
+    .sub-menu-dark();
+  }
+  .content-area {
+    background-color: @darkBackground;
+  }
+  .table-header {
+    color: darken(@darkForeground, 15%);
+  }
+}

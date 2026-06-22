@@ -32,9 +32,9 @@
 </admin-navbar>
 <div class="job-detail-container">
   @if (job && bangumi) {
-    <div class="ui segment section-card">
+    <div class="ui segment section-card" [ngClass]="{inverted: isDarkTheme}">
       <div class="ui header">Job Info</div>
-      <table class="ui table">
+      <table class="ui table" [ngClass]="{inverted: isDarkTheme}">
         <tbody>
           <tr>
             <td>Id:</td>
@@ -65,7 +65,7 @@
     </div>
   }
   @if (job && job.status === eJobStatus.UnrecoverableError ) {
-    <div class="ui segment section-card">
+    <div class="ui segment section-card" [ngClass]="{inverted: isDarkTheme}">
       <div class="ui header">Error Info</div>
       @if (errorInfo) {
         <div class="error-info">
@@ -79,13 +79,13 @@
       }
     </div>
   }
-  <div class="ui segment section-card">
+  <div class="ui segment section-card" [ngClass]="{inverted: isDarkTheme}">
     <div class="ui header">Vertex Info</div>
     @if (vertices) {
       <vertex-graph [vertices]="vertices" (nodeSelected)="openVertexDetail($event)"></vertex-graph>
     }
   </div>
-  <div class="ui segment section-card">
+  <div class="ui segment section-card" [ngClass]="{inverted: isDarkTheme}">
     <div class="ui header">Job Log</div>
     @if (!shouldShowJobLog) {
       <div class="job-log-action">

@@ -1,4 +1,4 @@
-<div class="ui segment" (click)="onClickCard($event)">
+<div class="ui segment" [ngClass]="{inverted: isDarkTheme}" (click)="onClickCard($event)">
   <div class="card-content">
     <div class="job-id">{{job.id}}</div>
     <div class="progress">{{job.progress + '%'}}</div>

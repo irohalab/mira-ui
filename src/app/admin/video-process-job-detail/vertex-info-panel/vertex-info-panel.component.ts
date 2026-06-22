@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { LogType } from '../../video-process-manager/LogType';
 import { Vertex } from '../../../entity/Vertex';
 import { Subject, Subscription } from 'rxjs';
@@ -8,16 +8,17 @@ import {
     processLineForStreamLogViewer
 } from '../stream-log-viewer/stream-log-helper';
 import { ActionType } from '../../../entity/action-type';
-import { UIDialogRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialogRef } from '@irohalab/deneb-ui';
 import { StreamLogViewerComponent } from '../stream-log-viewer/stream-log-viewer.component';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'vertex-info-panel',
     templateUrl: './vertex-info-panel.html',
     styleUrls: ['./vertex-info-panel.less'],
-    imports: [StreamLogViewerComponent]
+    imports: [StreamLogViewerComponent, NgClass]
 })
-export class VertexInfoPanelComponent implements OnDestroy {
+export class VertexInfoPanelComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
     private vertexLogContainerMaxCharacter: number;
 
@@ -29,10 +30,21 @@ export class VertexInfoPanelComponent implements OnDestroy {
     vertex: Vertex;
     shouldShowVertexLog = false;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     @ViewChild('vertexLogWrapper') vertexLogContainer: ElementRef;
 
     constructor(private _videoProcessManagerService: VideoProcessManagerService,
+                private _darkThemeService: DarkThemeService,
                 private _dialogRef: UIDialogRef<VertexInfoPanelComponent>) {
+    }
+
+    ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
     }
 
     ngOnDestroy(): void {

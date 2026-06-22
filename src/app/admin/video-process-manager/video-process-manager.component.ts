@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import { VideoProcessJobStatus } from '../../entity/VideoProcessJobStatus';
 import { VideoProcessJob } from '../../entity/VideoProcessJob';
@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 import { ActivatedRoute, RouterLinkActive, RouterLink } from '@angular/router';
 import { JobType } from '../../entity/JobType';
 import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
-import { UIToggle, InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToggle, InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
 import { FormsModule } from '@angular/forms';
 import { VideoProcessJobCardComponent } from '../video-process-job-card/video-process-job-card.component';
 
@@ -34,8 +34,12 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
     selectJobStatus: VideoProcessJobStatus | 'all' = VideoProcessJobStatus.Running;
     isShowMetaJobs: boolean = true;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _videoProcessManagerService: VideoProcessManagerService,
                 private _route: ActivatedRoute,
+                private _darkThemeService: DarkThemeService,
                 titleService: Title) {
         titleService.setTitle(`视频管理 - ${environment.siteTitle}`);
         if (window) {
@@ -49,6 +53,10 @@ export class VideoProcessManagerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._sub.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._sub.add(
             this._route.queryParams
                 .pipe(

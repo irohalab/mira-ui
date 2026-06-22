@@ -1,8 +1,8 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { Episode } from '../../../entity';
 import { AdminService } from '../../admin.service';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialogRef, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { BaseError } from '../../../../helpers/error';
 import { Subscription } from 'rxjs';
 import { NgClass } from '@angular/common';
@@ -17,6 +17,9 @@ export class EpisodeDetail implements OnInit, OnDestroy {
 
     private _toastRef: UIToastRef<UIToastComponent>;
     private _subscription = new Subscription();
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     episodeStatus = [
         {text: '未下载', labelColor: 'red'},
@@ -36,6 +39,7 @@ export class EpisodeDetail implements OnInit, OnDestroy {
 
     constructor(private _adminService: AdminService,
                 private _dialogRef: UIDialogRef<EpisodeDetail>,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast,
                 private _fb: FormBuilder) {
         this._toastRef = toastService.makeText();
@@ -51,6 +55,10 @@ export class EpisodeDetail implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         if (this.episode) {
             this.episodeForm.patchValue(this.episode);
         }

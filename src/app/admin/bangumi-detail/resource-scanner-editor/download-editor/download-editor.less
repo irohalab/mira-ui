@@ -1,3 +1,5 @@
+@import "../../../../_dark-theme-helpers";
+
 .download-editor-container {
   text-align: left;
   @media(max-width: 767px) {
@@ -84,5 +86,22 @@
   z-index: 220;
   > .ui.button {
     margin-right: 2rem;
+  }
+}
+
+.download-editor-container.dark-theme {
+  background-color: @darkPanelBg;
+  color: @darkForeground;
+  .torrent-info-wrapper {
+    border-bottom-color: @darkBorderColor;
+    background-color: @darkPanelBg;
+  }
+  .footer {
+    border-top-color: @darkBorderColor;
+    background-color: @darkPanelBg;
+  }
+  input[type="text"],
+  input[type="number"] {
+    .dark-input();
   }
 }

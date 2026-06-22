@@ -8,7 +8,7 @@
   </div>
 
   @for (videoFileFormGroup of videoFileList; track videoFileFormGroup) {
-    <div class="ui segment">
+    <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
       <form class="ui form" [formGroup]="videoFileFormGroup">
 
         @let rg = resourceGroupDict[videoFileFormGroup.value['resourceGroupId']];

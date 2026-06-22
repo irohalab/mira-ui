@@ -1,0 +1,25 @@
+@import "../../_dark-theme-helpers";
+
+:host.dark-theme {
+  color: @darkForeground;
+  .job-detail-container {
+    background-color: @darkBackground;
+  }
+  .anchor-button {
+    color: @darkLinkColor;
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
+  }
+  a[href] {
+    color: @darkLinkColor;
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
+  }
+  .error-stack {
+    color: @darkForeground;
+  }
+}

@@ -1,9 +1,9 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { VideoProcessManagerService } from '../video-process-manager/video-process-manager.service';
 import { combineLatestWith, delay, interval, Subject, Subscription } from 'rxjs';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { switchMap, takeWhile, tap } from 'rxjs/operators';
-import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { VideoProcessJob } from '../../entity/VideoProcessJob';
 import { Vertex } from '../../entity/Vertex';
 import { AdminService } from '../admin.service';
@@ -22,12 +22,13 @@ import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
 import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.directive';
 import { VertexGraphComponent } from './vertex-graph/vertex-graph.component';
 import { StreamLogViewerComponent } from './stream-log-viewer/stream-log-viewer.component';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'video-process-job-detail',
     templateUrl: './video-process-job-detail.html',
     styleUrls: ['./video-process-job-detail.less'],
-    imports: [AdminNavbar, ConfirmDialogDirective, RouterLink, VertexGraphComponent, StreamLogViewerComponent]
+    imports: [AdminNavbar, ConfirmDialogDirective, RouterLink, VertexGraphComponent, StreamLogViewerComponent, NgClass]
 })
 export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();
@@ -48,6 +49,9 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
 
     errorInfo: any;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     @ViewChild('jobLogContainer') jobLogContainerRef: ElementRef;
 
     constructor(private _videoProcessManagerService: VideoProcessManagerService,
@@ -55,6 +59,7 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
                 private _route: ActivatedRoute,
                 private _router: Router,
                 private _dialog: UIDialog,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast,
                 private titleService: Title) {
         this._toastRef = toastService.makeText();
@@ -66,6 +71,10 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._route.params.pipe(
                 switchMap(params => {

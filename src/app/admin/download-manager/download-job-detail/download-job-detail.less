@@ -1,3 +1,5 @@
+@import "../../../_dark-theme-helpers";
+
 :host {
   display: block;
   box-sizing: border-box;
@@ -11,6 +13,29 @@
   background-color: #fff;
   overflow: hidden;
   box-shadow: -5px 0 5px #7c7c7c;
+}
+
+:host.dark-theme {
+  background-color: @darkBackground;
+  color: @darkForeground;
+  box-shadow: -5px 0 5px #000;
+  .header-bar {
+    border-bottom-color: @darkBorderColor;
+    .close-button {
+      color: darken(@darkForeground, 15%);
+      &:hover,
+      &:focus {
+        color: @darkLinkHoverColor;
+      }
+    }
+  }
+  .bangumi-link {
+    color: @darkLinkColor;
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
+  }
 }
 
 .job-detail-container {

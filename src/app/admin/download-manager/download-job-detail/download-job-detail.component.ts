@@ -1,5 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
+import { DARK_THEME, DarkThemeService, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { DownloadJob } from '../../../entity/DownloadJob';
 import { interval, Subscription } from 'rxjs';
 import { DownloadManagerService } from '../download-manager.service';
@@ -7,14 +7,14 @@ import { switchMap, takeWhile } from 'rxjs/operators';
 import { DownloadJobStatus } from '../../../entity/DownloadJobStatus';
 import { TorrentFile } from '../../../entity/TorrentFile';
 import { RouterLink } from '@angular/router';
-import { PercentPipe } from '@angular/common';
+import { NgClass, PercentPipe } from '@angular/common';
 import { ReadableUnit } from '../../../pipes/readable-unit';
 
 @Component({
     selector: 'download-job-detail',
     templateUrl: './download-job-detail.html',
     styleUrls: ['./download-job-detail.less'],
-    imports: [RouterLink, PercentPipe, ReadableUnit]
+    imports: [RouterLink, NgClass, PercentPipe, ReadableUnit]
 })
 export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -27,8 +27,12 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
 
     jobContent: TorrentFile[];
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _dialogRef: UIDialogRef<DownloadJobDetailComponent>,
                 private _downloadManagerService: DownloadManagerService,
+                private _darkThemeService: DarkThemeService,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
     }
@@ -41,6 +45,10 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         if (this.job.status === DownloadJobStatus.Complete) {
             this._subscription.add(
                 this._downloadManagerService.getJobContent(this.job.id)

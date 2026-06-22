@@ -5,6 +5,8 @@
   display: block;
   .ui.sidebar {
     border-right: 1px solid @darkBorderColor;
+    display: flex;
+    flex-direction: column;
     .sidebar-header {
       height: 10rem;
       border-bottom: 1px solid rgba(225, 225, 225, 0.08);
@@ -17,5 +19,9 @@
     width: 100%;
     line-height: 5rem;
     padding-left: 1.1428rem;
+  }
+  .theme-toggle-item {
+    margin-top: auto;
+    border-top: 1px solid rgba(225, 225, 225, 0.08);
   }
 }

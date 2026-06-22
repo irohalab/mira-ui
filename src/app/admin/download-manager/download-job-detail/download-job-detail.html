@@ -15,7 +15,7 @@
     }
   </div>
   <div class="job-summary">
-    <table class="job-info-table ui table">
+    <table class="job-info-table ui table" [ngClass]="{inverted: isDarkTheme}">
       <tbody>
         <tr>
           <td style="width: 15em;">Create Time</td>
@@ -97,7 +97,7 @@
   }
   <div class="job-content">
     <div class="section-header">Content</div>
-    <table class="file-list-table ui table">
+    <table class="file-list-table ui table" [ngClass]="{inverted: isDarkTheme}">
       <thead>
         <tr>
           <th>Path</th>

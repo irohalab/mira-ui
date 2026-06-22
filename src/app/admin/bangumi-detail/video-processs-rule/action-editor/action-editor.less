@@ -4,6 +4,7 @@
   display: block;
   position: relative;
 }
+@import "../../../../_dark-theme-helpers";
 .action-editor-container {
   display: flex;
   flex-direction: row;
@@ -79,4 +80,51 @@
   top: 0;
   left: 0;
   cursor: pointer;
+}
+
+.action-editor-container.dark-theme {
+  border-color: #555;
+  background-color: #2a2a2a;
+  .node-editor-container {
+    background-color: #1f1f1f;
+    color: #d6d6d6;
+    .property-card.ui.segment {
+      background-color: @darkPanelBg;
+      border-color: @darkBorderColor;
+      color: @darkForeground;
+    }
+    .ui.header {
+      color: @darkForeground;
+    }
+    .ui.form {
+      label {
+        color: @darkForeground;
+      }
+      input,
+      textarea,
+      select {
+        .dark-input();
+      }
+      .ui.selection.dropdown {
+        .dark-input();
+        .menu {
+          background-color: @darkPanelBg;
+          border-color: @darkBorderColor;
+          .item {
+            color: @darkForeground;
+            border-top-color: @darkBorderColor;
+          }
+          .item:hover {
+            background-color: lighten(@darkPanelBg, 6%);
+          }
+        }
+        .text.default {
+          color: darken(@darkForeground, 25%);
+        }
+      }
+    }
+  }
+  .link-card > span {
+    color: #d6d6d6;
+  }
 }

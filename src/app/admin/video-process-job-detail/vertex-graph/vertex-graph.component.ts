@@ -17,6 +17,8 @@ import { ExtractTarget } from '../../../entity/ExtractTarget';
 import { getRemPixel } from '../../../../helpers/dom';
 import { Vertex } from '../../../entity/Vertex';
 import { NgClass } from '@angular/common';
+import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
+import { Subscription } from 'rxjs';
 
 const GRAPH_HEIGHT = getRemPixel(30);
 
@@ -32,6 +34,9 @@ export class VertexGraphComponent implements AfterViewInit, OnInit, OnChanges {
     readonly eExtractSource = ExtractSource;
     readonly eExtractTarget = ExtractTarget;
     private _timerOfDimensionDetect: number;
+    private _subscription = new Subscription();
+
+    isDarkTheme: boolean;
 
     graphViewDimension: [number, number];
 
@@ -60,6 +65,9 @@ export class VertexGraphComponent implements AfterViewInit, OnInit, OnChanges {
 
     @ViewChild('graphContainer') vertexGraphContainer: ElementRef;
 
+    constructor(private _darkThemeService: DarkThemeService) {
+    }
+
     ngOnChanges(changes: SimpleChanges): void {
         if(!changes['vertices'].isFirstChange()) {
             this.buildGraph();
@@ -67,6 +75,10 @@ export class VertexGraphComponent implements AfterViewInit, OnInit, OnChanges {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.buildGraph();
     }
 

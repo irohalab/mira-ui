@@ -1,20 +1,26 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { FileMapping } from '../../../entity/FileMapping';
 import { DownloadManagerService } from '../../download-manager/download-manager.service';
 import { Subscription } from 'rxjs';
-import { UIDialogRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialogRef } from '@irohalab/deneb-ui';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'file-mapping-list',
     templateUrl: './file-mapping-list.html',
-    styleUrls: ['./file-mapping-list.less']
+    styleUrls: ['./file-mapping-list.less'],
+    imports: [NgClass]
 })
 export class FileMappingListComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
 
     fileMappingEnhanced = false;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _downloadManagerService: DownloadManagerService,
+                private _darkThemeService: DarkThemeService,
                 private _dialogRef: UIDialogRef<FileMappingListComponent>) {
     }
 
@@ -25,6 +31,10 @@ export class FileMappingListComponent implements OnInit, OnDestroy {
     jobId: string;
 
     public ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._downloadManagerService.enhance_file_mapping(this.fileMapping)
                 .subscribe((newMapping) => {

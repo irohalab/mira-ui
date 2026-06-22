@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Bangumi, Episode } from '../../../entity';
 import { ResourceGroup } from '../../../entity/ResourceGroup';
 import { EMPTY, forkJoin, of, Subscription } from 'rxjs';
 import { AdminService } from '../../admin.service';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { ResourceScannerEditor } from '../resource-scanner-editor/resource-scanner-editor.component';
 import { FeedService } from '../feed.service';
 import { ResourceScanner } from '../../../entity/ResourceScanner';
@@ -40,6 +40,9 @@ interface EpisodeVideoFileStatus {
 export class ResourceGroupComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
     private toastRef!: UIToastRef<UIToastComponent>;
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     eVideoFileStatus = {
         Pending: VideoFile.STATUS_DOWNLOAD_PENDING,
@@ -78,6 +81,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                 private formBuilder: FormBuilder,
                 private videoProcessManageService: VideoProcessManagerService,
                 private downloadManagerService: DownloadManagerService,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast) {
         this.toastRef = toastService.makeText();
     }
@@ -87,6 +91,10 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.subscription.add(
             forkJoin([
                 this.adminService.listResourceGroups(

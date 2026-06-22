@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Optional, Output } f
 import { VideoProcessRule } from '../../../../entity/VideoProcessRule';
 import { VideoProcessRuleService } from '../video-process-rule.service';
 import { Subscription } from 'rxjs';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { VideoProcessRuleEditorComponent } from '../video-process-rule-editor/video-process-rule-editor.component';
 import { filter } from 'rxjs/operators';
 import { ProfileType } from '../../../../entity/ProfileType';
@@ -29,11 +29,14 @@ export class VideoProcessRuleItemComponent implements OnInit, OnDestroy {
 
     eProfileType = ProfileType;
 
+    isDarkTheme: boolean;
+
     @Output('delete')
     onDelete = new EventEmitter<any>();
 
     constructor(private _videoProcessRuleService: VideoProcessRuleService,
                 private _dialogService: UIDialog,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast) {
         this._toastRef = toastService.makeText();
     }
@@ -67,5 +70,9 @@ export class VideoProcessRuleItemComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
     }
 }

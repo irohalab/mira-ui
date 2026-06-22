@@ -21,6 +21,9 @@
         <a class="item" [routerLink]="['/admin/announce']">
             公告管理
         </a>
+        <div class="item theme-toggle-item">
+            <ui-toggle text="深色模式" [ngModel]="isDarkTheme" (ngModelChange)="changeTheme($event)" name="adminDarkTheme"></ui-toggle>
+        </div>
     </aside>
     <router-outlet></router-outlet>
 </div>
