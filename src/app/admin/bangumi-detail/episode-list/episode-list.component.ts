@@ -1,8 +1,8 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { AdminService } from '../../admin.service';
 import { Bangumi, Episode } from '../../../entity';
 import { EMPTY, forkJoin, Subscription } from 'rxjs';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { EpisodeDetail } from '../episode-detail/episode-detail.component';
 import { filter, mergeMap, take } from 'rxjs/operators';
 import { BaseError } from '../../../../helpers/error';
@@ -32,6 +32,9 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
     private toastRef: UIToastRef<UIToastComponent>;
     private episodeList: Episode[];
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     @Input()
     bangumi: Bangumi;
 
@@ -48,6 +51,7 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
 
     constructor(private adminService: AdminService,
                 private dialog: UIDialog,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast) {
         this.toastRef = toastService.makeText();
     }
@@ -57,6 +61,10 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.subscription.add(
             this.adminService.listEpisode(this.bangumi.id)
                 .subscribe({

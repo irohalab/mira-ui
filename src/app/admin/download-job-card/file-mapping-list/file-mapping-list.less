@@ -1,3 +1,5 @@
+@import "../../../_dark-theme-helpers";
+
 :host {
   display: block;
   box-sizing: border-box;
@@ -23,6 +25,18 @@
   border-radius: 4px;
   background-color: #fff;
   overflow: hidden;
+}
+
+:host.dark-theme {
+  background-color: @darkBackground;
+  color: @darkForeground;
+  .modal-header .close-button {
+    color: darken(@darkForeground, 15%);
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
+  }
 }
 
 .file-mapping-list-modal {

@@ -1,3 +1,5 @@
+@import "../../../_dark-theme-helpers";
+
 :host {
   display: block;
   box-sizing: border-box;
@@ -24,6 +26,15 @@
   background-color: #fff;
   overflow: hidden;
   padding-bottom: 5rem;
+}
+
+:host.dark-theme {
+  background-color: @darkBackground;
+  color: @darkForeground;
+  .footer {
+    border-top-color: @darkBorderColor;
+    background-color: @darkBackground;
+  }
 }
 
 .user-promote-modal {

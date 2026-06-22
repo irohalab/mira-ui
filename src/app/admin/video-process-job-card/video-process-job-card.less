@@ -1,3 +1,5 @@
+@import "../../_dark-theme-helpers";
+
 :host {
   display: block;
   box-sizing: border-box;
@@ -7,6 +9,9 @@
     display: block;
     margin: 0;
     cursor: default;
+    &.inverted .card-content {
+      color: darken(@darkForeground, 5%);
+    }
   }
 }
 

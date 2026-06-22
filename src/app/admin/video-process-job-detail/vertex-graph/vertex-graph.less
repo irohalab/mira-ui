@@ -1,3 +1,5 @@
+@import "../../../_dark-theme-helpers";
+
 .vertex-graph-container {
   display: block;
   position: relative;
@@ -6,6 +8,10 @@
   border-radius: 5px;
   overflow: hidden;
   background-color: #e6e6e6;
+  &.dark {
+    border-color: @darkBorderColor;
+    background-color: @darkPanelBg;
+  }
 }
 
 .graph-legend {

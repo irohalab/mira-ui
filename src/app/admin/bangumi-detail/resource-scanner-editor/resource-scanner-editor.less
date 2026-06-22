@@ -1,3 +1,5 @@
+@import "../../../_dark-theme-helpers";
+
 .resource-scanner-editor-container {
   text-align: left;
   @media(max-width: 767px) {
@@ -121,5 +123,28 @@
   z-index: 220;
   > .ui.button {
     margin-right: 2rem;
+  }
+}
+
+.resource-scanner-editor-container.dark-theme {
+  background-color: @darkPanelBg;
+  color: @darkForeground;
+  .no-result-tip,
+  .searching-wrapper .loader {
+    color: lighten(#9f9f9f, 10%);
+  }
+  .footer {
+    border-top-color: @darkBorderColor;
+    background-color: @darkPanelBg;
+  }
+  .ui.form {
+    label {
+      color: @darkForeground;
+    }
+    input,
+    textarea,
+    select {
+      .dark-input();
+    }
   }
 }

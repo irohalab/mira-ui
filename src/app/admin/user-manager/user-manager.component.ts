@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIDropdown, UIPagination } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef, UIDropdown, UIPagination } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { filter, mergeMap } from 'rxjs/operators';
 import { BaseError } from '../../../helpers/error';
@@ -13,13 +13,13 @@ import { environment } from '../../../environments/environment';
 import { Account } from '../../entity/Account';
 import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
 import { FormsModule } from '@angular/forms';
-import { KeyValuePipe } from '@angular/common';
+import { KeyValuePipe, NgClass } from '@angular/common';
 
 @Component({
     selector: 'user-manager',
     templateUrl: './user-manager.html',
     styleUrls: ['./user-manager.less'],
-    imports: [AdminNavbar, FormsModule, UIDropdown, UIPagination, KeyValuePipe]
+    imports: [AdminNavbar, FormsModule, UIDropdown, UIPagination, KeyValuePipe, NgClass]
 })
 export class UserManager implements OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -35,6 +35,9 @@ export class UserManager implements OnInit, OnDestroy {
 
     currentAdmin: User;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     availableField: { [key: string]: string } = {
         'nickName': 'nickName', 'subjectId': 'subjectId', 'uid': 'uid', 'role': 'role', 'email': 'email'
     };
@@ -45,6 +48,7 @@ export class UserManager implements OnInit, OnDestroy {
         private userService: UserService,
         private userManagerSerivce: UserManagerSerivce,
         private dialog: UIDialog,
+        private _darkThemeService: DarkThemeService,
         toast: UIToast,
         titleService: Title
     ) {
@@ -53,6 +57,10 @@ export class UserManager implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this.userService.userInfo
                 .subscribe(

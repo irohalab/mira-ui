@@ -1,6 +1,6 @@
 <admin-navbar navTitle="用户管理"></admin-navbar>
 <div class="content-area">
-  <div class="ui segment">
+  <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
     <h4>用户列表</h4>
     <form (submit)="getUserList(page)">
       <div class="ui compact selection dropdown" uiDropdown="click">
@@ -17,7 +17,7 @@
         <button type="submit" class="ui button">查询</button>
       </div>
     </form>
-    <table class="ui very basic table">
+    <table class="ui very basic table" [ngClass]="{inverted: isDarkTheme}">
       <thead>
         <tr>
           <th>ID</th>
@@ -51,13 +51,13 @@
       </div>
     }
   </div>
-  <div class="ui segment">
+  <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
     <h4>未使用的邀请码</h4>
     <div class="ui action input">
       <input type="number" placeholder="生成邀请码数量" [value]="1" [min]="1" #inviteCodeNumInput (change)="changeInviteCodeNumber(inviteCodeNumInput.value)">
       <button class="ui button" (click)="generateInviteCode()">生成{{inviteCodeNum}}个邀请码</button>
     </div>
-    <table class="ui very basic table">
+    <table class="ui very basic table" [ngClass]="{inverted: isDarkTheme}">
       <thead>
         <tr>
           <th>Code</th>

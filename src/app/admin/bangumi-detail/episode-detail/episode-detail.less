@@ -1,3 +1,5 @@
+@import "../../../_dark-theme-helpers";
+
 :host {
   display: block;
   box-sizing: border-box;
@@ -53,5 +55,24 @@
     position: absolute;
     top: 1.6rem;
     left: 2rem;
+  }
+}
+
+:host.dark-theme {
+  background-color: @darkPanelBg;
+  color: @darkForeground;
+  .footer {
+    border-top-color: @darkBorderColor;
+    background-color: @darkPanelBg;
+  }
+  .ui.form {
+    label {
+      color: @darkForeground;
+    }
+    input,
+    textarea,
+    select {
+      .dark-input();
+    }
   }
 }

@@ -1,9 +1,9 @@
 import { fromEvent as observableFromEvent, Subscription } from 'rxjs';
 
 import { distinctUntilChanged, map, debounceTime, takeWhile, mergeMap, tap, filter } from 'rxjs/operators';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AdminService } from '../admin.service';
-import { UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIPagination } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIPagination } from '@irohalab/deneb-ui';
 import { BaseError } from '../../../helpers/error';
 import { BangumiRaw } from '../../entity/BangumiRaw';
 import { NgClass } from '@angular/common';
@@ -19,7 +19,7 @@ import { BangumiTypeNamePipe } from '../bangumi-pipes/type-name-pipe';
     styleUrls: ['./search-bangumi.less'],
     imports: [NgClass, BangumiCard, UIPagination, ResultDetail, BangumiTypeNamePipe]
 })
-export class SearchBangumi implements AfterViewInit {
+export class SearchBangumi implements OnInit, AfterViewInit, OnDestroy {
     private _subscription = new Subscription();
     private _toastRef: UIToastRef<UIToastComponent>;
 
@@ -43,10 +43,25 @@ export class SearchBangumi implements AfterViewInit {
     showDetail: boolean = false;
     isSaving: boolean = false;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     constructor(private _adminService: AdminService,
                 private _dialogRef: UIDialogRef<SearchBangumi>,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast) {
         this._toastRef = toastService.makeText();
+    }
+
+    ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
+    }
+
+    ngOnDestroy(): void {
+        this._subscription.unsubscribe();
     }
 
     ngAfterViewInit(): void {

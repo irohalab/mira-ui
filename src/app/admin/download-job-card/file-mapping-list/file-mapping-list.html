@@ -5,7 +5,7 @@
   </div>
 
   <div class="modal-content">
-    <div class="ui relaxed divided list">
+    <div class="ui relaxed divided list" [ngClass]="{inverted: isDarkTheme}">
       @for (entry of fileMapping; track entry) {
         <div class="item">
           <i class="large file alternative middle aligned icon"></i>

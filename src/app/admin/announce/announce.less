@@ -1,3 +1,5 @@
+@import "../../_dark-theme-helpers";
+
 .content-area {
   position: fixed;
   top: 4.8rem;
@@ -28,5 +30,18 @@
   &:hover,
   &:focus {
     color: #5f94c5;
+  }
+}
+
+:host.dark-theme {
+  .content-area {
+    background-color: @darkBackground;
+  }
+  .anchor-button {
+    color: darken(@darkForeground, 15%);
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
   }
 }

@@ -1,9 +1,9 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormBuilder, FormControl, FormGroup, ValidationErrors, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VideoProcessRuleService } from '../video-process-rule.service';
 import { ActionType } from '../../../../entity/action-type';
 import { ProfileType } from '../../../../entity/ProfileType';
-import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialogRef, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Observable, Subscription } from 'rxjs';
 import { VideoProcessRule } from '../../../../entity/VideoProcessRule';
 import { map } from 'rxjs/operators';
@@ -20,6 +20,9 @@ import { NgClass } from '@angular/common';
 export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
     private _toastRef: UIToastRef<UIToastComponent>;
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     @Input()
     bangumiId: string;
@@ -47,6 +50,7 @@ export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
     constructor(private _fb: FormBuilder,
                 private _videoProcessRuleService: VideoProcessRuleService,
                 private _dialogRef: UIDialogRef<VideoProcessRuleEditorComponent>,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast) {
         this._toastRef = toastService.makeText();
     }
@@ -56,6 +60,10 @@ export class VideoProcessRuleEditorComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._videoProcessRuleService.listFonts()
                 .subscribe(fonts => this.fontList = fonts)

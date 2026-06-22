@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { DownloadJob } from '../../entity/DownloadJob';
 import { DownloadJobStatus } from '../../entity/DownloadJobStatus';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { FileMappingListComponent } from './file-mapping-list/file-mapping-list.component';
 import { DownloadManagerService } from '../download-manager/download-manager.service';
 import { Subscription } from 'rxjs';
@@ -36,8 +36,11 @@ export class DownloadJobCardComponent implements OnInit, OnDestroy {
 
     episodeNoList: string[]
 
+    isDarkTheme: boolean;
+
     constructor(private _dialog: UIDialog,
                 private downloadManagerService: DownloadManagerService,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast) {
         this._toast = toastService.makeText();
     }
@@ -68,6 +71,10 @@ export class DownloadJobCardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         if (this.job.fileMapping) {
             this.episodeNoList = this.job.fileMapping
                 .map(mapping => mapping.episode)

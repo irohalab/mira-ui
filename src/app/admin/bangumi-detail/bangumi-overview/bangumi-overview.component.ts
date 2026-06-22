@@ -1,5 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper } from '@irohalab/deneb-ui';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Bangumi, Episode } from '../../../entity';
 import { BangumiBasic } from '../bangumi-basic/bangumi-basic.component';
 import { filter, mergeMap, take } from 'rxjs/operators';
@@ -21,6 +21,9 @@ export class BangumiOverviewComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
     private toastRef: UIToastRef<UIToastComponent>;
     private _bangumi!: Bangumi;
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     @Input()
     set bangumi(bangumi: Bangumi) {
@@ -46,11 +49,16 @@ export class BangumiOverviewComponent implements OnInit, OnDestroy {
     constructor(private adminService: AdminService,
                 private dialog: UIDialog,
                 private userManagerSerivce: UserManagerSerivce,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast,) {
         this.toastRef = toastService.makeText();
     }
 
     ngOnInit() {
+        this.subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.subscription.add(
             this.userManagerSerivce
                 .listUser(

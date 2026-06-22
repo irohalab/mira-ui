@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIDropdown, UIToggle } from '@irohalab/deneb-ui';
+import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIDropdown, UIToggle, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Bangumi, Episode } from '../../../entity';
 import { Item } from '../../../entity/item';
@@ -45,6 +45,8 @@ export class ResourceScannerEditor implements OnInit, OnDestroy {
     isSearching: boolean;
     noResultFound: boolean;
 
+    isDarkTheme: boolean;
+
     static DIALOG_RESULT_UPDATE = 'update';
     static DIALOG_RESULT_DOWNLOAD_DIRECTLY = 'download_directly';
     static DIALOG_RESULT_DELETE = 'delete';
@@ -53,6 +55,7 @@ export class ResourceScannerEditor implements OnInit, OnDestroy {
                 private dialogRef: UIDialogRef<ResourceScannerEditor>,
                 private uiDialog: UIDialog,
                 private formBuilder: FormBuilder,
+                private _darkThemeService: DarkThemeService,
                 toast: UIToast) {
         this.toastRef = toast.makeText();
     }
@@ -70,6 +73,10 @@ export class ResourceScannerEditor implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.scannerForm = this.formBuilder.group({
             feed: [this.scanner.feed],
             criteria: [this.scanner.criteria, Validators.required],

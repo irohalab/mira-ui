@@ -1,3 +1,5 @@
+@import "../../../_dark-theme-helpers";
+
 :host {
   display: block;
   box-sizing: border-box;
@@ -103,4 +105,39 @@
 
 .video-rule {
   margin-bottom: 2rem;
+}
+
+:host.dark-theme {
+  background-color: @darkPanelBg;
+  color: @darkForeground;
+  .modal-header .close-button {
+    color: darken(@darkForeground, 15%);
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
+  }
+  .anchor-button {
+    color: darken(@darkForeground, 15%);
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
+  }
+  .footer {
+    color: lighten(#656565, 20%);
+  }
+  .ui.form {
+    label {
+      color: @darkForeground;
+    }
+    input,
+    textarea,
+    select {
+      .dark-input();
+    }
+  }
+  .ui.horizontal.divider.header {
+    color: @darkForeground;
+  }
 }

@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UIDialogRef } from '@irohalab/deneb-ui';
+import { UIDialogRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Announce } from '../../../entity/announce';
 import { Subscription } from 'rxjs';
 import dayjs from 'dayjs';
@@ -22,6 +22,9 @@ export function rangeLimit(group: FormGroup) {
 })
 export class EditAnnounceComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     @Input()
     announce: Announce;
@@ -59,6 +62,7 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
 
 
     constructor(private _dialogRef: UIDialogRef<EditAnnounceComponent>,
+                private _darkThemeService: DarkThemeService,
                 private _fb: FormBuilder) {
     }
 
@@ -96,6 +100,10 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         if (this.announce) {
             this.announceForm = this._fb.group({
                 sortOrder: [this.announce.sortOrder, Validators.required],

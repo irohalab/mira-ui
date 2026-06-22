@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { filter, mergeMap, switchMap } from 'rxjs/operators';
 import { BaseError } from '../../../helpers/error';
@@ -38,6 +38,9 @@ export class BangumiDetail implements OnInit, OnDestroy {
     private _toastRef: UIToastRef<UIToastComponent>;
     private refreshSubject = new BehaviorSubject<number>(0); // value has no meaning.
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     bangumi = <Bangumi>{};
 
     isLoading: boolean = false;
@@ -58,6 +61,7 @@ export class BangumiDetail implements OnInit, OnDestroy {
                 private _userManagerService: UserManagerSerivce,
                 private _announceService: AnnounceService,
                 private _uiDialog: UIDialog,
+                private _darkThemeService: DarkThemeService,
                 titleService: Title,
                 toastService: UIToast
     ) {
@@ -70,6 +74,10 @@ export class BangumiDetail implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             this._userManagerService
                 .listUser(

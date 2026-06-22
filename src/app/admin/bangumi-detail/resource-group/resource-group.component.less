@@ -1,4 +1,5 @@
 @import '../../../_color.less';
+@import '../../../_dark-theme-helpers';
 
 .resource-group-container {
   margin: 1rem 1rem 10rem 1rem;
@@ -123,5 +124,40 @@
   &:hover,
   &:focus {
     color: #5f94c5;
+  }
+}
+
+:host.dark-theme {
+  .scanner-item:hover {
+    background: lighten(@darkPanelBg, 6%);
+  }
+  .ui.header {
+    color: @darkForeground;
+  }
+  .ui.label:not(.red):not(.orange):not(.yellow):not(.olive):not(.green):not(.teal):not(.blue):not(.violet):not(.purple):not(.pink):not(.brown):not(.grey):not(.black) {
+    background-color: @grey-color;
+    border-color: @grey-color;
+    color: @white-color;
+  }
+  .episode-video-file-status-list .episode-vf .episode-no {
+    background-color: lighten(@darkPanelBg, 12%);
+    color: @darkForeground;
+  }
+  .anchor-button {
+    color: darken(@darkForeground, 15%);
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
+  }
+  .ui.form {
+    label {
+      color: @darkForeground;
+    }
+    input,
+    textarea,
+    select {
+      .dark-input();
+    }
   }
 }

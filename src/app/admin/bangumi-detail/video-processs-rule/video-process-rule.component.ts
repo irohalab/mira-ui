@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { VideoProcessRule } from '../../../entity/VideoProcessRule';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { VideoProcessRuleEditorComponent } from './video-process-rule-editor/video-process-rule-editor.component';
 import { filter, mergeMap, switchMap } from 'rxjs/operators';
 import { VideoProcessRuleService } from './video-process-rule.service';
@@ -21,6 +21,9 @@ export class VideoProcessRuleComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
     private toastRef: UIToastRef<UIToastComponent>;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
+
     @Input()
     bangumi: Bangumi;
 
@@ -31,6 +34,7 @@ export class VideoProcessRuleComponent implements OnInit, OnDestroy {
     constructor(private _uiDialog: UIDialog,
                 private _videoProcessRuleService: VideoProcessRuleService,
                 private _adminService: AdminService,
+                private _darkThemeService: DarkThemeService,
                 toastService: UIToast) {
         this.toastRef = toastService.makeText();
     }
@@ -110,6 +114,10 @@ export class VideoProcessRuleComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.refreshList();
     }
 }

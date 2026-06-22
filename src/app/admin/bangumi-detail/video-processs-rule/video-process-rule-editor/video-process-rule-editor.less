@@ -1,3 +1,5 @@
+@import "../../../../_dark-theme-helpers";
+
 :host {
   display: block;
   box-sizing: border-box;
@@ -85,4 +87,29 @@
   font-size: 0.8rem;
   color: #656565;
   padding: 0.6rem 1rem;
+}
+
+:host.dark-theme {
+  background-color: @darkPanelBg;
+  color: @darkForeground;
+  .anchor-button {
+    color: darken(@darkForeground, 15%);
+    &:hover,
+    &:focus {
+      color: @darkLinkHoverColor;
+    }
+  }
+  .footer {
+    color: lighten(#656565, 20%);
+  }
+  .ui.form {
+    label {
+      color: @darkForeground;
+    }
+    input,
+    textarea,
+    select {
+      .dark-input();
+    }
+  }
 }

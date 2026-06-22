@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Edge, Node, GraphComponent } from '@swimlane/ngx-graph';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Action } from '../../../../entity/action';
 import { ActionType } from '../../../../entity/action-type';
 import { ConvertAction } from '../../../../entity/ConvertAction';
@@ -12,7 +12,7 @@ import { ActionMap } from '../../../../entity/action-map';
 import { getRemPixel } from '../../../../../helpers/dom';
 import { isCyclicGraph } from './action-graph-utils';
 import { NgClass } from '@angular/common';
-import { UIDropdown } from '@irohalab/deneb-ui';
+import { UIDropdown, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { FormsModule } from '@angular/forms';
 import { ProfileTypePipe } from '../profile-type.pipe';
 
@@ -30,7 +30,7 @@ const NODE_EDITOR_WIDTH = 20; //unit rem;
     styleUrls: ['./action-editor.less'],
     imports: [GraphComponent, NgClass, UIDropdown, FormsModule, ProfileTypePipe]
 })
-export class ActionEditorComponent implements OnInit, AfterViewInit {
+export class ActionEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     readonly eActionType = ActionType;
     readonly eProfileType = ProfileType;
@@ -78,12 +78,22 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
     @ViewChild('actionEditorContainer') actionEditorContainer: ElementRef;
 
     private _timerOfDimensionDetect: number;
+    private _subscription = new Subscription();
+
+    isDarkTheme: boolean;
+
+    constructor(private _darkThemeService: DarkThemeService) {
+    }
 
     ngAfterViewInit(): void {
         this.detectDimension();
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.interactionLocked = !this.editMode;
         if (this.actions) {
             this.edges = [];
@@ -107,6 +117,10 @@ export class ActionEditorComponent implements OnInit, AfterViewInit {
 
     unlockInteraction(): void {
         this.interactionLocked = false;
+    }
+
+    ngOnDestroy(): void {
+        this._subscription.unsubscribe();
     }
 
     selectNode(nodeId: string, event?: Event, nodeMeta?: any): void {

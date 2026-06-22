@@ -1,21 +1,24 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MediaFile } from '../../../../entity/MediaFile';
-import { UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { UIDialogRef, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { AdminService } from '../../../admin.service';
 import { copyElementValueToClipboard } from '../../../../../helpers/clipboard';
 import { FormsModule } from '@angular/forms';
 import { ReadableUnit } from '../../../../pipes/readable-unit';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'download-editor',
     templateUrl: './download-editor.html',
     styleUrls: ['./download-editor.less'],
-    imports: [FormsModule, ReadableUnit]
+    imports: [FormsModule, ReadableUnit, NgClass]
 })
-export class DownloadEditorComponent implements OnDestroy {
+export class DownloadEditorComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
     private toastRef: UIToastRef<UIToastComponent>;
+
+    isDarkTheme: boolean;
 
     torrentTitle: string;
     downloadUrl: string;
@@ -32,8 +35,15 @@ export class DownloadEditorComponent implements OnDestroy {
 
     constructor(private adminService: AdminService,
                 private dialogRef: UIDialogRef<DownloadEditorComponent>,
+                private _darkThemeService: DarkThemeService,
                 toast: UIToast) {
         this.toastRef = toast.makeText();
+    }
+    ngOnInit(): void {
+        this.subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
     }
     copyDownloadUrlToClipboard(): void {
         const downloadUrlInput = this._downloadUrlTextBoxRef.nativeElement;

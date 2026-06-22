@@ -1,4 +1,5 @@
 @fontColor: #212121;
+@import "../../../../_dark-theme-helpers";
 
 .rule-item-container {
   margin: 2rem;
@@ -42,4 +43,12 @@
   position: absolute;
   top: 5px;
   right: 5px;
+}
+
+.rule-item-container.dark-theme {
+  border-color: @darkBorderColor;
+  color: @darkForeground;
+  .title-bar .entry > .entry-key {
+    color: lighten(@fontColor, 60%);
+  }
 }

@@ -1,4 +1,4 @@
-<div class="download-editor-container">
+<div class="download-editor-container" [ngClass]="{'dark-theme': isDarkTheme}">
   <div class="torrent-info-wrapper">
     <h3 class="torrent-name">{{torrentTitle}}</h3>
     <div class="download-url-wrapper ui mini fluid icon input">
@@ -7,7 +7,7 @@
     </div>
   </div>
   <div class="file-list-wrapper">
-    <table class="file-list-table ui striped table">
+    <table class="file-list-table ui striped table" [ngClass]="{inverted: isDarkTheme}">
       <thead>
         <tr>
           <th>File Path</th>

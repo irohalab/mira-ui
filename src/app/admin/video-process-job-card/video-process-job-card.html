@@ -1,4 +1,4 @@
-<a class="ui segment" [routerLink]="['/admin/video-manager', job.id]">
+<a class="ui segment" [routerLink]="['/admin/video-manager', job.id]" [ngClass]="{inverted: isDarkTheme}">
   <div class="card-content">
     <div class="job-id">{{job.id}}</div>
     <div class="bangumi-id">{{job.jobMessage.bangumiId}}</div>

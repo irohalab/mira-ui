@@ -1,5 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIToggle } from '@irohalab/deneb-ui';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
+import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIToggle, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { forkJoin, of, Subscription } from 'rxjs';
 import { VideoFile } from '../../../entity/video-file';
 import { Episode } from '../../../entity';
@@ -16,17 +16,21 @@ import { ResourceGroup } from '../../../entity/ResourceGroup';
 import { VideoProcessRuleItemComponent } from '../video-processs-rule/video-process-rule-item/video-process-rule-item.component';
 import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
 import { ContrastColorPipe } from '../../../pipes/contrast-color.pipe';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'video-file-modal',
     templateUrl: './video-file-modal.html',
     styleUrls: ['./video-file-list.less'],
-    imports: [FormsModule, ReactiveFormsModule, VideoProcessRuleItemComponent, ConfirmDialogDirective, UIToggle, ContrastColorPipe]
+    imports: [FormsModule, ReactiveFormsModule, VideoProcessRuleItemComponent, ConfirmDialogDirective, UIToggle, ContrastColorPipe, NgClass]
 })
 export class VideoFileModal implements OnInit, OnDestroy {
     private _subscription = new Subscription();
     private _toastRef: UIToastRef<UIToastComponent>;
     private videoTempId = 0;
+
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean;
 
     @Input()
     episode: Episode;
@@ -55,6 +59,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
                 private _fb: FormBuilder,
                 private _uiDialog: UIDialog,
                 private _videoProcessRuleService: VideoProcessRuleService,
+                private _darkThemeService: DarkThemeService,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
     }
@@ -155,6 +160,10 @@ export class VideoFileModal implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this._subscription.add(
+            this._darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this._subscription.add(
             forkJoin([
                 this._adminService.getEpisodeVideoFiles(this.episode.id, this.resourceGroup?.id),

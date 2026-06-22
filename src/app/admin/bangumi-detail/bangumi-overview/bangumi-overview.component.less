@@ -1,4 +1,5 @@
 @import '../common.less';
+@import '../../../_dark-theme-helpers';
 
 .bangumi-basic-info {
   display: flex;
@@ -70,3 +71,18 @@
   }
 }
 
+:host.dark-theme {
+  .section-card {
+    background-color: @darkPanelBg;
+    color: @darkForeground;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+  }
+  .bangumi-info-text {
+    .bangumi-title .external-link {
+      color: lighten(#818181, 15%);
+    }
+    .entry .entry-key {
+      color: lighten(#828574, 15%);
+    }
+  }
+}

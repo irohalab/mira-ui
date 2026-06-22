@@ -1,3 +1,5 @@
+@import "../../_dark-theme-helpers";
+
 .search-bangumi-modal {
   text-align: left;
   @media(max-width: 767px) {
@@ -102,5 +104,23 @@
   .pagination-wrapper {
     text-align: center;
     padding-bottom: 2rem;
+  }
+}
+
+:host.dark-theme {
+  .search-bangumi-modal {
+    background-color: @darkBackground;
+    color: @darkForeground;
+    .search-bar {
+      border-bottom-color: @darkBorderColor;
+      background-color: @darkPanelBg;
+      .back-button {
+        color: darken(@darkForeground, 15%);
+        &:hover,
+        &:focus {
+          color: @darkLinkHoverColor;
+        }
+      }
+    }
   }
 }
