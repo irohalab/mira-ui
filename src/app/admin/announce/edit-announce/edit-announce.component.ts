@@ -6,13 +6,13 @@ import { Subscription } from 'rxjs';
 import dayjs from 'dayjs';
 import { NgClass } from '@angular/common';
 import { NgxsmkDatepickerComponent } from 'ngxsmk-datepicker';
+import { ErrorMessageDict, ValidateMessageDict } from '../types';
 
 export function rangeLimit(group: FormGroup) {
     let start_time = group.get('start_time').value;
     let end_time = group.get('end_time').value;
     return end_time > start_time ? null: {dateRange: {end_time: end_time, start_time: start_time}};
 }
-
 
 @Component({
     selector: 'admin-edit-announce',
@@ -30,31 +30,31 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
 
     position = 1;
 
-    validationMessages = {
-        sort_order: {
-            'required': 'sort order不能为空'
+    validationMessages: ValidateMessageDict = {
+        sortOrder: {
+            'required': 'sortOrder不能为空'
         },
         content: {
             'required': 'url不能为空'
         },
-        image_url: {
-            'required': 'image_url不能为空'
+        imageUrl: {
+            'required': 'imageUrl不能为空'
         },
-        start_time: {
+        startTime: {
             'required': '开始时间不能为空',
         },
-        end_time: {
+        endTime: {
             'required': '开始时间不能为空'
         }
     };
 
 
-    announceFormErrors: any = {
-        sort_order: [],
+    announceFormErrors: ErrorMessageDict = {
+        sortOrder: [],
         content: [],
-        image_url: [],
-        start_time: [],
-        end_time: []
+        imageUrl: [],
+        startTime: [],
+        endTime: []
     };
 
 
@@ -76,8 +76,8 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
         }
         let result = this.announceForm.value;
         result.position = this.position;
-        result.start_time = dayjs(result.start_time).valueOf();
-        result.end_time = dayjs(result.end_time).valueOf();
+        result.startTime = dayjs(result.startTime).valueOf();
+        result.endTime = dayjs(result.endTime).valueOf();
         this._dialogRef.close(result);
     }
 
@@ -98,20 +98,20 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         if (this.announce) {
             this.announceForm = this._fb.group({
-                sort_order: [this.announce.sort_order, Validators.required],
+                sortOrder: [this.announce.sortOrder, Validators.required],
                 content: [this.announce.content, Validators.required],
-                image_url: [this.announce.image_url, Validators.required],
-                start_time: [dayjs(this.announce.start_time), Validators.required],
-                end_time: [dayjs(this.announce.end_time), Validators.required]
+                imageUrl: [this.announce.imageUrl, Validators.required],
+                startTime: [dayjs(this.announce.startTime), Validators.required],
+                endTime: [dayjs(this.announce.endTime), Validators.required]
             }, {validator: rangeLimit});
             this.position = this.announce.position;
         } else {
             this.announceForm = this._fb.group({
-                sort_order: [0, Validators.required],
+                sortOrder: [0, Validators.required],
                 content: ['', Validators.required],
-                image_url: ['', Validators.required],
-                start_time: [dayjs(), Validators.required],
-                end_time: [dayjs().add(1, 'day'), Validators.required]
+                imageUrl: ['', Validators.required],
+                startTime: [dayjs(), Validators.required],
+                endTime: [dayjs().add(1, 'day'), Validators.required]
             }, {validator: rangeLimit})
         }
 

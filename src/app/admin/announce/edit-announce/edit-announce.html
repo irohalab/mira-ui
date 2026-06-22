@@ -10,14 +10,14 @@
         </div>
       </div>
     </div>
-    <div class="field" [ngClass]="{error: announceFormErrors.sort_order.length > 0}">
+    <div class="field" [ngClass]="{error: announceFormErrors.sortOrder.length > 0}">
       <label>顺序</label>
       <input type="number" formControlName="sort_order" placeholder="当同一个位置有多个公告时使用">
     </div>
-    @if (announceFormErrors.sort_order.length > 0) {
+    @if (announceFormErrors.sortOrder.length > 0) {
       <div class="ui error message">
         <ul class="list">
-          @for (error of announceFormErrors.sort_order; track error) {
+          @for (error of announceFormErrors.sortOrder; track error) {
             <li>{{error}}</li>
           }
         </ul>
@@ -36,42 +36,42 @@
         </ul>
       </div>
     }
-    <div class="field" [ngClass]="{error: announceFormErrors.image_url.length > 0}">
+    <div class="field" [ngClass]="{error: announceFormErrors.imageUrl.length > 0}">
       <label>图片URL</label>
       <input formControlName="image_url" placeholder="请输入图片url，推荐https的地址">
     </div>
-    @if (announceFormErrors.image_url.length > 0) {
+    @if (announceFormErrors.imageUrl.length > 0) {
       <div class="ui error message">
         <ul class="list">
-          @for (error of announceFormErrors.image_url; track error) {
+          @for (error of announceFormErrors.imageUrl; track error) {
             <li>{{error}}</li>
           }
         </ul>
       </div>
     }
-    <div class="field" [ngClass]="{error: announceFormErrors.start_time.length > 0}">
+    <div class="field" [ngClass]="{error: announceFormErrors.startTime.length > 0}">
       <label>开始时间</label>
-      <ngxsmk-datepicker formControlName="start_time" mode="single"></ngxsmk-datepicker>
+      <ngxsmk-datepicker formControlName="startTime" mode="single"></ngxsmk-datepicker>
       <!--<input type="number" formControlName="start_time">-->
     </div>
-    @if (announceFormErrors.start_time.length > 0) {
+    @if (announceFormErrors.startTime.length > 0) {
       <div class="ui error message">
         <ul class="list">
-          @for (error of announceFormErrors.start_time; track error) {
+          @for (error of announceFormErrors.startTime; track error) {
             <li>{{error}}</li>
           }
         </ul>
       </div>
     }
-    <div class="field" [ngClass]="{error: announceFormErrors.end_time.length > 0}">
+    <div class="field" [ngClass]="{error: announceFormErrors.endTime.length > 0}">
       <label>结束时间</label>
-      <ngxsmk-datepicker formControlName="end_time" mode="single"></ngxsmk-datepicker>
+      <ngxsmk-datepicker formControlName="endTime" mode="single"></ngxsmk-datepicker>
       <!--<input type="number" formControlName="end_time">-->
     </div>
-    @if (announceFormErrors.end_time.length > 0) {
+    @if (announceFormErrors.endTime.length > 0) {
       <div class="ui error message">
         <ul class="list">
-          @for (error of announceFormErrors.end_time; track error) {
+          @for (error of announceFormErrors.endTime; track error) {
             <li>{{error}}</li>
           }
         </ul>

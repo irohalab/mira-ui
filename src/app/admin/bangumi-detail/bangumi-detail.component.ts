@@ -173,13 +173,13 @@ export class BangumiDetail implements OnInit, OnDestroy {
                     this.announceStatusText = '推荐这个番組';
                     if (data.length > 0) {
                         let announce = data[0];
-                        if (announce.start_time < currentTime && announce.end_time > currentTime) {
+                        if (announce.startTime < currentTime && announce.endTime > currentTime) {
                             this.announceStatus = AnnounceStatus.ANNOUNCING;
                             this.announceStatusText = '推荐中';
-                        } else if (announce.end_time < currentTime) {
+                        } else if (announce.endTime < currentTime) {
                             this.announceStatus = AnnounceStatus.EXPIRED;
                             this.announceStatusText = '已过期';
-                        } else if (announce.start_time > currentTime) {
+                        } else if (announce.startTime > currentTime) {
                             this.announceStatus = AnnounceStatus.NOT_YET;
                             this.announceStatusText = '即将推荐';
                         }
