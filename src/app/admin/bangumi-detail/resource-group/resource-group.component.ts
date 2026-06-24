@@ -59,9 +59,9 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
 
     feedList: string[];
     scannerLoadingState = false;
+    reconcileLoadingState: { [rgId: string]: boolean } = {};
 
     rgFormDict: { [rgId: string]: FormGroup } = {};
-
     @Output()
     episodeChanged = new EventEmitter<string>();
     pauseRefreshRG = false;
@@ -73,6 +73,14 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                 return epvf.videoFiles.filter(vf => vf.status === VideoFile.STATUS_DOWNLOADING).length > 0;
             });
         }).length > 0
+    }
+
+    hasDownloadingVideoFilesInGroup(resourceGroupId: string): boolean {
+        const epvfList = this.episodeVideoFileStatus[resourceGroupId];
+        if (!epvfList) {
+            return false;
+        }
+        return epvfList.some(epvf => epvf.videoFiles.some(vf => vf.status === VideoFile.STATUS_DOWNLOADING));
     }
 
     constructor(private adminService: AdminService,
@@ -387,5 +395,38 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                     this.pauseRefreshRG = false;
                 }
             });
+    }
+
+    reconcileResourceGroup(resourceGroup: ResourceGroup): void {
+        const epvfList = this.episodeVideoFileStatus[resourceGroup.id];
+        if (!epvfList) {
+            return;
+        }
+        const videoFileIds = epvfList
+            .reduce((ids, epvf) => {
+                epvf.videoFiles.forEach(vf => {
+                    if (vf.status === VideoFile.STATUS_DOWNLOADING) {
+                        ids.push(vf.id);
+                    }
+                });
+                return ids;
+            }, [] as string[]);
+        if (videoFileIds.length === 0) {
+            return;
+        }
+        this.reconcileLoadingState[resourceGroup.id] = true;
+        this.subscription.add(
+            this.videoProcessManageService.reconcileVideoFiles(videoFileIds)
+                .subscribe({
+                    next: (result) => {
+                        this.reconcileLoadingState[resourceGroup.id] = false;
+                        this.toastRef.show(`Reconcile requested for ${videoFileIds.length} video file(s), ${result.reconciled} re-published`);
+                    },
+                    error: (error) => {
+                        this.reconcileLoadingState[resourceGroup.id] = false;
+                        this.toastRef.show(error.error?.message || error.message || 'Unknown error');
+                    }
+                })
+        );
     }
 }

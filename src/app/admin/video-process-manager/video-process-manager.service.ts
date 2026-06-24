@@ -91,6 +91,18 @@ export class VideoProcessManagerService extends BaseService {
         return this.sendRequest<any>(reqData);
     }
 
+    reconcileVideoFiles(videoFileIds: string[]): Observable<{ reconciled: number, skipped: number, jobs: Array<{ jobId: string, videoId: string, bangumiId: string }> }> {
+        const reqData: ReqData = {
+            method: 'POST',
+            url: `/job/reconcile`,
+            body: { videoFileIds }
+        };
+        return this.sendRequest<{data: { reconciled: number, skipped: number, jobs: Array<{ jobId: string, videoId: string, bangumiId: string }> }}>(reqData)
+            .pipe(
+                map(res => res.data)
+            );
+    }
+
     getVertices(jobId: string): Observable<Vertex[]> {
         const reqData: ReqData = {
             method: 'GET',

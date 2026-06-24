@@ -45,7 +45,16 @@
         </form>
         <div class="ui divider"></div>
         <div class="episode-list">
-          <h4 class="ui header">Video File Status</h4>
+          <div class="video-file-status-header">
+            <h4 class="ui header">Video File Status</h4>
+            <button type="button" class="ui small button reconcile-button"
+              [disabled]="!hasDownloadingVideoFilesInGroup(resourceGroup.id) || reconcileLoadingState[resourceGroup.id]"
+              [ngClass]="{loading: reconcileLoadingState[resourceGroup.id]}"
+              (click)="reconcileResourceGroup(resourceGroup)"
+              title="Reconcile downloading video files">
+              <i class="sync icon"></i>Reconcile
+            </button>
+          </div>
           <ul class="notice">
             <li><span class="ui grey horizontal tiny label">&nbsp;</span> = Pending</li>
             <li><span class="ui blue horizontal tiny label">&nbsp;</span> = Downloading</li>
