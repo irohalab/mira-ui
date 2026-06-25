@@ -1,25 +1,28 @@
 import { Component, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Bangumi, Episode } from '../../../entity';
 import { ResourceGroup } from '../../../entity/ResourceGroup';
-import { EMPTY, forkJoin, of, Subscription } from 'rxjs';
+import { EMPTY, forkJoin, of, Subscription, timer } from 'rxjs';
 import { AdminService } from '../../admin.service';
 import { UIDialog, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { ResourceScannerEditor } from '../resource-scanner-editor/resource-scanner-editor.component';
 import { FeedService } from '../feed.service';
 import { ResourceScanner } from '../../../entity/ResourceScanner';
-import { filter, repeat, switchMap } from 'rxjs/operators';
+import { filter, finalize, switchMap, takeWhile } from 'rxjs/operators';
 import { nanoid } from 'nanoid';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VideoFile } from '../../../entity/video-file';
 import { VideoProcessManagerService } from '../../video-process-manager/video-process-manager.service';
 import { VideoProcessJob } from '../../../entity/VideoProcessJob';
+import { VideoProcessJobStatus } from '../../../entity/VideoProcessJobStatus';
 import { DownloadJob } from '../../../entity/DownloadJob';
+import { DownloadJobStatus } from '../../../entity/DownloadJobStatus';
 import { DownloadManagerService } from '../../download-manager/download-manager.service';
 import { VideoFileModal } from '../video-file-modal/video-file-modal.component';
 import { NgClass } from '@angular/common';
+import { ScanStatus } from '../../../entity/ScanStatus';
+import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
 
 const REFRESH_INTERVAL = 5000;
-const REFRESH_RG_INTERVAL = 60 * 1000;
 
 interface EpisodeVideoFileStatus {
     episode: Episode;
@@ -35,7 +38,7 @@ interface EpisodeVideoFileStatus {
     selector: 'app-resource-group',
     templateUrl: './resource-group.component.html',
     styleUrl: './resource-group.component.less',
-    imports: [FormsModule, ReactiveFormsModule, NgClass]
+    imports: [FormsModule, ReactiveFormsModule, NgClass, ConfirmDialogDirective]
 })
 export class ResourceGroupComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
@@ -56,7 +59,6 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     bangumi!: Bangumi;
 
     resourceGroupList: ResourceGroup[] = [];
-
     feedList: string[];
     scannerLoadingState = false;
     reconcileLoadingState: { [rgId: string]: boolean } = {};
@@ -66,6 +68,17 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     episodeChanged = new EventEmitter<string>();
     pauseRefreshRG = false;
     episodeVideoFileStatus: { [rgId: string]: EpisodeVideoFileStatus[] } = {};
+
+    resourceScanStatus?: ScanStatus;
+    videoFileScanStatus?: ScanStatus;
+    resourceScanCountdown = '—';
+    videoFileScanCountdown = '—';
+    private serverTimeOffset = 0;
+    private isRefreshingStatus = false;
+    private lastStatusRefresh = 0;
+    private lastResourceScanEndTime: string | null = null;
+    private lastVideoFileScanEndTime: string | null = null;
+    private jobPollingActive = false;
 
     get hasDownloadingVideoFiles(): boolean {
         return Object.values(this.episodeVideoFileStatus).filter(epvfList => {
@@ -97,12 +110,15 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
-
     ngOnInit(): void {
         this.subscription.add(
             this._darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
         );
+        this.subscription.add(
+            timer(0, 1000).subscribe(() => this.updateScanCountdowns())
+        );
+        this.refreshScanStatus();
         this.subscription.add(
             forkJoin([
                 this.adminService.listResourceGroups(
@@ -138,13 +154,8 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                         }
 
                         if (this.hasDownloadingVideoFiles) {
-                            this.refreshVideoJob();
-                            this.refreshDownloadJob();
+                            this.ensureJobPolling();
                         }
-
-                        setTimeout(() => {
-                            this.refreshResourceGroup();
-                        }, REFRESH_INTERVAL);
                     }
                 })
         );
@@ -162,6 +173,82 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         );
     }
 
+    private updateScanCountdowns(): void {
+        this.resourceScanCountdown = this.computeCountdown(this.resourceScanStatus);
+        this.videoFileScanCountdown = this.computeCountdown(this.videoFileScanStatus);
+        // The server keeps scanning on its own schedule, so once a countdown is
+        // due (or a scan is running), re-request the status to pick up the next
+        // scheduled time. Throttled to avoid spamming the endpoint.
+        if (this.needScanStatusRefresh()) {
+            this.refreshScanStatus();
+        }
+    }
+
+    private needScanStatusRefresh(): boolean {
+        return this.isScanStatusStale(this.resourceScanStatus)
+            || this.isScanStatusStale(this.videoFileScanStatus);
+    }
+
+    private isScanStatusStale(status?: ScanStatus): boolean {
+        if (!status) {
+            return false;
+        }
+        if (status.isScanning) {
+            return true;
+        }
+        if (!status.nextScanTime) {
+            return false;
+        }
+        const nowOnServer = Date.now() + this.serverTimeOffset;
+        return new Date(status.nextScanTime).getTime() - nowOnServer <= 0;
+    }
+
+    private refreshScanStatus(): void {
+        const MIN_REFRESH_INTERVAL = 3000;
+        if (this.isRefreshingStatus || Date.now() - this.lastStatusRefresh < MIN_REFRESH_INTERVAL) {
+            return;
+        }
+        this.isRefreshingStatus = true;
+        this.lastStatusRefresh = Date.now();
+        this.subscription.add(
+            this.adminService.getStatus()
+                .subscribe({
+                    next: (status) => {
+                        this.resourceScanStatus = status.resourceScan;
+                        this.videoFileScanStatus = status.videoFileScan;
+                        // Correct for clock skew between this browser and the server.
+                        this.serverTimeOffset = new Date(status.serverTime).getTime() - Date.now();
+                        this.isRefreshingStatus = false;
+                        this.detectScanCompletion();
+                    },
+                    error: () => {
+                        this.isRefreshingStatus = false;
+                    }
+                })
+        );
+    }
+
+    private computeCountdown(status?: ScanStatus): string {
+        if (!status) {
+            return '—';
+        }
+        if (status.isScanning) {
+            return 'Scanning…';
+        }
+        if (!status.nextScanTime) {
+            return '—';
+        }
+        const nowOnServer = Date.now() + this.serverTimeOffset;
+        const remainingMs = new Date(status.nextScanTime).getTime() - nowOnServer;
+        if (remainingMs <= 0) {
+            return 'Due now';
+        }
+        const totalSeconds = Math.floor(remainingMs / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
     addResourceGroup(): void {
         const rg = new ResourceGroup();
         rg.id = this.eDefaultRgId;
@@ -174,14 +261,24 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
             alertThresholdDay: [rg.alertThresholdDay]
         });
 
-        if (this.bangumi.episodes) {
-            this.episodeVideoFileStatus[rg.id] = this.bangumi.episodes.map(episode => {
-                return {
-                    episode,
-                    videoFiles: []
-                } as EpisodeVideoFileStatus;
-            });
-        }
+        this.subscription.add(
+            this.adminService.addResourceGroup(rg)
+                .subscribe({
+                    next: (resourceGroup) => {
+                        if (this.bangumi.episodes) {
+                            this.episodeVideoFileStatus[rg.id] = this.bangumi.episodes.map(episode => {
+                                return {
+                                    episode,
+                                    videoFiles: []
+                                } as EpisodeVideoFileStatus;
+                            });
+                        }
+                    },
+                    error: (error) => {
+                        this.toastRef.show(error.error?.message || 'Unknown error');
+                    }
+                })
+        );
     }
 
     updateResourceGroup(resourceGroup: ResourceGroup): void {
@@ -209,15 +306,64 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         )
     }
 
-    refreshResourceGroup(): void {
+    deleteResourceGroup(resourceGroupId: string): void {
         this.subscription.add(
-            of(this.pauseRefreshRG)
-                .pipe(
-                    filter((pause) => !pause),
-                    switchMap(() => {
-                        return this.adminService.listResourceGroups(this.bangumi.id, true)
-                    }),
-                    repeat({delay: REFRESH_RG_INTERVAL}))
+            this.adminService.deleteResourceGroup(this.bangumi.id, resourceGroupId)
+                .subscribe({
+                    next: () => {
+                        for (let i = 0; i < this.resourceGroupList.length; i++) {
+                            if (this.resourceGroupList[i].id === resourceGroupId) {
+                                this.resourceGroupList.splice(i, 1);
+                                break;
+                            }
+                        }
+                        delete this.rgFormDict[resourceGroupId];
+                        delete this.episodeVideoFileStatus[resourceGroupId];
+                    },
+                    error: (error) => {
+                        this.toastRef.show(error.error?.message || 'Unknown error');
+                    }
+                })
+        );
+    }
+
+    /**
+     * Detects whether a periodic scan finished since the last status poll and,
+     * if so, reloads the resource group info. A scan completing is the moment
+     * new video files may have been created (resource scan) or downloads may
+     * have been started (video file scan).
+     */
+    private detectScanCompletion(): void {
+        let scanCompleted = false;
+
+        const resourceEnd = this.resourceScanStatus?.lastScanEndTime ?? null;
+        if (this.lastResourceScanEndTime !== null && resourceEnd !== null && resourceEnd !== this.lastResourceScanEndTime) {
+            scanCompleted = true;
+        }
+        this.lastResourceScanEndTime = resourceEnd;
+
+        const videoFileEnd = this.videoFileScanStatus?.lastScanEndTime ?? null;
+        if (this.lastVideoFileScanEndTime !== null && videoFileEnd !== null && videoFileEnd !== this.lastVideoFileScanEndTime) {
+            scanCompleted = true;
+        }
+        this.lastVideoFileScanEndTime = videoFileEnd;
+
+        if (scanCompleted) {
+            this.reloadResourceGroups();
+        }
+    }
+
+    /**
+     * Fetches the resource groups once and merges the latest video file statuses
+     * into the current view. Triggered by events (scan completion, download
+     * complete, video process finished) rather than on a fixed interval.
+     */
+    private reloadResourceGroups(): void {
+        if (this.pauseRefreshRG) {
+            return;
+        }
+        this.subscription.add(
+            this.adminService.listResourceGroups(this.bangumi.id, true)
                 .subscribe({
                     next: (resourceGroups: ResourceGroup[]) => {
                         for (const resourceGroup of resourceGroups) {
@@ -239,10 +385,8 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                                 }
                             }
                         }
-                        if (this.hasDownloadingVideoFiles) {
-                            this.refreshVideoJob();
-                            this.refreshDownloadJob();
-                        }
+                        // New downloads may have appeared; keep job progress live.
+                        this.ensureJobPolling();
                     },
                     error: (error) => {
                         this.toastRef.show(error.message);
@@ -319,53 +463,69 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         );
     }
 
-    refreshVideoJob(): void {
+    /**
+     * Polls download / video-process job lists while there is active work, so
+     * progress stays live. It also detects the moment a download completes or a
+     * video process finishes and reloads the resource group to reflect the new
+     * video file statuses. The loop self-stops once nothing is downloading.
+     */
+    private ensureJobPolling(): void {
+        if (this.jobPollingActive || !this.hasDownloadingVideoFiles) {
+            return;
+        }
+        this.jobPollingActive = true;
         this.subscription.add(
-            this.videoProcessManageService.listJobs('all', this.bangumi.id)
-                .pipe(repeat({delay: REFRESH_INTERVAL}))
+            timer(0, REFRESH_INTERVAL)
+                .pipe(
+                    takeWhile(() => this.hasDownloadingVideoFiles),
+                    switchMap(() => forkJoin([
+                        this.videoProcessManageService.listJobs('all', this.bangumi.id),
+                        this.downloadManagerService.list_jobs('all', this.bangumi.id)
+                    ])),
+                    finalize(() => { this.jobPollingActive = false; })
+                )
                 .subscribe({
-                    next: (videoProcessJobList) => {
-                        Object.values(this.episodeVideoFileStatus).forEach(epvfList => {
-                            epvfList.forEach(epvf => {
-                                epvf.videoFiles.forEach(vf => {
-                                    if (vf.status === VideoFile.STATUS_DOWNLOADING) {
-                                        const job = videoProcessJobList.find(vpJob => vpJob.jobMessage.videoId === vf.id);
-                                        if (job) {
-                                            vf.videoProcessJob = job;
-                                        }
-                                    }
-                                });
-                            });
-                        });
+                    next: ([videoProcessJobList, downloadJobList]) => {
+                        this.applyJobUpdates(videoProcessJobList, downloadJobList);
                     },
                     error: (error) => {
+                        this.jobPollingActive = false;
                         this.toastRef.show(error.message);
                     }
                 })
         );
     }
 
-    refreshDownloadJob(): void {
-        this.subscription.add(
-            this.downloadManagerService.list_jobs('all', this.bangumi.id)
-                .pipe(repeat({delay: REFRESH_INTERVAL}))
-                .subscribe({
-                    next: (downloadJobList) => {
-                        Object.values(this.episodeVideoFileStatus).forEach(epvfList => {
-                            epvfList.forEach(epvf => {
-                                epvf.videoFiles.forEach(vf => {
-                                    if (vf.status === VideoFile.STATUS_DOWNLOADING) {
-                                        vf.downloadJob = downloadJobList.find(downloadJob => downloadJob.videoId === vf.id || (downloadJob.fileMapping && downloadJob.fileMapping.some(mapping => mapping.videoId === vf.id)));
-                                    }
-                                });
-                            });
-                        });
-                    },
-                    error: (error) => {
-                        this.toastRef.show(error.message);
+    private applyJobUpdates(videoProcessJobList: VideoProcessJob[], downloadJobList: DownloadJob[]): void {
+        let shouldReload = false;
+        Object.values(this.episodeVideoFileStatus).forEach(epvfList => {
+            epvfList.forEach(epvf => {
+                epvf.videoFiles.forEach(vf => {
+                    if (vf.status !== VideoFile.STATUS_DOWNLOADING) {
+                        return;
                     }
-                })
-        );
+                    const videoProcessJob = videoProcessJobList.find(vpJob => vpJob.jobMessage.videoId === vf.id);
+                    if (videoProcessJob) {
+                        if (vf.videoProcessJob?.status !== VideoProcessJobStatus.Finished
+                            && videoProcessJob.status === VideoProcessJobStatus.Finished) {
+                            shouldReload = true;
+                        }
+                        vf.videoProcessJob = videoProcessJob;
+                    }
+                    const downloadJob = downloadJobList.find(dJob => dJob.videoId === vf.id || (dJob.fileMapping && dJob.fileMapping.some(mapping => mapping.videoId === vf.id)));
+                    if (downloadJob) {
+                        if (vf.downloadJob?.status !== DownloadJobStatus.Complete
+                            && downloadJob.status === DownloadJobStatus.Complete) {
+                            shouldReload = true;
+                        }
+                        vf.downloadJob = downloadJob;
+                    }
+                });
+            });
+        });
+        if (shouldReload) {
+            this.reloadResourceGroups();
+        }
     }
 
     viewEpisode(resourceGroup: ResourceGroup, episode: Episode): void {
