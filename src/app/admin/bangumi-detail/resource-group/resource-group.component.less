@@ -5,6 +5,12 @@
   margin: 1rem 1rem 10rem 1rem;
 }
 
+.delete-resource-group-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 .float-action-buttons {
   position: fixed;
   bottom: 3rem;
@@ -15,6 +21,31 @@
     font-size: 1.4rem;
     margin-left: 1rem;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.45);
+  }
+}
+
+.scanner-timing-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1rem 1rem 0 1rem;
+  font-size: 0.85rem;
+  color: #9aa0a6;
+
+  .scanner-timing {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  .time-to-next-scan {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scanner-timing.scanning .time-to-next-scan {
+    color: #6f7378;
   }
 }
 
@@ -139,6 +170,13 @@
 }
 
 :host.dark-theme {
+  .scanner-timing-container {
+    color: #7a7f85;
+
+    .scanner-timing.scanning .time-to-next-scan {
+      color: #a0a6ac;
+    }
+  }
   .scanner-item:hover {
     background: lighten(@darkPanelBg, 6%);
   }

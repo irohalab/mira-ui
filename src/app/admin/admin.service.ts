@@ -9,6 +9,7 @@ import { BangumiRaw } from '../entity/BangumiRaw';
 import { environment } from '../../environments/environment';
 import { ResourceGroup } from '../entity/ResourceGroup';
 import dayjs from 'dayjs';
+import { ScanStatusResponse } from '../entity/ScanStatusResponse';
 
 // This is the same with backend. It should be retrieved from backend, but we hardcode this for convenient.
 const DELETE_DELAY_MINUTES = 10;
@@ -22,6 +23,11 @@ export class AdminService extends BaseService {
 
     constructor(private http: HttpClient) {
         super();
+    }
+
+    getStatus(): Observable<ScanStatusResponse> {
+        return this.http.get<{data: ScanStatusResponse}>(`${baseUrl}/scan/status`)
+            .pipe(map(res => res.data), catchError(this.handleError));
     }
 
     queryBangumi(bgmId: number): Observable<MainItem> {
@@ -123,7 +129,7 @@ export class AdminService extends BaseService {
     }
 
     deleteResourceGroup(bangumiId: string, resourceGroupId: string): Observable<void> {
-        return this.http.delete<never>(`${baseUrl}/bangumi/${bangumiId}/${resourceGroupId}`).pipe(catchError(this.handleError));
+        return this.http.delete<never>(`${baseUrl}/bangumi/${bangumiId}/resource-group/${resourceGroupId}`).pipe(catchError(this.handleError));
     }
 
     getEpisode(episode_id: string): Observable<Episode> {

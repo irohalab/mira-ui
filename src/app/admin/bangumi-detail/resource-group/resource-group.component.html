@@ -1,3 +1,13 @@
+<div class="scanner-timing-container">
+  <div class="scanner-timing" [ngClass]="{scanning: resourceScanStatus?.isScanning}">
+    <span class="scanner-name">Resource Scanner Next Scan:</span>
+    <span class="time-to-next-scan">{{ resourceScanCountdown }}</span>
+  </div>
+  <div class="scanner-timing" [ngClass]="{scanning: videoFileScanStatus?.isScanning}">
+    <span class="scanner-name">VideoFile Scanner Next Scan:</span>
+    <span class="time-to-next-scan">{{ videoFileScanCountdown }}</span>
+  </div>
+</div>
 <div class="resource-group-container">
   @for (resourceGroup of resourceGroupList; track resourceGroup) {
     <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
@@ -13,6 +23,11 @@
           </div>
           <button type="submit" class="ui primary button" [disabled]="rgFormDict[resourceGroup.id].invalid || !rgFormDict[resourceGroup.id].dirty">Apply</button>
           <button type="button" class="ui button" [disabled]="!rgFormDict[resourceGroup.id].dirty" (click)="resetForm(resourceGroup)">Reset</button>
+          <button class="delete-resource-group-button ui red button"
+                  title="Delete"
+                  confirmDialog dialogTitle="Delete Resource Group"
+                  dialogContent="Do you want to delete this resource group? This will also delete all the video files along with it and cannot be undone."
+                  (onConfirm)="deleteResourceGroup(resourceGroup.id)">Delete</button>
         </div>
         <div class="ui divider"></div>
         <h4 class="ui header">Scanner</h4>
