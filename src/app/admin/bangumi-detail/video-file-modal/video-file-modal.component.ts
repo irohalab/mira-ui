@@ -150,7 +150,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
             duration: null,
             label: null,
             blobStorageUrlV0: '',
-            resourceGroupId: null,
+            resourceGroupId: this.resourceGroup.id,
         });
         this.videoFileList.unshift(videoFileFormGroup);
     }
