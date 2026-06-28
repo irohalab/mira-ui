@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
-import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, debounceTime, filter, map, switchMap, tap } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
 import { User } from '../entity';
-import { OAuthService } from 'angular-oauth2-oidc';
+import { OAuthInfoEvent, OAuthService } from 'angular-oauth2-oidc';
 import { AuthCodeFlowConfig } from '../authCodeFlow.config';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -20,6 +20,21 @@ const legacyBaseUrl = environment.legacyApiBaseURL;
 // so we keep the original one around to use as the logout hint.
 const ORIGINAL_ID_TOKEN_KEY = 'original_id_token';
 
+// Name of the Web Locks resource that serializes refresh-token rotation across
+// browser tabs. Only the tab holding this lock performs the network refresh;
+// other tabs wait and then reuse the rotated token from shared storage. This
+// prevents two tabs from presenting the same refresh token concurrently, which
+// Hydra treats as token reuse and punishes by revoking the entire token chain.
+const REFRESH_LOCK = 'mira_token_refresh';
+
+// Shared-storage marker holding the epoch-ms of the last successful refresh.
+// A tab that enters the lock and finds a refresh happened within
+// REFRESH_DEDUP_WINDOW_MS reuses the freshly rotated token instead of rotating
+// again. This is robust to timer skew between tabs, unlike comparing the
+// refresh-token value (which a staggered tab may capture post-rotation).
+const LAST_REFRESH_AT_KEY = 'mira_last_token_refresh_at';
+const REFRESH_DEDUP_WINDOW_MS = 10_000;
+
 @Injectable({
     providedIn: 'root'
 })
@@ -34,6 +49,10 @@ export class UserService extends BaseService {
     // Emits true once the initial OAuth discovery/login + user info resolution has completed.
     // Route guards wait for this before deciding, so a hard refresh doesn't wrongly bounce a logged-in user.
     private _userLoadedSubject = new BehaviorSubject<boolean>(false);
+
+    // Holds the in-flight refresh promise so concurrent callers within this tab
+    // share a single network refresh instead of each firing their own.
+    private refreshInFlight?: Promise<void>;
 
     constructor(
         private httpClient: HttpClient,
@@ -60,7 +79,24 @@ export class UserService extends BaseService {
                 this._userLoadedSubject.next(true);
             });
 
-        this.oAuthService.setupAutomaticSilentRefresh();
+        // Drive automatic refresh ourselves instead of setupAutomaticSilentRefresh().
+        // The library's built-in version calls refreshToken() directly, bypassing the
+        // cross-tab lock; routing the 'token_expires' trigger through refreshOnce()
+        // keeps every refresh coordinated. The expiration timers that emit this event
+        // are still armed by the library (configure() -> setupRefreshTimer(), re-armed
+        // on each 'token_received').
+        this.oAuthService.events
+            .pipe(
+                filter((e) => e.type === 'token_expires'
+                    && (e as OAuthInfoEvent).info === 'access_token'),
+                debounceTime(1000),
+            )
+            .subscribe(() => {
+                this.refreshOnce().catch((err) => {
+                    console.error('Automatic token refresh failed', err);
+                });
+            });
+
         this.oAuthService.events
             .pipe(tap(e => {
                 console.log('event', e);
@@ -126,7 +162,7 @@ export class UserService extends BaseService {
     async getUserInfo(): Promise<void> {
         try {
             if (!this.oAuthService.hasValidAccessToken() && this.oAuthService.getRefreshToken()) {
-                await this.oAuthService.refreshToken();
+                await this.refreshOnce();
             }
             if (!this.oAuthService.hasValidAccessToken()) {
                 return;
@@ -138,6 +174,51 @@ export class UserService extends BaseService {
         } catch (ex) {
             console.log(ex);
         }
+    }
+
+    // Single-flight wrapper: collapses concurrent refresh requests in this tab
+    // into one shared promise, and delegates the actual rotation to the
+    // cross-tab-coordinated path below.
+    private refreshOnce(): Promise<void> {
+        this.refreshInFlight ??= this.coordinatedRefresh()
+            .finally(() => { this.refreshInFlight = undefined; });
+        return this.refreshInFlight;
+    }
+
+    // Performs the refresh under a cross-tab Web Lock so only one tab rotates the
+    // refresh token at a time. Inside the lock we re-check a shared timestamp: if
+    // another tab refreshed within the dedup window, the rotated token is already
+    // in shared storage, so we reuse it rather than spend the now-stale token.
+    private async coordinatedRefresh(): Promise<void> {
+        if (this.supportsWebLocks()) {
+            await navigator.locks.request(REFRESH_LOCK, () => this.refreshIfStale());
+            return;
+        }
+        // Fallback for browsers without the Web Locks API: best-effort
+        // single-flight within this tab only (provided by refreshOnce()).
+        await this.refreshIfStale();
+    }
+
+    // The critical section: must run while holding the lock. Reads the shared
+    // "last refresh" marker and only hits the network when no other tab has
+    // produced a fresh token within the dedup window.
+    private async refreshIfStale(): Promise<void> {
+        const lastRefreshAt = Number(storageAPI.getItem(LAST_REFRESH_AT_KEY) ?? '0');
+        const refreshedRecently = Date.now() - lastRefreshAt < REFRESH_DEDUP_WINDOW_MS;
+        if (refreshedRecently && this.oAuthService.hasValidAccessToken()) {
+            // Another tab just rotated the token; its result is already in shared
+            // storage. Reuse it instead of rotating again.
+            return;
+        }
+        await this.oAuthService.refreshToken();
+        storageAPI.setItem(LAST_REFRESH_AT_KEY, String(Date.now()));
+    }
+
+    private supportsWebLocks(): boolean {
+        return typeof navigator !== 'undefined'
+            && 'locks' in navigator
+            && !!navigator.locks
+            && typeof navigator.locks.request === 'function';
     }
 
     loginAlbireoAccount(name: string, password: string): Observable<boolean> {
