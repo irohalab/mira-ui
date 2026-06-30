@@ -200,26 +200,15 @@ export class AdminService extends BaseService {
         }).pipe(catchError(this.handleError),);
     }
 
-    syncEpisodes(bangumiId: string, bgmId: number): Observable<{
-        data: {
-            new_episodes?: Episode[],
-            removed_episodes?: Episode[],
-            updated_episodes?: Episode[]
-        },
-        msg?: string,
-        status?: number
+    syncEpisodes(bangumiId: string): Observable<{
+        newEpisodes: Episode[],
+        updatedEpisodes: Episode[],
+        removableEpisodes: Episode[]
     }> {
         return this.http.post<{
-            data: {
-                new_episodes?: Episode[],
-                removed_episodes?: Episode[],
-                updated_episodes?: Episode[]
-            },
-            msg?: string,
-            status?: number
-        }>(`${baseUrl}/sync-episodes`, {
-            bangumi_id: bangumiId,
-            bgm_id: bgmId
-        }).pipe(catchError(this.handleError),);
+            newEpisodes: Episode[],
+            updatedEpisodes: Episode[],
+            removableEpisodes: Episode[]
+        }>(`${baseUrl}/bangumi/${bangumiId}/sync-episodes`, null).pipe(catchError(this.handleError),);
     }
 }
