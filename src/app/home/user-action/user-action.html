@@ -1,6 +1,15 @@
-<div class="user-action" #userActionLink>
+@if (user.role === User.ID_INITIAL_USER) {
+  <div class="loading-tip">
+    <div class="ui placeholder">
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+  </div>
+} @else {
+  <div class="user-action" #userActionLink>
     <div class="text">
-        {{user?.name}}
+      {{user?.name}}
     </div>
     <i class="dropdown icon"></i>
-</div>
+  </div>
+}

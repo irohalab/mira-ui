@@ -60,4 +60,6 @@ export class UserActionComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
+
+    protected readonly User = User;
 }
