@@ -113,6 +113,8 @@ export class MyBangumiComponent implements OnInit, OnDestroy {
                         limit: -1,
                         countUnwatched: true,
                         enableEpsUpdateTime: true,
+                        orderBy: 'updateTime',
+                        sort: 'desc',
                         coverImage: false
                     });
                 })

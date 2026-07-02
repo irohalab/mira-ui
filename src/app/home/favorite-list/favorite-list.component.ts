@@ -53,7 +53,7 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
     sortFieldLabel: {[k: string]: string} = {
         'updateTime': '按我修改的时间',
         'eps_update_time': '按最近更新的时间',
-        'airDate': '按开播时间'
+        // 'bangumi.airDate': '按开播时间'
     };
 
     cardHeight: number;
@@ -212,6 +212,8 @@ export class FavoriteListComponent implements OnInit, OnDestroy {
                         limit: -1,
                         countUnwatched: false,
                         enableEpsUpdateTime: true,
+                        orderBy: this.orderBy,
+                        sort: this.sort,
                         coverImage: true
                     });
                 }))
