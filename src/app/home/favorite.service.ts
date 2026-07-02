@@ -60,6 +60,8 @@ export class FavoriteService {
         limit: number,
         countUnwatched: boolean,
         enableEpsUpdateTime: boolean,
+        orderBy: string,
+        sort: string,
         coverImage: boolean}): Observable<{data: Favorite[], total: number}> {
         return this.http.get<{data: Favorite[], total: number}>(baseUrl, {
             params
