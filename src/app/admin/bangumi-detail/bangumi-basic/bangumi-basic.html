@@ -27,16 +27,16 @@
     </div>
     <div class="field">
       <label>维护者</label>
-      <select formControlName="maintained_by_uid" name="maintained_by_uid">
+      <select formControlName="maintainedByUid" name="maintainedByUid">
         <option value="">System</option>
         @for (user of adminList; track user) {
-          <option [value]="user.id">{{user.nickName}}</option>
+          <option [value]="user.uid">{{user.nickName}}</option>
         }
       </select>
     </div>
     <div class="field">
       <label>报警超时值（当超过某个episode airdate若干天之后发送报警给维护者）</label>
-      <input type="number" formControlName="alert_timeout" name="alert_timeout">
+      <input type="number" formControlName="alertTimeout" name="alertTimeout">
     </div>
   </div>
   <div class="footer">

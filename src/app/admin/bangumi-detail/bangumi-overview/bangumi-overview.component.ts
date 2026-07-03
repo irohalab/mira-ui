@@ -90,8 +90,11 @@ export class BangumiOverviewComponent implements OnInit, OnDestroy {
                         this.isLoading = true;
                         this.bangumi.eps_no_offset = basicInfo.eps_no_offset as number;
                         this.bangumi.status = basicInfo.status as number;
-                        this.bangumi.maintained_by = this.adminList.find(account => account.uid == basicInfo.maintained_by_uid);
-                        this.bangumi.alert_timeout = basicInfo.alert_timeout as number;
+                        this.bangumi.maintainedByUid = basicInfo.maintainedByUid;
+                        if (basicInfo.maintainedByUid && this.adminList.length > 0) {
+                            this.bangumi.maintainedBy = this.adminList.find(user => user.uid === basicInfo.maintainedByUid);
+                        }
+                        this.bangumi.alertTimeout = basicInfo.alertTimeout as number;
                         return this.adminService.updateBangumi(this.bangumi);
                     }
                 ),)

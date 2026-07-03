@@ -30,6 +30,7 @@ export class BangumiBasic implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        console.log('adminList', this.adminList);
         this._subscription.add(
             this._darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
@@ -37,8 +38,8 @@ export class BangumiBasic implements OnInit, OnDestroy {
         this.bangumiForm = this._fb.group({
             eps_no_offset: this.bangumi.eps_no_offset,
             status: this.bangumi.status,
-            maintained_by_uid: this.bangumi.maintained_by ? this.bangumi.maintained_by.id: '',
-            alert_timeout: this.bangumi.alert_timeout
+            maintainedByUid: this.bangumi.maintainedByUid || '',
+            alertTimeout: this.bangumi.alertTimeout
         });
     }
 

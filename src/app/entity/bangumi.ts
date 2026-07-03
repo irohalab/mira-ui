@@ -49,14 +49,14 @@ export class Bangumi {
     coverImage!: Image | null;
 
     // @Optional
-    created_by!: Account;
+    createdBy!: Account;
 
     // @Optional
-    maintained_by!: Account;
-    maintained_by_uid!: string;
+    maintainedBy!: Account;
+    maintainedByUid!: string;
 
     // @Optional
-    alert_timeout!: number;
+    alertTimeout!: number;
 
     static WISH = 1;
     static WATCHED = 2;

@@ -44,6 +44,7 @@ export class UserService extends BaseService {
         User.ID_INITIAL_USER,
         null,
         null,
+        null,
         false));
 
     // Emits true once the initial OAuth discovery/login + user info resolution has completed.
@@ -152,8 +153,8 @@ export class UserService extends BaseService {
         this._userInfoSubject.next(null);
     }
 
-    activateAccount(invitation: string): Observable<Account> {
-        return this.httpClient.post<Account>(baseUrl, {invitation})
+    activateAccount(account: {invitation: string, nickName: string, email: string}): Observable<Account> {
+        return this.httpClient.post<Account>(baseUrl, account)
             .pipe(tap((account) => {
                 this.updateUser(this._userInfoSubject.getValue(), account);
             }))
@@ -255,7 +256,7 @@ export class UserService extends BaseService {
             userProfile.sub,
             userProfile.name,
             account.role ? account.role : User.GUEST_ROLE,
-            // userProfile.email,
+            userProfile.email,
             userProfile.email_verified,));
     }
 }
