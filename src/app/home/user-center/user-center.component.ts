@@ -75,7 +75,11 @@ export class UserCenter implements OnInit, OnDestroy {
         if (this.invitationCode.valid) {
             this.isSubmitting = true;
             this.subscription.add(
-                this.userService.activateAccount(this.invitationCode.value.trim())
+                this.userService.activateAccount({
+                    nickName: this.user.name,
+                    invitation: this.invitationCode.value.trim(),
+                    email: this.user.email
+                })
                     .subscribe({
                         next: () => {
                             this.isSubmitting = false;
