@@ -51,6 +51,7 @@
         @for (bangumi of bangumiList; track bangumi) {
           <bangumi-card
             [bangumi]="bangumi"
+            [isInit]="true"
             [showAddedTag]="false"
             (click)="editBangumi(bangumi)">
           </bangumi-card>
