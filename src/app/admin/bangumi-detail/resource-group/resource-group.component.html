@@ -62,13 +62,22 @@
         <div class="episode-list">
           <div class="video-file-status-header">
             <h4 class="ui header">Video File Status</h4>
-            <button type="button" class="ui small button reconcile-button"
-              [disabled]="!hasDownloadingVideoFilesInGroup(resourceGroup.id) || reconcileLoadingState[resourceGroup.id]"
-              [ngClass]="{loading: reconcileLoadingState[resourceGroup.id]}"
-              (click)="reconcileResourceGroup(resourceGroup)"
-              title="Reconcile downloading video files">
-              <i class="sync icon"></i>Reconcile
-            </button>
+            <div class="reconcile-actions">
+              <button type="button" class="ui small button reconcile-button"
+                [disabled]="!hasDownloadingVideoFilesInGroup(resourceGroup.id) || reconcileLoadingState[resourceGroup.id]"
+                [ngClass]="{loading: reconcileLoadingState[resourceGroup.id]}"
+                (click)="reconcileResourceGroup(resourceGroup)">
+                <i class="sync icon"></i>Reconcile
+              </button>
+              <a class="reconcile-help" role="button" tabindex="0"
+                ui-popover
+                popover="ui-basic"
+                trigger="click"
+                placement="top-end"
+                [popoverProp]="reconcileHelpPopover">
+                <i class="question circle outline icon"></i>
+              </a>
+            </div>
           </div>
           <ul class="notice">
             <li><span class="ui grey horizontal tiny label">&nbsp;</span> = Pending</li>

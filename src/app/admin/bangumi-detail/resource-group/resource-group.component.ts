@@ -3,7 +3,7 @@ import { Bangumi, Episode } from '../../../entity';
 import { ResourceGroup } from '../../../entity/ResourceGroup';
 import { EMPTY, forkJoin, of, Subscription, timer } from 'rxjs';
 import { AdminService } from '../../admin.service';
-import { UIDialog, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
+import { UIDialog, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService, UIPopoverModule } from '@irohalab/deneb-ui';
 import { ResourceScannerEditor } from '../resource-scanner-editor/resource-scanner-editor.component';
 import { FeedService } from '../feed.service';
 import { ResourceScanner } from '../../../entity/ResourceScanner';
@@ -38,7 +38,7 @@ interface EpisodeVideoFileStatus {
     selector: 'app-resource-group',
     templateUrl: './resource-group.component.html',
     styleUrl: './resource-group.component.less',
-    imports: [FormsModule, ReactiveFormsModule, NgClass, ConfirmDialogDirective]
+    imports: [FormsModule, ReactiveFormsModule, NgClass, ConfirmDialogDirective, UIPopoverModule]
 })
 export class ResourceGroupComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
@@ -54,6 +54,14 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     };
 
     eDefaultRgId = 'DEFAULT_RG_ID';
+
+    reconcileHelpPopover = {
+        title: 'Reconcile',
+        content: 'Use this only when a video has finished processing but its video file status has not been updated. ' +
+            'It asks the video manager to resend the completion message so the status can be reconciled.',
+        triggeredBy: 'click',
+        clickToClose: true
+    };
 
     @Input()
     bangumi!: Bangumi;
