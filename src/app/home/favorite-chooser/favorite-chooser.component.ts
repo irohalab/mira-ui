@@ -1,20 +1,18 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
-import { forkJoin, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Bangumi } from '../../entity';
 import { BANGUMI_TYPE, FAVORITE_LABEL } from '../../entity/constants';
 import { EditReviewDialogComponent } from '../rating/edit-review-dialog/edit-review-dialog.component';
-import { FavoriteStatus, isStatusEqual } from '../../entity/FavoriteStatus';
+import { FavoriteStatus } from '../../entity/FavoriteStatus';
 import { FavoriteService } from '../favorite.service';
 import { Favorite } from '../../entity/Favorite';
-import { DefaultMira, Favorite as ExternalFavorite, SubItem, SubItemFavorite } from '@irohalab/mira-sdk-angular';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { filter, switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { extractErrorMessage } from '../../../helpers/http-error-helper';
 import { NgClass } from '@angular/common';
 import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.directive';
 import { MyReviewComponent } from '../rating/my-review/my-review.component';
-import EpisodeTypeEnum = SubItem.EpisodeTypeEnum;
 
 @Component({
     selector: 'favorite-chooser',
@@ -45,7 +43,6 @@ export class FavoriteChooser implements OnInit, OnDestroy {
     constructor(private dialog: UIDialog,
                 private darkThemeService: DarkThemeService,
                 private favoriteService: FavoriteService,
-                private miraApiService: DefaultMira,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
     }
@@ -103,46 +100,6 @@ export class FavoriteChooser implements OnInit, OnDestroy {
                     this.isDarkTheme = theme === DARK_THEME;
                 })
         );
-        const favorite = this.bangumi.favorite;
-        this.isOnSynchronizing = true;
-        let favoriteInput = favorite?.externalFavoriteId ?
-            this.miraApiService.getFavoriteById(favorite.externalFavoriteId).pipe(map(res => {
-                return res.data;
-            })) : this.miraApiService.getFavoriteByMainItemId(this.bangumi.itemId);
-        this.subscription.add(
-            forkJoin([
-                favoriteInput,
-                this.miraApiService.listSubItemFavorites(this.bangumi.itemId, null, null, null, null, true)
-                    .pipe(map(res => res.data)),
-            ])
-            .subscribe({
-                next: ([fav, subItemFavoriteList]) => {
-                    if (favorite) {
-                        favorite.externalFavoriteId = fav.id;
-                        favorite.rating = fav.rating;
-                        favorite.reviewComment = fav.reviewComment;
-                        this.bangumi.favorite = {...favorite};
-                        this.resolveConflictAndUpdateFavorite(fav, subItemFavoriteList, this.bangumi);
-                    } else {
-                        // conflict occurred.
-                        this.resolveConflictAndUpdateFavorite(fav, subItemFavoriteList, this.bangumi);
-                    }
-                },
-                error: (err: HttpErrorResponse) => {
-                    if (err.status === 404) {
-                        if (favorite) {
-                            // conflict occurred.
-                            this.isOnSynchronizing = true;
-                            this.resolveConflictAndUpdateFavorite(null, [], this.bangumi);
-                            return;
-                        }
-                    } else {
-                        this._toastRef.show(extractErrorMessage(err));
-                    }
-                    this.isOnSynchronizing = false;
-                }
-            })
-        );
         this.subscription.add(
             this.favoriteService.favoriteChanged
                 .subscribe(event => {
@@ -160,23 +117,5 @@ export class FavoriteChooser implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
-    }
-
-    resolveConflictAndUpdateFavorite(fav: ExternalFavorite, subItemFavoriteList: SubItemFavorite[], bangumi: Bangumi) {
-        this.subscription.add(this.favoriteService.resolveConflict(fav, subItemFavoriteList, bangumi)
-            .subscribe({
-                next: (needReloadEpisode) => {
-                    this.bangumi.favorite = {...this.bangumi.favorite};
-                    if (needReloadEpisode) {
-                        this.reloadEpisodes.next(true);
-                    }
-                },
-                error: (err: HttpErrorResponse) => {
-                    this._toastRef.show(extractErrorMessage(err));
-                },
-                complete: () => {
-                    this.isOnSynchronizing = false;
-                }
-            }));
     }
 }
