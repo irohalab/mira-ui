@@ -92,8 +92,29 @@
     align-items: center;
     justify-content: space-between;
 
+    .reconcile-actions {
+      display: flex;
+      align-items: center;
+    }
+
     .reconcile-button {
       margin: 0;
+    }
+
+    .reconcile-help {
+      display: inline-flex;
+      align-items: center;
+      margin-left: .5rem;
+      cursor: pointer;
+      color: rgba(0, 0, 0, .4);
+
+      &:hover {
+        color: rgba(0, 0, 0, .7);
+      }
+
+      .icon {
+        margin: 0;
+      }
     }
   }
 
