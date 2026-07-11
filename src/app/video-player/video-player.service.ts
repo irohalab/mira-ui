@@ -58,22 +58,6 @@ export class VideoPlayerService {
         return this._onScrolling.asObservable();
     }
 
-    /**
-     * Current watching Episode watch status changed. (only emits when WATCHING and WATCHED)
-     * @type {Subject<Episode>}
-     */
-    get onWatchStatusChanges(): Observable<Episode> {
-        return this._watchStatusChanges.asObservable();
-    }
-
-    /**
-     * Current watching bangumi status changed. (only emits when changed to WATCHED)
-     * @type {Subject<Bangumi>}
-     */
-    get onBangumiFavoriteChange(): Observable<Bangumi> {
-        return this._bangumiFavoriteChanges.asObservable();
-    }
-
     get onPlayNextEpisode(): Observable<string> {
         return this._playNextEpisode.asObservable();
     }
@@ -346,7 +330,7 @@ export class VideoPlayerService {
                         this._episode.watchProgress.bangumi = this._bangumi;
                         this._episode.watchProgress.episode = this._episode;
                         this._episode.watchProgress.watchStatus = WatchProgress.WATCHING;
-                        this._watchStatusChanges.next(Object.assign({}, this._episode));
+                        this._watchService.watchProgressChanged.emit(Object.assign({}, this._episode.watchProgress));
                     } else if (this._episode.watchProgress.watchStatus === WatchProgress.WATCHED) {
                         isFinished = true;
                     }
@@ -355,7 +339,6 @@ export class VideoPlayerService {
                     if (this._episode.watchProgress.watchStatus !== WatchProgress.WATCHED
                         && isFinished) {
                         this._episode.watchProgress.watchStatus = WatchProgress.WATCHED;
-                        this._watchStatusChanges.next(Object.assign({}, this._episode));
                     }
                     return {
                         position: position,
@@ -366,36 +349,6 @@ export class VideoPlayerService {
                 throttleTime(1000))
                 .subscribe(({position, percentage, isFinished}) => {
                     this._watchService.updateWatchProgress(this._bangumi.id, this._episode.id, position, percentage, isFinished);
-                })
-        );
-
-        this._videoPlayerSubscription.add(
-            this.onWatchStatusChanges.pipe(
-                tap(episode => {
-                    const episodeOfBangumi = this._bangumi.episodes.find(e => e.id === this._episode.id);
-                    episodeOfBangumi.watchProgress = episode.watchProgress;
-                }),
-                filter(episode => {
-                    let isBangumiWatched = this._bangumi.favorite && this._bangumi.favorite.status === FavoriteStatus.WATCHED;
-                    return episode.watchProgress.watchStatus === WatchProgress.WATCHED
-                        && !isBangumiWatched;
-                }))
-                .subscribe(() => {
-                    const allWatched = this._bangumi.episodes
-                        .every(episode => {
-                            return episode.watchProgress
-                                && episode.watchProgress.watchStatus === WatchProgress.WATCHED;
-                        });
-
-                    if (allWatched) {
-                        let favorite = this._bangumi.favorite;
-                        if (!favorite) {
-                            favorite = new Favorite();
-                        }
-                        favorite.status = FavoriteStatus.WATCHED;
-                        this._bangumi.favorite = favorite;
-                        this._bangumiFavoriteChanges.next(Object.assign({}, this._bangumi));
-                    }
                 })
         );
 

@@ -1,11 +1,14 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
 import { PersistStorage } from '../user-service';
 import { WatchProgress } from '../entity/watch-progress';
 import { environment } from '../../environments/environment';
+import { Favorite } from '../entity/Favorite';
+import { FavoriteService } from './favorite.service';
+import { Bangumi, Episode } from '../entity';
 
 export const PREFIX = 'watch_history';
 
@@ -29,11 +32,17 @@ const baseUrl = `${environment.resourceProvider}/episode`;
 })
 export class WatchService extends BaseService {
 
-    constructor(private http: HttpClient, private _persistStorage: PersistStorage) {
+    constructor(private http: HttpClient, private _persistStorage: PersistStorage,
+                private favoriteService: FavoriteService) {
         super();
         this.synchronizeWatchProgress();
         this.runPeriodTask();
     }
+
+    /**
+     * WatchProgress can be non-persistent temporary object.
+     */
+    watchProgressChanged: EventEmitter<WatchProgress> = new EventEmitter<WatchProgress>();
 
     updateEpisodeWatchStatus(bangumiId: string, episodeId: string, watchStatus: number): Observable<WatchProgress> {
         return this.http.post<any>(`${baseUrl}/watch`, {
@@ -41,6 +50,9 @@ export class WatchService extends BaseService {
             episode: {id: episodeId},
             watchStatus,
         }).pipe(
+            tap((watchProgress: WatchProgress) => {
+                this.watchProgressChanged.emit(watchProgress);
+            }),
             catchError(this.handleError),);
     }
 
@@ -54,7 +66,7 @@ export class WatchService extends BaseService {
     }
 
     updateWatchProgress(bangumiId: string, episodeId: string, lastWatchPosition: number, percentage: number, isFinished: boolean): void {
-        this._persistStorage.setItem(`${PREFIX}:${episodeId}`, JSON.stringify({
+        const watchHistoryRecord: WatchHistoryRecord = {
             bangumiId: bangumiId,
             episodeId: episodeId,
             lastWatchPosition: lastWatchPosition,
@@ -62,7 +74,18 @@ export class WatchService extends BaseService {
             isFinished: isFinished,
             percentage: percentage,
             version: WATCH_HISTORY_RECORD_VERSION
-        }));
+        };
+        const wp = new WatchProgress();
+        wp.watchStatus = isFinished ? WatchProgress.WATCHED : WatchProgress.WATCHING;
+        wp.bangumi = {id: bangumiId} as Bangumi;
+        wp.episode = {id: episodeId} as Episode;
+        wp.bangumi_id = bangumiId;
+        wp.episode_id = episodeId;
+        wp.lastWatchPosition = lastWatchPosition;
+        wp.lastWatchTime = watchHistoryRecord.lastWatchTime;
+        wp.percentage = percentage;
+        this.watchProgressChanged.emit(wp);
+        this._persistStorage.setItem(`${PREFIX}:${episodeId}`, JSON.stringify(watchHistoryRecord));
     }
 
     getLocalWatchHistory(episode_id: string): WatchHistoryRecord | null {
@@ -88,12 +111,21 @@ export class WatchService extends BaseService {
         if (watchHistoryRecords.length === 0) {
             return;
         }
-        this.http.post<any>(`${baseUrl}/watch/sync`, {
+        this.http.post<{changedFavorites: Favorite[]}>(`${baseUrl}/watch/sync`, {
             records: watchHistoryRecords
         }).pipe(
             catchError(this.handleError),)
             .subscribe({
-                next: () => {
+                next: ({changedFavorites}) => {
+                    if (changedFavorites.length > 0) {
+                        for (const favorite of changedFavorites) {
+                            this.favoriteService.favoriteChanged.emit({
+                                id: this.favoriteService.getEventId(),
+                                op: 'change',
+                                favorite: favorite
+                            });
+                        }
+                    }
                     watchHistoryRecords.forEach(record => {
                         let key = `${PREFIX}:${record.episodeId}`;
                         let recordInStorageStr = this._persistStorage.getItem(key, null);

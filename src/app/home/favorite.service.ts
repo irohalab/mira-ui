@@ -9,6 +9,7 @@ import { VideoPlayerService } from '../video-player/video-player.service';
 import { environment } from '../../environments/environment';
 
 export type FavoriteChangeEvent = {
+    id: number;
     op: 'change' | 'remove';
     favorite: Partial<Favorite> | Favorite;
 };
@@ -19,16 +20,18 @@ const baseUrl = `${environment.resourceProvider}/favorite`;
     providedIn: 'root'
 })
 export class FavoriteService {
-    constructor(private http: HttpClient,
-                videoPlayerService: VideoPlayerService,) {
-        videoPlayerService.onBangumiFavoriteChange
-            .subscribe((bangumi) => {
-                this.changeFavorite(bangumi.favorite.status, bangumi.favorite.id, bangumi).subscribe((favorite) => {console.log(favorite)});
-            });
+    constructor(private http: HttpClient,) {
     }
 
     favoriteChecked: EventEmitter<{bangumi_id: string, check_time: string}> = new EventEmitter<{bangumi_id: string, check_time: string}>();
     favoriteChanged: EventEmitter<FavoriteChangeEvent> = new EventEmitter<FavoriteChangeEvent>();
+
+    /**
+     * Generate a random id, should be only used for scenario with no penalty for collision.
+     */
+    getEventId(): number {
+        return Math.random() * 100000;
+    }
 
     checkFavorite(bangumi_id: string) {
         this.http.post<any>(`${baseUrl}/check/${bangumi_id}`, null)
@@ -51,19 +54,20 @@ export class FavoriteService {
         });
     }
 
-    addOrUpdateFavorite(changePayload: {bangumiId: string, status: FavoriteStatus, review: string, rating: number, syncToUpstream: boolean}, bangumi: Bangumi) {
+    addOrUpdateFavorite(changePayload: {bangumiId: string, status: FavoriteStatus, review: string, rating: number, syncToUpstream: boolean}, bangumi: Bangumi, eventId?: number) {
         return this.http.post<Favorite>(baseUrl, changePayload)
             .pipe(tap((fav: Favorite) => {
                 fav.bangumi = Object.assign({}, bangumi);
-                fav.bangumi.favorite = null;
+                delete fav.bangumi.favorite;
                 this.favoriteChanged.emit({
+                    id: eventId ? eventId : this.getEventId(),
                     op: 'change',
                     favorite: fav
                 })
             }));
     }
 
-    changeFavorite(status: string, favoriteId: string, bangumi: Bangumi): Observable<any> {
+    changeFavorite(status: string, favoriteId: string, bangumi: Bangumi, eventId?: number): Observable<any> {
         return this.http.put<any>(`${baseUrl}/${favoriteId}`, null, {
             params: {
                 status,
@@ -73,16 +77,18 @@ export class FavoriteService {
             .pipe(tap((fav: Favorite) => {
                 fav.bangumi = bangumi;
                 this.favoriteChanged.emit({
+                    id: eventId ? eventId : this.getEventId(),
                     op: 'change',
                     favorite: fav
                 });
             }));
     }
 
-    deleteFavorite(favoriteId: string): Observable<any> {
+    deleteFavorite(favoriteId: string, eventId?: number): Observable<any> {
         return this.http.delete<any>(`${baseUrl}/${favoriteId}`)
             .pipe(tap(() => {
                 this.favoriteChanged.emit({
+                    id: eventId ? eventId : this.getEventId(),
                     op: 'remove',
                     favorite: {id: favoriteId}
                 });

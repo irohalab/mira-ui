@@ -52,14 +52,14 @@ export class MyBangumiComponent implements OnInit, OnDestroy {
                 })
         );
         this.subscription.add(
-            this.videoPlayerService.onWatchStatusChanges
-                .pipe(filter(episode => {
-                    return episode.watchProgress
-                        && (episode.watchProgress.watchStatus === WatchProgress.WATCHED
-                            || episode.watchProgress.watchStatus === WatchProgress.WATCHING);
+            this.watchService.watchProgressChanged
+                .pipe(filter(watchProgress => {
+                    return watchProgress
+                        && (watchProgress.watchStatus === WatchProgress.WATCHED
+                            || watchProgress.watchStatus === WatchProgress.WATCHING);
                 }))
-                .subscribe(episode => {
-                    let bangumi = this.favoriteList.find(bangumi => bangumi.id === episode.bangumi.id);
+                .subscribe(watchProgress => {
+                    let bangumi = this.favoriteList.find(bangumi => bangumi.id === watchProgress.bangumi.id);
                     if (bangumi && bangumi.unwatchedCount > 0) {
                         bangumi.unwatchedCount--;
                     }
@@ -82,6 +82,7 @@ export class MyBangumiComponent implements OnInit, OnDestroy {
                             }
                         }
                     } else if (event.op === 'change') {
+                        console.log(event.favorite);
                         const favorite = event.favorite as Favorite;
                         let found = false;
                         for (let i = 0; i < this.favoriteList.length; i++) {
