@@ -22,7 +22,7 @@
             </div>
           </div>
           <div class="account-name">{{tabSelect === 'Sent' ? message.sender?.nickName : message.recipient?.nickName || 'System'}}</div>
-          <div class="message-snip">{{message.content}}</div>
+          <div class="message-snip">{{message | messageContent:'text'}}</div>
           <div class="date-time">{{message.createdTime}}</div>
         </div>
       }
@@ -36,8 +36,7 @@
         <div class="date-time">
           {{selectedMessage.createdTime}}
         </div>
-        <div class="message-content">
-          {{selectedMessage.content}}
+        <div class="message-content" [innerHTML]="selectedMessage | messageContent">
         </div>
         <div class="message-actions">
           <!--                <button class="ui basic labeled icon button" (click)="markAsRead(true)"><i class="envelope open icon"></i>Done</button>-->

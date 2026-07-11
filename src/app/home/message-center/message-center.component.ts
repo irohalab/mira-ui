@@ -6,12 +6,13 @@ import { switchMap } from 'rxjs/operators';
 import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MessageContentPipe } from '../../pipes/message-content.pipe';
 
 @Component({
     selector: 'app-message-center',
     templateUrl: './message-center.component.html',
     styleUrl: './message-center.component.less',
-    imports: [NgClass, FormsModule]
+    imports: [NgClass, FormsModule, MessageContentPipe]
 })
 export class MessageCenterComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();

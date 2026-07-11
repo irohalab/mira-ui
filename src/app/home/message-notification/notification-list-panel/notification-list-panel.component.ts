@@ -6,12 +6,13 @@ import { filter, skip } from 'rxjs/operators';
 import { closest } from '../../../../helpers/dom';
 import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { MessageContentPipe } from '../../../pipes/message-content.pipe';
 
 @Component({
     selector: 'app-notification-list-panel',
     templateUrl: './notification-list-panel.component.html',
     styleUrl: './notification-list-panel.component.less',
-    imports: [RouterLink, NgClass]
+    imports: [RouterLink, NgClass, MessageContentPipe]
 })
 export class NotificationListPanelComponent extends UIPopoverContent implements AfterViewInit, OnInit, OnDestroy {
     private subscription = new Subscription();

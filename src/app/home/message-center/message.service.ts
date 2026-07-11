@@ -33,7 +33,7 @@ export class MessageService extends BaseService {
     }
 
     markAsRead(messageIdList: string[]): Observable<void> {
-        return this.http.post<never>(`${baseUrl}/read`, messageIdList)
+        return this.http.put<never>(`${baseUrl}/read`, messageIdList)
             .pipe(catchError(this.handleError));
     }
 
