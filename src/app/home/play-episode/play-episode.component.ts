@@ -21,6 +21,7 @@ import { FavoriteChooser } from '../favorite-chooser/favorite-chooser.component'
 import { RevealExtraComponent } from './reveal-extra/reveal-extra.component';
 import { CommentComponent } from './comment/comment.component';
 import { Home } from '../home.component';
+import { WatchService } from '../watch.service';
 
 export const MIN_WATCHED_PERCENTAGE = 0.95;
 
@@ -95,6 +96,7 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
                 private videoPlayerService: VideoPlayerService,
                 private persistStorage: PersistStorage,
                 private darkThemeService: DarkThemeService,
+                private watchService: WatchService,
                 toast: UIToast) {
         super(homeService);
         this._toastRef = toast.makeText();
@@ -200,6 +202,22 @@ export class PlayEpisode extends HomeChild implements OnInit, OnDestroy, AfterVi
                             this.videoPlayerContainer, this.episode, this.episode.bangumi, this.nextEpisode, this.currentVideoFile);
                     },
                     error: error => console.log(error)
+                })
+        );
+
+        this._subscription.add(
+            this.watchService.watchProgressChanged
+                .pipe(filter(wp => wp.bangumi.id === this.episode.bangumi.id))
+                .subscribe((wp) => {
+                    const episode = this.episode.bangumi.episodes.find(episode => episode.id === wp.episode.id);
+                    if (episode.watchProgress) {
+                        episode.watchProgress.watchStatus = wp.watchStatus;
+                        episode.watchProgress.lastWatchPosition = wp.lastWatchPosition;
+                        episode.watchProgress.lastWatchTime = wp.lastWatchTime;
+                        episode.watchProgress.percentage = wp.percentage;
+                    } else {
+                        episode.watchProgress = wp;
+                    }
                 })
         );
 

@@ -7,7 +7,7 @@ import { EditReviewDialogComponent } from '../rating/edit-review-dialog/edit-rev
 import { FavoriteStatus } from '../../entity/FavoriteStatus';
 import { FavoriteService } from '../favorite.service';
 import { Favorite } from '../../entity/Favorite';
-import { filter, switchMap } from 'rxjs/operators';
+import { filter, switchMap, tap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { extractErrorMessage } from '../../../helpers/http-error-helper';
 import { NgClass } from '@angular/common';
@@ -40,6 +40,8 @@ export class FavoriteChooser implements OnInit, OnDestroy {
     isOnSynchronizing: boolean;
     isDarkTheme: boolean;
 
+    lastEventId!: number;
+
     constructor(private dialog: UIDialog,
                 private darkThemeService: DarkThemeService,
                 private favoriteService: FavoriteService,
@@ -54,13 +56,14 @@ export class FavoriteChooser implements OnInit, OnDestroy {
             filter(result => !!result),
             switchMap((result: { status: FavoriteStatus, rating: number, reviewComment: string }) => {
                 this.isOnSynchronizing = true;
+                this.lastEventId = this.favoriteService.getEventId();
                 return this.favoriteService.addOrUpdateFavorite({
                     bangumiId: this.bangumi.id,
                     status: result.status,
                     rating: result.rating,
                     review: result.reviewComment,
                     syncToUpstream: true
-                }, this.bangumi);
+                }, this.bangumi, this.lastEventId);
             }),)
             .subscribe({
                 next: (fav: Favorite) => {
@@ -102,6 +105,11 @@ export class FavoriteChooser implements OnInit, OnDestroy {
         );
         this.subscription.add(
             this.favoriteService.favoriteChanged
+                .pipe(
+                    filter(event => event.id !== this.lastEventId),
+                    tap(() => {
+                        this.lastEventId = undefined;
+                    }))
                 .subscribe(event => {
                     if (event.op === 'remove' && this.bangumi.favorite.id === event.favorite.id) {
                         this.bangumi.favorite = null;
