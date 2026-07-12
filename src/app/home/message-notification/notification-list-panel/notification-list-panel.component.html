@@ -1,4 +1,4 @@
-<div class="message-notification-list-dropdown">
+<div class="message-notification-list-dropdown" [ngClass]="{'dark-theme': isDarkTheme}">
   <h4 class="header-bar">
     Notifications
     <a class="anchor-button view-all-button" routerLink="/message" (click)="onClickViewAll()">View All</a>

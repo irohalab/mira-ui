@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { MessageService } from './message.service';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { Message } from '../../entity/Message';
 import { switchMap } from 'rxjs/operators';
-import { UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageContentPipe } from '../../pipes/message-content.pipe';
@@ -30,12 +30,20 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
 
     selectedMessage!: Message;
 
+    @HostBinding('class.dark-theme')
+    isDarkTheme: boolean = false;
+
     constructor(private messageService: MessageService,
+                private darkThemeService: DarkThemeService,
                 toastService: UIToast) {
         this.toastRef = toastService.makeText();
     }
 
     ngOnInit() {
+        this.subscription.add(
+            this.darkThemeService.themeChange
+                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
+        );
         this.subscription.add(
             this.refreshSub
                 .pipe(switchMap(() => {

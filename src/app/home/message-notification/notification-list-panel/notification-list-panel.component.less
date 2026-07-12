@@ -38,12 +38,35 @@
   &.dark-theme {
     background-color: @invertedBg;
     border-color: @invertedBorderColor;
+    color: @darkForeground;
     -webkit-box-shadow: 0 2px 4px 0 @invertedShadowColor, 0 2px 10px 0 @invertedShadowColor;
     -moz-box-shadow: 0 2px 4px 0 @invertedShadowColor, 0 2px 10px 0 @invertedShadowColor;
     box-shadow: 0 2px 4px 0 @invertedShadowColor, 0 2px 10px 0 @invertedShadowColor;
     &:before {
       background-color: @invertedBg;
       box-shadow: @invertedBottomArrowBoxShadow;
+    }
+    > .header-bar {
+      color: @darkForeground;
+    }
+    > .ui.menu > .item {
+      color: @darkForeground;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+      }
+      .message-content {
+        color: @darkForeground;
+      }
+      .date-time {
+        color: darken(@darkForeground, 40%);
+      }
+    }
+    .anchor-button {
+      color: @darkLinkColor;
+      &:hover,
+      &:focus {
+        color: @darkLinkHoverColor;
+      }
     }
   }
   &:before {

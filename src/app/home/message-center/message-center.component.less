@@ -20,6 +20,58 @@
     }
     .dark-segment-panel();
     .dark-web-hook-list();
+    .dark-message-center();
+  }
+}
+
+.dark-message-center() {
+  .content.ui.segment {
+    background-color: @darkPanelBg !important;
+    border-color: @darkBorderColor !important;
+    color: @darkForeground;
+  }
+  .message-list .item {
+    border-color: @darkBorderColor;
+    color: @darkForeground;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+    &.read {
+      > .account-name {
+        color: darken(@darkForeground, 30%);
+      }
+      > .message-snip {
+        color: darken(@darkForeground, 45%);
+      }
+      > .date-time {
+        color: darken(@darkForeground, 45%);
+      }
+    }
+    > .account-name {
+      color: @darkForeground;
+    }
+    > .message-snip {
+      color: darken(@darkForeground, 20%);
+    }
+    > .date-time {
+      color: darken(@darkForeground, 35%);
+    }
+  }
+  .message-detail {
+    color: @darkForeground;
+    .account-info {
+      color: @darkForeground;
+    }
+    .message-content {
+      border-top-color: @darkBorderColor;
+      a[href] {
+        color: @darkLinkColor;
+        &:focus,
+        &:hover {
+          color: @darkLinkHoverColor;
+        }
+      }
+    }
   }
 }
 
