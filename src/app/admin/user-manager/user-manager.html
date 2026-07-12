@@ -23,6 +23,7 @@
           <th>ID</th>
           <th>名字</th>
           <th>Email</th>
+          <th>角色</th>
           <th>activateTime</th>
           <th>updateTime</th>
           <th>操作</th>
@@ -34,11 +35,12 @@
             <td>{{account.id}}</td>
             <td>{{account.nickName}}</td>
             <td>{{account.email}}</td>
+            <td>{{account.role}}</td>
             <td>{{account.activateTime}}</td>
             <td>{{account.updateTime}}</td>
             <td>
-              @if (currentAdmin.level >= 3) {
-                <a class="anchor-button" title="修改用户等级" (click)="promoteUser(account)"><i class="wizard icon"></i></a>
+              @if (canPromoteUser) {
+                <a class="anchor-button" title="修改用户角色" (click)="promoteUser(account)"><i class="wizard icon"></i></a>
               }
             </td>
           </tr>

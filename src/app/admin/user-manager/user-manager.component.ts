@@ -77,6 +77,10 @@ export class UserManager implements OnInit, OnDestroy {
         this._subscription.unsubscribe();
     }
 
+    get canPromoteUser(): boolean {
+        return !!this.currentAdmin && User.satisfiesRole(this.currentAdmin.role, User.SUPER_ADMIN_ROLE);
+    }
+
     changeQueryField(field: string) {
         this.queryField = field;
     }
@@ -153,7 +157,7 @@ export class UserManager implements OnInit, OnDestroy {
                 }),)
                 .subscribe({
                     next: () => {
-                        this._toastRef.show('更改用户等级成功');
+                        this._toastRef.show('更改用户角色成功');
                         this.getUserList(this.page);
                     },
                     error: (error: BaseError) => {
