@@ -13,7 +13,7 @@
       <button class="ui basic tiny icon button" [disabled]="!isAllChecked && !indeterminateAllChecked" (click)="markAsRead(false)"><i class="envelope open icon"></i></button>
     </div>
     <div class="message-list">
-      @for (message of messageList; track message) {
+      @for (message of currentMessageList; track message) {
         <div class="item" (click)="onMessageSelect($event, message)" [ngClass]="{read: message.read}">
           <div class="checkbox-wrapper">
             <div class="ui checkbox">

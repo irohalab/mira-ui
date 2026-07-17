@@ -80,6 +80,12 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
 
     changeTab(tab: 'Inbox' | 'Sent') {
         this.tabSelect = tab;
+        this.selectedMessage = this.currentMessageList[0];
+        this.onMessageChecked();
+    }
+
+    get currentMessageList(): Message[] {
+        return this.tabSelect === 'Sent' ? this.sentMessageList : this.messageList;
     }
 
     markAsRead(selectedMessage: boolean) {
@@ -87,7 +93,8 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
         if (selectedMessage) {
             messageIdList = [this.selectedMessage.id];
         } else {
-            messageIdList = Object.keys(this.messageList)
+            messageIdList = this.currentMessageList
+                .map(message => message.id)
                 .filter(msgId => this.checkDict[msgId]);
         }
         this.subscription.add(
@@ -108,7 +115,8 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
         if (selectedMessage) {
             messageIdList = [this.selectedMessage.id];
         } else {
-            messageIdList = Object.keys(this.messageList)
+            messageIdList = this.currentMessageList
+                .map(message => message.id)
                 .filter(msgId => this.checkDict[msgId]);
         }
 
@@ -126,8 +134,8 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
     }
 
     onMessageChecked() {
-        const checkList = Object.values(this.checkDict);
-        if (checkList.every(checked => checked)) {
+        const checkList = this.currentMessageList.map(message => this.checkDict[message.id]);
+        if (checkList.length > 0 && checkList.every(checked => checked)) {
             this.isAllChecked = true;
             this.indeterminateAllChecked = false;
         } else if (checkList.every(checked => !checked)) {
@@ -140,9 +148,9 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
 
     toggleAllChecked() {
         this.indeterminateAllChecked = false;
-        Object.keys(this.checkDict)
-            .forEach(msgId => {
-                this.checkDict[msgId] = this.isAllChecked;
+        this.currentMessageList
+            .forEach(message => {
+                this.checkDict[message.id] = this.isAllChecked;
             });
     }
 
@@ -154,5 +162,18 @@ export class MessageCenterComponent implements OnInit, OnDestroy {
             return;
         }
         this.selectedMessage = message;
+        if (this.tabSelect === 'Inbox' && !message.read) {
+            this.subscription.add(
+                this.messageService.markAsRead([message.id])
+                    .subscribe({
+                        next: () => {
+                            message.read = true;
+                        },
+                        error: (error) => {
+                            this.toastRef.show(error.message);
+                        }
+                    })
+            );
+        }
     }
 }

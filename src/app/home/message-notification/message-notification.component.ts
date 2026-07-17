@@ -72,6 +72,13 @@ export class MessageNotificationComponent implements OnInit, OnDestroy, AfterVie
                     this.messageList = messages;
                 })
         );
+        this.subscription.add(
+            this.messageService.messageChange
+                .pipe(switchMap(() => this.messageService.listMessage(10, 0)))
+                .subscribe((messages: Message[]) => {
+                    this.messageList = messages;
+                })
+        );
     }
 
     ngOnDestroy() {
