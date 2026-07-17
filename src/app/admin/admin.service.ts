@@ -82,8 +82,7 @@ export class AdminService extends BaseService {
     }
 
     getBangumi(id: string): Observable<Bangumi> {
-        let queryUrl = baseUrl + '/bangumi/' + id;
-        return this.http.get<Bangumi>(queryUrl).pipe(
+        return this.http.get<Bangumi>(`${baseUrl}/bangumi/${id}`).pipe(
             tap(bangumi => {
                 const deleteMarkDate = bangumi.deleteMark && dayjs(bangumi.deleteMark);
                 if (deleteMarkDate && deleteMarkDate.isValid()) {

@@ -23,6 +23,8 @@ import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.dire
 import { VertexGraphComponent } from './vertex-graph/vertex-graph.component';
 import { StreamLogViewerComponent } from './stream-log-viewer/stream-log-viewer.component';
 import { NgClass } from '@angular/common';
+import { ResourceGroup } from '../../entity/ResourceGroup';
+import { VideoFile } from '../../entity/video-file';
 
 @Component({
     selector: 'video-process-job-detail',
@@ -187,9 +189,8 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
                                 this.jobLogLines.next(logLine);
                             })
                         },
-                        error: () => {
-
-                        }, complete: () => {
+                        error: (error) => {
+                            console.log(error);
                         }
                     })
             );
@@ -198,16 +199,27 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
     }
 
     private getEpisode(): void {
-        for(const episode of this.bangumi.episodes) {
-            this._subscription.add(
-                this._adminService.getEpisodeVideoFiles(episode.id)
-                    .subscribe((videoFileList) => {
-                        if (videoFileList.some(videoFile => videoFile.id === this.job.jobMessage.videoId)) {
-                            this.episode = episode;
+        this._subscription.add(
+            this._adminService.listResourceGroups(this.bangumi.id, true)
+                .subscribe({
+                    next: (resourceGroupList: ResourceGroup[]) => {
+                        const videoFileId = this.job.jobMessage.videoId;
+                        let videoFile: VideoFile;
+                        for (const resourceGroup of resourceGroupList) {
+                            videoFile = resourceGroup.videoFiles.find(vf => vf.id === videoFileId);
+                            if (videoFile) {
+                                break;
+                            }
                         }
-                    })
-            );
-        }
+                        if (videoFile) {
+                            this.episode = this.bangumi.episodes.find(eps => eps.id === videoFile.episode.id);
+                        }
+                    },
+                    error: (error) => {
+                        this._toastRef.show(error.message);
+                    },
+                })
+        );
     }
 
     private getVertices(): void {

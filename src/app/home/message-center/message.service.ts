@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { BaseService } from '../../../helpers/base.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Message } from '../../entity/Message';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 
 const baseUrl = `${environment.resourceProvider}/message`;
 
@@ -12,6 +12,17 @@ const baseUrl = `${environment.resourceProvider}/message`;
     providedIn: 'root'
 })
 export class MessageService extends BaseService {
+
+    private _messageChange = new Subject<void>();
+
+    /**
+     * Emits whenever messages are mutated (marked as read or deleted) so that
+     * different components displaying messages can stay in sync.
+     */
+    get messageChange(): Observable<void> {
+        return this._messageChange.asObservable();
+    }
+
     constructor(private http: HttpClient) {
         super();
     }
@@ -34,7 +45,7 @@ export class MessageService extends BaseService {
 
     markAsRead(messageIdList: string[]): Observable<void> {
         return this.http.put<never>(`${baseUrl}/read`, messageIdList)
-            .pipe(catchError(this.handleError));
+            .pipe(tap(() => this._messageChange.next()), catchError(this.handleError));
     }
 
     deleteMessages(messageIdList: string[]): Observable<void> {
@@ -43,6 +54,6 @@ export class MessageService extends BaseService {
                 ids: messageIdList.join(',')
             }
         })
-        .pipe(catchError(this.handleError));
+        .pipe(tap(() => this._messageChange.next()), catchError(this.handleError));
     }
 }

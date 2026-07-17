@@ -25,6 +25,35 @@
 }
 
 .dark-message-center() {
+  .ui.secondary.pointing.menu {
+    border-bottom-color: @darkBorderColor;
+    .item {
+      color: darken(@darkForeground, 25%);
+      &:hover {
+        color: @darkForeground;
+      }
+      &.active {
+        color: @darkForeground;
+        border-bottom-color: @darkForeground;
+      }
+    }
+  }
+  .message-list-actions {
+    .ui.basic.button {
+      color: @darkForeground !important;
+      box-shadow: 0 0 0 1px @darkBorderColor inset !important;
+      background-color: transparent !important;
+      &:hover:not([disabled]) {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: @darkForeground !important;
+      }
+      &[disabled] {
+        color: darken(@darkForeground, 55%) !important;
+        box-shadow: 0 0 0 1px darken(@darkBorderColor, 10%) inset !important;
+        opacity: 1;
+      }
+    }
+  }
   .content.ui.segment {
     background-color: @darkPanelBg !important;
     border-color: @darkBorderColor !important;
