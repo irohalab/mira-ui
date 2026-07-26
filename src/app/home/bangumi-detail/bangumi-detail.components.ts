@@ -13,6 +13,7 @@ import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UITo
 import { AuthError } from '../../../helpers/error';
 import { WatchService } from '../watch.service';
 import { environment } from '../../../environments/environment';
+import { WatchProgress } from '../../entity/watch-progress';
 
 const LAYOUT_TYPE: string = 'layout_type';
 const LAYOUT_TYPES = {
@@ -124,6 +125,9 @@ export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
                 status)
                 .subscribe(() => {
                     episode.watch_progress.watch_status = status;
+                    if (status === WatchProgress.WATCHED && !Number.isFinite(episode.watch_progress.percentage)) {
+                        episode.watch_progress.percentage = 1;
+                    }
                     this._toastRef.show('已更新');
                 })
         );
