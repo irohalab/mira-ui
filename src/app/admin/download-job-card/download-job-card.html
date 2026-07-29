@@ -17,9 +17,6 @@
     @if (job.bangumi) {
       <a class="file-mapping anchor-button" (click)="onViewFileMapping($event)">View FileMapping</a>
     }
-    @if (job.status === mJobStatus.Complete && debugUtil) {
-      <a class="anchor-button" (click)="resendCompleteMessage($event)">Resend Complete Message</a>
-    }
   </div>
     <div class="ui bottom attached progress" [ngClass]="{
         success: job.status === mJobStatus.Complete,

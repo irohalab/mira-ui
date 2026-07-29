@@ -1,20 +1,22 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { DARK_THEME, DarkThemeService, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { DownloadJob } from '../../../entity/DownloadJob';
-import { interval, Subscription } from 'rxjs';
+import { of, Subscription, timer } from 'rxjs';
 import { DownloadManagerService } from '../download-manager.service';
-import { switchMap, takeWhile } from 'rxjs/operators';
+import { finalize, switchMap, takeWhile } from 'rxjs/operators';
 import { DownloadJobStatus } from '../../../entity/DownloadJobStatus';
 import { TorrentFile } from '../../../entity/TorrentFile';
 import { RouterLink } from '@angular/router';
-import { NgClass, PercentPipe } from '@angular/common';
+import { DatePipe, NgClass, PercentPipe } from '@angular/common';
 import { ReadableUnit } from '../../../pipes/readable-unit';
+
+type JobDetailTab = 'details' | 'content' | 'downloadedObjects';
 
 @Component({
     selector: 'download-job-detail',
     templateUrl: './download-job-detail.html',
     styleUrls: ['./download-job-detail.less'],
-    imports: [RouterLink, NgClass, PercentPipe, ReadableUnit]
+    imports: [RouterLink, NgClass, PercentPipe, DatePipe, ReadableUnit]
 })
 export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -25,7 +27,9 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     @Input()
     job: DownloadJob;
 
-    jobContent: TorrentFile[];
+    jobContent: TorrentFile[] = [];
+    activeTab: JobDetailTab = 'details';
+    isResendingCompleteMessage: boolean = false;
 
     @HostBinding('class.dark-theme')
     isDarkTheme: boolean;
@@ -40,6 +44,30 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
         this._dialogRef.close(null);
     }
 
+    selectTab(tab: JobDetailTab): void {
+        this.activeTab = tab;
+    }
+
+    resendCompleteMessage(): void {
+        if (this.isResendingCompleteMessage) {
+            return;
+        }
+
+        this.isResendingCompleteMessage = true;
+        this._subscription.add(
+            this._downloadManagerService.resendJobCompleteMessage(this.job.id)
+                .pipe(finalize(() => { this.isResendingCompleteMessage = false; }))
+                .subscribe({
+                    next: (status) => {
+                        this._toastRef.show(status === 0 ? 'Successfully resent!' : 'Resend failed!');
+                    },
+                    error: (error) => {
+                        this._toastRef.show(error.message || error);
+                    }
+                })
+        );
+    }
+
     ngOnDestroy(): void {
         this._subscription.unsubscribe();
     }
@@ -49,43 +77,37 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
             this._darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
         );
-        if (this.job.status === DownloadJobStatus.Complete) {
-            this._subscription.add(
-                this._downloadManagerService.getJobContent(this.job.id)
-                    .subscribe({
-                        next: (content) => {
-                            this.jobContent = content;
-                        },
-                        error: (error) => {
-                            this._toastRef.show(error.message || error);
-                        }
-                    })
-            );
-        } else {
-            this._subscription.add(
-                interval(5000)
-                    .pipe(
-                        takeWhile(() => {
-                            return this.job.status === DownloadJobStatus.Downloading
-                                || this.job.status === DownloadJobStatus.Pending
-                                || this.job.status === DownloadJobStatus.Paused;
-                        }),
-                        switchMap(() => {
-                            return this._downloadManagerService.getJob(this.job.id);
-                        }),
-                        switchMap((job) => {
-                            this.job = job;
-                            return this._downloadManagerService.getJobContent(job.id);
-                        }))
-                    .subscribe({
-                        next: (content) => {
-                            this.jobContent = content;
-                        },
-                        error: (error) => {
-                            this._toastRef.show(error.message || error);
-                        }
-                    })
-            );
-        }
+
+        const refreshJob$ = this.isActiveJob(this.job)
+            ? timer(0, 5000).pipe(takeWhile(() => this.isActiveJob(this.job)))
+            : of(0);
+
+        this._subscription.add(
+            refreshJob$
+                .pipe(
+                    switchMap(() => this._downloadManagerService.getJob(this.job.id)),
+                    switchMap((job) => {
+                        this.job = job;
+                        return this.hasContent(job) ? this._downloadManagerService.getJobContent(job.id) : of([]);
+                    }))
+                .subscribe({
+                    next: (content) => {
+                        this.jobContent = content;
+                    },
+                    error: (error) => {
+                        this._toastRef.show(error.message || error);
+                    }
+                })
+        );
+    }
+
+    private isActiveJob(job: DownloadJob): boolean {
+        return job.status === DownloadJobStatus.Downloading
+            || job.status === DownloadJobStatus.Pending
+            || job.status === DownloadJobStatus.Paused;
+    }
+
+    private hasContent(job: DownloadJob): boolean {
+        return job.status === DownloadJobStatus.Complete || this.isActiveJob(job);
     }
 }
