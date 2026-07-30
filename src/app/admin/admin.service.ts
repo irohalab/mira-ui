@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { BaseService } from '../../helpers/base.service';
-import { Bangumi, Episode, MainItem } from '../entity';
+import { Bangumi, Episode } from '../entity';
 import { VideoFile } from '../entity/video-file';
 import { BangumiRaw } from '../entity/BangumiRaw';
 import { environment } from '../../environments/environment';
@@ -28,13 +28,6 @@ export class AdminService extends BaseService {
     getStatus(): Observable<ScanStatusResponse> {
         return this.http.get<{data: ScanStatusResponse}>(`${baseUrl}/scan/status`)
             .pipe(map(res => res.data), catchError(this.handleError));
-    }
-
-    queryBangumi(bgmId: number): Observable<MainItem> {
-        let queryUrl = baseUrl + '/query/' + bgmId;
-        return this.http.get<any>(queryUrl).pipe(
-            map<any, MainItem>(res => new MainItem(res)),
-            catchError(this.handleError));
     }
 
     searchBangumi(params: {keyword: string, type: number, offset: number, count: number}): Observable<{data: BangumiRaw[], total: number}> {

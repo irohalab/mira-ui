@@ -15,7 +15,7 @@ export class Episode {
     name: string;
     nameCn: string;
     duration: string;
-    airdate: string;
+    airDate: string;
     status: number;
     subItemId: string;
     type: EpisodeTypeEnum;
@@ -40,18 +40,6 @@ export class Episode {
     thumbnail_color: string;
 
     thumbnailImage: Image | null;
-
-
-    static fromRawData(rawData: any, episode_no?: number) {
-        let episode = new Episode();
-        episode.bgmEpsId = rawData.id;
-        episode.episodeNo = episode_no;
-        episode.name = rawData.name;
-        episode.nameCn = rawData.name_cn;
-        episode.duration = rawData.duration;
-        episode.airdate = rawData.airdate;
-        return episode;
-    }
 
     static STATUS_NOT_DOWNLOADED = 0;
     static STATUS_DOWNLOADING = 1;

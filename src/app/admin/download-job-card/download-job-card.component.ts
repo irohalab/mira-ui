@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { DownloadJob } from '../../entity/DownloadJob';
 import { DownloadJobStatus } from '../../entity/DownloadJobStatus';
-import { DARK_THEME, DarkThemeService, UIDialog, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog } from '@irohalab/deneb-ui';
 import { FileMappingListComponent } from './file-mapping-list/file-mapping-list.component';
-import { DownloadManagerService } from '../download-manager/download-manager.service';
 import { Subscription } from 'rxjs';
 import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
@@ -18,7 +17,6 @@ import { ReadableUnit } from '../../pipes/readable-unit';
 })
 export class DownloadJobCardComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
-    private _toast: UIToastRef<UIToastComponent>;
 
     @Output()
     selectCard = new EventEmitter<string>();
@@ -29,9 +27,6 @@ export class DownloadJobCardComponent implements OnInit, OnDestroy {
     @Input()
     job: DownloadJob;
 
-    @Input()
-    debugUtil: boolean;
-
     mJobStatus = DownloadJobStatus;
 
     episodeNoList: string[]
@@ -39,31 +34,13 @@ export class DownloadJobCardComponent implements OnInit, OnDestroy {
     isDarkTheme: boolean;
 
     constructor(private _dialog: UIDialog,
-                private downloadManagerService: DownloadManagerService,
-                private _darkThemeService: DarkThemeService,
-                toastService: UIToast) {
-        this._toast = toastService.makeText();
-    }
+                private _darkThemeService: DarkThemeService) {}
 
     onViewFileMapping(event: Event) {
         event.stopPropagation();
         const dialogRef = this._dialog.open(FileMappingListComponent, {stickyDialog: false, backdrop: true})
         dialogRef.componentInstance.fileMapping = this.job.fileMapping;
         dialogRef.componentInstance.jobId = this.job.id;
-    }
-
-    resendCompleteMessage(event: Event) {
-        event.stopPropagation();
-        this._subscription.add(
-            this.downloadManagerService.resendJobCompleteMessage(this.job.id)
-                .subscribe((status) => {
-                    if (status === 0) {
-                        this._toast.show('Successfully resent!');
-                    } else {
-                        this._toast.show('Resent failed!');
-                    }
-                })
-        );
     }
 
     ngOnDestroy(): void {

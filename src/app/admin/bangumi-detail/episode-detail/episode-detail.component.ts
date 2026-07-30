@@ -81,10 +81,10 @@ export class EpisodeDetail implements OnInit, OnDestroy {
         episode.bgmEpsId = modelValue.bgmEpsId as number;
         episode.name = modelValue.name as string;
         episode.nameCn = modelValue.nameCn as string;
-        episode.airdate = modelValue.airdate as string;
+        episode.airDate = modelValue.airdate as string;
         episode.status = modelValue.status as number;
-        if (!episode.airdate) {
-            episode.airdate = null;
+        if (!episode.airDate) {
+            episode.airDate = null;
         }
         episode.duration = modelValue.duration as string;
         let saveObservable;

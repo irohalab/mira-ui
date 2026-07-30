@@ -6,14 +6,13 @@ import { interval, Subscription } from 'rxjs';
 import { DownloadManagerService } from './download-manager.service';
 import { filter, switchMap } from 'rxjs/operators';
 import { AdminService } from '../admin.service';
-import { DARK_THEME, DarkThemeService, UIDialog, UIDropdown, UIToggle, InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIDialog, UIDropdown, InfiniteList, InfiniteForOf } from '@irohalab/deneb-ui';
 import { DownloadJobDetailComponent } from './download-job-detail/download-job-detail.component';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
 import { ActivatedRoute, RouterLinkActive, RouterLink } from '@angular/router';
 import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
 import { NgClass } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { DownloadJobCardComponent } from '../download-job-card/download-job-card.component';
 import { Admin } from '../admin.component';
 
@@ -25,7 +24,7 @@ type SearchType = 'Job ID' | 'Bangumi ID' | 'Bangumi Name';
     selector: 'download-manager',
     templateUrl: './download-manager.html',
     styleUrls: ['./download-manager.less'],
-    imports: [AdminNavbar, UIDropdown, NgClass, UIToggle, FormsModule, RouterLinkActive, RouterLink, InfiniteList, InfiniteForOf, DownloadJobCardComponent]
+    imports: [AdminNavbar, UIDropdown, NgClass, RouterLinkActive, RouterLink, InfiniteList, InfiniteForOf, DownloadJobCardComponent]
 })
 export class DownloadManagerComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -40,7 +39,6 @@ export class DownloadManagerComponent implements OnInit, OnDestroy {
     isLoading: boolean;
     jobList: DownloadJob[];
     selectedJobId: string;
-    isDebugUtilityEnabled: boolean = false;
 
     @HostBinding('class.dark-theme')
     isDarkTheme: boolean;

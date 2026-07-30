@@ -14,106 +14,195 @@
       </div>
     }
   </div>
-  <div class="job-summary">
-    <table class="job-info-table ui table" [ngClass]="{inverted: isDarkTheme}">
-      <tbody>
-        <tr>
-          <td style="width: 15em;">Create Time</td>
-          <td>{{job.createTime}}</td>
-        </tr>
-        <tr>
-          <td>End Time</td>
-          <td>{{job.endTime}}</td>
-        </tr>
-        <tr>
-          <td>Download Speed</td>
-          <td>{{job.downloadSpeed}}</td>
-        </tr>
-        <tr>
-          <td>Seeds(Total seeds)</td>
-          <td>{{job.connectedSeeds}}({{job.seeds}})</td>
-        </tr>
-        <tr>
-          <td>Leechers(Total Leechers)</td>
-          <td>{{job.connectedLeechers}}({{job.leechers}})</td>
-        </tr>
-        <tr>
-          <td>Torrent Name</td>
-          <td>{{job.torrentName}}</td>
-        </tr>
-        <tr>
-          <td>Torrent URL</td>
-          <td>{{job.torrentUrl}}</td>
-        </tr>
-        <tr>
-          <td>Torrent Hash</td>
-          <td>{{job.torrentId}}</td>
-        </tr>
-        @if (job.videoId) {
-          <tr>
-            <td>VideoId</td>
-            <td>{{job.videoId}}</td>
-          </tr>
-        }
-        <tr>
-          <td>ETA</td>
-          <td>{{job.eta}}</td>
-        </tr>
-        <tr>
-          <td>Availability</td>
-          <td>{{job.availability}}</td>
-        </tr>
-        <tr>
-          <td>Priority</td>
-          <td>{{job.priority}}</td>
-        </tr>
-        <tr>
-          <td>Downloaded</td>
-          <td>{{job.downloaded}}</td>
-        </tr>
-        <tr>
-          <td>AmountLeft</td>
-          <td>{{job.amountLeft}}</td>
-        </tr>
-        <tr>
-          <td>ActiveTime</td>
-          <td>{{job.activeTime}}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  @if (job.errorInfo) {
-    <div class="job-error">
-      <div class="section-header">Error Info</div>
-      @if (job.errorInfo.message) {
-        <div class="ui message">{{job.errorInfo.message}}</div>
-      }
-      @if (job.errorInfo.stack) {
-        <div class="error-stack">
-          <pre>{{job.errorInfo.stack}}</pre>
-        </div>
-      }
+  @if (job.status === mJobStatus.Complete) {
+    <div class="job-actions" role="toolbar" aria-label="Job actions">
+      <button
+        class="ui small basic labeled icon button"
+        type="button"
+        [ngClass]="{inverted: isDarkTheme}"
+        [disabled]="isResendingCompleteMessage"
+        (click)="resendCompleteMessage()">
+        <i class="redo icon" aria-hidden="true"></i>
+        {{isResendingCompleteMessage ? 'Resending...' : 'Resend Complete Message'}}
+      </button>
     </div>
   }
-  <div class="job-content">
-    <div class="section-header">Content</div>
-    <table class="file-list-table ui table" [ngClass]="{inverted: isDarkTheme}">
-      <thead>
-        <tr>
-          <th>Path</th>
-          <th>Size</th>
-          <th>Progress</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (torrentFile of jobContent; track torrentFile) {
-          <tr>
-            <td>{{torrentFile.name}}</td>
-            <td>{{torrentFile.size | readableUnit:'byte':1}}</td>
-            <td>{{torrentFile.progress | percent}}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
+  <div class="ui secondary pointing menu" [ngClass]="{inverted: isDarkTheme}" role="tablist" aria-label="Job detail sections">
+    <a
+      id="job-details-tab"
+      class="item"
+      role="tab"
+      [ngClass]="{active: activeTab === 'details'}"
+      [attr.aria-selected]="activeTab === 'details'"
+      aria-controls="job-details-panel"
+      (click)="selectTab('details')">
+      <i class="info circle icon" aria-hidden="true"></i>
+      Details
+    </a>
+    <a
+      id="job-content-tab"
+      class="item"
+      role="tab"
+      [ngClass]="{active: activeTab === 'content'}"
+      [attr.aria-selected]="activeTab === 'content'"
+      aria-controls="job-content-panel"
+      (click)="selectTab('content')">
+      <i class="folder open icon" aria-hidden="true"></i>
+      Content ({{jobContent.length}})
+    </a>
+    <a
+      id="downloaded-objects-tab"
+      class="item"
+      role="tab"
+      [ngClass]="{active: activeTab === 'downloadedObjects'}"
+      [attr.aria-selected]="activeTab === 'downloadedObjects'"
+      aria-controls="downloaded-objects-panel"
+      (click)="selectTab('downloadedObjects')">
+      <i class="cloud download icon" aria-hidden="true"></i>
+      Downloaded Objects ({{job.downloadedObjects?.length || 0}})
+    </a>
   </div>
+  @if (activeTab === 'details') {
+    <section id="job-details-panel" class="tab-panel" role="tabpanel" aria-labelledby="job-details-tab">
+      <div class="job-summary">
+        <table class="job-info-table ui table" [ngClass]="{inverted: isDarkTheme}">
+          <tbody>
+            <tr>
+              <td style="width: 15em;">Create Time</td>
+              <td>{{job.createTime}}</td>
+            </tr>
+            <tr>
+              <td>End Time</td>
+              <td>{{job.endTime}}</td>
+            </tr>
+            <tr>
+              <td>Download Speed</td>
+              <td>{{job.downloadSpeed}}</td>
+            </tr>
+            <tr>
+              <td>Seeds(Total seeds)</td>
+              <td>{{job.connectedSeeds}}({{job.seeds}})</td>
+            </tr>
+            <tr>
+              <td>Leechers(Total Leechers)</td>
+              <td>{{job.connectedLeechers}}({{job.leechers}})</td>
+            </tr>
+            <tr>
+              <td>Torrent Name</td>
+              <td>{{job.torrentName}}</td>
+            </tr>
+            <tr>
+              <td>Torrent URL</td>
+              <td>{{job.torrentUrl}}</td>
+            </tr>
+            <tr>
+              <td>Torrent Hash</td>
+              <td>{{job.torrentId}}</td>
+            </tr>
+            @if (job.videoId) {
+              <tr>
+                <td>VideoId</td>
+                <td>{{job.videoId}}</td>
+              </tr>
+            }
+            <tr>
+              <td>ETA</td>
+              <td>{{job.eta}}</td>
+            </tr>
+            <tr>
+              <td>Availability</td>
+              <td>{{job.availability}}</td>
+            </tr>
+            <tr>
+              <td>Priority</td>
+              <td>{{job.priority}}</td>
+            </tr>
+            <tr>
+              <td>Downloaded</td>
+              <td>{{job.downloaded}}</td>
+            </tr>
+            <tr>
+              <td>AmountLeft</td>
+              <td>{{job.amountLeft}}</td>
+            </tr>
+            <tr>
+              <td>ActiveTime</td>
+              <td>{{job.activeTime}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      @if (job.errorInfo) {
+        <div class="job-error">
+          <div class="section-header">Error Info</div>
+          @if (job.errorInfo.message) {
+            <div class="ui message">{{job.errorInfo.message}}</div>
+          }
+          @if (job.errorInfo.stack) {
+            <div class="error-stack">
+              <pre>{{job.errorInfo.stack}}</pre>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+  @if (activeTab === 'content') {
+    <section id="job-content-panel" class="tab-panel" role="tabpanel" aria-labelledby="job-content-tab">
+      @if (jobContent.length > 0) {
+        <div class="table-wrapper">
+          <table class="file-list-table ui table" [ngClass]="{inverted: isDarkTheme}">
+            <thead>
+              <tr>
+                <th>Path</th>
+                <th>Size</th>
+                <th>Progress</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (torrentFile of jobContent; track torrentFile) {
+                <tr>
+                  <td>{{torrentFile.name}}</td>
+                  <td>{{torrentFile.size | readableUnit:'byte':1}}</td>
+                  <td>{{torrentFile.progress | percent}}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">No torrent content is available for this job.</div>
+      }
+    </section>
+  }
+  @if (activeTab === 'downloadedObjects') {
+    <section id="downloaded-objects-panel" class="tab-panel" role="tabpanel" aria-labelledby="downloaded-objects-tab">
+      @if (job.downloadedObjects?.length) {
+        <div class="table-wrapper">
+          <table class="downloaded-object-list ui table" [ngClass]="{inverted: isDarkTheme}">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>S3 URI</th>
+                <th>Local Path</th>
+                <th>Expires</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (downloadedObject of job.downloadedObjects ?? []; track downloadedObject.id) {
+                <tr>
+                  <td>{{downloadedObject.name}}</td>
+                  <td><code>{{downloadedObject.s3Uri}}</code></td>
+                  <td><code>{{downloadedObject.localPath}}</code></td>
+                  <td>{{downloadedObject.expiration | date:'medium'}}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">No reusable downloaded objects are available for this job.</div>
+      }
+    </section>
+  }
 </div>

@@ -16,6 +16,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { LayoutService } from '@swimlane/ngx-graph';
 import { appRoutes } from './app/app.routes';
 import { App } from './app/app.component';
+import { MultiFormatGenerateSrcService } from './app/MultiFormatGenerateSrcService';
 
 if (environment.production) {
   enableProdMode();
@@ -41,7 +42,7 @@ bootstrapApplication(App, {
             }
         }),
         { provide: OAuthStorage, useFactory: () => storageAPI },
-        { provide: SRC_GENERATOR_SERVICE, useClass: ResponsiveGenerateSrcService },
+        { provide: SRC_GENERATOR_SERVICE, useClass: MultiFormatGenerateSrcService },
         LayoutService,
         provideRouter(appRoutes)
     ]
