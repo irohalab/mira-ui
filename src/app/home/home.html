@@ -19,14 +19,15 @@
 </div>
 <div class="right-area">
   <dark-theme-toggle class="dark-theme-toggle"></dark-theme-toggle>
-  @if (isUserLogonObservable | async) {
-    <app-message-notification></app-message-notification>
-  }
-  @if (isUserLogonObservable | async) {
+  @if (!(isUserLoadedObservable | async)) {
     <user-action></user-action>
-  }
-  @if (!(isUserLogonObservable | async)) {
-    <button class="ui basic tiny button" [ngClass]="{inverted: isDarkTheme}" (click)="login()">Login</button>
+  } @else {
+    @if (isUserLogonObservable | async) {
+      <app-message-notification></app-message-notification>
+      <user-action></user-action>
+    } @else {
+      <button class="ui basic tiny button" [ngClass]="{inverted: isDarkTheme}" (click)="login()">Login</button>
+    }
   }
   <a class="search-toggle-button" (click)="toggleFloatSearchFrame()">
     <i class="search icon"></i>

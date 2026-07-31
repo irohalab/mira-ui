@@ -1,4 +1,4 @@
-@if (user.role === User.ID_INITIAL_USER) {
+@if (!user || user.id === User.ID_INITIAL_USER) {
   <div class="loading-tip">
     <div class="ui placeholder">
       <div class="line"></div>
