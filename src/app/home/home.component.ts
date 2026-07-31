@@ -42,6 +42,7 @@ export class Home implements OnInit, OnDestroy {
 
     isShowAdminLink: Observable<boolean>;
     isUserLogonObservable: Observable<boolean>;
+    isUserLoadedObservable: Observable<boolean>;
     isUserActivated: Observable<boolean>;
 
     siteTitle: string = environment.siteTitle;
@@ -89,6 +90,7 @@ export class Home implements OnInit, OnDestroy {
 
         this.isShowAdminLink = this.userService.userInfo.pipe(map(user => user && user.role === User.ADMIN_ROLE || user.role === User.SUPER_ADMIN_ROLE));
         this.isUserLogonObservable = this.userService.userInfo.pipe(map(user => user && user.id !== User.ID_INITIAL_USER));
+        this.isUserLoadedObservable = this.userService.userLoaded;
         this.isUserActivated = this.userService.userInfo.pipe(map(user => user && user.id !== User.ID_INITIAL_USER && user.role !== User.GUEST_ROLE));
     }
 

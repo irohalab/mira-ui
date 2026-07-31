@@ -168,7 +168,7 @@ export class UserService extends BaseService {
             if (!this.oAuthService.hasValidAccessToken()) {
                 return;
             }
-            const userProfile = (await this.oAuthService.loadUserProfile() as any).info;
+            const userProfile = await this.loadUserProfileWithRefresh();
             const account = await lastValueFrom(this.httpClient.get<Account>(`${baseUrl}/info`));
             console.log('userProfile: ', userProfile, account);
             this.updateUser(userProfile, account);
@@ -177,11 +177,40 @@ export class UserService extends BaseService {
         }
     }
 
+    private async loadUserProfileWithRefresh(): Promise<User> {
+        const accessToken = this.oAuthService.getAccessToken();
+        try {
+            return (await this.oAuthService.loadUserProfile() as { info: User }).info;
+        } catch (error) {
+            if (!this.isUnauthorized(error) || !this.oAuthService.getRefreshToken()) {
+                throw error;
+            }
+            await this.refreshOnce(accessToken);
+            return (await this.oAuthService.loadUserProfile() as { info: User }).info;
+        }
+    }
+
+    private isUnauthorized(error: unknown): boolean {
+        return typeof error === 'object'
+            && error !== null
+            && 'status' in error
+            && error.status === 401;
+    }
+
     // Single-flight wrapper: collapses concurrent refresh requests in this tab
     // into one shared promise, and delegates the actual rotation to the
     // cross-tab-coordinated path below.
-    private refreshOnce(): Promise<void> {
-        this.refreshInFlight ??= this.coordinatedRefresh()
+    private refreshOnce(rejectedAccessToken?: string): Promise<void> {
+        if (this.refreshInFlight) {
+            return this.refreshInFlight.then(async () => {
+                if (rejectedAccessToken
+                    && this.oAuthService.getAccessToken() === rejectedAccessToken
+                    && this.oAuthService.getRefreshToken()) {
+                    await this.refreshOnce(rejectedAccessToken);
+                }
+            });
+        }
+        this.refreshInFlight = this.coordinatedRefresh(rejectedAccessToken)
             .finally(() => { this.refreshInFlight = undefined; });
         return this.refreshInFlight;
     }
@@ -190,23 +219,26 @@ export class UserService extends BaseService {
     // refresh token at a time. Inside the lock we re-check a shared timestamp: if
     // another tab refreshed within the dedup window, the rotated token is already
     // in shared storage, so we reuse it rather than spend the now-stale token.
-    private async coordinatedRefresh(): Promise<void> {
+    private async coordinatedRefresh(rejectedAccessToken?: string): Promise<void> {
         if (this.supportsWebLocks()) {
-            await navigator.locks.request(REFRESH_LOCK, () => this.refreshIfStale());
+            await navigator.locks.request(REFRESH_LOCK, () => this.refreshIfStale(rejectedAccessToken));
             return;
         }
         // Fallback for browsers without the Web Locks API: best-effort
         // single-flight within this tab only (provided by refreshOnce()).
-        await this.refreshIfStale();
+        await this.refreshIfStale(rejectedAccessToken);
     }
 
     // The critical section: must run while holding the lock. Reads the shared
     // "last refresh" marker and only hits the network when no other tab has
     // produced a fresh token within the dedup window.
-    private async refreshIfStale(): Promise<void> {
+    private async refreshIfStale(rejectedAccessToken?: string): Promise<void> {
         const lastRefreshAt = Number(storageAPI.getItem(LAST_REFRESH_AT_KEY) ?? '0');
         const refreshedRecently = Date.now() - lastRefreshAt < REFRESH_DEDUP_WINDOW_MS;
-        if (refreshedRecently && this.oAuthService.hasValidAccessToken()) {
+        const rejectedTokenWasReplaced = rejectedAccessToken
+            && this.oAuthService.getAccessToken() !== rejectedAccessToken;
+        if ((rejectedTokenWasReplaced || (!rejectedAccessToken && refreshedRecently))
+            && this.oAuthService.hasValidAccessToken()) {
             // Another tab just rotated the token; its result is already in shared
             // storage. Reuse it instead of rotating again.
             return;

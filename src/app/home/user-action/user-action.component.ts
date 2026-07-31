@@ -39,7 +39,10 @@ export class UserActionComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        let userActionLinkElement = this.userActionLinkRef.nativeElement;
+        const userActionLinkElement = this.userActionLinkRef?.nativeElement;
+        if (!userActionLinkElement) {
+            return;
+        }
         this.subscription.add(
             observableFromEvent(userActionLinkElement, 'click').pipe(
                 switchMap(() => {
