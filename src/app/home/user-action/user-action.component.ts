@@ -4,12 +4,16 @@ import { filter, switchMap } from 'rxjs/operators';
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { User } from '../../entity';
 import { UserService } from '../../user-service';
-import { UIPopover } from '@irohalab/deneb-ui';
+import { DARK_THEME, DarkThemeService, UIPopover } from '@irohalab/deneb-ui';
 import { UserActionPanelComponent } from './user-action-panel/user-action-panel.component';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'user-action',
     templateUrl: './user-action.html',
+    imports: [
+        NgClass
+    ],
     styleUrls: ['./user-action.less']
 })
 export class UserActionComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -18,9 +22,12 @@ export class UserActionComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input()
     user: User;
 
+    isDarkTheme = false;
+
     @ViewChild('userActionLink', {static: false}) userActionLinkRef: ElementRef;
 
     constructor(private userService: UserService,
+                private darkThemeService: DarkThemeService,
                 private _popover: UIPopover,) {
     }
 
@@ -29,6 +36,11 @@ export class UserActionComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngOnInit(): void {
+        this.subscription.add(
+            this.darkThemeService.themeChange.subscribe(theme => {
+                this.isDarkTheme = theme === DARK_THEME;
+            })
+        );
         this.subscription.add(
             this.userService.userInfo
                 .subscribe(user => {

@@ -10,6 +10,7 @@ import { Bangumi } from '../../entity';
 import { AdminService } from '../admin.service';
 import { TorrentFile } from '../../entity/TorrentFile';
 import { environment } from '../../../environments/environment';
+import { FinishMessageResendState } from '../../entity/FinishMessageResendState';
 
 type ReqData = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -106,13 +107,30 @@ export class DownloadManagerService extends BaseService {
                 catchError(this.handleError));
     }
 
-    public resendJobCompleteMessage(jobId: string): Observable<number> {
+    public resendJobCompleteMessage(jobId: string): Observable<FinishMessageResendState> {
         const reqData: ReqData = {
             method: 'PUT',
             url: `/download/job/${jobId}/resend-finish-message`
-        }
-        return this.sendRequest<{ status: number }>(reqData)
-            .pipe(map(res => res.status), catchError(this.handleError));
+        };
+        return this.sendRequest<{data: FinishMessageResendState, message: string, status: number}>(reqData)
+            .pipe(
+                map(res => {
+                    if (!res.data) {
+                        throw new Error(res.message || 'Unable to start message resend');
+                    }
+                    return res.data;
+                }),
+                catchError(this.handleError)
+            );
+    }
+
+    public getJobCompleteMessageResend(jobId: string): Observable<FinishMessageResendState | null> {
+        const reqData: ReqData = {
+            method: 'GET',
+            url: `/download/job/${jobId}/resend-finish-message`
+        };
+        return this.sendRequest<{data: FinishMessageResendState | null, status: number}>(reqData)
+            .pipe(map(res => res.data), catchError(this.handleError));
     }
 
     public getJobContent(jobId: string): Observable<TorrentFile[]> {

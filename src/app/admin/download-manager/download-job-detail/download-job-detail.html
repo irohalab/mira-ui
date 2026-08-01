@@ -27,6 +27,52 @@
       </button>
     </div>
   }
+  @if (finishMessageResend) {
+    <section class="resend-status" aria-live="polite">
+      <div
+        class="ui small progress"
+        [ngClass]="{
+          active: isResendingCompleteMessage,
+          success: finishMessageResend.status === 'succeeded',
+          error: finishMessageResend.status === 'failed',
+          inverted: isDarkTheme
+        }"
+        [attr.data-percent]="hasResendProgress ? resendProgressPercent : null"
+        role="progressbar"
+        [attr.aria-label]="resendStatusLabel"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        [attr.aria-valuenow]="hasResendProgress ? resendProgressPercent : null">
+        <div class="bar" [style.width.%]="hasResendProgress ? resendProgressPercent : 0">
+          @if (hasResendProgress) {
+            <div class="progress">{{resendProgressPercent}}%</div>
+          }
+        </div>
+        <div class="label">
+          @if (finishMessageResend.status === 'succeeded') {
+            <i class="check circle icon" aria-hidden="true"></i>
+          } @else if (finishMessageResend.status === 'failed') {
+            <i class="exclamation triangle icon" aria-hidden="true"></i>
+          } @else {
+            <i class="cloud upload icon" aria-hidden="true"></i>
+          }
+          <span>{{resendStatusLabel}}</span>
+          @if ((finishMessageResend.totalBytes ?? 0) > 0) {
+            <span class="resend-byte-progress">
+              {{(finishMessageResend.uploadedBytes ?? 0) | readableUnit:'byte':1}}
+              of
+              {{finishMessageResend.totalBytes | readableUnit:'byte':1}}
+            </span>
+          }
+        </div>
+      </div>
+      @if (finishMessageResend.status === 'failed' && finishMessageResend.error) {
+        <div class="ui tiny negative message" [ngClass]="{inverted: isDarkTheme}">
+          {{finishMessageResend.error}}
+        </div>
+      }
+    </section>
+  }
   <div class="ui secondary pointing menu" [ngClass]="{inverted: isDarkTheme}" role="tablist" aria-label="Job detail sections">
     <a
       id="job-details-tab"
