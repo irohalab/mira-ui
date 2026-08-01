@@ -1,6 +1,6 @@
 @if (!user || user.id === User.ID_INITIAL_USER) {
   <div class="loading-tip">
-    <div class="ui placeholder">
+    <div class="ui placeholder" [ngClass]="{inverted: isDarkTheme}">
       <div class="line"></div>
       <div class="line"></div>
     </div>

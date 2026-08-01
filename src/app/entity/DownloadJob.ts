@@ -20,6 +20,7 @@ import { DownloadTaskMessage } from './DownloadTaskMessage';
 import { FileMapping } from './FileMapping';
 import { Bangumi } from './bangumi';
 import { DownloadedObject } from './DownloadedObject';
+import { FinishMessageResendState } from './FinishMessageResendState';
 
 export class DownloadJob {
     public id: string;
@@ -51,6 +52,7 @@ export class DownloadJob {
     public endTime: string;
     public errorInfo: { message?: string, stack?: string };
     public downloadedObjects?: DownloadedObject[];
+    public finishMessageResend?: FinishMessageResendState;
 
     // not from database
     public bangumi: Bangumi;
