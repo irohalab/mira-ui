@@ -1,8 +1,6 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIToggle, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { forkJoin, of, Subscription } from 'rxjs';
-import { VideoFile } from '../../../entity/video-file';
-import { Episode } from '../../../entity';
 import { AdminService } from '../../admin.service';
 import { BaseError } from '../../../../helpers/error';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -17,6 +15,8 @@ import { VideoProcessRuleItemComponent } from '../video-processs-rule/video-proc
 import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
 import { ContrastColorPipe } from '../../../pipes/contrast-color.pipe';
 import { NgClass } from '@angular/common';
+import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
+import { VideoFileAdminEntity, VideoFileAdminPayload } from '../../../entity/admin/VideoFileAdminEntity';
 
 @Component({
     selector: 'video-file-modal',
@@ -33,7 +33,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
     isDarkTheme: boolean;
 
     @Input()
-    episode: Episode;
+    episode: EpisodeAdminEntity;
 
     @Input()
     resourceGroup: ResourceGroup;
@@ -47,9 +47,9 @@ export class VideoFileModal implements OnInit, OnDestroy {
     handlingConvert = false;
 
     eVideoFileStatus = {
-        PENDING: VideoFile.STATUS_DOWNLOAD_PENDING,
-        DOWNLOADING: VideoFile.STATUS_DOWNLOADING,
-        DOWNLOADED: VideoFile.STATUS_DOWNLOADED
+        PENDING: VideoFileAdminEntity.STATUS_DOWNLOAD_PENDING,
+        DOWNLOADING: VideoFileAdminEntity.STATUS_DOWNLOADING,
+        DOWNLOADED: VideoFileAdminEntity.STATUS_DOWNLOADED
     };
 
     enableBlobStorageOptions = false;
@@ -65,7 +65,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
     }
 
     saveVideoFile(videoFileGroup: FormGroup) {
-        let videoFile = videoFileGroup.value as VideoFile;
+        let videoFile = videoFileGroup.value as VideoFileAdminPayload;
         let videoFileId = videoFile.id;
         if (!VideoFileModal.isTempVideoId(videoFileId)) {
             if (videoFileGroup.dirty) {
@@ -109,7 +109,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
     }
 
     deleteVideoFile(videoFileGroup: FormGroup) {
-        let videoFile = videoFileGroup.value as VideoFile;
+        let videoFile = videoFileGroup.value as VideoFileAdminPayload;
         if (VideoFileModal.isTempVideoId(videoFile.id)) {
             if (this.ruleMap[videoFile.id]) {
                 this.deleteRule(videoFile.id);
@@ -142,7 +142,7 @@ export class VideoFileModal implements OnInit, OnDestroy {
             episodeId: this.episode.id,
             downloadUrl: '',
             torrentId: null,
-            status: VideoFile.STATUS_DOWNLOAD_PENDING,
+            status: VideoFileAdminEntity.STATUS_DOWNLOAD_PENDING,
             filePath: null,
             fileName: null,
             resolutionW: null,
@@ -264,12 +264,15 @@ export class VideoFileModal implements OnInit, OnDestroy {
     convertVideoFile(videoFileGroup: FormGroup): void {
         this.handlingConvert = true;
         const videoFileId = videoFileGroup.value.id;
-        if (this.ruleCount > 0 && videoFileGroup.value.status === VideoFile.STATUS_DOWNLOADED) {
+        if (this.ruleCount > 0 && videoFileGroup.value.status === VideoFileAdminEntity.STATUS_DOWNLOADED) {
             this._subscription.add(
                 this._adminService.getEpisodeVideoFiles(this.episode.id)
                     .pipe(switchMap((videoFileList) => {
                         const videoFile = videoFileList.find(v => v.id === videoFileId);
-                        return this._videoProcessRuleService.createJobFromVideoFile(videoFile);
+                        if (!videoFile) {
+                            throw new Error('VideoFile no longer exists.');
+                        }
+                        return this._videoProcessRuleService.createJobFromVideoFile(videoFile.id);
                     }))
                     .subscribe({
                         next: () => {

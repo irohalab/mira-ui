@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { VideoProcessRule } from '../../../entity/VideoProcessRule';
 import { catchError, map } from 'rxjs/operators';
 import { BaseService } from '../../../../helpers/base.service';
-import { VideoFile } from '../../../entity/video-file';
 import { environment } from '../../../../environments/environment';
 
 type ReqData = {
@@ -92,20 +91,10 @@ export class VideoProcessRuleService extends BaseService {
         return this.sendRequest<{data: string[]}>(reqData).pipe(map(res => res.data));
     }
 
-    createJobFromVideoFile(videoFile: VideoFile): Observable<any> {
-        console.log(videoFile.url);
-        const urlObj = new URL(videoFile.url, location.protocol + '//' + location.host);
-        videoFile.url = urlObj.toString();
-        const reqData: ReqData = {
-            method: 'POST',
-            url: '/rule/video-file',
-            body: {
-                bangumiId: videoFile.bangumi.id,
-                videoFileId: videoFile.id,
-                fileUrl: videoFile.url,
-                filename: videoFile.filePath.substring(videoFile.filePath.lastIndexOf('/') + 1)
-            }
-        };
-        return this.sendRequest<any>(reqData);
+    createJobFromVideoFile(videoFileId: string): Observable<any> {
+        return this._httpClient.post<any>(
+            `${environment.resourceProvider}/admin/video-process/video-file/${videoFileId}`,
+            null
+        ).pipe(catchError(this.handleError));
     }
 }

@@ -1,6 +1,5 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
-import { Bangumi, Episode } from '../../../entity';
 import { BangumiBasic } from '../bangumi-basic/bangumi-basic.component';
 import { filter, mergeMap, take } from 'rxjs/operators';
 import { BaseError } from '../../../../helpers/error';
@@ -10,6 +9,8 @@ import { UserManagerSerivce } from '../../user-manager/user-manager.service';
 import { AdminService } from '../../admin.service';
 import { DatePipe } from '@angular/common';
 import { BangumiTypeNamePipe } from '../../bangumi-pipes/type-name-pipe';
+import { BangumiAdminEntity } from '../../../entity/admin/BangumiAdminEntity';
+import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
 
 @Component({
     selector: 'app-bangumi-overview',
@@ -20,13 +21,13 @@ import { BangumiTypeNamePipe } from '../../bangumi-pipes/type-name-pipe';
 export class BangumiOverviewComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
     private toastRef: UIToastRef<UIToastComponent>;
-    private _bangumi!: Bangumi;
+    private _bangumi!: BangumiAdminEntity;
 
     @HostBinding('class.dark-theme')
     isDarkTheme: boolean;
 
     @Input()
-    set bangumi(bangumi: Bangumi) {
+    set bangumi(bangumi: BangumiAdminEntity) {
         this._bangumi = bangumi;
         if (this._bangumi.episodes && this._bangumi.episodes.length > 0) {
             this.orderedEpisodeList = this._bangumi.episodes.sort((episode1, episode2) => {
@@ -37,11 +38,11 @@ export class BangumiOverviewComponent implements OnInit, OnDestroy {
         }
     }
 
-    get bangumi(): Bangumi {
+    get bangumi(): BangumiAdminEntity {
         return this._bangumi;
     }
 
-    orderedEpisodeList: Episode[];
+    orderedEpisodeList: EpisodeAdminEntity[];
 
     adminList: Account[];
     isLoading: boolean = false;
@@ -88,7 +89,7 @@ export class BangumiOverviewComponent implements OnInit, OnDestroy {
                 mergeMap(
                     (basicInfo: any) => {
                         this.isLoading = true;
-                        this.bangumi.eps_no_offset = basicInfo.eps_no_offset as number;
+                        this.bangumi.epsNoOffset = basicInfo.eps_no_offset as number;
                         this.bangumi.status = basicInfo.status as number;
                         this.bangumi.maintainedByUid = basicInfo.maintainedByUid;
                         if (basicInfo.maintainedByUid && this.adminList.length > 0) {

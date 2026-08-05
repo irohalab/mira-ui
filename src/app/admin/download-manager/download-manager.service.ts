@@ -11,6 +11,7 @@ import { AdminService } from '../admin.service';
 import { TorrentFile } from '../../entity/TorrentFile';
 import { environment } from '../../../environments/environment';
 import { FinishMessageResendState } from '../../entity/FinishMessageResendState';
+import { BangumiAdminEntity } from '../../entity/admin/BangumiAdminEntity';
 
 type ReqData = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -25,7 +26,7 @@ const baseUrl = `${environment.resourceProvider}/admin/download`;
     providedIn: 'root'
 })
 export class DownloadManagerService extends BaseService {
-    private bangumiDict: { [bgmId: string]: Bangumi };
+    private bangumiDict: { [bgmId: string]: BangumiAdminEntity };
 
     constructor(private _httpClient: HttpClient, private _adminService: AdminService) {
         super();
@@ -59,7 +60,7 @@ export class DownloadManagerService extends BaseService {
                         idsDict[job.bangumiId] = true;
                     });
                     return this.getBangumiFromIds(Object.keys(idsDict))
-                        .pipe(map((bangumiList: Bangumi[]) => {
+                        .pipe(map((bangumiList: BangumiAdminEntity[]) => {
                             jobs.forEach(job => {
                                 job.bangumi = bangumiList.find(bangumi => bangumi.id === job.bangumiId);
                             });
@@ -82,7 +83,7 @@ export class DownloadManagerService extends BaseService {
                 const job = res.data;
                 job.progress = Math.floor(job.progress * 100 * 10) / 10;
                 return this.getBangumiFromIds([job.bangumiId])
-                    .pipe(map((bangumiList: Bangumi[]) => {
+                    .pipe(map((bangumiList: BangumiAdminEntity[]) => {
                         job.bangumi = bangumiList[0];
                         return job;
                     }));
@@ -142,7 +143,7 @@ export class DownloadManagerService extends BaseService {
             .pipe(map(res => res.data), catchError(this.handleError));
     }
 
-    public getBangumi(id: string): Observable<Bangumi> {
+    public getBangumi(id: string): Observable<BangumiAdminEntity> {
         if (this.bangumiDict[id]) {
             return of(this.bangumiDict[id]);
         } else {
@@ -153,12 +154,12 @@ export class DownloadManagerService extends BaseService {
         }
     }
 
-    public getBangumiFromIds(ids: string[]): Observable<Bangumi[]> {
+    public getBangumiFromIds(ids: string[]): Observable<BangumiAdminEntity[]> {
         const nonCachedIds = ids.filter(id => {
             return !this.bangumiDict.hasOwnProperty(id);
         });
         if (nonCachedIds.length > 0) {
-            return this._httpClient.post<{ data: Bangumi[], total: number }>(`${baseUrl}/bangumi`, {
+            return this._httpClient.post<{ data: BangumiAdminEntity[], total: number }>(`${baseUrl}/bangumi`, {
                 ids: nonCachedIds
             }).pipe(
                 map((res) => {

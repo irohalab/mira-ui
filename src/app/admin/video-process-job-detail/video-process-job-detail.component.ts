@@ -7,7 +7,6 @@ import { DARK_THEME, DarkThemeService, UIDialog, UIDialogRef, UIToast, UIToastCo
 import { VideoProcessJob } from '../../entity/VideoProcessJob';
 import { Vertex } from '../../entity/Vertex';
 import { AdminService } from '../admin.service';
-import { Bangumi, Episode } from '../../entity';
 import { VideoProcessJobStatus } from '../../entity/VideoProcessJobStatus';
 import { LogType } from '../video-process-manager/LogType';
 import {
@@ -25,6 +24,9 @@ import { StreamLogViewerComponent } from './stream-log-viewer/stream-log-viewer.
 import { NgClass } from '@angular/common';
 import { ResourceGroup } from '../../entity/ResourceGroup';
 import { VideoFile } from '../../entity/video-file';
+import { BangumiAdminEntity } from '../../entity/admin/BangumiAdminEntity';
+import { EpisodeAdminEntity } from '../../entity/admin/EpisodeAdminEntity';
+import { VideoFileAdminEntity } from '../../entity/admin/VideoFileAdminEntity';
 
 @Component({
     selector: 'video-process-job-detail',
@@ -43,8 +45,8 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
 
     job: VideoProcessJob;
     vertices: Vertex[];
-    bangumi: Bangumi;
-    episode: Episode;
+    bangumi: BangumiAdminEntity;
+    episode: EpisodeAdminEntity;
 
     shouldShowJobLog = false;
     jobLogLines = new Subject<LogType>();
@@ -91,7 +93,7 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
                     return this._adminService.getBangumi(job.jobMessage.bangumiId);
                 }))
                 .subscribe({
-                    next: (bangumi: Bangumi) => {
+                    next: (bangumi: BangumiAdminEntity) => {
                         this.bangumi = bangumi;
                         this.getEpisode();
                         this.getVertices();
@@ -204,7 +206,7 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
                 .subscribe({
                     next: (resourceGroupList: ResourceGroup[]) => {
                         const videoFileId = this.job.jobMessage.videoId;
-                        let videoFile: VideoFile;
+                        let videoFile: VideoFileAdminEntity;
                         for (const resourceGroup of resourceGroupList) {
                             videoFile = resourceGroup.videoFiles.find(vf => vf.id === videoFileId);
                             if (videoFile) {

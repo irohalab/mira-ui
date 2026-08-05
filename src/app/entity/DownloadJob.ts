@@ -21,6 +21,7 @@ import { FileMapping } from './FileMapping';
 import { Bangumi } from './bangumi';
 import { DownloadedObject } from './DownloadedObject';
 import { FinishMessageResendState } from './FinishMessageResendState';
+import { BangumiAdminEntity } from './admin/BangumiAdminEntity';
 
 export class DownloadJob {
     public id: string;
@@ -55,5 +56,5 @@ export class DownloadJob {
     public finishMessageResend?: FinishMessageResendState;
 
     // not from database
-    public bangumi: Bangumi;
+    public bangumi: BangumiAdminEntity;
 }

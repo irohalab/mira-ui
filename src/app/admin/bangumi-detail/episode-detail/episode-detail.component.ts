@@ -1,11 +1,11 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
-import { Episode } from '../../../entity';
 import { AdminService } from '../../admin.service';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UIDialogRef, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { BaseError } from '../../../../helpers/error';
 import { Subscription } from 'rxjs';
 import { NgClass } from '@angular/common';
+import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
 
 @Component({
     selector: 'episode-detail',
@@ -28,10 +28,7 @@ export class EpisodeDetail implements OnInit, OnDestroy {
     ];
 
     @Input()
-    episode: Episode;
-
-    @Input()
-    bangumi_id: string;
+    episode: EpisodeAdminEntity;
 
     episodeForm: FormGroup;
 
@@ -44,12 +41,6 @@ export class EpisodeDetail implements OnInit, OnDestroy {
                 private _fb: FormBuilder) {
         this._toastRef = toastService.makeText();
         this.episodeForm = _fb.group({
-            episodeNo: 0,
-            name: '',
-            nameCn: '',
-            bgmEpsId: 0,
-            airdate: '',
-            duration: '',
             status: 0
         });
     }
@@ -74,30 +65,13 @@ export class EpisodeDetail implements OnInit, OnDestroy {
 
     saveEpisode(): void {
         this.busy = true;
-        let modelValue = this.episodeForm.value;
-        let episode = Object.assign({}, this.episode);
-        episode.bangumi_id = this.bangumi_id;
-        episode.episodeNo = modelValue.episodeNo as number;
-        episode.bgmEpsId = modelValue.bgmEpsId as number;
-        episode.name = modelValue.name as string;
-        episode.nameCn = modelValue.nameCn as string;
-        episode.airDate = modelValue.airdate as string;
-        episode.status = modelValue.status as number;
-        if (!episode.airDate) {
-            episode.airDate = null;
-        }
-        episode.duration = modelValue.duration as string;
-        let saveObservable;
-        if (episode.id) {
-            saveObservable = this._adminService.updateEpisode(episode);
-        } else {
-            saveObservable = this._adminService.addEpisode(episode);
-        }
-        this._subscription.add(saveObservable
+        const status = this.episodeForm.value.status as number;
+        this._subscription.add(this._adminService.updateEpisodeStatus(this.episode.id, status)
             .subscribe({
                 next: () => {
+                    this.episode.status = status;
                     this.busy = false;
-                    this._toastRef.show(episode.id ? '添加成功' : '更新成功');
+                    this._toastRef.show('更新成功');
                     this._dialogRef.close(true);
                 },
                 error: (error: BaseError) => {

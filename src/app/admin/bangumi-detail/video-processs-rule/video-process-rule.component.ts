@@ -6,10 +6,10 @@ import { filter, mergeMap, switchMap } from 'rxjs/operators';
 import { VideoProcessRuleService } from './video-process-rule.service';
 import { from, Subscription } from 'rxjs';
 import { AdminService } from '../../admin.service';
-import { Bangumi } from '../../../entity';
-import { VideoFile } from '../../../entity/video-file';
 import { VideoProcessRuleItemComponent } from './video-process-rule-item/video-process-rule-item.component';
 import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
+import { BangumiAdminEntity } from '../../../entity/admin/BangumiAdminEntity';
+import { VideoFileAdminEntity } from '../../../entity/admin/VideoFileAdminEntity';
 
 @Component({
     selector: 'video-process-rule',
@@ -25,7 +25,7 @@ export class VideoProcessRuleComponent implements OnInit, OnDestroy {
     isDarkTheme: boolean;
 
     @Input()
-    bangumi: Bangumi;
+    bangumi: BangumiAdminEntity;
 
     videoProcessRuleList: VideoProcessRule[];
 
@@ -80,20 +80,20 @@ export class VideoProcessRuleComponent implements OnInit, OnDestroy {
                         }
                         return this._adminService.getBangumi(this.bangumi.id)
                     }),
-                    mergeMap((bangumi: Bangumi) => {
+                    mergeMap((bangumi: BangumiAdminEntity) => {
                         return from(bangumi.episodes.map(eps => eps.id));
                     }),
                     mergeMap((episodeId: string) => {
                         return this._adminService.getEpisodeVideoFiles(episodeId);
                     }),
-                    mergeMap((videoFileList: VideoFile[]) => {
+                    mergeMap((videoFileList: VideoFileAdminEntity[]) => {
                         return from(videoFileList);
                     }),
-                    filter((videoFile: VideoFile) => {
-                        return videoFile.status === VideoFile.STATUS_DOWNLOADED;
+                    filter((videoFile: VideoFileAdminEntity) => {
+                        return videoFile.status === VideoFileAdminEntity.STATUS_DOWNLOADED;
                     }),
-                    mergeMap((videoFile: VideoFile) => {
-                        return this._videoProcessRuleService.createJobFromVideoFile(videoFile);
+                    mergeMap((videoFile: VideoFileAdminEntity) => {
+                        return this._videoProcessRuleService.createJobFromVideoFile(videoFile.id);
                     })
                 )
                 .subscribe({
