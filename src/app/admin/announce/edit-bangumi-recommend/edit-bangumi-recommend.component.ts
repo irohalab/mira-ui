@@ -2,7 +2,6 @@ import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UIDialogRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
-import { Bangumi } from '../../../entity';
 import { Announce } from '../../../entity/announce';
 import dayjs from 'dayjs';
 import { NgClass } from '@angular/common';
@@ -36,7 +35,7 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
     announce: Announce;
 
     @Input()
-    bangumi: Bangumi;
+    bangumi: { id: string, name: string };
 
     recommendForm: FormGroup;
 

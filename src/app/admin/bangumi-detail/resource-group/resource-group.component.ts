@@ -1,5 +1,4 @@
 import { Component, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Bangumi, Episode } from '../../../entity';
 import { ResourceGroup } from '../../../entity/ResourceGroup';
 import { EMPTY, forkJoin, of, Subscription, timer } from 'rxjs';
 import { AdminService } from '../../admin.service';
@@ -10,7 +9,6 @@ import { ResourceScanner } from '../../../entity/ResourceScanner';
 import { filter, finalize, switchMap, takeWhile } from 'rxjs/operators';
 import { nanoid } from 'nanoid';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { VideoFile } from '../../../entity/video-file';
 import { VideoProcessManagerService } from '../../video-process-manager/video-process-manager.service';
 import { VideoProcessJob } from '../../../entity/VideoProcessJob';
 import { VideoProcessJobStatus } from '../../../entity/VideoProcessJobStatus';
@@ -21,11 +19,14 @@ import { VideoFileModal } from '../video-file-modal/video-file-modal.component';
 import { NgClass } from '@angular/common';
 import { ScanStatus } from '../../../entity/ScanStatus';
 import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
+import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
+import { BangumiAdminEntity } from '../../../entity/admin/BangumiAdminEntity';
+import { VideoFileAdminEntity } from '../../../entity/admin/VideoFileAdminEntity';
 
 const REFRESH_INTERVAL = 5000;
 
 interface EpisodeVideoFileStatus {
-    episode: Episode;
+    episode: EpisodeAdminEntity;
     videoFiles: {
         id: string;
         status: number;
@@ -48,9 +49,9 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     isDarkTheme: boolean;
 
     eVideoFileStatus = {
-        Pending: VideoFile.STATUS_DOWNLOAD_PENDING,
-        Downloading: VideoFile.STATUS_DOWNLOADING,
-        Downloaded: VideoFile.STATUS_DOWNLOADED
+        Pending: VideoFileAdminEntity.STATUS_DOWNLOAD_PENDING,
+        Downloading: VideoFileAdminEntity.STATUS_DOWNLOADING,
+        Downloaded: VideoFileAdminEntity.STATUS_DOWNLOADED
     };
 
     eDefaultRgId = 'DEFAULT_RG_ID';
@@ -64,7 +65,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     };
 
     @Input()
-    bangumi!: Bangumi;
+    bangumi!: BangumiAdminEntity;
 
     resourceGroupList: ResourceGroup[] = [];
     feedList: string[];
@@ -91,7 +92,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
     get hasDownloadingVideoFiles(): boolean {
         return Object.values(this.episodeVideoFileStatus).filter(epvfList => {
             return epvfList.some(epvf => {
-                return epvf.videoFiles.filter(vf => vf.status === VideoFile.STATUS_DOWNLOADING).length > 0;
+                return epvf.videoFiles.filter(vf => vf.status === VideoFileAdminEntity.STATUS_DOWNLOADING).length > 0;
             });
         }).length > 0
     }
@@ -101,7 +102,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         if (!epvfList) {
             return false;
         }
-        return epvfList.some(epvf => epvf.videoFiles.some(vf => vf.status === VideoFile.STATUS_DOWNLOADING));
+        return epvfList.some(epvf => epvf.videoFiles.some(vf => vf.status === VideoFileAdminEntity.STATUS_DOWNLOADING));
     }
 
     constructor(private adminService: AdminService,
@@ -509,7 +510,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         Object.values(this.episodeVideoFileStatus).forEach(epvfList => {
             epvfList.forEach(epvf => {
                 epvf.videoFiles.forEach(vf => {
-                    if (vf.status !== VideoFile.STATUS_DOWNLOADING) {
+                    if (vf.status !== VideoFileAdminEntity.STATUS_DOWNLOADING) {
                         return;
                     }
                     const videoProcessJob = videoProcessJobList.find(vpJob => vpJob.jobMessage.videoId === vf.id);
@@ -536,7 +537,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         }
     }
 
-    viewEpisode(resourceGroup: ResourceGroup, episode: Episode): void {
+    viewEpisode(resourceGroup: ResourceGroup, episode: EpisodeAdminEntity): void {
         this.pauseRefreshRG = true;
         const dialogRef = this.uiDialog.open(VideoFileModal, {stickyDialog: true, backdrop: true});
         dialogRef.componentInstance.episode = episode;
@@ -573,7 +574,7 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         const videoFileIds = epvfList
             .reduce((ids, epvf) => {
                 epvf.videoFiles.forEach(vf => {
-                    if (vf.status === VideoFile.STATUS_DOWNLOADING) {
+                    if (vf.status === VideoFileAdminEntity.STATUS_DOWNLOADING) {
                         ids.push(vf.id);
                     }
                 });

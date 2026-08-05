@@ -1,9 +1,9 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
-import { Bangumi } from '../../../entity';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UIDialogRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Account } from '../../../entity/Account';
 import { Subscription } from 'rxjs';
+import { BangumiAdminEntity } from '../../../entity/admin/BangumiAdminEntity';
 
 @Component({
     selector: 'bangumi-basic',
@@ -18,7 +18,7 @@ export class BangumiBasic implements OnInit, OnDestroy {
     isDarkTheme: boolean;
 
     @Input()
-    bangumi: Bangumi;
+    bangumi: BangumiAdminEntity;
 
     bangumiForm: FormGroup;
 
@@ -36,7 +36,7 @@ export class BangumiBasic implements OnInit, OnDestroy {
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
         );
         this.bangumiForm = this._fb.group({
-            eps_no_offset: this.bangumi.eps_no_offset,
+            eps_no_offset: this.bangumi.epsNoOffset,
             status: this.bangumi.status,
             maintainedByUid: this.bangumi.maintainedByUid || '',
             alertTimeout: this.bangumi.alertTimeout

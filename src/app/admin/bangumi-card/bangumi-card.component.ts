@@ -5,7 +5,7 @@ import {
 import { DARK_THEME, DarkThemeService, InfiniteList, SCROLL_STATE, UIResponsiveImageWrapper } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { ImageLoadingStrategy } from '../../home/bangumi-card/image-loading-strategy.service';
-import { BangumiRaw } from '../../entity/BangumiRaw';
+import { BangumiCardItem } from '../../entity/admin/BangumiSearchResult';
 import { NgClass } from '@angular/common';
 
 const IMAGE_LOAD_DELAY = 1000;
@@ -27,7 +27,7 @@ export class BangumiCard implements OnInit, OnChanges, OnDestroy{
     showAddedTag: boolean;
 
     @Input()
-    bangumi: BangumiRaw;
+    bangumi: BangumiCardItem;
 
     @Input()
     isInit: boolean;
@@ -86,7 +86,9 @@ export class BangumiCard implements OnInit, OnChanges, OnDestroy{
     }
 
     onImageLoad() {
-        this._imageLoadingStrategy.addLoadedUrl(this.bangumi.coverImage.url);
+        if (this.bangumi.coverImage) {
+            this._imageLoadingStrategy.addLoadedUrl(this.bangumi.coverImage.url);
+        }
     }
 
     private checkIfCanloadImage() {

@@ -1,6 +1,5 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { AdminService } from '../../admin.service';
-import { Bangumi, Episode } from '../../../entity';
 import { forkJoin, Subscription } from 'rxjs';
 import { UIDialog, UIToast, UIToastComponent, UIToastRef, UIResponsiveImageWrapper, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { EpisodeDetail } from '../episode-detail/episode-detail.component';
@@ -11,11 +10,13 @@ import { AlertDialog } from '../../../alert-dialog/alert-dialog.component';
 import { VideoFileModal } from '../video-file-modal/video-file-modal.component';
 import { NgClass } from '@angular/common';
 import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
+import { BangumiAdminEntity } from '../../../entity/admin/BangumiAdminEntity';
+import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
 
 const EP_STATUS_TEXT = {
-    [Episode.STATUS_NOT_DOWNLOADED]: '未下载',
-    [Episode.STATUS_DOWNLOADING]: '下载中',
-    [Episode.STATUS_DOWNLOADED]: '已下载'
+    [EpisodeAdminEntity.STATUS_NOT_DOWNLOADED]: '未下载',
+    [EpisodeAdminEntity.STATUS_DOWNLOADING]: '下载中',
+    [EpisodeAdminEntity.STATUS_DOWNLOADED]: '已下载'
 }
 
 /**
@@ -30,15 +31,15 @@ const EP_STATUS_TEXT = {
 export class EpisodeListComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
     private toastRef: UIToastRef<UIToastComponent>;
-    private episodeList: Episode[];
+    private episodeList: EpisodeAdminEntity[];
 
     @HostBinding('class.dark-theme')
     isDarkTheme: boolean;
 
     @Input()
-    bangumi: Bangumi;
+    bangumi: BangumiAdminEntity;
 
-    get episodes(): Episode[] {
+    get episodes(): EpisodeAdminEntity[] {
         return this.episodeList;
     }
 
@@ -78,10 +79,9 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
         );
     }
 
-    editEpisode(episode?: Episode): void {
+    editEpisode(episode: EpisodeAdminEntity): void {
         let dialogRef = this.dialog.open(EpisodeDetail, {stickyDialog: true, backdrop: true});
         dialogRef.componentInstance.episode = episode;
-        dialogRef.componentInstance.bangumi_id = this.bangumi.id;
         this.subscription.add(
             dialogRef.afterClosed().pipe(
                 filter((result: boolean) => result),
@@ -90,7 +90,7 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
                     return this.adminService.listEpisode(this.bangumi.id);
                 }),)
                 .subscribe({
-                    next: (episodes: Episode[]) => {
+                    next: (episodes: EpisodeAdminEntity[]) => {
                         this.isLoading = false;
                         this.episodes = episodes;
                     },
@@ -108,7 +108,7 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
             this.adminService.syncEpisodes(this.bangumi.id)
                 .pipe(mergeMap((res) => {
                     this.isLoading = false;
-                    const formatEpisodes = (episodes: Episode[]) => {
+                    const formatEpisodes = (episodes: EpisodeAdminEntity[]) => {
                         return episodes.length === 0 ? '无' : '[' + episodes.map(ep => {
                             if (ep.name) {
                                 return ep.episodeNo + '(' + ep.name + ')'
@@ -171,7 +171,7 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
         );
     }
 
-    editVideoFile(episode: Episode): void {
+    editVideoFile(episode: EpisodeAdminEntity): void {
         let dialogRef = this.dialog.open(VideoFileModal, {stickyDialog: true, backdrop: true});
         dialogRef.componentInstance.episode = episode;
     }

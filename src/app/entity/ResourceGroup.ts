@@ -1,6 +1,6 @@
-import { Bangumi } from './bangumi';
 import { ResourceScanner } from './ResourceScanner';
-import { VideoFile } from './video-file';
+import { VideoFileAdminEntity } from './admin/VideoFileAdminEntity';
+import { AdminEntityReference } from './admin/AdminEntityReference';
 
 export class ResourceGroup {
     id!: string;
@@ -9,8 +9,8 @@ export class ResourceGroup {
     updatedTime!: string;
     lastCheckTime!: string;
     alertThresholdDay!: number;
-    bangumi!: Bangumi;
+    bangumi!: AdminEntityReference;
     scanner: ResourceScanner[] = [];
-    videoFiles: VideoFile[] = [];
+    videoFiles: VideoFileAdminEntity[] = [];
     color!: string;
 }

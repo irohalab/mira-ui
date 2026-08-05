@@ -5,7 +5,6 @@ import { UIDialog, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeS
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { filter, mergeMap, switchMap } from 'rxjs/operators';
 import { BaseError } from '../../../helpers/error';
-import { Bangumi } from '../../entity';
 import { Announce } from '../../entity/announce';
 import { AdminService } from '../admin.service';
 import { AnnounceService } from '../announce/announce.service';
@@ -20,6 +19,7 @@ import { BangumiOverviewComponent } from './bangumi-overview/bangumi-overview.co
 import { EpisodeListComponent } from './episode-list/episode-list.component';
 import { ResourceGroupComponent } from './resource-group/resource-group.component';
 import { VideoProcessRuleComponent } from './video-processs-rule/video-process-rule.component';
+import { BangumiAdminEntity } from '../../entity/admin/BangumiAdminEntity';
 
 type TabName =  'Overview' | 'Episode' | 'ResourceGroup' | 'VideoProcess';
 
@@ -41,7 +41,7 @@ export class BangumiDetail implements OnInit, OnDestroy {
     @HostBinding('class.dark-theme')
     isDarkTheme: boolean;
 
-    bangumi = <Bangumi>{};
+    bangumi = <BangumiAdminEntity>{};
 
     isLoading: boolean = false;
 
@@ -99,7 +99,7 @@ export class BangumiDetail implements OnInit, OnDestroy {
                         return this._adminService.getBangumi(id);
                     }))
                 .subscribe({
-                    next: (bangumi: Bangumi) => {
+                    next: (bangumi: BangumiAdminEntity) => {
                         this.bangumi = bangumi;
                         this.fetchAnnounceList(bangumi.id);
                     },

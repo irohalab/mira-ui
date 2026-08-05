@@ -5,7 +5,8 @@ import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, OnInit, V
 import { AdminService } from '../admin.service';
 import { DARK_THEME, DarkThemeService, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIPagination } from '@irohalab/deneb-ui';
 import { BaseError } from '../../../helpers/error';
-import { BangumiRaw } from '../../entity/BangumiRaw';
+import { BangumiAdminEntity } from '../../entity/admin/BangumiAdminEntity';
+import { BangumiSearchResult } from '../../entity/admin/BangumiSearchResult';
 import { NgClass } from '@angular/common';
 import { BangumiCard } from '../bangumi-card/bangumi-card.component';
 import { ResultDetail } from './result-detail/result-detail.component';
@@ -33,12 +34,12 @@ export class SearchBangumi implements OnInit, AfterViewInit, OnDestroy {
     total: number = 0;
     count: number = 10;
 
-    bangumiList: BangumiRaw[];
+    bangumiList: BangumiSearchResult[];
     isLoading: boolean = false;
 
     typePickerOpen: boolean = false;
 
-    selectedBgm: BangumiRaw;
+    selectedBgm: BangumiSearchResult;
 
     showDetail: boolean = false;
     isSaving: boolean = false;
@@ -136,10 +137,10 @@ export class SearchBangumi implements OnInit, AfterViewInit, OnDestroy {
             keyword: this.name,
             type: this.bangumiType,
             offset: offset,
-            count: this.count
+            limit: this.count
         })
             .subscribe({
-                next: (result: { data: BangumiRaw[], total: number }) => {
+                next: (result: { data: BangumiSearchResult[], total: number }) => {
                     this.bangumiList = result.data;
                     this.total = result.total;
                     this.isLoading = false;
@@ -156,7 +157,7 @@ export class SearchBangumi implements OnInit, AfterViewInit, OnDestroy {
         this._dialogRef.close('cancelled');
     }
 
-    viewDetail(bangumi: BangumiRaw): void {
+    viewDetail(bangumi: BangumiSearchResult): void {
         if (bangumi.id) {
             return;
         }
@@ -170,7 +171,7 @@ export class SearchBangumi implements OnInit, AfterViewInit, OnDestroy {
             this._subscription.add(
                 this._adminService.addBangumi(itemId)
                     .subscribe({
-                        next: (bangumi: BangumiRaw) => {
+                        next: (bangumi: BangumiAdminEntity) => {
                             this._dialogRef.close(bangumi.id);
                         },
                         error: (error: BaseError) => {

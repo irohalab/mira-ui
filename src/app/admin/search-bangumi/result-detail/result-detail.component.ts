@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { BangumiRaw } from '../../../entity/BangumiRaw';
+import { BangumiSearchResult } from '../../../entity/admin/BangumiSearchResult';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
@@ -15,7 +15,7 @@ export class ResultDetail implements OnInit, OnDestroy {
     private _subscription = new Subscription();
 
     @Input()
-    bangumi: BangumiRaw;
+    bangumi: BangumiSearchResult;
 
     @Input()
     showDetail: boolean = false;

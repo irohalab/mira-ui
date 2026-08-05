@@ -11,7 +11,7 @@ import { CARD_HEIGHT_REM, BangumiCard } from '../bangumi-card/bangumi-card.compo
 import { SearchBangumi } from '../search-bangumi';
 import { ListBangumiService } from './list-bangumi.service';
 import { environment } from '../../../environments/environment';
-import { BangumiRaw } from '../../entity/BangumiRaw';
+import { BangumiAdminEntity } from '../../entity/admin/BangumiAdminEntity';
 import { groupByQuarters } from '../../../helpers/TimelineListHelpers';
 import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
 import { NgClass } from '@angular/common';
@@ -49,7 +49,7 @@ export class ListBangumi implements OnDestroy, OnInit {
         6: '电视剧'
     };
 
-    bangumiList: BangumiRaw[] = [];
+    bangumiList: BangumiAdminEntity[] = [];
     bucketsStub: InfiniteDataBucketsStub;
 
     isLoading: boolean = false;
@@ -231,7 +231,7 @@ export class ListBangumi implements OnDestroy, OnInit {
         return lastValueFrom(this.adminService.listBangumi(options).pipe(map(res => res.data)));
     }
 
-    public editBangumi(bangumi: BangumiRaw): void {
+    public editBangumi(bangumi: BangumiAdminEntity): void {
         this.router.navigate(['/admin/bangumi', bangumi.id]);
     }
 

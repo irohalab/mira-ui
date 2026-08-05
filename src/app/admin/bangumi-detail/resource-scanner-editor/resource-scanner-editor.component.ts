@@ -9,6 +9,7 @@ import { DownloadEditorComponent } from './download-editor/download-editor.compo
 import { ResourceScanner } from '../../../entity/ResourceScanner';
 import { NgClass } from '@angular/common';
 import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
+import { BangumiAdminEntity } from '../../../entity/admin/BangumiAdminEntity';
 
 @Component({
     selector: 'resource-scanner-editor',
@@ -21,7 +22,7 @@ export class ResourceScannerEditor implements OnInit, OnDestroy {
     private toastRef: UIToastRef<UIToastComponent>;
 
     @Input()
-    bangumi!: Bangumi;
+    bangumi!: BangumiAdminEntity;
 
     @Input()
     feedList!: string[];
