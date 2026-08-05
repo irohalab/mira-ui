@@ -124,10 +124,7 @@ export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
                 episode.id,
                 status)
                 .subscribe(() => {
-                    episode.watch_progress.watch_status = status;
-                    if (status === WatchProgress.WATCHED && !Number.isFinite(episode.watch_progress.percentage)) {
-                        episode.watch_progress.percentage = 1;
-                    }
+                    this.reloadEpisodes();
                     this._toastRef.show('已更新');
                 })
         );
