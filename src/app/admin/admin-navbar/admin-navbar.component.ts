@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
@@ -21,6 +21,12 @@ export class AdminNavbar implements OnInit, OnDestroy {
     @Input()
     backLink: string;
 
+    @Input()
+    interceptBack = false;
+
+    @Output()
+    backRequested = new EventEmitter<void>();
+
     isDarkTheme: boolean;
 
     constructor(private _darkThemeService: DarkThemeService,
@@ -42,6 +48,10 @@ export class AdminNavbar implements OnInit, OnDestroy {
     }
 
     back(): void {
+        if (this.interceptBack) {
+            this.backRequested.emit();
+            return;
+        }
         this._navigationService.goBack(this.backLink);
     }
 }

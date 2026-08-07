@@ -87,7 +87,7 @@
           </ul>
           <div class="episode-video-file-status-list">
             @for (evfs of episodeVideoFileStatus[resourceGroup.id]; track evfs) {
-              <div class="episode-vf" (click)="viewEpisode(resourceGroup, evfs.episode)">
+              <div class="episode-vf" (click)="viewEpisode(resourceGroup, evfs)">
                 <div class="episode-no">{{evfs.episode.sort}}</div>
                 @for (vf of evfs.videoFiles; track vf) {
 <div class="video-file" [ngClass]="{

@@ -1,4 +1,8 @@
-<admin-navbar navTitle="Video Process Job" backLink="/admin/video-manager?status=Running">
+<admin-navbar
+  navTitle="Video Process Job"
+  backLink="/admin/video-manager?status=Running"
+  [interceptBack]="isDialogMode"
+  (backRequested)="closeDialog()">
   @if (job && (job.status === eJobStatus.Running || job.status === eJobStatus.Queueing)) {
     <a class="accessory-action anchor-button"
       title="Cancel"
@@ -44,7 +48,7 @@
           </tr>
           <tr>
             <td>Bangumi:</td>
-            <td><a [routerLink]="['/admin/bangumi', bangumi.id]">{{bangumi.name}}</a></td>
+            <td><button class="inline-link" type="button" (click)="navigate(['/admin/bangumi', bangumi.id])">{{bangumi.name}}</button></td>
             <td>Create Time: </td>
             <td>{{job.createTime}}</td>
           </tr>

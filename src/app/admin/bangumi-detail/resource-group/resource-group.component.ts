@@ -15,13 +15,13 @@ import { VideoProcessJobStatus } from '../../../entity/VideoProcessJobStatus';
 import { DownloadJob } from '../../../entity/DownloadJob';
 import { DownloadJobStatus } from '../../../entity/DownloadJobStatus';
 import { DownloadManagerService } from '../../download-manager/download-manager.service';
-import { VideoFileModal } from '../video-file-modal/video-file-modal.component';
 import { NgClass } from '@angular/common';
 import { ScanStatus } from '../../../entity/ScanStatus';
 import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
 import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
 import { BangumiAdminEntity } from '../../../entity/admin/BangumiAdminEntity';
 import { VideoFileAdminEntity } from '../../../entity/admin/VideoFileAdminEntity';
+import { VideoFileDetailPanelComponent } from './video-file-detail-panel/video-file-detail-panel.component';
 
 const REFRESH_INTERVAL = 5000;
 
@@ -537,33 +537,46 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         }
     }
 
-    viewEpisode(resourceGroup: ResourceGroup, episode: EpisodeAdminEntity): void {
+    viewEpisode(resourceGroup: ResourceGroup, episodeVideoFileStatus: EpisodeVideoFileStatus): void {
         this.pauseRefreshRG = true;
-        const dialogRef = this.uiDialog.open(VideoFileModal, {stickyDialog: true, backdrop: true});
+        const episode = episodeVideoFileStatus.episode;
+        const linkedVideoFile = episodeVideoFileStatus.videoFiles.length === 1
+            ? episodeVideoFileStatus.videoFiles[0]
+            : undefined;
+        const dialogRef = this.uiDialog.open(VideoFileDetailPanelComponent, {stickyDialog: true, backdrop: true});
         dialogRef.componentInstance.episode = episode;
         dialogRef.componentInstance.resourceGroup = resourceGroup;
-        dialogRef.afterClosed()
-            .pipe(switchMap(() => {
-                return this.adminService.getEpisodeVideoFiles(episode.id, resourceGroup.id);
-            }))
-            .subscribe({
-                next: (videoFileList) => {
-                    const epvfs = this.episodeVideoFileStatus[resourceGroup.id].find(epvfs => epvfs.episode.id === episode.id);
-                    for (const videoFile of videoFileList) {
-                        const idx = resourceGroup.videoFiles.indexOf(videoFile);
-                        if (idx >= 0) {
-                            resourceGroup.videoFiles[idx] = videoFile;
-                        }
-                        if (epvfs) {
-                            const vf = epvfs.videoFiles.find(vf => vf.id === videoFile.id);
-                            if (vf) {
-                                vf.status = videoFile.status;
-                            }
-                        }
+        dialogRef.componentInstance.downloadJob = linkedVideoFile?.downloadJob;
+        dialogRef.componentInstance.videoProcessJob = linkedVideoFile?.videoProcessJob;
+        this.subscription.add(
+            dialogRef.afterClosed()
+                .pipe(
+                    switchMap(() => this.adminService.getEpisodeVideoFiles(episode.id, resourceGroup.id)),
+                    finalize(() => { this.pauseRefreshRG = false; })
+                )
+                .subscribe({
+                    next: (videoFileList) => {
+                        const previousVideoFiles = episodeVideoFileStatus.videoFiles;
+                        resourceGroup.videoFiles = [
+                            ...resourceGroup.videoFiles.filter(videoFile => videoFile.episode.id !== episode.id),
+                            ...videoFileList
+                        ];
+                        episodeVideoFileStatus.videoFiles = videoFileList.map(videoFile => {
+                            const previous = previousVideoFiles.find(item => item.id === videoFile.id);
+                            return {
+                                id: videoFile.id,
+                                status: Number(videoFile.status),
+                                downloadJob: previous?.downloadJob,
+                                videoProcessJob: previous?.videoProcessJob
+                            };
+                        });
+                        this.ensureJobPolling();
+                    },
+                    error: (error) => {
+                        this.toastRef.show(error.message || error);
                     }
-                    this.pauseRefreshRG = false;
-                }
-            });
+                })
+        );
     }
 
     reconcileResourceGroup(resourceGroup: ResourceGroup): void {

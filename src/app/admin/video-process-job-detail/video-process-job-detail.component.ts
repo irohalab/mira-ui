@@ -1,8 +1,8 @@
-import { AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Optional, Output, ViewChild } from '@angular/core';
 import { VideoProcessManagerService } from '../video-process-manager/video-process-manager.service';
-import { combineLatestWith, delay, interval, Subject, Subscription } from 'rxjs';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { switchMap, takeWhile, tap } from 'rxjs/operators';
+import { combineLatestWith, delay, interval, ReplaySubject, Subject, Subscription } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { distinctUntilChanged, filter, map, switchMap, takeWhile, tap } from 'rxjs/operators';
 import { DARK_THEME, DarkThemeService, UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { VideoProcessJob } from '../../entity/VideoProcessJob';
 import { Vertex } from '../../entity/Vertex';
@@ -32,7 +32,7 @@ import { VideoFileAdminEntity } from '../../entity/admin/VideoFileAdminEntity';
     selector: 'video-process-job-detail',
     templateUrl: './video-process-job-detail.html',
     styleUrls: ['./video-process-job-detail.less'],
-    imports: [AdminNavbar, ConfirmDialogDirective, RouterLink, VertexGraphComponent, StreamLogViewerComponent, NgClass]
+    imports: [AdminNavbar, ConfirmDialogDirective, VertexGraphComponent, StreamLogViewerComponent, NgClass]
 })
 export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _subscription = new Subscription();
@@ -40,6 +40,7 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
     private jobContainerMaxCharacter: number;
     private vertexDetailDialogRef: UIDialogRef<VertexInfoPanelComponent>;
     private _dialogSubscription = new Subscription();
+    private jobIdInput = new ReplaySubject<string>(1);
 
     eJobStatus = VideoProcessJobStatus;
 
@@ -58,6 +59,20 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
 
     @ViewChild('jobLogContainer') jobLogContainerRef: ElementRef;
 
+    @Input()
+    set jobId(jobId: string) {
+        if (jobId) {
+            this.jobIdInput.next(jobId);
+        }
+    }
+
+    get isDialogMode(): boolean {
+        return !!this._dialogRef;
+    }
+
+    @Output()
+    navigationRequested = new EventEmitter<any[]>();
+
     constructor(private _videoProcessManagerService: VideoProcessManagerService,
                 private _adminService: AdminService,
                 private _route: ActivatedRoute,
@@ -65,7 +80,8 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
                 private _dialog: UIDialog,
                 private _darkThemeService: DarkThemeService,
                 toastService: UIToast,
-                private titleService: Title) {
+                private titleService: Title,
+                @Optional() private _dialogRef: UIDialogRef<VideoProcessJobDetailComponent>) {
         this._toastRef = toastService.makeText();
     }
 
@@ -79,11 +95,17 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
             this._darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
         );
+        const jobIdSource = this.isDialogMode
+            ? this.jobIdInput
+            : this._route.params.pipe(map(params => params['id'] as string));
         this._subscription.add(
-            this._route.params.pipe(
-                switchMap(params => {
-                    const jobId = params['id'];
-                    this.titleService.setTitle(`Video Job Detail - ${environment.siteTitle}`);
+            jobIdSource.pipe(
+                filter(jobId => !!jobId),
+                distinctUntilChanged(),
+                switchMap(jobId => {
+                    if (!this.isDialogMode) {
+                        this.titleService.setTitle(`Video Job Detail - ${environment.siteTitle}`);
+                    }
                     return this._videoProcessManagerService.getJob(jobId)
                         .pipe(combineLatestWith(this._videoProcessManagerService.getVertices(jobId)));
                 }),
@@ -108,6 +130,24 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
 
     ngOnDestroy(): void {
         this._subscription.unsubscribe();
+        this._dialogSubscription.unsubscribe();
+        if (this.vertexDetailDialogRef) {
+            this.vertexDetailDialogRef.close(null);
+            this.vertexDetailDialogRef = undefined;
+        }
+    }
+
+    closeDialog(): void {
+        this._dialogRef?.close(null);
+    }
+
+    navigate(commands: any[]): void {
+        if (this.isDialogMode && this.navigationRequested.observed) {
+            this.navigationRequested.emit(commands);
+            return;
+        }
+        this.closeDialog();
+        this._router.navigate(commands);
     }
 
     cancelJob(): void {
@@ -172,7 +212,7 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
             this.vertexDetailDialogRef.componentInstance.vertex = this.vertices.find(v => v.id === vertexId);
             this._dialogSubscription.add(this.vertexDetailDialogRef.afterClosed()
                 .subscribe(() => {
-                    this._dialogSubscription.unsubscribe();
+                    this.vertexDetailDialogRef = undefined;
                     console.log('close vertex info of ' + vertexId);
                 })
             );
@@ -246,7 +286,9 @@ export class VideoProcessJobDetailComponent implements OnInit, OnDestroy, AfterV
             interval(5000)
                 .pipe(
                     takeWhile(() => {
-                        return this.job && this.job.status === VideoProcessJobStatus.Queueing || this.job.status === VideoProcessJobStatus.Running;
+                        return this.job
+                            && (this.job.status === VideoProcessJobStatus.Queueing
+                                || this.job.status === VideoProcessJobStatus.Running);
                     }),
                     switchMap(() => {
                         return this._videoProcessManagerService.getJob(this.job.id)

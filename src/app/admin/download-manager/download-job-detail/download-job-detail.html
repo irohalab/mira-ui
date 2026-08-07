@@ -10,7 +10,7 @@
     @if (!!job.bangumi) {
       <div class="bangumi-name">
         Bangumi:
-        <a class="bangumi-link" [routerLink]="['/admin/bangumi', job.bangumiId]">{{job.bangumi.name}}</a>
+        <button class="bangumi-link inline-link" type="button" (click)="navigate(['/admin/bangumi', job.bangumiId])">{{job.bangumi.name}}</button>
       </div>
     }
   </div>

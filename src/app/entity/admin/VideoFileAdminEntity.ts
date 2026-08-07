@@ -18,7 +18,7 @@ export class VideoFileAdminEntity {
     kfTileSize?: number;
     kfFrameWidth?: number;
     kfFrameHeight?: number;
-    kfImagePathList?: any;
+    kfImagePathList?: string[];
     blobStorageUrlV0?: string;
 
     static STATUS_DOWNLOAD_PENDING = 1;
@@ -41,4 +41,5 @@ export interface VideoFileAdminPayload {
     duration?: number;
     label?: string;
     blobStorageUrlV0?: string;
+    kfImagePathList?: string[];
 }
