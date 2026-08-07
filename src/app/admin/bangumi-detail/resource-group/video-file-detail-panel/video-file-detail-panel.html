@@ -1,0 +1,324 @@
+<div class="video-file-detail-panel">
+  <header class="panel-header">
+    <div class="panel-leading">
+      @if (videoFileForm?.dirty) {
+        <button
+          class="ui small basic labeled icon button cancel-button"
+          [ngClass]="{inverted: isDarkTheme}"
+          type="button"
+          confirmDialog
+          dialogTitle="Discard unsaved changes?"
+          dialogContent="Your VideoFile changes have not been saved."
+          (onConfirm)="close()">
+          <i class="chevron left icon" aria-hidden="true"></i>
+          Cancel
+        </button>
+      } @else {
+        <button class="ui small basic labeled icon button cancel-button" [ngClass]="{inverted: isDarkTheme}" type="button" (click)="close()">
+          <i class="chevron left icon" aria-hidden="true"></i>
+          Cancel
+        </button>
+      }
+      <div class="panel-heading">
+        <div class="episode-marker">Episode {{episode.episodeNo}}</div>
+        <h2>VideoFile</h2>
+        <span class="resource-group-name">{{resourceGroup.displayName}}</span>
+      </div>
+    </div>
+    <div class="panel-actions" role="toolbar" aria-label="VideoFile actions">
+      @if (!loading && !loadError && videoFileForm) {
+        <button
+          class="ui small red basic button"
+          type="button"
+          [disabled]="deleting"
+          confirmDialog
+          dialogTitle="Delete VideoFile"
+          dialogContent="This cannot be undone."
+          (onConfirm)="deleteVideoFile()">
+          <i class="trash icon" aria-hidden="true"></i>
+          {{isPersisted ? 'Delete' : 'Discard'}}
+        </button>
+        @if (isPersisted && videoFile?.status === videoFileStatus.downloaded && hasApplicableRule) {
+          <button
+            class="ui small basic labeled icon button"
+            [ngClass]="{inverted: isDarkTheme}"
+            type="button"
+            [disabled]="handlingConvert"
+            confirmDialog
+            dialogTitle="Re-process VideoFile"
+            dialogContent="Start a new video process job for this VideoFile?"
+            (onConfirm)="reprocessVideoFile()">
+            <i class="redo icon" aria-hidden="true"></i>
+            Re-process
+          </button>
+        }
+      }
+      @if (!loading && !loadError && videoFileForm) {
+        <button
+          class="ui small primary labeled icon button"
+          type="button"
+          [ngClass]="{loading: saving}"
+          [disabled]="saving || videoFileForm.invalid || (!videoFileForm.dirty && isPersisted)"
+          (click)="save()">
+          <i class="save icon" aria-hidden="true"></i>
+          Save
+        </button>
+      }
+    </div>
+  </header>
+
+  <nav class="ui secondary pointing menu panel-tabs" [ngClass]="{inverted: isDarkTheme}" role="tablist" aria-label="VideoFile sections">
+    <button
+      id="video-file-details-tab"
+      type="button"
+      class="item"
+      role="tab"
+      [ngClass]="{active: activeTab === 'details'}"
+      [attr.aria-selected]="activeTab === 'details'"
+      aria-controls="video-file-details-panel"
+      (click)="selectTab('details')">
+      <i class="file video outline icon" aria-hidden="true"></i>
+      Details
+    </button>
+    <button
+      id="video-file-rule-tab"
+      type="button"
+      class="item"
+      role="tab"
+      [ngClass]="{active: activeTab === 'rule'}"
+      [attr.aria-selected]="activeTab === 'rule'"
+      aria-controls="video-file-rule-panel"
+      (click)="selectTab('rule')">
+      <i class="sliders horizontal icon" aria-hidden="true"></i>
+      Process Rule
+    </button>
+  </nav>
+
+  <main class="panel-body">
+    @if (loading) {
+      <div class="panel-state" aria-live="polite">
+        <div class="ui active inline loader"></div>
+        <span>Loading VideoFile...</span>
+      </div>
+    } @else if (loadError) {
+      <div class="panel-state error-state" role="alert">
+        <i class="exclamation triangle icon" aria-hidden="true"></i>
+        <span>{{loadError}}</span>
+      </div>
+    } @else if (videoFileForm) {
+      @if (activeTab === 'details') {
+        <section id="video-file-details-panel" role="tabpanel" aria-labelledby="video-file-details-tab">
+          <div class="details-layout">
+            <form class="ui form video-file-form" [ngClass]="{inverted: isDarkTheme}" [formGroup]="videoFileForm" (ngSubmit)="save()">
+              <section class="form-section identity-section">
+                <div class="section-heading">
+                  <h3>Identity</h3>
+                  <span class="persistence-state" [ngClass]="{persisted: isPersisted}">
+                    {{isPersisted ? 'Persisted' : 'New'}}
+                  </span>
+                </div>
+                <dl class="identity-grid">
+                  <div><dt>VideoFile ID</dt><dd>{{videoFile?.id || 'Not assigned'}}</dd></div>
+                  <div><dt>Bangumi ID</dt><dd>{{episode.bangumi.id}}</dd></div>
+                  <div><dt>Episode ID</dt><dd>{{episode.id}}</dd></div>
+                  <div><dt>Resource Group ID</dt><dd>{{resourceGroup.id}}</dd></div>
+                </dl>
+              </section>
+
+              <section class="form-section">
+                <div class="section-heading"><h3>Presentation</h3></div>
+                <div class="two fields">
+                  <div class="field">
+                    <label for="video-file-name">File name</label>
+                    <input id="video-file-name" type="text" formControlName="fileName">
+                  </div>
+                  <div class="field">
+                    <label for="video-file-label">Label</label>
+                    <input id="video-file-label" type="text" formControlName="label">
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="video-file-download-url">Download URL</label>
+                  <input id="video-file-download-url" type="text" formControlName="downloadUrl">
+                </div>
+              </section>
+
+              <section class="form-section system-section">
+                <div class="section-heading system-heading">
+                  <div>
+                    <h3>System-managed fields</h3>
+                    <span class="lock-state"><i class="lock icon" aria-hidden="true"></i>{{systemFieldsUnlocked ? 'Unlocked' : 'Locked'}}</span>
+                  </div>
+                  <ui-toggle
+                    text="Unlock system-managed fields"
+                    name="unlockSystemFields"
+                    [ngModel]="systemFieldsUnlocked"
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="setSystemFieldsUnlocked($event)">
+                  </ui-toggle>
+                </div>
+
+                <div class="four fields">
+                  <div class="field">
+                    <label for="video-file-status">Status</label>
+                    <select id="video-file-status" formControlName="status">
+                      <option [ngValue]="videoFileStatus.pending">Pending</option>
+                      <option [ngValue]="videoFileStatus.downloading">Downloading</option>
+                      <option [ngValue]="videoFileStatus.downloaded">Downloaded</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="video-file-resolution-w">Width</label>
+                    <input id="video-file-resolution-w" type="number" formControlName="resolutionW">
+                  </div>
+                  <div class="field">
+                    <label for="video-file-resolution-h">Height</label>
+                    <input id="video-file-resolution-h" type="number" formControlName="resolutionH">
+                  </div>
+                  <div class="field">
+                    <label for="video-file-duration">Duration</label>
+                    <input id="video-file-duration" type="number" formControlName="duration">
+                  </div>
+                </div>
+                <div class="two fields">
+                  <div class="field">
+                    <label for="video-file-torrent-id">Torrent ID</label>
+                    <input id="video-file-torrent-id" type="text" formControlName="torrentId">
+                  </div>
+                  <div class="field">
+                    <label for="video-file-path">File path</label>
+                    <input id="video-file-path" type="text" formControlName="filePath">
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="video-file-blob-url">Blob storage URL</label>
+                  <input id="video-file-blob-url" type="text" formControlName="blobStorageUrlV0">
+                </div>
+                <div class="field">
+                  <label for="video-file-keyframe-paths">Keyframe image paths</label>
+                  <textarea id="video-file-keyframe-paths" rows="5" formControlName="kfImagePathList"></textarea>
+                </div>
+              </section>
+
+              <section class="form-section diagnostics-section">
+                <button
+                  class="diagnostics-toggle"
+                  type="button"
+                  [attr.aria-expanded]="diagnosticsExpanded"
+                  aria-controls="video-file-diagnostics"
+                  (click)="diagnosticsExpanded = !diagnosticsExpanded">
+                  <i class="chevron icon" [ngClass]="{right: !diagnosticsExpanded, down: diagnosticsExpanded}" aria-hidden="true"></i>
+                  Processing diagnostics
+                </button>
+                @if (diagnosticsExpanded) {
+                  <dl id="video-file-diagnostics" class="identity-grid diagnostics-grid">
+                    <div><dt>Task ID</dt><dd>{{videoFile?.taskId || 'N/A'}}</dd></div>
+                    <div><dt>Keyframe tile size</dt><dd>{{videoFile?.kfTileSize ?? 'N/A'}}</dd></div>
+                    <div><dt>Keyframe width</dt><dd>{{videoFile?.kfFrameWidth ?? 'N/A'}}</dd></div>
+                    <div><dt>Keyframe height</dt><dd>{{videoFile?.kfFrameHeight ?? 'N/A'}}</dd></div>
+                  </dl>
+                }
+              </section>
+            </form>
+
+            <aside class="job-column" aria-label="Linked jobs">
+              <section class="job-summary">
+                <div class="job-summary-heading">
+                  <div>
+                    <span class="job-kind">Download</span>
+                    <h3>{{downloadJob ? downloadJob.status : 'No linked job'}}</h3>
+                  </div>
+                  @if (downloadJob) {
+                    <button class="ui small icon button" type="button" title="Open full download job" aria-label="Open full download job" (click)="openDownloadJobDetail()">
+                      <i class="external alternate icon" aria-hidden="true"></i>
+                    </button>
+                  }
+                </div>
+                @if (downloadJob) {
+                  <div class="progress-track" role="progressbar" aria-label="Download progress" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="downloadJob.progress">
+                    <span [style.width.%]="downloadJob.progress"></span>
+                  </div>
+                  <div class="progress-value">{{downloadJob.progress}}%</div>
+                  <dl class="job-facts">
+                    <div><dt>Job ID</dt><dd>{{downloadJob.id}}</dd></div>
+                    <div><dt>Torrent</dt><dd>{{downloadJob.torrentName || 'N/A'}}</dd></div>
+                    <div><dt>Downloaded</dt><dd>{{downloadJob.downloaded | readableUnit:'byte':1}} / {{downloadJob.size | readableUnit:'byte':1}}</dd></div>
+                    <div><dt>Speed</dt><dd>{{downloadJob.downloadSpeed | readableUnit:'byte':1}}/s</dd></div>
+                    <div><dt>ETA</dt><dd>{{downloadJob.eta | readableUnit:'second':0}}</dd></div>
+                    <div><dt>Seeds</dt><dd>{{downloadJob.connectedSeeds}} / {{downloadJob.seeds}}</dd></div>
+                    <div><dt>Availability</dt><dd>{{downloadJob.availability}}</dd></div>
+                    <div><dt>Created</dt><dd>{{downloadJob.createTime | date:'medium'}}</dd></div>
+                    <div><dt>Ended</dt><dd>{{downloadJob.endTime ? (downloadJob.endTime | date:'medium') : 'N/A'}}</dd></div>
+                  </dl>
+                  @if (downloadJob.errorInfo?.message) {
+                    <div class="job-error" role="alert">{{downloadJob.errorInfo.message}}</div>
+                  }
+                }
+              </section>
+
+              <section class="job-summary">
+                <div class="job-summary-heading">
+                  <div>
+                    <span class="job-kind">Video process</span>
+                    <h3>{{videoProcessJob ? videoProcessJob.status : 'No linked job'}}</h3>
+                  </div>
+                  @if (videoProcessJob) {
+                    <button class="ui small icon button" type="button" title="Open full video process job" aria-label="Open full video process job" (click)="openVideoProcessJobDetail()">
+                      <i class="external alternate icon" aria-hidden="true"></i>
+                    </button>
+                  }
+                </div>
+                @if (videoProcessJob) {
+                  <dl class="job-facts">
+                    <div><dt>Job ID</dt><dd>{{videoProcessJob.id}}</dd></div>
+                    <div><dt>Action</dt><dd>{{videoProcessJob.progress + 1}} / {{videoProcessJob.jobMessage?.actions?.length || 0}}</dd></div>
+                    <div><dt>Type</dt><dd>{{videoProcessJob.jobMessage?.jobType || 'N/A'}}</dd></div>
+                    <div><dt>Version</dt><dd>{{videoProcessJob.jobMessage?.version || 'N/A'}}</dd></div>
+                    <div><dt>Executor</dt><dd>{{videoProcessJob.jobExecutorId || 'N/A'}}</dd></div>
+                    <div><dt>Created</dt><dd>{{videoProcessJob.createTime | date:'medium'}}</dd></div>
+                    <div><dt>Started</dt><dd>{{videoProcessJob.startTime ? (videoProcessJob.startTime | date:'medium') : 'N/A'}}</dd></div>
+                    <div><dt>Finished</dt><dd>{{videoProcessJob.finishedTime ? (videoProcessJob.finishedTime | date:'medium') : 'N/A'}}</dd></div>
+                    <div><dt>Latest state</dt><dd>{{latestProcessState?.startTime ? (latestProcessState?.startTime | date:'medium') : 'N/A'}}</dd></div>
+                  </dl>
+                }
+              </section>
+            </aside>
+          </div>
+        </section>
+      } @else {
+        <section id="video-file-rule-panel" class="rule-panel" role="tabpanel" aria-labelledby="video-file-rule-tab">
+          <div class="rule-panel-heading">
+            <div>
+              <span class="section-eyebrow">VideoFile-specific rule</span>
+              <h3>Process Rule</h3>
+            </div>
+            @if (isPersisted && !videoProcessRule && !ruleInvariantError) {
+              <button class="ui primary labeled icon button" type="button" (click)="addRule()">
+                <i class="plus icon" aria-hidden="true"></i>
+                Add Rule
+              </button>
+            }
+          </div>
+
+          @if (ruleInvariantError) {
+            <div class="ui negative message" role="alert">{{ruleInvariantError}}</div>
+          } @else if (videoProcessRule) {
+            <video-process-rule-item [rule]="videoProcessRule" (delete)="onRuleDeleted()"></video-process-rule-item>
+          } @else if (!isPersisted) {
+            <div class="empty-state">Save the VideoFile before adding its process rule.</div>
+          } @else {
+            <div class="empty-state">No VideoFile-specific process rule.</div>
+          }
+
+          @if (hasBangumiWideRule) {
+            <div class="fallback-rule-state">
+              <i class="check circle icon" aria-hidden="true"></i>
+              A Bangumi-wide fallback rule is available.
+            </div>
+          }
+        </section>
+      }
+    }
+  </main>
+
+</div>

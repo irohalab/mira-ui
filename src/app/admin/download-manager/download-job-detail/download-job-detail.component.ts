@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { DARK_THEME, DarkThemeService, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { DownloadJob } from '../../../entity/DownloadJob';
 import { concat, Observable, of, Subscription, timer } from 'rxjs';
@@ -6,7 +6,7 @@ import { DownloadManagerService } from '../download-manager.service';
 import { catchError, filter, finalize, map, switchMap, takeWhile } from 'rxjs/operators';
 import { DownloadJobStatus } from '../../../entity/DownloadJobStatus';
 import { TorrentFile } from '../../../entity/TorrentFile';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { DatePipe, NgClass, PercentPipe } from '@angular/common';
 import { ReadableUnit } from '../../../pipes/readable-unit';
 import { FinishMessageResendState } from '../../../entity/FinishMessageResendState';
@@ -23,7 +23,7 @@ interface FinishMessageResendUpdate {
     selector: 'download-job-detail',
     templateUrl: './download-job-detail.html',
     styleUrls: ['./download-job-detail.less'],
-    imports: [RouterLink, NgClass, PercentPipe, DatePipe, ReadableUnit]
+    imports: [NgClass, PercentPipe, DatePipe, ReadableUnit]
 })
 export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     private _subscription = new Subscription();
@@ -33,6 +33,9 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
 
     @Input()
     job: DownloadJob;
+
+    @Output()
+    navigationRequested = new EventEmitter<any[]>();
 
     jobContent: TorrentFile[] = [];
     activeTab: JobDetailTab = 'details';
@@ -45,6 +48,7 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
     constructor(private _dialogRef: UIDialogRef<DownloadJobDetailComponent>,
                 private _downloadManagerService: DownloadManagerService,
                 private _darkThemeService: DarkThemeService,
+                private _router: Router,
                 toast: UIToast) {
         this._toastRef = toast.makeText();
     }
@@ -54,6 +58,15 @@ export class DownloadJobDetailComponent implements OnInit, OnDestroy {
 
     selectTab(tab: JobDetailTab): void {
         this.activeTab = tab;
+    }
+
+    navigate(commands: any[]): void {
+        if (this.navigationRequested.observed) {
+            this.navigationRequested.emit(commands);
+            return;
+        }
+        this.closePanel();
+        this._router.navigate(commands);
     }
 
     resendCompleteMessage(): void {
