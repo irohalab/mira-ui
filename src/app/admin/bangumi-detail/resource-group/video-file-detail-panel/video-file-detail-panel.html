@@ -4,6 +4,7 @@
       @if (videoFileForm?.dirty) {
         <button
           class="ui small basic labeled icon button cancel-button"
+          [ngClass]="{inverted: isDarkTheme}"
           type="button"
           confirmDialog
           dialogTitle="Discard unsaved changes?"
@@ -13,7 +14,7 @@
           Cancel
         </button>
       } @else {
-        <button class="ui small basic labeled icon button cancel-button" type="button" (click)="close()">
+        <button class="ui small basic labeled icon button cancel-button" [ngClass]="{inverted: isDarkTheme}" type="button" (click)="close()">
           <i class="chevron left icon" aria-hidden="true"></i>
           Cancel
         </button>
@@ -40,6 +41,7 @@
         @if (isPersisted && videoFile?.status === videoFileStatus.downloaded && hasApplicableRule) {
           <button
             class="ui small basic labeled icon button"
+            [ngClass]="{inverted: isDarkTheme}"
             type="button"
             [disabled]="handlingConvert"
             confirmDialog
