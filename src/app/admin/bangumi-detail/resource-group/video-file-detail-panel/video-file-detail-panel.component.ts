@@ -94,6 +94,8 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
     loadError?: string;
     ruleInvariantError?: string;
 
+    eDownloadJobStatus = DownloadJobStatus;
+
     readonly videoFileStatus = {
         pending: VideoFileAdminEntity.STATUS_DOWNLOAD_PENDING,
         downloading: VideoFileAdminEntity.STATUS_DOWNLOADING,

@@ -14,4 +14,46 @@
     <div class="inline field">
         <ui-toggle text="自动从上次播放的位置开始" [(ngModel)]="autoPlayFromLastPosition" name="auto_play_from_last_position"></ui-toggle>
     </div>
+    <div class="routing-field field">
+        <label for="playback-route">播放线路</label>
+        <div class="routing-select-row">
+            <select id="playback-route"
+                    name="playback_route"
+                    [ngModel]="routeSelection"
+                    (ngModelChange)="onRouteSelectionChange($event)">
+                <option value="auto">自动（推荐）</option>
+                @if (preferredBackendUnavailable) {
+                    <option [value]="routeSelection" disabled>已保存的节点（当前不可用）</option>
+                }
+                @for (group of backendGroups; track group.region) {
+                    <optgroup [label]="group.label">
+                        @for (backend of group.backends; track backend.id) {
+                            <option [value]="'backend:' + backend.id"
+                                    [disabled]="!isBackendAvailable(backend)">
+                                {{backend.label}}{{isBackendAvailable(backend) ? '' : '（不可用）'}}
+                            </option>
+                        }
+                    </optgroup>
+                }
+            </select>
+            @if (loadingBackends) {
+                <i class="notched circle loading icon" title="正在加载线路"></i>
+            }
+            @if (backendLoadFailed) {
+                <button type="button" class="routing-retry-button" title="重新加载线路" (click)="loadBackends()">
+                    <i class="refresh icon"></i>
+                </button>
+            }
+        </div>
+        @if (activeRoute?.selectedBackend) {
+            <div class="routing-status">当前节点：{{activeRoute.selectedBackend.label}}</div>
+        } @else if (activeRoute && !activeRoute.routed) {
+            <div class="routing-status">当前使用默认线路</div>
+        }
+        @if (activeRoute?.selection?.reason === 'preferred-backend-unavailable') {
+            <div class="routing-warning">首选节点当前不可用，已自动选择其他节点</div>
+        } @else if (preferredBackendUnavailable) {
+            <div class="routing-warning">已保存的节点不在当前可用列表中，请选择其他线路</div>
+        }
+    </div>
 </form>

@@ -1,6 +1,6 @@
 
 import {retry, tap, timeout} from 'rxjs/operators';
-import {AfterViewInit, Component, ElementRef, Injector, OnDestroy, OnInit, Self, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, forwardRef, Injector, OnDestroy, OnInit, Self, ViewChild} from '@angular/core';
 import { CONTROL_FADE_OUT_TIME, VideoPlayerHelpers } from '../core/helpers';
 import { VideoPlayer } from '../video-player.component';
 import { Subscription ,  Subject } from 'rxjs';
@@ -10,6 +10,8 @@ import {closest} from "../../../helpers/dom";
 import { VideoFullscreenButton } from '../controls/fullscreen-button/fullscreen-button.component';
 import { VideoPlayButton } from '../controls/play-button/play-button.component';
 import { VideoPlayerScrubBar } from '../controls/scrub-bar/scrub-bar.component';
+import { VideoPlayerConfigButton } from '../controls/config-button/config-button.component';
+import { VIDEO_CONTROL_HOST, VideoControlHost } from '../controls/control-host';
 
 @Component({
     selector: 'video-touch-controls',
@@ -27,17 +29,20 @@ import { VideoPlayerScrubBar } from '../controls/scrub-bar/scrub-bar.component';
             transition('hide => show', animate('200ms ease-in'))
         ])
     ],
-    imports: [VideoFullscreenButton, VideoPlayButton, VideoPlayerScrubBar]
+    imports: [VideoFullscreenButton, VideoPlayButton, VideoPlayerScrubBar, VideoPlayerConfigButton],
+    providers: [{provide: VIDEO_CONTROL_HOST, useExisting: forwardRef(() => VideoTouchControls)}]
 })
-export class VideoTouchControls implements OnInit, OnDestroy, AfterViewInit {
+export class VideoTouchControls implements OnInit, OnDestroy, AfterViewInit, VideoControlHost {
     private _subscription = new Subscription();
     private _motion = new Subject();
     private _videoPlayer: VideoPlayer;
     private _tapHandlerBinding = this.tapHandler.bind(this);
     private _hammerManager: HammerManager;
     private _fadeOutTime = CONTROL_FADE_OUT_TIME + 1000;
+    private _preventHide = false;
 
     showControls = true;
+    readonly configPopoverPlacement = 'bottom' as const;
 
     currentTime = Number.NaN;
     duration = Number.NaN;
@@ -62,6 +67,14 @@ export class VideoTouchControls implements OnInit, OnDestroy, AfterViewInit {
 
     onMotion() {
         this._motion.next(1);
+    }
+
+    keepShow(keep: boolean): void {
+        this._preventHide = keep;
+        this.showControls = true;
+        if (!keep) {
+            this.onMotion();
+        }
     }
 
     constructor(private _injector: Injector, @Self() private _hostRef: ElementRef) {
@@ -91,7 +104,9 @@ export class VideoTouchControls implements OnInit, OnDestroy, AfterViewInit {
                 timeout(this._fadeOutTime),
                 tap(() => {},
                     () => {
-                        this.showControls = false;
+                        if (!this._preventHide) {
+                            this.showControls = false;
+                        }
                     }),
                 retry(),)
                 .subscribe(
@@ -108,6 +123,9 @@ export class VideoTouchControls implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private tapHandler(event: HammerInput) {
+        if (this._preventHide) {
+            return;
+        }
         let targetEl = event.target;
         if (this.showControls && !targetEl.classList.contains('interact-element') && !closest(targetEl, '.interact-element')) {
             this.showControls = false;

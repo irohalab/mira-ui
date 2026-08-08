@@ -30,7 +30,7 @@ export class VideoPlayButton implements OnInit, OnDestroy {
     @Input()
     controlVisibleState: boolean;
 
-    state: PlayState;
+    state: number;
 
     get iconClass() : 'pause' | 'play' | 'repeat' {
         switch (this.state) {

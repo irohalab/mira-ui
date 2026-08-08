@@ -25,3 +25,9 @@ export class FloatPlayer {
     static AUTO_FLOAT_WHEN_SCROLL = `${FloatPlayer.prefix}:AutoFloatWhenScroll`;
     static AUTO_FLOAT_WHEN_LEAVE = `${FloatPlayer.prefix}:AutoFloatWhenLeave`;
 }
+
+export class Routing {
+    static className = 'Routing';
+    static prefix = `${PREFIX}:${Routing.className}`;
+    static PREFERENCE = `${Routing.prefix}:Preference`;
+}

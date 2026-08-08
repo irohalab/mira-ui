@@ -235,10 +235,15 @@
                   }
                 </div>
                 @if (downloadJob) {
-                  <div class="progress-track" role="progressbar" aria-label="Download progress" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="downloadJob.progress">
-                    <span [style.width.%]="downloadJob.progress"></span>
+                  <div class="ui progress" [ngClass]="{
+                    active: downloadJob.status === eDownloadJobStatus.Downloading,
+                    success: downloadJob.status === eDownloadJobStatus.Complete,
+                    warning: downloadJob.status === eDownloadJobStatus.Paused,
+                    error: downloadJob.status === eDownloadJobStatus.Error}" role="progressbar" aria-label="Download progress" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="downloadJob.progress">
+                    <div class="bar" [style.width.%]="downloadJob.progress">
+                      <div class="progress">{{downloadJob.progress}}%</div>
+                    </div>
                   </div>
-                  <div class="progress-value">{{downloadJob.progress}}%</div>
                   <dl class="job-facts">
                     <div><dt>Job ID</dt><dd>{{downloadJob.id}}</dd></div>
                     <div><dt>Torrent</dt><dd>{{downloadJob.torrentName || 'N/A'}}</dd></div>

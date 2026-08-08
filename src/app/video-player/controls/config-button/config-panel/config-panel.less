@@ -32,3 +32,64 @@
     padding: 1rem;
   }
 }
+
+.routing-field {
+  min-width: min(24rem, 75vw);
+  margin-top: 1rem !important;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+
+  > label {
+    display: block;
+    margin-bottom: 0.5rem !important;
+    color: #fff !important;
+  }
+}
+
+.routing-select-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2rem;
+  align-items: center;
+  gap: 0.5rem;
+
+  select {
+    width: 100%;
+    min-width: 0;
+    padding: 0.5rem;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #171717;
+    color: #fff;
+  }
+}
+
+.routing-retry-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+
+  .icon {
+    margin: 0;
+  }
+}
+
+.routing-status,
+.routing-warning {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.routing-status {
+  color: #bbb;
+}
+
+.routing-warning {
+  color: #f2c037;
+}
