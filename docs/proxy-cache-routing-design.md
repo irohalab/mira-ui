@@ -7,6 +7,11 @@
 > Systems: `mira-ui`, `mira-streaming-platform`, and
 > [`irohalab/redirect`](https://github.com/irohalab/redirect)
 
+This document describes the long-term architecture. The signed route API v1 is
+now deployed. Use [Mira UI Signed Routing Integration](mira-ui-routing-integration.md)
+for the implementation plan and [Signed Routing Client Integration Guide](signed-routing-client-guide.md)
+for the current client protocol.
+
 ## 1. Summary
 
 Mira serves image and video URLs through a small redirect load balancer. The
@@ -58,11 +63,14 @@ The main decisions are:
 `mira-streaming-platform` generates canonical resource URLs. Its configured
 image and video domains identify the redirect ingress:
 
-- An empty domain produces a relative URL such as `/video/...` or `/pic/...`.
-- A configured domain produces an absolute URL pointing to the same redirect
-  service through a separate public origin.
+- A configured domain produces an absolute URL pointing to redirect ingress.
+- When a domain is empty, the backend falls back to the origin of `siteRoot`, so
+  ordinary `/video/...` and `/pic/...` URLs are still absolute.
 - The configured domain is not a selected proxy/cache node and is not the
   resource origin.
+- S3-backed HTTP URLs can use bucket paths instead of `/video/`; client routing
+  eligibility is based on whether their origin exposes the routing API, while
+  `redirect` validates configured path prefixes.
 
 This responsibility should not change. Content metadata should not contain a
 transient proxy choice.
@@ -258,16 +266,16 @@ sequenceDiagram
 
 ### 8.2 Discovering the routing API
 
-Mira derives the routing API origin from the canonical resource URL, not from
-the page origin:
+Mira derives the routing API origin from the absolute canonical resource URL,
+not from the page origin:
 
 ```ts
-const resourceUrl = new URL(videoFile.url, window.location.href);
+const resourceUrl = new URL(videoFile.url);
 const routeApiUrl = new URL('/_mira/routing/v1/routes', resourceUrl.origin);
 ```
 
-This supports both relative same-origin URLs and an absolute configured
-redirect domain.
+This supports a configured redirect domain that differs from the website
+origin. The redirect deployment must allow the website origin through CORS.
 
 ### 8.3 Route API
 

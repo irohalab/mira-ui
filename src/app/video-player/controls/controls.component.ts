@@ -8,7 +8,8 @@ import {
     OnInit,
     Self,
     ViewChild,
-    ViewContainerRef
+    ViewContainerRef,
+    forwardRef
 } from '@angular/core';
 import { fromEvent as observableFromEvent, merge, Subject, Subscription } from 'rxjs';
 
@@ -30,6 +31,7 @@ import { VideoPlayerHelpButton } from './help-button/help-button.component';
 import { VideoPlayerConfigButton } from './config-button/config-button.component';
 import { VideoCaptureButton } from './capture-button/capture-button.component';
 import { VideoFullscreenButton } from './fullscreen-button/fullscreen-button.component';
+import { VIDEO_CONTROL_HOST, VideoControlHost } from './control-host';
 
 @Component({
     selector: 'video-controls',
@@ -68,17 +70,19 @@ import { VideoFullscreenButton } from './fullscreen-button/fullscreen-button.com
     host: {
         '[class.hide-cursor]': '!showControls'
     },
+    providers: [{provide: VIDEO_CONTROL_HOST, useExisting: forwardRef(() => VideoControls)}],
     imports: [NgClass, CapturedFrameList, VideoNextEpisodeOverlay, LastPositionOverlayComponent, VideoPlayerScrubBar, VideoPlayButton, VideoVolumeControl, VideoTimeIndicator, VideoPlayerHelpButton, VideoPlayerConfigButton, VideoCaptureButton, VideoFullscreenButton]
 })
-export class VideoControls implements OnInit, OnDestroy, AfterViewInit {
+export class VideoControls implements OnInit, OnDestroy, AfterViewInit, VideoControlHost {
     private _subscription = new Subscription();
     private _motion = new Subject();
     private _videoPlayer: VideoPlayer;
     private _preventHide = false;
 
     showControls = true;
+    readonly configPopoverPlacement = 'top' as const;
 
-    pendingPlayState: PlayState;
+    pendingPlayState: number;
     reflectAnimationState: string = 'inactive';
 
     isPlayEnd: boolean;

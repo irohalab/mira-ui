@@ -20,6 +20,8 @@ import { PlayState } from './core/state';
 import { FLOAT_PLAYER_SCALE_RATIO, VideoPlayer } from './video-player.component';
 import { FavoriteStatus } from '../entity/FavoriteStatus';
 import { Favorite } from '../entity/Favorite';
+import { PlaybackRoutingService } from './routing/playback-routing.service';
+import { ResolvedMediaRoute } from './routing/playback-routing.models';
 
 @Injectable({
     providedIn: 'root'
@@ -33,13 +35,16 @@ export class VideoPlayerService {
      */
     private _videoPlayerSubscription: Subscription;
 
-    private _state: PlayState = PlayState.INITIAL;
-    private _pendingState: PlayState = PlayState.INVALID;
+    private _state: number = PlayState.INITIAL;
+    private _pendingState: number = PlayState.INVALID;
 
     private _episode: Episode;
     private _bangumi: Bangumi;
     private _nextEpisode: Episode;
     private _videoFileId: string;
+    private _canonicalVideoFile: VideoFile;
+    private _routeResolutionSubscription = new Subscription();
+    private _routeResolutionGeneration = 0;
     private _autoFloatPlayWhenScroll: boolean;
     private _autoFloatPlayWhenLeave: boolean;
 
@@ -72,7 +77,8 @@ export class VideoPlayerService {
     constructor(private _appRef: ApplicationRef,
                 private _watchService: WatchService,
                 private _router: Router,
-                private _persistent: PersistStorage) {
+                private _persistent: PersistStorage,
+                private _playbackRouting: PlaybackRoutingService) {
         this._persistent.subscribe(FloatPlayer.AUTO_FLOAT_WHEN_SCROLL)
             .subscribe(v => {
                 this._autoFloatPlayWhenScroll = v === 'true';
@@ -83,6 +89,15 @@ export class VideoPlayerService {
             });
         this._autoFloatPlayWhenScroll = this._persistent.getItem(FloatPlayer.AUTO_FLOAT_WHEN_SCROLL, 'true') === 'true';
         this._autoFloatPlayWhenLeave = this._persistent.getItem(FloatPlayer.AUTO_FLOAT_WHEN_LEAVE, 'true') === 'true';
+        this._playbackRouting.preferenceChanged
+            .subscribe(() => {
+                if (this._canonicalVideoFile && this._videoPlayerComponentRef) {
+                    this._resolveAndApplyRoute(
+                        this._canonicalVideoFile,
+                        this._currentPlaybackPosition()
+                    );
+                }
+            });
     }
 
     public onLoadAndPlay(container: ElementRef,
@@ -93,9 +108,18 @@ export class VideoPlayerService {
         this.isPortrait = VideoPlayerHelpers.isPortrait();
         const lastContainer = this._currentViewContainer;
         this._currentViewContainer = container;
+        const sameVideoFile = this._episode
+            && this._episode.id === episode.id
+            && this._videoFileId === videoFile.id;
+        const startPosition = this._initialPlaybackPosition(episode);
+        if (!sameVideoFile) {
+            this._prepareData(episode, bangumi, nextEpisode, videoFile);
+        }
         // create video player component if not exists.
+        let playerCreated = false;
         if (!this._videoPlayerComponentRef) {
-            this._createNewPlayer();
+            this._createNewPlayer(startPosition);
+            playerCreated = true;
         }
         if (this._videoPlayerComponentRef.instance.isFloatPlay) {
             if (lastContainer !== container) {
@@ -103,10 +127,18 @@ export class VideoPlayerService {
             }
             this.leaveFloatPlay(false, true);
         }
-        if (this._episode && this._episode.id === episode.id) {
-            // same video situation
-        } else {
-            this._initializeData(episode, bangumi, nextEpisode, videoFile);
+        if (!sameVideoFile) {
+            const videoPlayer = this._videoPlayerComponentRef.instance;
+            if (!playerCreated) {
+                videoPlayer.setData(
+                    this._episode,
+                    this._bangumi,
+                    this._nextEpisode,
+                    this._canonicalVideoFile,
+                    startPosition
+                );
+            }
+            this._resolveAndApplyRoute(videoFile, videoPlayer.startPosition);
         }
     }
 
@@ -216,11 +248,15 @@ export class VideoPlayerService {
      * This is not the lifecycle callback of the service.
      */
     public onDestroy() {
+        this._routeResolutionSubscription.unsubscribe();
+        this._routeResolutionGeneration++;
+        this._playbackRouting.setActiveCanonicalUrl(null);
         this._unloadCurrentPlayer();
         this._currentViewContainer = null;
         this._episode = null;
         this._bangumi = null;
         this._nextEpisode = null;
+        this._canonicalVideoFile = null;
     }
 
     private _scrollToTop() {
@@ -262,12 +298,19 @@ export class VideoPlayerService {
         return container.classList.contains('theater-backdrop');
     }
 
-    private _createNewPlayer(): void {
+    private _createNewPlayer(startPosition: number): void {
         if (!this._currentViewContainer) {
             throw new Error('No container available');
         }
         const environmentInjector = this._appRef.injector;
         this._videoPlayerComponentRef = createComponent(VideoPlayer, {environmentInjector});
+        this._videoPlayerComponentRef.instance.setData(
+            this._episode,
+            this._bangumi,
+            this._nextEpisode,
+            this._canonicalVideoFile,
+            startPosition
+        );
         this._appRef.attachView(this._videoPlayerComponentRef.hostView);
         const containerElement = this._currentViewContainer.nativeElement as HTMLElement;
         containerElement.appendChild(getComponentRootNode(this._videoPlayerComponentRef));
@@ -279,16 +322,50 @@ export class VideoPlayerService {
         containerElement.appendChild(getComponentRootNode(this._videoPlayerComponentRef));
     }
 
-    private _initializeData(episode: Episode, bangumi: Bangumi, nextEpisode: Episode, videoFile: VideoFile) {
-        let startPosition = 0;
-        if (episode.watchProgress) {
-            startPosition =  episode.watchProgress.lastWatchPosition;
-        }
+    private _prepareData(episode: Episode, bangumi: Bangumi, nextEpisode: Episode, videoFile: VideoFile): void {
         this._episode = Object.assign({}, episode);
         this._bangumi = Object.assign({}, bangumi);
         this._nextEpisode = Object.assign({}, nextEpisode);
         this._videoFileId = videoFile.id;
-        this._videoPlayerComponentRef.instance.setData(this._episode, this._bangumi, this._nextEpisode, videoFile, startPosition);
+        this._canonicalVideoFile = Object.assign({}, videoFile);
+        this._playbackRouting.setActiveCanonicalUrl(videoFile.url);
+    }
+
+    private _resolveAndApplyRoute(videoFile: VideoFile,
+                              startPosition: number): void {
+        const generation = ++this._routeResolutionGeneration;
+        this._routeResolutionSubscription.unsubscribe();
+        const videoPlayer = this._videoPlayerComponentRef.instance;
+        if (videoPlayer.mediaUrl) {
+            videoPlayer.pause();
+        }
+        videoPlayer.loadingSource = true;
+        this._routeResolutionSubscription = this._playbackRouting.resolve(videoFile.url)
+            .subscribe(route => {
+                if (generation !== this._routeResolutionGeneration || !this._videoPlayerComponentRef) {
+                    return;
+                }
+                this._videoPlayerComponentRef.instance.loadingSource = false;
+                this._playbackRouting.setActiveRoute(route);
+                this._videoPlayerComponentRef.instance.loadMediaUrl(
+                    route.playbackUrl,
+                    startPosition
+                );
+            });
+    }
+
+    private _initialPlaybackPosition(episode: Episode): number {
+        return episode.watchProgress ? episode.watchProgress.lastWatchPosition : 0;
+    }
+
+    private _currentPlaybackPosition(): number {
+        if (this._videoPlayerComponentRef) {
+            return this._videoPlayerComponentRef.instance.currentPosition;
+        }
+        if (this._episode?.watchProgress) {
+            return this._episode.watchProgress.lastWatchPosition;
+        }
+        return 0;
     }
 
     private _eventSubscribe() {

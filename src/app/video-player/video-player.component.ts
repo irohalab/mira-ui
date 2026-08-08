@@ -61,6 +61,7 @@ export const FLOAT_PLAYER_SCALE_RATIO = 0.4;
 export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges {
     private _subscription = new Subscription();
     private _waitingSubscription = new Subscription();
+    private _viewInitialized = false;
 
     private _currentTimeSubject = new BehaviorSubject(0);
     private _durationSubject = new BehaviorSubject(Number.NaN);
@@ -147,6 +148,7 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
 
     mediaUrl: string;
     mediaType: string;
+    loadingSource = false;
 
     playerId = 'videoPlayerId' + (nextId++);
 
@@ -167,6 +169,10 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
         return this._currentTimeSubject.asObservable();
     }
 
+    get currentPosition(): number {
+        return this._currentTimeSubject.getValue();
+    }
+
     /**
      * duration of media element
      * @returns {Observable<number>} duration in seconds
@@ -179,11 +185,11 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
      * media element play state
      * @returns {Observable<PlayState>}
      */
-    get state(): Observable<PlayState> {
+    get state(): Observable<number> {
         return this._stateSubject.asObservable();
     }
 
-    get pendingState(): Observable<PlayState> {
+    get pendingState(): Observable<number> {
         return this._pendingStateSubject.asObservable();
     }
 
@@ -204,6 +210,9 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     }
 
     get showLoader(): boolean {
+        if (this.loadingSource) {
+            return true;
+        }
         if (this.mediaRef) {
             let mediaElement = this.mediaRef.nativeElement;
             return (mediaElement.readyState < ReadyState.HAVE_FUTURE_DATA) && !mediaElement.paused;
@@ -431,7 +440,11 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     /**
      * Invoked by VideoPlayerService
      */
-    setData(episode: Episode, bangumi: Bangumi, nextEpisode: Episode, videoFile: VideoFile, startPosition: number): void {
+    setData(episode: Episode,
+            bangumi: Bangumi,
+            nextEpisode: Episode,
+            videoFile: VideoFile,
+            startPosition: number): void {
         let lastVideoFileId;
         if (this.videoFile) {
             lastVideoFileId = this.videoFile.id;
@@ -444,6 +457,10 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
         this.nextEpisodeNameCN = nextEpisode.nameCn;
         this.videoFile = videoFile;
         this.lastPlayedPosition = startPosition;
+        // Initial metadata is set before view attachment; this handles a new VideoFile on an existing player.
+        if (this._viewInitialized && this.videoFile.resolutionW && this.videoFile.resolutionH) {
+            this.togglePlayerDimension(this.videoPlayerRef.nativeElement as HTMLElement);
+        }
         // auto jump to last position when user config enables this feature,
         // otherwise start from the beginning and popup an overlay to ask user whether to jump to lastPosition
         const autoPlayFromLastPosition = this._persistStorage.getItem(CorePlayer.AUTO_PLAY_FROM_LAST_POSITION, 'false');
@@ -457,7 +474,19 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
         } else {
             this.startPosition = startPosition;
         }
-        this._initiatePlayer();
+    }
+
+    /**
+     * Loads a playback URL without changing the canonical VideoFile metadata or player dimensions.
+     */
+    loadMediaUrl(playbackUrl: string, startPosition: number): void {
+        this.startPosition = startPosition;
+        this.mediaUrl = playbackUrl;
+        this.mediaType = 'video/' + VideoPlayerHelpers.getExtname(this.videoFile.url);
+        this._changeDetector.detectChanges();
+        const mediaElement = this.mediaRef.nativeElement as HTMLMediaElement;
+        mediaElement.load();
+        this.play();
     }
 
     ngOnInit(): void {
@@ -474,6 +503,7 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     ngAfterViewInit(): void {
         let mediaElement = this.mediaRef.nativeElement as HTMLMediaElement;
         let hostElement = this.videoPlayerRef.nativeElement as HTMLElement;
+        this._viewInitialized = true;
         this._videoCapture.registerVideoElement(mediaElement as HTMLVideoElement);
 
         // init fullscreen API
@@ -501,7 +531,9 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
                 })
         );
 
-        this.togglePlayerDimension(hostElement);
+        if (this.videoFile && this.videoFile.resolutionW && this.videoFile.resolutionH) {
+            this.togglePlayerDimension(hostElement);
+        }
 
         this._subscription.add(
             observableFromEvent(mediaElement, 'durationchange')
@@ -619,10 +651,7 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
     }
 
     private _initiatePlayer(): void {
-        let mediaElement = this.mediaRef.nativeElement as HTMLMediaElement;
-        this.makeMediaUrl();
-        mediaElement.load();
-        this.play();
+        this.loadMediaUrl(this.videoFile.url, this.startPosition);
     }
 
     private _resetPlayer(): void {
@@ -631,12 +660,6 @@ export class VideoPlayer implements AfterViewInit, OnInit, OnDestroy, OnChanges 
         this._stateSubject.next(PlayState.INITIAL);
         this._pendingStateSubject.next(PlayState.INVALID);
         this._buffered.next(0);
-    }
-
-    private makeMediaUrl(): void {
-        this.mediaUrl = `${this.videoFile.url}`;
-        this.mediaType = 'video/' + VideoPlayerHelpers.getExtname(this.videoFile.url);
-        this._changeDetector.detectChanges();
     }
 
     private watchForWaiting(): void {

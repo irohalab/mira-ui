@@ -1,9 +1,9 @@
-import { Component, ElementRef, HostListener, OnDestroy, Self } from '@angular/core';
+import { Component, ElementRef, HostListener, Inject, OnDestroy, Self } from '@angular/core';
 import { UIPopover, UIPopoverRef } from '@irohalab/deneb-ui';
-import { VideoControls } from '../controls.component';
 import { VideoPlayer } from '../../video-player.component';
 import { VideoConfigPanelComponent } from './config-panel/config-panel.component';
 import { Subscription } from 'rxjs';
+import { VIDEO_CONTROL_HOST, VideoControlHost } from '../control-host';
 
 @Component({
     selector: 'video-player-config-button',
@@ -26,7 +26,7 @@ export class VideoPlayerConfigButton implements OnDestroy {
     private _configPanelOpen = false;
     private _popoverRef: UIPopoverRef<VideoConfigPanelComponent>;
 
-    constructor(private _controls: VideoControls,
+    constructor(@Inject(VIDEO_CONTROL_HOST) private _controls: VideoControlHost,
                 private _popover: UIPopover,
                 private _videoPlayer: VideoPlayer,
                 @Self() private _host: ElementRef) {
@@ -50,7 +50,11 @@ export class VideoPlayerConfigButton implements OnDestroy {
             return;
         }
         this._controls.keepShow(true);
-        this._popoverRef = this._popover.createPopover(this._host.nativeElement, VideoConfigPanelComponent, 'top');
+        this._popoverRef = this._popover.createPopover(
+            this._host.nativeElement,
+            VideoConfigPanelComponent,
+            this._controls.configPopoverPlacement
+        );
         this._configPanelOpen = true;
         this._subscription.add(
             this._popoverRef.afterClosed()
