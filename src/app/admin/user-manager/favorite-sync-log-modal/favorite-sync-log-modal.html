@@ -1,0 +1,38 @@
+<div class="sync-log-dialog">
+  <header>
+    <div>
+      <h3>收藏同步日志</h3>
+      <div class="account-name">{{account?.nickName || account?.id}}</div>
+    </div>
+    <button type="button" class="ui icon basic button" title="关闭" [ngClass]="{inverted: isDarkTheme}" (click)="close()">
+      <i class="close icon"></i>
+    </button>
+  </header>
+
+  <main>
+    @if (sync?.progress) {
+      <div class="sync-summary">
+        <span><strong>状态</strong> {{sync.progress.status}}</span>
+        <span><strong>阶段</strong> {{sync.progress.stage}}</span>
+        <span><strong>进度</strong> {{sync.progress.percentage}}%</span>
+        <span><strong>批次</strong> {{sync.progress.completedBatches}} / {{sync.progress.totalBatches}}</span>
+      </div>
+    }
+
+    @if (sync?.log; as log) {
+      @if (log.error) {
+        <div class="ui negative message">{{log.error}}</div>
+      }
+      <section>
+        <h4>发送内容</h4>
+        <pre>{{log.request | json}}</pre>
+      </section>
+      <section>
+        <h4>返回内容</h4>
+        <pre>{{log.response | json}}</pre>
+      </section>
+    } @else {
+      <div class="ui message">该用户尚无收藏同步日志。</div>
+    }
+  </main>
+</div>

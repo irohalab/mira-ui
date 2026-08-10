@@ -26,6 +26,7 @@
           <th>角色</th>
           <th>activateTime</th>
           <th>updateTime</th>
+          <th>收藏同步</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -39,6 +40,14 @@
             <td>{{account.activateTime}}</td>
             <td>{{account.updateTime}}</td>
             <td>
+              <span class="ui tiny label sync-status" [ngClass]="account.favoriteSyncProgress?.status || 'none'">
+                {{favoriteSyncStatusText(account)}}
+              </span>
+            </td>
+            <td>
+              <a class="anchor-button" title="查看最近一次收藏同步日志" (click)="viewFavoriteSyncLog(account)">
+                <i class="file alternate outline icon"></i>
+              </a>
               @if (canPromoteUser) {
                 <a class="anchor-button" title="修改用户角色" (click)="promoteUser(account)"><i class="wizard icon"></i></a>
               }

@@ -1,8 +1,8 @@
-import { filter, switchMap } from 'rxjs/operators';
+import { catchError, exhaustMap, finalize, filter, map, takeWhile, tap } from 'rxjs/operators';
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../entity';
 import { UserService } from '../../user-service';
-import { Subscription } from 'rxjs';
+import { EMPTY, Subscription, timer } from 'rxjs';
 import { DARK_THEME, DarkThemeService, UIToggle } from '@irohalab/deneb-ui';
 import { Title } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
@@ -13,6 +13,7 @@ import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { Home } from '../home.component';
+import { FavoriteSyncProgress, FavoriteSyncStage } from '../../entity/Account';
 
 @Component({
     selector: 'user-center',
@@ -36,7 +37,10 @@ export class UserCenter implements OnInit, OnDestroy {
     errorMessage!: string;
     syncFormGroup!: FormGroup;
 
-    isSyncing = false;
+    favoriteSyncProgress?: FavoriteSyncProgress;
+    syncRequestError = '';
+    isStartingSync = false;
+    private syncPollingSubscription?: Subscription;
 
     constructor(private userService: UserService,
                 private darkThemeService: DarkThemeService,
@@ -65,6 +69,7 @@ export class UserCenter implements OnInit, OnDestroy {
                 )
         );
         this.loadAlbireoUserInfo();
+        this.loadFavoriteSyncProgress();
     }
 
     ngOnDestroy(): void {
@@ -119,17 +124,53 @@ export class UserCenter implements OnInit, OnDestroy {
     }
 
     syncFavorite() {
-        this.isSyncing = true;
+        this.isStartingSync = true;
+        this.syncRequestError = '';
         const { overrideOnConflict } = this.syncFormGroup.value;
-        this.favoriteService.syncFavorite(overrideOnConflict)
+        this.subscription.add(this.favoriteService.syncFavorite(overrideOnConflict)
             .subscribe({
-                next: () => {
-                    this.isSyncing = false;
+                next: (progress) => {
+                    this.isStartingSync = false;
+                    this.favoriteSyncProgress = progress;
+                    this.startSyncPolling();
                 },
                 error: (err) => {
-                    this.isSyncing = false;
+                    this.isStartingSync = false;
+                    if (err.status === 409 && err.error?.progress) {
+                        this.favoriteSyncProgress = err.error.progress;
+                        this.startSyncPolling();
+                        return;
+                    }
+                    this.syncRequestError = '无法启动同步，请稍后重试。';
                 }
-            })
+            }));
+    }
+
+    get isSyncing(): boolean {
+        return this.isStartingSync || this.isActiveSync(this.favoriteSyncProgress);
+    }
+
+    get syncStatusText(): string {
+        if (!this.favoriteSyncProgress) {
+            return '';
+        }
+        const stageText: Record<FavoriteSyncStage, string> = {
+            queued: '等待同步',
+            preparing: '正在准备数据',
+            syncing: '正在与 box.moe 同步',
+            applying: '正在更新本地数据',
+            completed: '同步完成',
+            failed: '同步失败',
+        };
+        return stageText[this.favoriteSyncProgress.stage];
+    }
+
+    get syncBatchText(): string {
+        const progress = this.favoriteSyncProgress;
+        if (!progress || progress.totalBatches === 0) {
+            return '';
+        }
+        return `批次 ${progress.completedBatches} / ${progress.totalBatches}`;
     }
 
     switchToV2() {
@@ -169,5 +210,47 @@ export class UserCenter implements OnInit, OnDestroy {
                     }
                 })
         );
+    }
+
+    private loadFavoriteSyncProgress(): void {
+        this.subscription.add(
+            this.userService.getAccountInfo().subscribe({
+                next: account => {
+                    this.favoriteSyncProgress = account.favoriteSyncProgress;
+                    if (this.isActiveSync(this.favoriteSyncProgress)) {
+                        this.startSyncPolling();
+                    }
+                },
+                error: () => {
+                    this.syncRequestError = '暂时无法获取同步状态。';
+                },
+            })
+        );
+    }
+
+    private startSyncPolling(): void {
+        this.syncPollingSubscription?.unsubscribe();
+        this.syncPollingSubscription = timer(0, 2000).pipe(
+            exhaustMap(() => this.userService.getAccountInfo().pipe(
+                catchError(() => {
+                    this.syncRequestError = '同步仍在后台运行，但暂时无法刷新进度。';
+                    return EMPTY;
+                }),
+            )),
+            map(account => account.favoriteSyncProgress),
+            tap(progress => {
+                this.favoriteSyncProgress = progress;
+                this.syncRequestError = '';
+            }),
+            takeWhile(progress => this.isActiveSync(progress), true),
+            finalize(() => {
+                this.syncPollingSubscription = undefined;
+            }),
+        ).subscribe();
+        this.subscription.add(this.syncPollingSubscription);
+    }
+
+    private isActiveSync(progress?: FavoriteSyncProgress): boolean {
+        return progress?.status === 'queued' || progress?.status === 'running';
     }
 }

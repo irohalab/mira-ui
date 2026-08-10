@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { BaseService } from '../../../helpers/base.service';
-import { Account } from '../../entity/Account';
+import { Account, FavoriteSyncLogResponse } from '../../entity/Account';
 import { environment } from '../../../environments/environment';
 
 const baseUrl = `${environment.resourceProvider}/admin/account`;
@@ -39,6 +39,12 @@ export class UserManagerSerivce extends BaseService {
     promoteUser(accountId: string, role: string): Observable<any> {
         return this._http.put<any>(`${baseUrl}/${accountId}`, { role }).pipe(
             catchError(this.handleError),);
+    }
+
+    getFavoriteSyncLog(accountId: string): Observable<FavoriteSyncLogResponse> {
+        return this._http.get<FavoriteSyncLogResponse>(`${baseUrl}/${accountId}/favorite-sync-log`).pipe(
+            catchError(this.handleError),
+        );
     }
 
     listUnusedInviteCode(): Observable<string[]> {

@@ -7,6 +7,7 @@ import { tap } from 'rxjs/operators';
 import { Bangumi } from '../entity';
 import { VideoPlayerService } from '../video-player/video-player.service';
 import { environment } from '../../environments/environment';
+import { FavoriteSyncProgress } from '../entity/Account';
 
 export type FavoriteChangeEvent = {
     id: number;
@@ -95,8 +96,8 @@ export class FavoriteService {
             }));
     }
 
-    syncFavorite(overrideOnConflict: boolean): Observable<any> {
-        return this.http.post(`${baseUrl}/sync`, null, {
+    syncFavorite(overrideOnConflict: boolean): Observable<FavoriteSyncProgress> {
+        return this.http.post<FavoriteSyncProgress>(`${baseUrl}/sync`, null, {
             params: {
                 overrideOnConflict: `${overrideOnConflict}`
             }

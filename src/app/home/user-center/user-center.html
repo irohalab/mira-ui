@@ -81,8 +81,37 @@
       <div class="field">
         <ui-toggle formControlName="overrideOnConflict">冲突时覆盖box.moe的收藏</ui-toggle>
       </div>
-      <button class="ui primary button" [disabled]="isSyncing" (click)="syncFavorite()">开始同步</button>
+      <button type="button" class="ui primary button" [class.loading]="isStartingSync" [disabled]="isSyncing" (click)="syncFavorite()">
+        {{isSyncing ? '同步中' : '开始同步'}}
+      </button>
     </form>
+    @if (favoriteSyncProgress) {
+      <div class="sync-progress-panel" [ngClass]="{
+        completed: favoriteSyncProgress.status === 'completed',
+        failed: favoriteSyncProgress.status === 'failed'
+      }">
+        <div class="sync-status-row">
+          <strong>{{syncStatusText}}</strong>
+          <span>{{favoriteSyncProgress.percentage}}%</span>
+        </div>
+        <div class="sync-progress-track"
+             role="progressbar"
+             [attr.aria-valuenow]="favoriteSyncProgress.percentage"
+             aria-valuemin="0"
+             aria-valuemax="100">
+          <div class="sync-progress-value" [style.width.%]="favoriteSyncProgress.percentage"></div>
+        </div>
+        @if (syncBatchText) {
+          <div class="sync-progress-meta">{{syncBatchText}}</div>
+        }
+        @if (favoriteSyncProgress.status === 'failed') {
+          <div class="ui tiny negative message">同步未完成，请稍后重试。管理员可以查看详细日志。</div>
+        }
+      </div>
+    }
+    @if (syncRequestError) {
+      <div class="ui tiny negative message">{{syncRequestError}}</div>
+    }
   </div>
   @if (user.role === 'Invited') {
     <div class="ui segment basic-info" [ngClass]="{inverted: isDarkTheme}">

@@ -41,3 +41,21 @@
     color: #5f94c5;
   }
 }
+
+.sync-status {
+  &.queued,
+  &.running {
+    background: #2185d0;
+    color: #fff;
+  }
+
+  &.completed {
+    background: #21ba45;
+    color: #fff;
+  }
+
+  &.failed {
+    background: #db2828;
+    color: #fff;
+  }
+}

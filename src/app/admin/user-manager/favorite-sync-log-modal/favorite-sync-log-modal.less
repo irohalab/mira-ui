@@ -1,0 +1,102 @@
+@import "../../../_dark-theme-helpers";
+
+:host {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: min(920px, 94vw);
+  height: min(760px, 88vh);
+  margin: auto;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+}
+
+.sync-log-dialog {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #dedede;
+
+  h3 {
+    margin: 0;
+  }
+
+  .account-name {
+    margin-top: 0.3rem;
+    color: #666;
+    overflow-wrap: anywhere;
+  }
+}
+
+main {
+  min-height: 0;
+  overflow: auto;
+  padding: 1.25rem 1.5rem 1.75rem;
+}
+
+.sync-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.4rem;
+
+  span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+section + section {
+  margin-top: 1.5rem;
+}
+
+pre {
+  max-height: 24rem;
+  margin: 0;
+  padding: 1rem;
+  overflow: auto;
+  border: 1px solid #dedede;
+  border-radius: 4px;
+  background: #f7f7f7;
+  color: #222;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+:host.dark-theme {
+  background: @darkBackground;
+  color: @darkForeground;
+
+  header,
+  pre {
+    border-color: @darkBorderColor;
+  }
+
+  header .account-name {
+    color: #b8b8b8;
+  }
+
+  pre {
+    background: #202020;
+    color: @darkForeground;
+  }
+}
+
+@media (max-width: 700px) {
+  .sync-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
