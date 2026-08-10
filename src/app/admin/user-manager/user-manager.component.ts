@@ -14,6 +14,7 @@ import { Account } from '../../entity/Account';
 import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
 import { FormsModule } from '@angular/forms';
 import { KeyValuePipe, NgClass } from '@angular/common';
+import { FavoriteSyncLogModal } from './favorite-sync-log-modal/favorite-sync-log-modal.component';
 
 @Component({
     selector: 'user-manager',
@@ -169,6 +170,31 @@ export class UserManager implements OnInit, OnDestroy {
                     }
                 })
         );
+    }
+
+    viewFavoriteSyncLog(account: Account): void {
+        this._subscription.add(
+            this.userManagerSerivce.getFavoriteSyncLog(account.id).subscribe({
+                next: sync => {
+                    const dialogRef = this.dialog.open(FavoriteSyncLogModal, {stickyDialog: true, backdrop: true});
+                    dialogRef.componentInstance.account = account;
+                    dialogRef.componentInstance.sync = sync;
+                },
+                error: (error: BaseError) => {
+                    this._toastRef.show(error.message);
+                },
+            })
+        );
+    }
+
+    favoriteSyncStatusText(account: Account): string {
+        const status = account.favoriteSyncProgress?.status;
+        return {
+            queued: '等待中',
+            running: '同步中',
+            completed: '已完成',
+            failed: '失败',
+        }[status] ?? '无记录';
     }
 
     changeInviteCodeNumber(num: string): void {

@@ -169,12 +169,16 @@ export class UserService extends BaseService {
                 return;
             }
             const userProfile = await this.loadUserProfileWithRefresh();
-            const account = await lastValueFrom(this.httpClient.get<Account>(`${baseUrl}/info`));
+            const account = await lastValueFrom(this.getAccountInfo());
             console.log('userProfile: ', userProfile, account);
             this.updateUser(userProfile, account);
         } catch (ex) {
             console.log(ex);
         }
+    }
+
+    getAccountInfo(): Observable<Account> {
+        return this.httpClient.get<Account>(`${baseUrl}/info`);
     }
 
     private async loadUserProfileWithRefresh(): Promise<User> {
