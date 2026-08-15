@@ -20,3 +20,18 @@
     display: inline-block;
     vertical-align: baseline;
 }
+
+.box-moe-icon {
+    height: 21px;
+    width: 21px;
+    display: inline-block;
+    /*vertical-align: baseline;*/
+}
+
+.box-moe-icon.light {
+    background: transparent url('/assets/img/mira-logo.svg') no-repeat;
+}
+
+.box-moe-icon.dark {
+    background: transparent url('/assets/img/mira-logo-dark.svg') no-repeat;
+}

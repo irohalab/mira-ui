@@ -7,7 +7,7 @@ import { EMPTY, forkJoin, Subscription } from 'rxjs';
 import { Account } from '../../../entity/Account';
 import { UserManagerSerivce } from '../../user-manager/user-manager.service';
 import { AdminService } from '../../admin.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { BangumiTypeNamePipe } from '../../bangumi-pipes/type-name-pipe';
 import { BangumiAdminEntity } from '../../../entity/admin/BangumiAdminEntity';
 import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
@@ -16,7 +16,7 @@ import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
     selector: 'app-bangumi-overview',
     templateUrl: './bangumi-overview.component.html',
     styleUrl: './bangumi-overview.component.less',
-    imports: [UIResponsiveImageWrapper, DatePipe, BangumiTypeNamePipe]
+    imports: [UIResponsiveImageWrapper, DatePipe, BangumiTypeNamePipe, NgClass]
 })
 export class BangumiOverviewComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
