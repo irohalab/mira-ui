@@ -154,7 +154,7 @@
                      brown: episode.watchProgress.watchStatus === 4,
                      grey: episode.watchProgress.watchStatus === 5
                      }">
-                      <div class="bar" [style.width]="episode.watchProgress.percentage * 100 + '%'"></div>
+                      <div class="bar" [style.width]="episode.watchProgress.percentage | progressValue"></div>
                     </div>
                   }
                 </div>
@@ -212,7 +212,7 @@
                      brown: episode.watchProgress.watchStatus === 4,
                      grey: episode.watchProgress.watchStatus === 5
                      }">
-                    <div class="bar" [style.width]="episode.watchProgress.percentage * 100 + '%'"></div>
+                    <div class="bar" [style.width]="episode.watchProgress.percentage | progressValue"></div>
                   </div>
                 }
               </div>
