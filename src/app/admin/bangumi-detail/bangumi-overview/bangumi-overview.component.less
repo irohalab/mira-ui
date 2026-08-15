@@ -26,10 +26,16 @@
       white-space: normal;
       word-break: break-all;
       .external-link {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        vertical-align: middle;
         margin-left: 1.5rem;
         font-size: 0.8em;
         color: #818181;
+        > .box-moe-icon {
+          background-position: center;
+          background-size: 26px 26px;
+        }
       }
     }
     h4.entry {

@@ -59,6 +59,10 @@
           <a [routerLink]="['/bangumi', episode.bangumi.id]">
             {{episode.bangumi.nameCn}}
           </a>
+          <a class="external-link" [href]="'https://box.moe/item/' + episode.bangumi.itemId" target="_blank"
+             title="在box.moe页面查看">
+            <i class="box-moe-icon bgm-link-icon" [ngClass]="{light: !isDarkTheme, dark: isDarkTheme}"></i>
+          </a>
           <a class="external-link" [href]="'https://bgm.tv/subject/' + episode.bangumi.bgmId" target="_blank"
             title="在bgm.tv页面查看">
             <i class="bgm-emo-47 bgm-link-icon"></i>

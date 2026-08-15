@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 371 371" role="img" aria-labelledby="title description">
+  <title id="title">Mira logo</title>
+  <desc id="description">Three black rounded squares and one cyan rounded diamond.</desc>
+
+  <g fill="#F1F5F9">
+    <rect x="46" y="51" width="114" height="117" rx="24"/>
+    <rect x="180" y="51" width="114" height="117" rx="24"/>
+    <rect x="46" y="191" width="114" height="117" rx="24"/>
+  </g>
+
+  <path
+    d="M238.5 190.5a24.75 24.75 0 0 1 35 0l45.5 45.5a24.75 24.75 0 0 1 0 35l-45.5 45.5a24.75 24.75 0 0 1-35 0l-45.5-45.5a24.75 24.75 0 0 1 0-35z"
+    fill="#22D3EE"
+  />
+</svg>
