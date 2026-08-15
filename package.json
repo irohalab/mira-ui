@@ -1,12 +1,14 @@
 {
   "name": "mira-ui",
-  "version": "3.12.0",
+  "version": "3.12.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "node scripts/process-environment.js && ng build",
+    "check": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:once": "ng test --watch=false --browsers=ChromeHeadless"
   },
   "private": true,
   "dependencies": {
