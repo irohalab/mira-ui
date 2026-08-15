@@ -63,9 +63,6 @@ export class UserService extends BaseService {
         this.oAuthService.configure(AuthCodeFlowConfig);
         this.oAuthService.loadDiscoveryDocumentAndTryLogin()
             .then((result) => {
-                console.log(this.oAuthService.getIdentityClaims());
-                console.log(this.oAuthService.getIdToken());
-                console.log(this.oAuthService.getAccessToken());
                 console.log(result);
                 this.captureOriginalIdToken();
                 return this.getUserInfo();

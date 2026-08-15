@@ -28,10 +28,10 @@
             "inlineStyleLanguage": "less",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              "src/main.css"
+              "src/assets"
             ],
             "styles": [
+              "src/assets/css/main.css",
               "src/styles.less",
               "node_modules/@irohalab/semantic-ui/semantic.css",
               "node_modules/@angular/cdk/overlay-prebuilt.css"
