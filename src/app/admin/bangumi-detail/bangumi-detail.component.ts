@@ -176,7 +176,7 @@ export class BangumiDetail implements OnInit, OnDestroy {
             this._announceService.listAnnounce(2,0, 10, bangumi_id)
                 .subscribe(({data}) => {
                     this.announceList = data;
-                    let currentTime = Date.now();
+                    let currentTime = new Date();
                     this.announceStatus = AnnounceStatus.NOT_SET;
                     this.announceStatusText = '推荐这个番組';
                     if (data.length > 0) {

@@ -1,5 +1,5 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UIDialogRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Subscription } from 'rxjs';
 import { Announce } from '../../../entity/announce';
@@ -10,13 +10,21 @@ import { ErrorMessageDict, ValidateMessageDict } from '../types';
 
 export const MAX_DATE_RANGE = 7; // days
 
-export function rangeLimitWithMaxRange(group: FormGroup) {
-    let start_time = group.get('start_time').value;
-    let end_time = group.get('end_time').value;
-    let result = end_time > start_time ? null : {dateRange: 'invalid range'};
-    result = !result ? (end_time - start_time <= MAX_DATE_RANGE * 24 * 3600 * 1000 ? null: {dateRange: 'exceed max range'}) : result;
-    console.log(result);
-    return result;
+export function rangeLimitWithMaxRange(group: AbstractControl): ValidationErrors | null {
+    const startTime = group.get('startTime')?.value;
+    const endTime = group.get('endTime')?.value;
+    if (startTime == null || endTime == null) {
+        return null;
+    }
+
+    const startTimeValue = dayjs(startTime).valueOf();
+    const endTimeValue = dayjs(endTime).valueOf();
+    if (!Number.isFinite(startTimeValue) || !Number.isFinite(endTimeValue) || endTimeValue <= startTimeValue) {
+        return {dateRange: 'invalid range'};
+    }
+    return endTimeValue - startTimeValue <= MAX_DATE_RANGE * 24 * 3600 * 1000
+        ? null
+        : {dateRange: 'exceed max range'};
 }
 
 @Component({
@@ -103,11 +111,12 @@ export class EditBangumiRecommendComponent implements OnInit, OnDestroy {
             this._darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
         );
+        const startTime = dayjs();
         this.recommendForm = this._fb.group({
             sortOrder: [0, Validators.required],
-            startTime: [dayjs(), Validators.required],
-            endTime: [dayjs().add(7, 'day'), Validators.required]
-        },{validator: rangeLimitWithMaxRange});
+            startTime: [startTime, Validators.required],
+            endTime: [startTime.add(MAX_DATE_RANGE, 'day'), Validators.required]
+        }, {validators: rangeLimitWithMaxRange});
         if (this.announce) {
             this.bangumi = this.announce.bangumi;
             this.recommendForm.get('sortOrder').patchValue(this.announce.sortOrder);

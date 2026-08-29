@@ -1,5 +1,13 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+    FormBuilder,
+    FormGroup,
+    Validators,
+    FormsModule,
+    ReactiveFormsModule,
+    AbstractControl,
+    ValidationErrors
+} from '@angular/forms';
 import { UIDialogRef, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
 import { Announce } from '../../../entity/announce';
 import { Subscription } from 'rxjs';
@@ -7,11 +15,21 @@ import dayjs from 'dayjs';
 import { NgClass } from '@angular/common';
 import { NgxsmkDatepickerComponent } from 'ngxsmk-datepicker';
 import { ErrorMessageDict, ValidateMessageDict } from '../types';
+import { MAX_DATE_RANGE } from '../edit-bangumi-recommend/edit-bangumi-recommend.component';
 
-export function rangeLimit(group: FormGroup) {
-    let start_time = group.get('start_time').value;
-    let end_time = group.get('end_time').value;
-    return end_time > start_time ? null: {dateRange: {end_time: end_time, start_time: start_time}};
+export function rangeLimit(group: AbstractControl): ValidationErrors | null {
+    const startTime = group.get('startTime')?.value;
+    const endTime = group.get('endTime')?.value;
+    if (startTime == null || endTime == null) {
+        return null;
+    }
+
+    const startTimeValue = dayjs(startTime).valueOf();
+    const endTimeValue = dayjs(endTime).valueOf();
+    if (!Number.isFinite(startTimeValue) || !Number.isFinite(endTimeValue) || endTimeValue <= startTimeValue) {
+        return {dateRange: 'invalid range'};
+    }
+    return null;
 }
 
 @Component({
@@ -80,8 +98,8 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
         }
         let result = this.announceForm.value;
         result.position = this.position;
-        result.startTime = dayjs(result.startTime).valueOf();
-        result.endTime = dayjs(result.endTime).valueOf();
+        result.startTime = result.startTime.toISOString();
+        result.endTime = result.endTime.toISOString();
         this._dialogRef.close(result);
     }
 
@@ -114,13 +132,14 @@ export class EditAnnounceComponent implements OnInit, OnDestroy {
             }, {validator: rangeLimit});
             this.position = this.announce.position;
         } else {
+            const startTime = dayjs();
             this.announceForm = this._fb.group({
                 sortOrder: [0, Validators.required],
                 content: ['', Validators.required],
                 imageUrl: ['', Validators.required],
-                startTime: [dayjs(), Validators.required],
-                endTime: [dayjs().add(1, 'day'), Validators.required]
-            }, {validator: rangeLimit})
+                startTime: [startTime, Validators.required],
+                endTime: [startTime.add(1, 'day'), Validators.required]
+            }, {validators: rangeLimit})
         }
 
         this.onFormChanged(this.announceFormErrors, this.validationMessages, this.announceForm);

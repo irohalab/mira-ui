@@ -7,9 +7,16 @@ export class Announce {
     imageUrl?: string;
     position: number;
     sortOrder: number;
-    startTime: number;
-    endTime: number;
+    startTime: Date;
+    endTime: Date;
 
     static POSITION_BANNER = 1;
     static POSITION_BANGUMI = 2;
+    static fromResponse(resp: Omit<Announce, 'startTime'|'endTime'> & {startTime: string, endTime: string}): Announce {
+        return {
+            ...resp,
+            startTime: new Date(resp.startTime),
+            endTime: new Date(resp.endTime)
+        };
+    }
 }
