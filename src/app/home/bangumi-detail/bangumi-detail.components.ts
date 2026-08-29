@@ -18,6 +18,7 @@ import { FavoriteChooser } from '../favorite-chooser/favorite-chooser.component'
 import { RatingComponent } from '../rating/rating.component';
 import { BangumiCharacterComponent } from '../bangumi-extra-info/bangumi-character/bangumi-character.component';
 import { WeekdayPipe } from '../../pipes/weekday.pipe';
+import { ProgressValuePipe } from '../../pipes/progress-value.pipe';
 
 const LAYOUT_TYPE: string = 'layout_type';
 const LAYOUT_TYPES = {
@@ -31,7 +32,7 @@ const SORT_ORDER: string = 'bangumi_detail_eps_sort_order';
     selector: 'view-bangumi-detail',
     templateUrl: './bangumi-detail.html',
     styleUrls: ['./bangumi-detail.less'],
-    imports: [NgClass, UIResponsiveImageWrapper, BangumiStaffInfoComponent, RouterLink, FavoriteChooser, RatingComponent, BangumiCharacterComponent, UIDropdown, WeekdayPipe]
+    imports: [NgClass, UIResponsiveImageWrapper, BangumiStaffInfoComponent, RouterLink, FavoriteChooser, RatingComponent, BangumiCharacterComponent, UIDropdown, WeekdayPipe, ProgressValuePipe]
 })
 export class BangumiDetail extends HomeChild implements OnInit, OnDestroy {
     private _toastRef: UIToastRef<UIToastComponent>;
