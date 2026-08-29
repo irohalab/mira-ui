@@ -55,7 +55,7 @@
 }
 @if (!isInit) {
 <div class="ui container">
-    <div class="ui segment">
+    <div class="ui segment" [ngClass]="{inverted: isDarkTheme}">
         <div class="bangumi-list-item">
             <div class="cover-wrapper ui placeholder" [ngClass]="{inverted: isDarkTheme}">
                 <div class="image"></div>

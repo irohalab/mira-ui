@@ -1,4 +1,4 @@
-<form class="bangumi-overview-form section-card ui form" [formGroup]="bangumiForm" (ngSubmit)="save()" novalidate>
+<form class="bangumi-overview-form section-card ui form" [ngClass]="{inverted: isDarkTheme}" [formGroup]="bangumiForm" (ngSubmit)="save()" novalidate>
   <header class="overview-header">
     <div class="heading-copy">
       <span class="section-eyebrow">Bangumi</span>
@@ -101,32 +101,29 @@
             <p>锁定字段后，从上游同步时不会覆盖本地内容。</p>
           </div>
         </div>
-
-        <div class="two fields">
-          <div class="field">
-            <div class="field-label">
-              <label for="bangumi-name-cn">中文名</label>
-              <button class="field-lock-button" [ngClass]="{locked: isFieldLocked('nameCn')}" type="button"
-                      [attr.aria-pressed]="isFieldLocked('nameCn')" [title]="lockButtonTitle('nameCn')"
-                      (click)="toggleFieldLock('nameCn')">
-                <i class="icon" [ngClass]="isFieldLocked('nameCn') ? 'lock' : 'unlock'" aria-hidden="true"></i>
-                {{isFieldLocked('nameCn') ? '已锁定' : '未锁定'}}
-              </button>
-            </div>
-            <input id="bangumi-name-cn" type="text" formControlName="nameCn" required>
+        <div class="field">
+          <div class="field-label">
+            <label for="bangumi-name-cn">中文名</label>
+            <button class="field-lock-button" [ngClass]="{locked: isFieldLocked('nameCn')}" type="button"
+                    [attr.aria-pressed]="isFieldLocked('nameCn')" [title]="lockButtonTitle('nameCn')"
+                    (click)="toggleFieldLock('nameCn')">
+              <i class="icon" [ngClass]="isFieldLocked('nameCn') ? 'lock' : 'unlock'" aria-hidden="true"></i>
+              {{isFieldLocked('nameCn') ? '已锁定' : '未锁定'}}
+            </button>
           </div>
-          <div class="field">
-            <div class="field-label">
-              <label for="bangumi-name">原名</label>
-              <button class="field-lock-button" [ngClass]="{locked: isFieldLocked('name')}" type="button"
-                      [attr.aria-pressed]="isFieldLocked('name')" [title]="lockButtonTitle('name')"
-                      (click)="toggleFieldLock('name')">
-                <i class="icon" [ngClass]="isFieldLocked('name') ? 'lock' : 'unlock'" aria-hidden="true"></i>
-                {{isFieldLocked('name') ? '已锁定' : '未锁定'}}
-              </button>
-            </div>
-            <input id="bangumi-name" type="text" formControlName="name" required>
+          <input id="bangumi-name-cn" type="text" formControlName="nameCn" required>
+        </div>
+        <div class="field">
+          <div class="field-label">
+            <label for="bangumi-name">原名</label>
+            <button class="field-lock-button" [ngClass]="{locked: isFieldLocked('name')}" type="button"
+                    [attr.aria-pressed]="isFieldLocked('name')" [title]="lockButtonTitle('name')"
+                    (click)="toggleFieldLock('name')">
+              <i class="icon" [ngClass]="isFieldLocked('name') ? 'lock' : 'unlock'" aria-hidden="true"></i>
+              {{isFieldLocked('name') ? '已锁定' : '未锁定'}}
+            </button>
           </div>
+          <input id="bangumi-name" type="text" formControlName="name" required>
         </div>
 
         <div class="field">
