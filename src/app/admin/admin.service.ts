@@ -93,6 +93,11 @@ export class AdminService extends BaseService {
             catchError(this.handleError),);
     }
 
+    syncBangumi(bangumiId: string): Observable<void> {
+        return this.http.post<void>(`${baseUrl}/bangumi/${bangumiId}/sync`, null).pipe(
+            catchError(this.handleError),);
+    }
+
     deleteBangumi(bangumi_id: string): Observable<never> {
         return this.http.delete<never>(`${baseUrl}/bangumi/${bangumi_id}`).pipe(
             catchError(this.handleError),)

@@ -37,10 +37,14 @@
     </a>
   }
 </admin-navbar>
-@if (bangumi && adminList) {
+@if (bangumi.id && adminList) {
   <div class="bangumi-detail-container">
     @if (activatedTab === 'Overview') {
-      <app-bangumi-overview [bangumi]="bangumi"></app-bangumi-overview>
+      <app-bangumi-overview
+        [bangumi]="bangumi"
+        [adminList]="adminList"
+        (bangumiChange)="bangumi = $event">
+      </app-bangumi-overview>
     }
     @if (activatedTab === 'Episode') {
       <app-episode-list [bangumi]="bangumi"></app-episode-list>
@@ -53,7 +57,7 @@
     }
   </div>
 }
-@if (!bangumi && !adminList) {
+@if (!bangumi.id || !adminList) {
   <div class="initial-placeholder">
     <div class="placeholder-text">加载中...</div>
   </div>
