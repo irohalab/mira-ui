@@ -46,6 +46,8 @@ export class BangumiAdminEntity {
     // @Optional
     alertTimeout!: number;
 
+    lockedFields?: Record<string, boolean>;
+
     watchingCount?: number;
     favoriteCount?: number;
 

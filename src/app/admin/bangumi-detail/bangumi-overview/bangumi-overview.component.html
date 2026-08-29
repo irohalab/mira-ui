@@ -1,65 +1,210 @@
-<div class="bangumi-basic-info section-card">
-  @if (bangumi.coverImage) {
-    <div class="cover-wrapper">
-      <ui-responsive-image
-        [src]="bangumi.coverImage.url"
-            [size]="{
-                    width: '100%',
-                    height: 'auto',
-                    originalWidth: bangumi.coverImage.width,
-                    originalHeight: bangumi.coverImage.height}"
-      [background]="bangumi.coverImage.dominantColor"></ui-responsive-image>
+<form class="bangumi-overview-form section-card ui form" [formGroup]="bangumiForm" (ngSubmit)="save()" novalidate>
+  <header class="overview-header">
+    <div class="heading-copy">
+      <span class="section-eyebrow">Bangumi</span>
+      <h3>基本信息</h3>
+      @if (bangumiForm.dirty) {
+        <span class="unsaved-indicator">有未保存的更改</span>
+      }
     </div>
-  }
-  <div class="bangumi-info-text">
-    <h3 class="bangumi-title">
-      {{bangumi.nameCn || bangumi.name}}
-      <a class="external-link" [href]="'https://box.moe/item/' + bangumi.itemId" target="_blank"
-         title="在box.moe页面查看">
-        <i class="box-moe-icon bgm-link-icon" [ngClass]="{light: !isDarkTheme, dark: isDarkTheme}"></i>
-      </a>
-      <a class="external-link" [href]="'https://bgm.tv/subject/' + bangumi.bgmId" target="_blank" title="在bgm.tv页面查看">
-        <i class="bgm-emo-47 bgm-link-icon"></i>
-      </a>
-    </h3>
-    @if (bangumi.nameCn) {
-      <h4 class="entry">
-        <span class="entry-key">日文名</span>
-        <span class="entry-value">{{bangumi.name || '暂无'}}</span>
-      </h4>
-    }
-    <p class="entry">
-      <span class="entry-key">简介</span>
-      <span class="entry-value">{{bangumi.summary || '暂无'}}</span>
-    </p>
-    <p class="entry">
-      <span class="entry-key">放送开始</span>
-      <span class="entry-value">{{bangumi.airDate || '未知'}}</span>
-    </p>
-    <p class="entry">
-      <span class="entry-key">放送星期</span>
-      <span class="entry-value">{{bangumi.airWeekday || '未知'}}</span>
-    </p>
-    <p class="entry">
-      <span class="entry-key">类型</span>
-      <span class="entry-value">{{bangumi.type | bangumiTypeName}}</span>
-    </p>
-    <p class="entry">
-      <span class="entry-key">创建时间</span>
-      <span class="entry-value">{{bangumi.createTime | date: 'medium'}}</span>
-    </p>
-    <p class="entry">
-      <span class="entry-key">更新时间</span>
-      <span class="entry-value">{{bangumi.updateTime | date: 'medium'}}</span>
-    </p>
-    <p class="entry">
-      <span class="entry-key">创建者</span>
-      <span class="entry-value">{{bangumi.createdBy?.nickName || 'System'}}</span>
-    </p>
-    <p class="entry">
-      <span class="entry-key">维护者</span>
-      <span class="entry-value">{{bangumi.maintainedBy?.nickName || 'System'}}</span>
-    </p>
+    <div class="form-actions" role="toolbar" aria-label="番组操作">
+      <button
+        class="ui small orange basic labeled icon button"
+        [ngClass]="{loading: isSyncing, inverted: isDarkTheme}"
+        type="button"
+        [disabled]="isBusy || bangumiForm.dirty || !bangumi.itemId"
+        confirmDialog
+        dialogTitle="确定从上游同步番组吗？"
+        dialogContent="上游数据会覆盖所有未锁定的字段。同步前请先保存或重置当前更改。"
+        (onConfirm)="syncBangumi()">
+        <i class="sync icon" aria-hidden="true"></i>
+        从上游同步
+      </button>
+      <button
+        class="ui small basic labeled icon button"
+        [ngClass]="{inverted: isDarkTheme}"
+        type="button"
+        [disabled]="isBusy || !bangumiForm.dirty"
+        (click)="reset()">
+        <i class="undo icon" aria-hidden="true"></i>
+        重置
+      </button>
+      <button
+        class="ui small primary labeled icon button"
+        [ngClass]="{loading: isSaving}"
+        type="submit"
+        [disabled]="isBusy || bangumiForm.invalid || !bangumiForm.dirty">
+        <i class="save icon" aria-hidden="true"></i>
+        保存
+      </button>
+    </div>
+  </header>
+
+  <div class="overview-content">
+    <aside class="bangumi-summary-card">
+      @if (bangumi.coverImage) {
+        <div class="cover-wrapper">
+          <ui-responsive-image
+            [src]="bangumi.coverImage.url"
+            [size]="{
+              width: '100%',
+              height: 'auto',
+              originalWidth: bangumi.coverImage.width,
+              originalHeight: bangumi.coverImage.height
+            }"
+            [background]="bangumi.coverImage.dominantColor">
+          </ui-responsive-image>
+        </div>
+      } @else {
+        <div class="cover-placeholder">
+          <i class="image outline icon" aria-hidden="true"></i>
+          <span>暂无封面</span>
+        </div>
+      }
+
+      <div class="external-links" aria-label="外部链接">
+        @if (bangumi.itemId) {
+          <a [href]="'https://box.moe/item/' + bangumi.itemId" target="_blank" rel="noopener" title="在 box.moe 页面查看">
+            <i class="box-moe-icon bgm-link-icon" [ngClass]="{light: !isDarkTheme, dark: isDarkTheme}" aria-hidden="true"></i>
+            box.moe
+          </a>
+        }
+        @if (bangumi.bgmId) {
+          <a [href]="'https://bgm.tv/subject/' + bangumi.bgmId" target="_blank" rel="noopener" title="在 bgm.tv 页面查看">
+            <i class="bgm-emo-47 bgm-link-icon" aria-hidden="true"></i>
+            bgm.tv
+          </a>
+        }
+      </div>
+
+      <dl class="metadata-list">
+        <div><dt>类型</dt><dd>{{bangumi.type | bangumiTypeName}}</dd></div>
+        <div>
+          <dt>放送星期</dt>
+          <dd class="weekday-value" aria-live="polite">
+            <i class="calendar alternate outline icon" aria-hidden="true"></i>
+            {{airWeekdayLabel}}
+          </dd>
+          <dd class="metadata-description">根据放送开始日期自动计算。</dd>
+        </div>
+        <div><dt>创建时间</dt><dd>{{bangumi.createTime | date: 'medium'}}</dd></div>
+        <div><dt>更新时间</dt><dd>{{bangumi.updateTime | date: 'medium'}}</dd></div>
+        <div><dt>创建者</dt><dd>{{bangumi.createdBy?.nickName || 'System'}}</dd></div>
+      </dl>
+    </aside>
+
+    <fieldset class="editable-content" [disabled]="isBusy">
+      <section class="form-section">
+        <div class="section-heading">
+          <div>
+            <h4>标题与简介</h4>
+            <p>锁定字段后，从上游同步时不会覆盖本地内容。</p>
+          </div>
+        </div>
+
+        <div class="two fields">
+          <div class="field">
+            <div class="field-label">
+              <label for="bangumi-name-cn">中文名</label>
+              <button class="field-lock-button" [ngClass]="{locked: isFieldLocked('nameCn')}" type="button"
+                      [attr.aria-pressed]="isFieldLocked('nameCn')" [title]="lockButtonTitle('nameCn')"
+                      (click)="toggleFieldLock('nameCn')">
+                <i class="icon" [ngClass]="isFieldLocked('nameCn') ? 'lock' : 'unlock'" aria-hidden="true"></i>
+                {{isFieldLocked('nameCn') ? '已锁定' : '未锁定'}}
+              </button>
+            </div>
+            <input id="bangumi-name-cn" type="text" formControlName="nameCn" required>
+          </div>
+          <div class="field">
+            <div class="field-label">
+              <label for="bangumi-name">原名</label>
+              <button class="field-lock-button" [ngClass]="{locked: isFieldLocked('name')}" type="button"
+                      [attr.aria-pressed]="isFieldLocked('name')" [title]="lockButtonTitle('name')"
+                      (click)="toggleFieldLock('name')">
+                <i class="icon" [ngClass]="isFieldLocked('name') ? 'lock' : 'unlock'" aria-hidden="true"></i>
+                {{isFieldLocked('name') ? '已锁定' : '未锁定'}}
+              </button>
+            </div>
+            <input id="bangumi-name" type="text" formControlName="name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="bangumi-summary">简介</label>
+            <button class="field-lock-button" [ngClass]="{locked: isFieldLocked('summary')}" type="button"
+                    [attr.aria-pressed]="isFieldLocked('summary')" [title]="lockButtonTitle('summary')"
+                    (click)="toggleFieldLock('summary')">
+              <i class="icon" [ngClass]="isFieldLocked('summary') ? 'lock' : 'unlock'" aria-hidden="true"></i>
+              {{isFieldLocked('summary') ? '已锁定' : '未锁定'}}
+            </button>
+          </div>
+          <textarea id="bangumi-summary" rows="7" formControlName="summary" required></textarea>
+        </div>
+
+        <div class="schedule-fields">
+          <div class="field air-date-field">
+            <div class="field-label">
+              <label>放送开始</label>
+              <button class="field-lock-button" [ngClass]="{locked: isFieldLocked('airDate')}" type="button"
+                      [attr.aria-pressed]="isFieldLocked('airDate')" [title]="lockButtonTitle('airDate')"
+                      (click)="toggleFieldLock('airDate')">
+                <i class="icon" [ngClass]="isFieldLocked('airDate') ? 'lock' : 'unlock'" aria-hidden="true"></i>
+                {{isFieldLocked('airDate') ? '已锁定' : '未锁定'}}
+              </button>
+            </div>
+            <ngxsmk-datepicker
+              formControlName="airDate"
+              mode="single"
+              [appendToBody]="true"
+              [theme]="isDarkTheme ? 'dark' : 'light'">
+            </ngxsmk-datepicker>
+            <small class="field-help">保存为 ISO 日期字符串。</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <div class="section-heading">
+          <div>
+            <h4>管理设置</h4>
+            <p>这些设置会与标题信息一起保存。</p>
+          </div>
+        </div>
+
+        <div class="two fields">
+          <div class="field">
+            <label for="bangumi-status">状态</label>
+            <select id="bangumi-status" formControlName="status">
+              <option [ngValue]="0">Pending</option>
+              <option [ngValue]="1">On Air</option>
+              <option [ngValue]="2">Finished</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="bangumi-maintainer">维护者</label>
+            <select id="bangumi-maintainer" formControlName="maintainedByUid">
+              <option value="">System</option>
+              @for (user of adminList; track user.uid) {
+                <option [value]="user.uid">{{user.nickName}}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="two fields">
+          <div class="field">
+            <label for="bangumi-eps-offset">集数偏移</label>
+            <input id="bangumi-eps-offset" type="number" formControlName="epsNoOffset">
+            <small class="field-help">用于集数不是从 1 开始的番组。</small>
+          </div>
+          <div class="field">
+            <label for="bangumi-alert-timeout">报警超时（天）</label>
+            <input id="bangumi-alert-timeout" type="number" formControlName="alertTimeout" required>
+            <small class="field-help">超过 episode 放送日期后多少天向维护者报警。</small>
+          </div>
+        </div>
+      </section>
+    </fieldset>
   </div>
-  <a class="edit-button anchor-button" (click)="editBasicInfo()"><i class="edit icon"></i></a>
-</div>
+</form>
