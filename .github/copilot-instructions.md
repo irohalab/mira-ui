@@ -19,6 +19,26 @@
 - Development server: `npm start`
 - Do not use raw `npm test` for agent verification because it starts watch mode.
 
+## Project Sources of Truth
+
+- Use [package.json](../package.json) and [angular.json](../angular.json) for the
+  current Angular version and commands; the root README is stale CLI scaffold
+  text.
+- Local API targets and path ownership are defined in
+  [proxy.conf.json](../proxy.conf.json). Keep browser calls same-origin unless a
+  task explicitly changes that architecture.
+- `npm run build` generates ignored deployment files through
+  [scripts/process-environment.js](../scripts/process-environment.js). Use
+  `npm run check` for ordinary source validation.
+- For playback or signed-routing changes, read the
+  [UI integration guide](../docs/mira-ui-routing-integration.md),
+  [proxy/cache design](../docs/proxy-cache-routing-design.md), and
+  [signed-routing client guide](../docs/signed-routing-client-guide.md) instead
+  of restating those contracts here.
+- Authentication startup, refresh, and logout behavior is coordinated in
+  `src/app/user-service/user.service.ts`; preserve its single-flight and
+  cross-tab refresh behavior when changing the OIDC flow.
+
 ## Browser Test Environment
 
 - Browser tests require Chrome and may fail before executing any specs when run
