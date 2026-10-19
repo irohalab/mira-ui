@@ -7,6 +7,10 @@ import { AnnounceComponent } from './announce/announce.component';
 import { DownloadManagerComponent } from './download-manager/download-manager.component';
 import { VideoProcessManagerComponent } from './video-process-manager/video-process-manager.component';
 import { VideoProcessJobDetailComponent } from './video-process-job-detail/video-process-job-detail.component';
+import { StorageMigrationDashboardComponent } from './storage-migration/storage-migration-dashboard.component';
+import { StorageMigrationRunDetailComponent } from './storage-migration/storage-migration-run-detail.component';
+import { roleGuard } from '../user-service/auth.guard';
+import { User } from '../entity/user';
 
 
 export const adminRoutes: Routes = [
@@ -41,6 +45,18 @@ export const adminRoutes: Routes = [
             {
                 path: 'announce',
                 component: AnnounceComponent
+            },
+            {
+                path: 'storage-migration',
+                component: StorageMigrationDashboardComponent,
+                canActivate: [roleGuard],
+                data: {minRole: User.SUPER_ADMIN_ROLE}
+            },
+            {
+                path: 'storage-migration/runs/:id',
+                component: StorageMigrationRunDetailComponent,
+                canActivate: [roleGuard],
+                data: {minRole: User.SUPER_ADMIN_ROLE}
             },
             {
                 path: '',

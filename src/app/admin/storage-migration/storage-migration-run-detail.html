@@ -1,0 +1,158 @@
+<admin-navbar navTitle="迁移任务" backLink="/admin/storage-migration"></admin-navbar>
+<div class="migration-content">
+  @if (errorMessage) {
+    <div class="ui negative message">{{errorMessage}}</div>
+  }
+
+  @if (run) {
+    <section class="detail-band">
+      <div class="run-header">
+        <div>
+          <span class="eyebrow">{{run.mode}} · {{run.id}}</span>
+          <h1>{{statusLabel(run.status)}}</h1>
+          <p>{{run.stage}} · 创建于 {{run.createdAt | date:'medium'}}</p>
+        </div>
+        <div class="run-actions">
+          @if (run.availableActions.start) {
+            <button class="ui primary button" [class.loading]="isBusy('run:start')" (click)="runAction('start')"><i class="play icon"></i>开始</button>
+          }
+          @if (run.availableActions.pause) {
+            <button class="ui button" [class.loading]="isBusy('run:pause')" (click)="runAction('pause')"><i class="pause icon"></i>暂停</button>
+          }
+          @if (run.availableActions.resume) {
+            <button class="ui primary button" [class.loading]="isBusy('run:resume')" (click)="runAction('resume')"><i class="play icon"></i>继续</button>
+          }
+          @if (run.availableActions.cancel) {
+            <button class="ui button" confirmDialog dialogTitle="确认取消" dialogContent="取消任务并清理尚未切换的迁移目标？" (onConfirm)="runAction('cancel')"><i class="ban icon"></i>取消</button>
+          }
+          @if (run.availableActions.rollback) {
+            <button class="ui negative button" confirmDialog dialogTitle="确认回滚" dialogContent="将已切换的数据库路径恢复为本地源，并清理迁移目标？" (onConfirm)="runAction('rollback')"><i class="undo icon"></i>回滚全部</button>
+          }
+          @if (run.availableActions.cleanup) {
+            <button class="ui negative button" confirmDialog dialogTitle="确认清理本地源" dialogContent="本地文件删除后，回滚需要从 S3 恢复。确认继续？" (onConfirm)="runAction('cleanup')"><i class="trash alternate icon"></i>清理本地源</button>
+          }
+        </div>
+      </div>
+      @if (run.lastError) {
+        <div class="ui negative message">{{run.lastError}}</div>
+      }
+      <div class="run-metrics">
+        <div><span>已选择</span><strong>{{run.summary.selectedUnits}}</strong></div>
+        <div><span>已验证</span><strong>{{run.summary.verifiedUnits}}</strong></div>
+        <div><span>已切换</span><strong>{{run.summary.completedUnits}}</strong></div>
+        <div><span>待审核</span><strong>{{(run.lifecycle?.reviewRequired || 0) - (run.lifecycle?.reviewApproved || 0)}}</strong></div>
+        <div><span>保留源</span><strong>{{run.summary.retainedUnits}}</strong></div>
+        <div><span>保留数据</span><strong>{{formatBytes(run.summary.retainedBytes)}}</strong></div>
+      </div>
+    </section>
+
+    @if (run.status === 'cleanup-ready') {
+      <div class="cleanup-warning">
+        <i class="exclamation triangle icon"></i>
+        本地源清理是回滚边界。删除后只能从 S3 恢复文件。
+      </div>
+    }
+  }
+
+  <section class="units-band">
+    <div class="units-toolbar">
+      <div><span class="eyebrow">迁移单元</span><h2>{{unitTotal}} 项</h2></div>
+      <div class="filter-controls">
+        <select class="ui dropdown" [(ngModel)]="unitStatus" (ngModelChange)="filtersChanged()" aria-label="单元状态">
+          <option value="">全部状态</option>
+          @for (status of unitStatuses; track status) { <option [value]="status">{{statusLabel(status)}}</option> }
+        </select>
+        <select class="ui dropdown" [(ngModel)]="reviewFilter" (ngModelChange)="filtersChanged()" aria-label="审核状态">
+          <option value="all">全部审核</option>
+          <option value="pending">待审核</option>
+          <option value="approved">已通过</option>
+          <option value="rejected">已拒绝</option>
+        </select>
+        <label class="ui checkbox issue-filter">
+          <input type="checkbox" [(ngModel)]="hasIssues" (ngModelChange)="filtersChanged()">
+          <span>仅问题项</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table class="ui very basic unstackable table" [ngClass]="{inverted: isDarkTheme}">
+        <thead><tr><th></th><th>番组 / 集数 / VideoFile</th><th>状态</th><th>资产</th><th>源数据</th><th>审核</th><th>操作</th></tr></thead>
+        <tbody>
+          @for (unit of units; track unit.id) {
+            <tr>
+              <td><button class="asset-toggle" (click)="toggleUnit(unit.id)" [title]="isExpanded(unit.id) ? '收起资产' : '展开资产'"><i class="chevron icon" [ngClass]="isExpanded(unit.id) ? 'down' : 'right'"></i></button></td>
+              <td class="unit-context">
+                <a class="unit-bangumi" [href]="bangumiUrl(unit)" [title]="'打开番组 ' + unit.bangumiId">
+                  <span>番组</span><code>{{unit.bangumiId}}</code>
+                </a>
+                <strong class="unit-episode">EP {{unit.episodeNo}}</strong>
+                <small>VideoFile · {{unit.videoFileId || '已删除'}}</small>
+              </td>
+              <td><span class="ui mini label" [ngClass]="statusClass(unit.status)">{{statusLabel(unit.status)}}</span></td>
+              <td>{{unit.assetProgress.verified}} / {{unit.assetProgress.total}}</td>
+              <td>{{formatBytes(unit.sourceBytes)}}</td>
+              <td>
+                @if (unit.reviewDecision) {
+                  <span class="ui mini label" [ngClass]="statusClass(unit.reviewDecision)">{{unit.reviewDecision}}</span>
+                } @else if (unit.reviewRequired) {
+                  <span class="ui mini yellow label">pending</span>
+                } @else { <span>—</span> }
+              </td>
+              <td class="unit-actions">
+                @if (unit.availableActions.openPlayer) {
+                  <a class="ui icon button" [href]="playerUrl(unit)" target="_blank" rel="noopener" title="在正常播放器打开"><i class="external alternate icon"></i></a>
+                }
+                @if (unit.availableActions.retry) {
+                  <button class="ui icon button" confirmDialog dialogTitle="确认重试" dialogContent="重新检查并重试该迁移单元？" (onConfirm)="retryUnit(unit)" title="重试"><i class="redo icon"></i></button>
+                }
+                @if (unit.availableActions.rollback) {
+                  <button class="ui icon button" confirmDialog dialogTitle="确认回滚" dialogContent="恢复该视频的本地数据库路径？" (onConfirm)="rollbackUnit(unit)" title="回滚"><i class="undo icon"></i></button>
+                }
+              </td>
+            </tr>
+            @if (unit.lastError || unit.warnings.length) {
+              <tr class="issue-row"><td></td><td colspan="6">
+                @if (unit.lastError) { <div class="unit-error">{{unit.lastError}}</div> }
+                @for (warning of unit.warnings; track warning) { <div class="unit-warning">{{warning}}</div> }
+              </td></tr>
+            }
+            @if (unit.availableActions.approve || unit.availableActions.reject) {
+              <tr class="review-row"><td></td><td colspan="6">
+                <div class="review-controls">
+                  <input type="text" maxlength="2000" [(ngModel)]="reviewNotes[unit.id]" placeholder="审核备注（可选）" [attr.aria-label]="'审核备注 ' + unit.id">
+                  <button class="ui positive button" [class.loading]="isBusy('review:' + unit.id)" (click)="review(unit, 'approved')"><i class="check icon"></i>通过</button>
+                  <button class="ui negative button" confirmDialog dialogTitle="确认拒绝" dialogContent="拒绝会暂停批次并自动回滚该单元。" (onConfirm)="review(unit, 'rejected')"><i class="times icon"></i>拒绝</button>
+                </div>
+              </td></tr>
+            }
+            @if (isExpanded(unit.id)) {
+              <tr class="asset-detail-row"><td></td><td colspan="6">
+                <div class="asset-grid">
+                  @for (asset of unit.assets; track asset.id) {
+                    <div class="asset-line">
+                      <span class="asset-kind">{{asset.type}}</span>
+                      <span class="asset-path">{{asset.sourceRelativePath}}</span>
+                      <span>{{formatBytes(asset.sourceBytes)}}</span>
+                      <span class="ui mini label" [ngClass]="statusClass(asset.status)">{{asset.status}}</span>
+                      <code>{{asset.targetUri}}</code>
+                      @if (asset.availableActions.retryTargetDeletion) {
+                        <button class="ui mini button" (click)="retryTargetDeletion(asset)"><i class="redo icon"></i>重试目标清理</button>
+                      }
+                      @if (asset.lastError) { <div class="asset-error">{{asset.lastError}}</div> }
+                    </div>
+                  }
+                </div>
+              </td></tr>
+            }
+          } @empty {
+            <tr><td colspan="7" class="empty-state">没有符合筛选条件的迁移单元</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (unitTotal > unitCount) {
+      <ui-pagination [currentPage]="unitPage" [total]="unitTotal" [countPerPage]="unitCount" [max]="6" (pageChange)="refreshUnits($event)"></ui-pagination>
+    }
+  </section>
+</div>

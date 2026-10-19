@@ -1,0 +1,125 @@
+<admin-navbar navTitle="存储迁移" backLink="/"></admin-navbar>
+<div class="migration-content">
+  @if (errorMessage) {
+    <div class="ui negative message">{{errorMessage}}</div>
+  }
+
+  @if (overview) {
+    <section class="status-band" [ngClass]="{inverted: isDarkTheme}">
+      <div class="status-primary">
+        <span class="eyebrow">迁移服务</span>
+        <strong>{{overview.enabled ? '已启用' : '未启用'}}</strong>
+      </div>
+      <div><span class="eyebrow">视频存储桶</span><strong>{{overview.buckets.video}}</strong></div>
+      <div><span class="eyebrow">图片存储桶</span><strong>{{overview.buckets.image}}</strong></div>
+      <div>
+        <span class="eyebrow">最近预检</span>
+        <span class="ui mini label" [ngClass]="overview.preflight.status === 'ready' ? 'green' : overview.preflight.status === 'failed' ? 'red' : 'grey'">
+          {{overview.preflight.status}}
+        </span>
+      </div>
+    </section>
+
+    <section class="metric-grid">
+      <div class="metric"><span>数据库可选</span><strong>{{overview.eligibility.eligible}}</strong></div>
+      <div class="metric"><span>已在 S3</span><strong>{{overview.eligibility.alreadyS3}}</strong></div>
+      <div class="metric"><span>路径缺失</span><strong>{{overview.eligibility.missingFilePath}}</strong></div>
+      <div class="metric"><span>活动迁移</span><strong>{{overview.eligibility.activeMigration}}</strong></div>
+      <div class="metric"><span>需要 Worker 检查</span><strong>{{overview.eligibility.requiresWorkerInspection}}</strong></div>
+      <div class="metric"><span>Canary Gate</span><strong>{{overview.canaryGate.unlocked ? '开放' : '锁定'}}</strong></div>
+    </section>
+
+    <section class="budget-band">
+      <div class="section-heading">
+        <div><span class="eyebrow">本地保留预算</span><h2>{{formatBytes(overview.limits.retainedBytes)}} / {{formatBytes(overview.limits.retainedLimitBytes)}}</h2></div>
+        <strong>{{budgetPercent() | number:'1.0-2'}}%</strong>
+      </div>
+      <div class="budget-track"><span [style.width.%]="budgetPercent()"></span></div>
+    </section>
+
+    @if (overview.activeRun) {
+      <section class="active-run-band">
+        <div>
+          <span class="eyebrow">当前任务</span>
+          <h2>{{overview.activeRun.mode}} · {{statusLabel(overview.activeRun.status)}}</h2>
+          <p>{{overview.activeRun.summary.completedUnits}} / {{overview.activeRun.summary.selectedUnits}} 单元完成</p>
+          @if (overview.activeRun.status === 'cleanup-ready') {
+            <p class="active-run-guidance">审核已完成。清理本地源或回滚后，才能创建下一批次。</p>
+          }
+        </div>
+        <span class="ui label" [ngClass]="statusClass(overview.activeRun.status)">{{overview.activeRun.stage}}</span>
+        <a class="ui primary button" [routerLink]="['/admin/storage-migration/runs', overview.activeRun.id]">
+          <i class="arrow right icon"></i>{{activeRunActionLabel()}}
+        </a>
+      </section>
+    }
+
+    <section class="create-band" [class.disabled-section]="!overview.enabled || !!overview.activeRun">
+      <div class="section-heading">
+        <div><span class="eyebrow">创建任务</span><h2>分批迁移</h2></div>
+      </div>
+      @if (creationBlockedMessage()) {
+        <div class="creation-blocked"><i class="lock icon"></i>{{creationBlockedMessage()}}</div>
+      }
+      <div class="create-grid">
+        <div class="create-option">
+          <h3>Canary</h3>
+          <p>{{overview.limits.canaryUnits}} 个最早可选视频，全部需要人工审核。</p>
+          <button class="ui primary button" [class.loading]="isCreating" [disabled]="isCreating || !overview.enabled || !!overview.activeRun" (click)="createCanary()">
+            <i class="shield alternate icon"></i>创建 Canary
+          </button>
+        </div>
+        <form class="ui form batch-form" #batchForm="ngForm" (ngSubmit)="createBatch()">
+          <div class="fields">
+            <div class="field">
+              <label>视频数量</label>
+              <input type="number" name="videoLimit" min="1" step="1" required [max]="overview.limits.batchUnits" [(ngModel)]="batchVideoFileLimit">
+            </div>
+            <div class="field">
+              <label>源数据 GiB</label>
+              <input type="number" name="sourceLimit" min="1" required [max]="maxBatchSourceGiB()" [(ngModel)]="batchSourceLimitGiB">
+            </div>
+            <div class="field">
+              <label>审核样本</label>
+              <input type="number" name="reviewSamples" min="1" step="1" required [max]="batchVideoFileLimit" [(ngModel)]="batchReviewSampleCount">
+            </div>
+          </div>
+          <div class="ui checkbox oversized-option">
+            <input type="checkbox" name="allowOversized" [(ngModel)]="allowOversizedSingle">
+            <label>允许单个超大视频</label>
+          </div>
+          <button class="ui button" type="submit" [class.loading]="isCreating" [disabled]="batchForm.invalid || !canCreateBatch()">
+            <i class="plus icon"></i>创建批次
+          </button>
+        </form>
+      </div>
+    </section>
+  }
+
+  <section class="history-band">
+    <div class="section-heading"><div><span class="eyebrow">历史</span><h2>迁移任务</h2></div></div>
+    <div class="table-scroll">
+      <table class="ui very basic unstackable table" [ngClass]="{inverted: isDarkTheme}">
+        <thead><tr><th>创建时间</th><th>模式</th><th>状态</th><th>阶段</th><th>单元</th><th>保留数据</th><th></th></tr></thead>
+        <tbody>
+          @for (run of runs; track run.id) {
+            <tr>
+              <td>{{run.createdAt | date:'medium'}}</td>
+              <td>{{run.mode}}</td>
+              <td><span class="ui mini label" [ngClass]="statusClass(run.status)">{{statusLabel(run.status)}}</span></td>
+              <td>{{run.stage}}</td>
+              <td>{{run.summary.completedUnits}} / {{run.summary.selectedUnits}}</td>
+              <td>{{formatBytes(run.summary.retainedBytes)}}</td>
+              <td><a class="icon-link" [routerLink]="['/admin/storage-migration/runs', run.id]" title="查看任务"><i class="chevron right icon"></i></a></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="empty-state">暂无迁移任务</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (runTotal > runCount) {
+      <ui-pagination [currentPage]="runPage" [total]="runTotal" [countPerPage]="runCount" [max]="6" (pageChange)="refreshRuns($event)"></ui-pagination>
+    }
+  </section>
+</div>
