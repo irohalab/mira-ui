@@ -19,18 +19,11 @@
       </div>
     }
 
-    @if (sync?.log; as log) {
-      @if (log.error) {
-        <div class="ui negative message">{{log.error}}</div>
-      }
-      <section>
-        <h4>发送内容</h4>
-        <pre>{{log.request | json}}</pre>
-      </section>
-      <section>
-        <h4>返回内容</h4>
-        <pre>{{log.response | json}}</pre>
-      </section>
+    @if (sync?.logPath; as logPath) {
+      <a class="ui primary labeled icon button" [href]="logPath" target="_blank" rel="noopener noreferrer" title="下载日志">
+        <i class="download icon" aria-hidden="true"></i>
+        下载日志
+      </a>
     } @else {
       <div class="ui message">该用户尚无收藏同步日志。</div>
     }
