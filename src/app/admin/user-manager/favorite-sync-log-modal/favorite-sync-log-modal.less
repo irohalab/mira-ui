@@ -4,8 +4,8 @@
   display: block;
   position: absolute;
   inset: 0;
-  width: min(920px, 94vw);
-  height: min(760px, 88vh);
+  width: min(640px, 94vw);
+  height: min(360px, 88vh);
   margin: auto;
   overflow: hidden;
   border-radius: 4px;
@@ -57,31 +57,11 @@ main {
   }
 }
 
-section + section {
-  margin-top: 1.5rem;
-}
-
-pre {
-  max-height: 24rem;
-  margin: 0;
-  padding: 1rem;
-  overflow: auto;
-  border: 1px solid #dedede;
-  border-radius: 4px;
-  background: #f7f7f7;
-  color: #222;
-  font-size: 0.85rem;
-  line-height: 1.45;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
 :host.dark-theme {
   background: @darkBackground;
   color: @darkForeground;
 
-  header,
-  pre {
+  header {
     border-color: @darkBorderColor;
   }
 
@@ -89,10 +69,6 @@ pre {
     color: #b8b8b8;
   }
 
-  pre {
-    background: #202020;
-    color: @darkForeground;
-  }
 }
 
 @media (max-width: 700px) {

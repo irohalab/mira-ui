@@ -14,18 +14,9 @@ export interface FavoriteSyncProgress {
     finishedAt?: string;
 }
 
-export interface FavoriteSyncLog {
-    syncId: string;
-    startedAt: string;
-    finishedAt?: string;
-    request: unknown | null;
-    response: unknown | null;
-    error?: string;
-}
-
 export interface FavoriteSyncLogResponse {
     progress: FavoriteSyncProgress | null;
-    log: FavoriteSyncLog | null;
+    logPath: string | null;
 }
 
 export class Account {
