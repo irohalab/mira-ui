@@ -8,75 +8,94 @@
             (onConfirm)="syncEpisodes()" title="Sync Episodes" type="button">
       <i class="sync icon"></i>同步剧集
     </button>
+    <button #columnPickerButton class="ui basic icon button column-picker" [class.inverted]="isDarkTheme"
+            type="button" title="显示列" aria-label="显示列" aria-haspopup="dialog"
+            [attr.aria-expanded]="isColumnPickerOpen" (click)="toggleColumnPicker(columnPickerButton)">
+      <i class="columns icon" aria-hidden="true"></i>
+    </button>
   </div>
   <ul class="notice">
     <li><span class="ui green horizontal tiny label">&nbsp;</span> = 已下载</li>
     <li><span class="ui blue horizontal tiny label">&nbsp;</span> = 下载中</li>
   </ul>
-  <div class="table-wrapper">
-    <table class="ui celled padded table" [ngClass]="{inverted: isDarkTheme}">
+  <div class="table-wrapper" role="region" aria-label="各话列表" tabindex="0">
+    <table class="ui celled padded unstackable table" [ngClass]="{inverted: isDarkTheme}">
       <thead>
         <tr>
-          <th>序号</th>
-          <th style="width: 7rem;">预览图</th>
-          <th>标题</th>
-          <th>放送日期</th>
-          <th>时长</th>
-          <th>操作</th>
+          @for (column of visibleColumns; track column.key) {
+            <th scope="col" [class]="'column-' + column.key" [attr.data-column]="column.key">{{column.label}}</th>
+          }
+          <th scope="col">操作</th>
         </tr>
       </thead>
       <tbody>
         @for (episode of episodes; track episode) {
-          <tr
-                [ngClass]="{
-                        downloaded: episode.status === 2 && !episode.removedMark,
-                        downloading: episode.status === 1 && !episode.removedMark,
-                        removed: episode.removedMark}">
-            <td>{{episode.episodeNo}}</td>
-            <td>
-              @if (episode.status !== 2 || !episode.thumbnailImage) {
-                <div class="image-wrapper">
-                  <div class="image-fallback">
-                    <h4 class="ui icon film icon-holder">
-                      <i class="film icon"></i>
-                    </h4>
-                  </div>
-                </div>
-              }
-              @if (episode.status === 2 && !!episode.thumbnailImage) {
-                <ui-responsive-image
-                  [src]="episode.thumbnailImage.url"
+          <tr [ngClass]="{
+                downloaded: episode.status === 2 && !episode.removedMark,
+                downloading: episode.status === 1 && !episode.removedMark,
+                removed: episode.removedMark}">
+            @for (column of visibleColumns; track column.key) {
+              <td [class]="'column-' + column.key" [attr.data-column]="column.key">
+                @switch (column.key) {
+                  @case ('episodeNo') { {{episode.episodeNo ?? '-'}} }
+                  @case ('sort') { {{episode.sort ?? '-'}} }
+                  @case ('thumbnail') {
+                    @if (episode.status !== 2 || !episode.thumbnailImage) {
+                      <div class="image-wrapper">
+                        <div class="image-fallback">
+                          <h4 class="ui icon film icon-holder">
+                            <i class="film icon"></i>
+                          </h4>
+                        </div>
+                      </div>
+                    }
+                    @if (episode.status === 2 && !!episode.thumbnailImage) {
+                      <ui-responsive-image
+                        [src]="episode.thumbnailImage.url"
                         [size]="{
-                                width: '6rem',
-                                height: '3.375rem',
-                                originalWidth: episode.thumbnailImage.width,
-                                originalHeight: episode.thumbnailImage.height}"
-                  display="block"
-                [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
-              }
-            </td>
-            <td class="title">
-              <span class="key">日文:</span><span class="value">{{episode.name}}</span> <br>
-              <span class="key">中文:</span><span class="value">{{episode.nameCn}}</span>
-            </td>
-            <td>{{episode.airdate}}</td>
-            <td>{{episode.duration}}</td>
-            <td>
+                          width: '6rem',
+                          height: '3.375rem',
+                          originalWidth: episode.thumbnailImage.width,
+                          originalHeight: episode.thumbnailImage.height}"
+                        display="block"
+                        [background]="episode.thumbnailImage.dominantColor"></ui-responsive-image>
+                    }
+                  }
+                  @case ('title') {
+                    <span class="key">日文:</span><span class="value">{{episode.name}}</span> <br>
+                    <span class="key">中文:</span><span class="value">{{episode.nameCn}}</span>
+                  }
+                  @case ('airdate') { {{episode.airdate || '-'}} }
+                  @case ('duration') { {{episode.duration || '-'}} }
+                  @case ('id') { {{episode.id || '-'}} }
+                  @case ('subItemId') { {{episode.subItemId || '-'}} }
+                  @case ('type') { {{episode.type ?? '-'}} }
+                  @case ('properties') { <pre>{{episode.properties | json}}</pre> }
+                  @case ('createTime') { {{episode.createTime || '-'}} }
+                  @case ('updateTime') { {{episode.updateTime || '-'}} }
+                }
+              </td>
+            }
+            <td class="episode-actions">
               <a class="anchor-button" (click)="editEpisode(episode)" title="编辑"><i class="edit icon"></i></a>
               <a class="anchor-button" (click)="editVideoFile(episode)" title="文件列表"><i class="server icon"></i></a>
               <a class="anchor-button"
-                title="删除"
-                confirmDialog
-                dialogTitle="确定删除该话么"
-                dialogContent="删除该话将会同时删除与该话有关的torrent信息，文件，用户进度信息"
-                (onConfirm)="deleteEpisode(episode.id)"><i class="remove icon"></i></a>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+                 title="删除"
+                 confirmDialog
+                 dialogTitle="确定删除该话么"
+                 dialogContent="删除该话将会同时删除与该话有关的torrent信息，文件，用户进度信息"
+                 (onConfirm)="deleteEpisode(episode.id)"><i class="remove icon"></i></a>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="visibleColumns.length + 1">暂无剧集</td>
+          </tr>
+        }
+      </tbody>
+    </table>
   </div>
+</div>
   <!--<div class="float-action-buttons">-->
   <!--    <button class="ui circular icon primary button" (click)="editEpisode()" title="Add Episode" type="button">-->
   <!--        <i class="plus icon"></i>-->

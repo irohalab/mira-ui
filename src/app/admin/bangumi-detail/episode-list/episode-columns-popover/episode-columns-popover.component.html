@@ -1,0 +1,20 @@
+<div class="ui segment column-options" [class.inverted]="isDarkTheme" role="dialog" aria-label="显示列">
+  <div class="column-options-heading">
+    <strong>显示列</strong>
+    <button class="ui mini basic icon button" [class.inverted]="isDarkTheme" type="button"
+            title="恢复默认列" aria-label="恢复默认列" (click)="reset.emit()">
+      <i class="undo icon" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="column-checkboxes" role="group" aria-label="显示列">
+    @for (column of columns; track column.key) {
+      <div class="ui checkbox">
+        <input type="checkbox" [id]="'episode-column-' + column.key"
+               [checked]="isColumnVisible(column.key)"
+               [disabled]="isColumnVisible(column.key) && visibleColumnKeys.length === 1"
+               (change)="columnToggle.emit(column.key)">
+        <label [for]="'episode-column-' + column.key">{{column.label}}</label>
+      </div>
+    }
+  </div>
+</div>
