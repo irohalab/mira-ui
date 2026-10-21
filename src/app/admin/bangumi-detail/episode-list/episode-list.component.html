@@ -68,6 +68,7 @@
                   @case ('airdate') { {{episode.airdate || '-'}} }
                   @case ('duration') { {{episode.duration || '-'}} }
                   @case ('id') { {{episode.id || '-'}} }
+                  @case ('bgmEpsId') { {{episode.bgmEpsId || '-'}} }
                   @case ('subItemId') { {{episode.subItemId || '-'}} }
                   @case ('type') { {{episode.type ?? '-'}} }
                   @case ('properties') { <pre>{{episode.properties | json}}</pre> }

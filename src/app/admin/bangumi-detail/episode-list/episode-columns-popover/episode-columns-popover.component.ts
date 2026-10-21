@@ -3,7 +3,7 @@ import { DARK_THEME, DarkThemeService, UIPopoverContent, UIPopoverRef } from '@i
 import { Subscription } from 'rxjs';
 
 export type EpisodeColumnKey = 'episodeNo' | 'thumbnail' | 'title' | 'airdate' | 'duration'
-    | 'id' | 'subItemId' | 'type' | 'sort' | 'properties'
+    | 'id' | 'bgmEpsId' | 'subItemId' | 'type' | 'sort' | 'properties'
     | 'createTime' | 'updateTime';
 
 export interface EpisodeColumn {

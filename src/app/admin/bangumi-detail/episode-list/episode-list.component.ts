@@ -51,6 +51,7 @@ export class EpisodeListComponent implements OnInit, OnDestroy {
         {key: 'airdate', label: 'airdate', defaultVisible: true},
         {key: 'duration', label: 'duration', defaultVisible: true},
         {key: 'id', label: 'id', defaultVisible: false},
+        {key: 'bgmEpsId', label: 'bgmEpsId', defaultVisible: true},
         {key: 'subItemId', label: 'subItemId', defaultVisible: false},
         {key: 'type', label: 'type', defaultVisible: false},
         {key: 'properties', label: 'properties', defaultVisible: false},
