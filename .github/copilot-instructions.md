@@ -9,6 +9,7 @@
 - Do not modify unrelated code to repair pre-existing failures.
 - Documentation-only changes do not require an application build.
 - Styling changes and small layout changes do not require a test.
+- Prefer use Semantic-UI over custom CSS unless it doesn't meet the design requirements.
 
 ## Canonical Commands
 
