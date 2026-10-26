@@ -6,7 +6,7 @@ import { UIDialog, UIToast, UIToastComponent, UIToastRef, DARK_THEME, DarkThemeS
 import { ResourceScannerEditor } from '../resource-scanner-editor/resource-scanner-editor.component';
 import { FeedService } from '../feed.service';
 import { ResourceScanner } from '../../../entity/ResourceScanner';
-import { filter, finalize, switchMap, takeWhile } from 'rxjs/operators';
+import { filter, finalize, map, switchMap, takeWhile } from 'rxjs/operators';
 import { nanoid } from 'nanoid';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VideoProcessManagerService } from '../../video-process-manager/video-process-manager.service';
@@ -21,7 +21,7 @@ import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.d
 import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
 import { BangumiAdminEntity } from '../../../entity/admin/BangumiAdminEntity';
 import { VideoFileAdminEntity } from '../../../entity/admin/VideoFileAdminEntity';
-import { VideoFileDetailPanelComponent } from './video-file-detail-panel/video-file-detail-panel.component';
+import { VideoFileDetailPanelComponent, VideoFileDetailPanelResult } from './video-file-detail-panel/video-file-detail-panel.component';
 
 const REFRESH_INTERVAL = 5000;
 
@@ -551,25 +551,28 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
         this.subscription.add(
             dialogRef.afterClosed()
                 .pipe(
-                    switchMap(() => this.adminService.getEpisodeVideoFiles(episode.id, resourceGroup.id)),
+                    switchMap((result?: VideoFileDetailPanelResult) => result?.transferred
+                        ? this.adminService.listResourceGroups(this.bangumi.id, true)
+                            .pipe(map(groups => ({kind: 'transferred' as const, groups})))
+                        : this.adminService.getEpisodeVideoFiles(episode.id, resourceGroup.id)
+                            .pipe(map(videoFiles => ({kind: 'scoped' as const, videoFiles})))),
                     finalize(() => { this.pauseRefreshRG = false; })
                 )
                 .subscribe({
-                    next: (videoFileList) => {
-                        const previousVideoFiles = episodeVideoFileStatus.videoFiles;
-                        resourceGroup.videoFiles = [
-                            ...resourceGroup.videoFiles.filter(videoFile => videoFile.episode.id !== episode.id),
-                            ...videoFileList
-                        ];
-                        episodeVideoFileStatus.videoFiles = videoFileList.map(videoFile => {
-                            const previous = previousVideoFiles.find(item => item.id === videoFile.id);
-                            return {
-                                id: videoFile.id,
-                                status: Number(videoFile.status),
-                                downloadJob: previous?.downloadJob,
-                                videoProcessJob: previous?.videoProcessJob
-                            };
-                        });
+                    next: result => {
+                        if (result.kind === 'transferred') {
+                            for (const latestGroup of result.groups) {
+                                const currentGroup = this.resourceGroupList.find(group => group.id === latestGroup.id);
+                                if (!currentGroup) continue;
+                                currentGroup.videoFiles = latestGroup.videoFiles;
+                                for (const status of this.episodeVideoFileStatus[currentGroup.id] ?? []) {
+                                    this.updateEpisodeVideoFiles(currentGroup, status,
+                                        latestGroup.videoFiles.filter(file => file.episode.id === status.episode.id));
+                                }
+                            }
+                        } else {
+                            this.updateEpisodeVideoFiles(resourceGroup, episodeVideoFileStatus, result.videoFiles);
+                        }
                         this.ensureJobPolling();
                     },
                     error: (error) => {
@@ -577,6 +580,24 @@ export class ResourceGroupComponent implements OnInit, OnDestroy {
                     }
                 })
         );
+    }
+
+    private updateEpisodeVideoFiles(resourceGroup: ResourceGroup, episodeStatus: EpisodeVideoFileStatus,
+                                    videoFiles: VideoFileAdminEntity[]): void {
+        const previousVideoFiles = episodeStatus.videoFiles;
+        resourceGroup.videoFiles = [
+            ...resourceGroup.videoFiles.filter(file => file.episode.id !== episodeStatus.episode.id),
+            ...videoFiles
+        ];
+        episodeStatus.videoFiles = videoFiles.map(videoFile => {
+            const previous = previousVideoFiles.find(item => item.id === videoFile.id);
+            return {
+                id: videoFile.id,
+                status: Number(videoFile.status),
+                downloadJob: previous?.downloadJob,
+                videoProcessJob: previous?.videoProcessJob
+            };
+        });
     }
 
     reconcileResourceGroup(resourceGroup: ResourceGroup): void {

@@ -33,12 +33,16 @@ import { AdminService } from '../../../admin.service';
 import { VideoProcessRuleEditorComponent } from '../../video-processs-rule/video-process-rule-editor/video-process-rule-editor.component';
 import { VideoProcessRuleItemComponent } from '../../video-processs-rule/video-process-rule-item/video-process-rule-item.component';
 import { VideoProcessRuleService } from '../../video-processs-rule/video-process-rule.service';
+import { UserService } from '../../../../user-service/user.service';
+import { User } from '../../../../entity/user';
+import { UUID_PATTERN } from '../../../../../helpers/admin-form-validators';
 
 type DetailTab = 'details' | 'rule';
 
 export interface VideoFileDetailPanelResult {
     action: 'saved' | 'deleted' | 'dismissed';
     videoFileId?: string;
+    transferred?: boolean;
 }
 
 const LINKED_JOB_REFRESH_INTERVAL = 5000;
@@ -64,12 +68,20 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
     private toastRef: UIToastRef<UIToastComponent>;
     private bangumiRules: VideoProcessRule[] = [];
     private videoFileRules: VideoProcessRule[] = [];
+    private destinationSubscription?: Subscription;
+    private loadedDestinationBangumiId?: string;
 
     @Input()
     episode!: EpisodeAdminEntity;
 
     @Input()
     resourceGroup!: ResourceGroup;
+
+    @Input()
+    videoFileId?: string;
+
+    @Input()
+    createNew = false;
 
     @Input()
     downloadJob?: DownloadJob;
@@ -93,6 +105,13 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
     handlingConvert = false;
     loadError?: string;
     ruleInvariantError?: string;
+    isSuperAdmin = false;
+    ownershipEditing = false;
+    destinationLoading = false;
+    destinationError?: string;
+    destinationBangumiName?: string;
+    destinationEpisodes: EpisodeAdminEntity[] = [];
+    destinationResourceGroups: ResourceGroup[] = [];
 
     eDownloadJobStatus = DownloadJobStatus;
 
@@ -111,7 +130,8 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
                 private videoProcessManagerService: VideoProcessManagerService,
                 private darkThemeService: DarkThemeService,
                 private router: Router,
-                toast: UIToast) {
+                toast: UIToast,
+                private userService: UserService) {
         this.toastRef = toast.makeText();
     }
 
@@ -128,15 +148,37 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
         return history?.length ? history[history.length - 1] : undefined;
     }
 
+    get ownershipChanged(): boolean {
+        if (!this.videoFileForm) return false;
+        const value = this.videoFileForm.getRawValue();
+        return value.bangumiId !== (this.videoFile?.bangumi.id ?? this.episode.bangumi.id)
+            || value.episodeId !== (this.videoFile?.episode.id ?? this.episode.id)
+            || value.resourceGroupId !== (this.videoFile?.resourceGroup.id ?? this.resourceGroup.id);
+    }
+
+    get destinationReady(): boolean {
+        if (!this.ownershipEditing) return true;
+        const value = this.videoFileForm?.getRawValue();
+        return !this.destinationLoading && !!value
+            && this.loadedDestinationBangumiId === value.bangumiId
+            && this.destinationEpisodes.some(episode => episode.id === value.episodeId)
+            && this.destinationResourceGroups.some(group => group.id === value.resourceGroupId);
+    }
+
     ngOnInit(): void {
         this.subscription.add(
             this.darkThemeService.themeChange
                 .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
         );
+        this.subscription.add(this.userService.userInfo.subscribe(user => {
+            this.isSuperAdmin = user?.role === User.SUPER_ADMIN_ROLE;
+            if (!this.isSuperAdmin && this.ownershipEditing) this.setOwnershipEditing(false);
+        }));
 
         this.subscription.add(
             forkJoin({
-                videoFiles: this.adminService.getEpisodeVideoFiles(this.episode.id, this.resourceGroup.id),
+                videoFiles: this.createNew ? of([] as VideoFileAdminEntity[])
+                    : this.adminService.getEpisodeVideoFiles(this.episode.id, this.resourceGroup.id),
                 rules: this.videoProcessRuleService.listRulesByBangumi(this.episode.bangumi.id)
                     .pipe(catchError(error => {
                         this.toastRef.show(error.message || error);
@@ -147,11 +189,17 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
                 .subscribe({
                     next: ({videoFiles, rules}) => {
                         this.bangumiRules = rules;
-                        if (videoFiles.length > 1) {
+                        if (!this.videoFileId && videoFiles.length > 1) {
                             this.loadError = `Expected one VideoFile for this episode and resource group, but found ${videoFiles.length}.`;
                             return;
                         }
-                        this.videoFile = videoFiles[0];
+                        this.videoFile = this.videoFileId
+                            ? videoFiles.find(file => file.id === this.videoFileId)
+                            : videoFiles[0];
+                        if (this.videoFileId && !this.videoFile) {
+                            this.loadError = 'The selected VideoFile no longer belongs to this episode and resource group.';
+                            return;
+                        }
                         this.buildForm(this.videoFile);
                         this.applyRuleState();
                         this.resolveLinkedJobs();
@@ -166,6 +214,7 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
         this.jobPollingSubscription.unsubscribe();
+        this.destinationSubscription?.unsubscribe();
     }
 
     selectTab(tab: DetailTab): void {
@@ -180,13 +229,90 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
         }
     }
 
+    setOwnershipEditing(editing: boolean): void {
+        if (editing && !this.isSuperAdmin) return;
+        this.destinationSubscription?.unsubscribe();
+        this.ownershipEditing = editing;
+        this.loadedDestinationBangumiId = undefined;
+        this.destinationError = undefined;
+        this.destinationBangumiName = undefined;
+        this.destinationEpisodes = [];
+        this.destinationResourceGroups = [];
+        const form = this.videoFileForm;
+        if (!form) return;
+        if (!editing) {
+            form.patchValue({
+                bangumiId: this.videoFile?.bangumi.id ?? this.episode.bangumi.id,
+                episodeId: this.videoFile?.episode.id ?? this.episode.id,
+                resourceGroupId: this.videoFile?.resourceGroup.id ?? this.resourceGroup.id
+            });
+        }
+        for (const name of ['bangumiId', 'episodeId', 'resourceGroupId']) {
+            form.get(name)![editing ? 'enable' : 'disable']({emitEvent: false});
+        }
+        if (editing) this.loadOwnershipDestination();
+    }
+
+    onDestinationBangumiChange(): void {
+        this.destinationSubscription?.unsubscribe();
+        this.loadedDestinationBangumiId = undefined;
+        this.destinationBangumiName = undefined;
+        this.destinationEpisodes = [];
+        this.destinationResourceGroups = [];
+        this.destinationError = undefined;
+        this.videoFileForm?.patchValue({episodeId: '', resourceGroupId: ''});
+    }
+
+    loadOwnershipDestination(): void {
+        if (!this.ownershipEditing || !this.videoFileForm) return;
+        const bangumiId: string = this.videoFileForm.get('bangumiId')!.value;
+        if (!UUID_PATTERN.test(bangumiId)) {
+            this.destinationError = 'Enter a valid destination bangumiId.';
+            this.toastRef.show(this.destinationError);
+            return;
+        }
+        this.destinationSubscription?.unsubscribe();
+        this.destinationError = undefined;
+        this.destinationLoading = true;
+        this.destinationSubscription = forkJoin({
+            bangumi: this.adminService.getBangumi(bangumiId),
+            episodes: this.adminService.listEpisode(bangumiId),
+            resourceGroups: this.adminService.listResourceGroups(bangumiId, false)
+        }).pipe(finalize(() => { this.destinationLoading = false; }))
+            .subscribe({
+                next: ({bangumi, episodes, resourceGroups}) => {
+                    this.loadedDestinationBangumiId = bangumiId;
+                    this.destinationBangumiName = bangumi.nameCn || bangumi.name || bangumi.id;
+                    this.destinationEpisodes = episodes;
+                    this.destinationResourceGroups = resourceGroups;
+                    const value = this.videoFileForm!.getRawValue();
+                    if (!episodes.some(episode => episode.id === value.episodeId)) {
+                        this.videoFileForm!.get('episodeId')!.setValue('');
+                    }
+                    if (!resourceGroups.some(group => group.id === value.resourceGroupId)) {
+                        this.videoFileForm!.get('resourceGroupId')!.setValue('');
+                    }
+                },
+                error: error => {
+                    this.loadedDestinationBangumiId = undefined;
+                    this.destinationError = `Unable to load destination: ${error.message || error}`;
+                    this.toastRef.show(this.destinationError);
+                }
+            });
+    }
+
     save(): void {
         if (!this.videoFileForm || this.videoFileForm.invalid || this.saving) {
+            return;
+        }
+        if (!this.destinationReady) {
+            this.toastRef.show('Load the destination bangumi and select its episode and resourceGroup before saving.');
             return;
         }
 
         this.saving = true;
         const payload = this.buildPayload();
+        const transferring = this.isPersisted && this.ownershipChanged;
         const saveRequest = this.isPersisted
             ? this.adminService.updateVideoFile(payload).pipe(map(() => this.videoFile!.id))
             : this.adminService.addVideoFile(payload);
@@ -195,13 +321,19 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
             saveRequest
                 .pipe(
                     switchMap(videoFileId => this.adminService
-                        .getEpisodeVideoFiles(this.episode.id, this.resourceGroup.id)
+                        .getEpisodeVideoFiles(payload.episodeId, payload.resourceGroupId)
                         .pipe(map(videoFiles => this.requireSingleVideoFile(videoFiles, videoFileId)))),
                     finalize(() => { this.saving = false; })
                 )
                 .subscribe({
                     next: videoFile => {
                         this.videoFile = videoFile;
+                        this.createNew = false;
+                        if (transferring) {
+                            this.toastRef.show('VideoFile transferred. Storage, jobs, and processing rules were not changed.');
+                            this.dialogRef.close({action: 'saved', videoFileId: videoFile.id, transferred: true} satisfies VideoFileDetailPanelResult);
+                            return;
+                        }
                         this.buildForm(videoFile);
                         this.applyRuleState();
                         this.resolveLinkedJobs();
@@ -365,6 +497,9 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
     private buildForm(videoFile?: VideoFileAdminEntity): void {
         this.systemFieldsUnlocked = false;
         this.videoFileForm = this.formBuilder.group({
+            bangumiId: [videoFile?.bangumi.id ?? this.episode.bangumi.id, [Validators.required, Validators.pattern(UUID_PATTERN)]],
+            episodeId: [videoFile?.episode.id ?? this.episode.id, [Validators.required, Validators.pattern(UUID_PATTERN)]],
+            resourceGroupId: [videoFile?.resourceGroup.id ?? this.resourceGroup.id, [Validators.required, Validators.pattern(UUID_PATTERN)]],
             fileName: [videoFile?.fileName ?? ''],
             label: [videoFile?.label ?? ''],
             downloadUrl: [videoFile?.downloadUrl ?? ''],
@@ -377,6 +512,7 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
             blobStorageUrlV0: [videoFile?.blobStorageUrlV0 ?? ''],
             kfImagePathList: [(videoFile?.kfImagePathList ?? []).join('\n')]
         });
+        this.setOwnershipEditing(false);
         this.setSystemFieldsUnlocked(false);
         this.videoFileForm.markAsPristine();
     }
@@ -385,9 +521,9 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
         const value = this.videoFileForm!.getRawValue();
         return {
             id: this.videoFile?.id,
-            bangumiId: this.episode.bangumi.id,
-            episodeId: this.episode.id,
-            resourceGroupId: this.resourceGroup.id,
+            bangumiId: value.bangumiId,
+            episodeId: value.episodeId,
+            resourceGroupId: value.resourceGroupId,
             fileName: value.fileName,
             label: value.label,
             downloadUrl: value.downloadUrl,
@@ -410,11 +546,13 @@ export class VideoFileDetailPanelComponent implements OnInit, OnDestroy {
     }
 
     private requireSingleVideoFile(videoFiles: VideoFileAdminEntity[], expectedId: string): VideoFileAdminEntity {
+        if (expectedId) {
+            const videoFile = videoFiles.find(file => file.id === expectedId);
+            if (!videoFile) throw new Error('The saved VideoFile could not be found in the destination episode and resource group.');
+            return videoFile;
+        }
         if (videoFiles.length !== 1) {
             throw new Error(`Expected one saved VideoFile, but found ${videoFiles.length}.`);
-        }
-        if (expectedId && videoFiles[0].id !== expectedId) {
-            throw new Error('The saved VideoFile could not be found in this resource group.');
         }
         return videoFiles[0];
     }

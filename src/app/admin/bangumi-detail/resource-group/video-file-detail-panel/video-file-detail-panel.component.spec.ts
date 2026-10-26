@@ -1,7 +1,7 @@
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DARK_THEME, DarkThemeService, UIDialog, UIDialogRef, UIToast } from '@irohalab/deneb-ui';
-import { of } from 'rxjs';
+import { BehaviorSubject, of, throwError } from 'rxjs';
 import { DownloadJob } from '../../../../entity/DownloadJob';
 import { DownloadJobStatus } from '../../../../entity/DownloadJobStatus';
 import { VideoFileAdminEntity } from '../../../../entity/admin/VideoFileAdminEntity';
@@ -14,6 +14,10 @@ import { VideoProcessManagerService } from '../../../video-process-manager/video
 import { AdminService } from '../../../admin.service';
 import { VideoProcessRuleService } from '../../video-processs-rule/video-process-rule.service';
 import { VideoFileDetailPanelComponent } from './video-file-detail-panel.component';
+import { EpisodeAdminEntity } from '../../../../entity/admin/EpisodeAdminEntity';
+import { BangumiAdminEntity } from '../../../../entity/admin/BangumiAdminEntity';
+import { User } from '../../../../entity/user';
+import { UserService } from '../../../../user-service/user.service';
 
 describe('VideoFileDetailPanelComponent', () => {
     let component: VideoFileDetailPanelComponent;
@@ -26,15 +30,16 @@ describe('VideoFileDetailPanelComponent', () => {
     let router: jasmine.SpyObj<Router>;
     let toastShow: jasmine.Spy;
     let videoFile: VideoFileAdminEntity;
+    let user: BehaviorSubject<User>;
 
-    const episode = {
-        id: 'episode-1',
+    const episode = Object.assign(new EpisodeAdminEntity(), {
+        id: '20000000-0000-4000-8000-000000000002',
         episodeNo: 3,
-        bangumi: {id: 'bangumi-1'}
-    } as any;
+        bangumi: {id: '10000000-0000-4000-8000-000000000001'}
+    });
 
     const resourceGroup = {
-        id: 'resource-group-1',
+        id: '30000000-0000-4000-8000-000000000003',
         displayName: 'Primary source',
         videoFiles: []
     } as ResourceGroup;
@@ -42,9 +47,9 @@ describe('VideoFileDetailPanelComponent', () => {
     beforeEach(() => {
         videoFile = {
             id: 'video-1',
-            bangumi: {id: 'bangumi-1'},
-            episode: {id: 'episode-1'},
-            resourceGroup: {id: 'resource-group-1'},
+            bangumi: {id: episode.bangumi.id},
+            episode: {id: episode.id},
+            resourceGroup: {id: resourceGroup.id},
             fileName: 'episode-03.mkv',
             filePath: '/video/episode-03.mkv',
             torrentId: 'torrent-1',
@@ -66,7 +71,10 @@ describe('VideoFileDetailPanelComponent', () => {
             'getEpisodeVideoFiles',
             'addVideoFile',
             'updateVideoFile',
-            'deleteVideoFile'
+            'deleteVideoFile',
+            'getBangumi',
+            'listEpisode',
+            'listResourceGroups'
         ]);
         dialog = jasmine.createSpyObj<UIDialog>('UIDialog', ['open']);
         dialog.open.and.returnValue({
@@ -94,6 +102,10 @@ describe('VideoFileDetailPanelComponent', () => {
         ruleService.listRulesByBangumi.and.returnValue(of([]));
         downloadManagerService.list_jobs.and.returnValue(of([]));
         videoProcessManagerService.listJobs.and.returnValue(of([]));
+        adminService.getBangumi.and.returnValue(of(Object.assign(new BangumiAdminEntity(), {id: episode.bangumi.id, name: 'Source'})));
+        adminService.listEpisode.and.returnValue(of([episode]));
+        adminService.listResourceGroups.and.returnValue(of([resourceGroup]));
+        user = new BehaviorSubject(new User('test-user', 'Test', User.SUPER_ADMIN_ROLE, '', false));
 
         component = new VideoFileDetailPanelComponent(
             dialogRef,
@@ -105,7 +117,8 @@ describe('VideoFileDetailPanelComponent', () => {
             videoProcessManagerService,
             {themeChange: of(DARK_THEME)} as DarkThemeService,
             router,
-            {makeText: () => ({show: toastShow})} as any as UIToast
+            {makeText: () => ({show: toastShow})} as any as UIToast,
+            jasmine.createSpyObj<UserService>('UserService', [], {userInfo: user.asObservable()})
         );
         component.episode = episode;
         component.resourceGroup = resourceGroup;
@@ -243,5 +256,91 @@ describe('VideoFileDetailPanelComponent', () => {
 
         expect(component.loadError).toContain('found 2');
         expect(component.videoFileForm).toBeUndefined();
+    });
+
+    it('opens the explicitly selected VideoFile when a resource group contains multiple files', () => {
+        adminService.getEpisodeVideoFiles.and.returnValue(of([{...videoFile, id: 'other-video'}, videoFile]));
+        component.videoFileId = videoFile.id;
+
+        component.ngOnInit();
+
+        expect(component.videoFile).toEqual(videoFile);
+        expect(component.loadError).toBeUndefined();
+    });
+
+    it('can explicitly create a new file without selecting an existing file in the same group', () => {
+        component.createNew = true;
+
+        component.ngOnInit();
+
+        expect(adminService.getEpisodeVideoFiles).not.toHaveBeenCalled();
+        expect(component.isPersisted).toBeFalse();
+        expect(component.videoFileForm).toBeDefined();
+    });
+
+    it('transfers all three parent references and reloads by destination before closing', () => {
+        const targetBangumi = Object.assign(new BangumiAdminEntity(), {id: '40000000-0000-4000-8000-000000000004', name: 'Destination'});
+        const targetEpisode = Object.assign(new EpisodeAdminEntity(), {id: '50000000-0000-4000-8000-000000000005', bangumi: {id: targetBangumi.id}});
+        const targetGroup = Object.assign(new ResourceGroup(), {id: '60000000-0000-4000-8000-000000000006', bangumi: {id: targetBangumi.id}});
+        const transferredFile = {...videoFile, bangumi: {id: targetBangumi.id}, episode: {id: targetEpisode.id}, resourceGroup: {id: targetGroup.id}};
+        adminService.getEpisodeVideoFiles.and.returnValues(of([videoFile]), of([{...transferredFile, id: 'other-video'}, transferredFile]));
+        adminService.updateVideoFile.and.returnValue(of(null));
+        component.ngOnInit();
+        component.setOwnershipEditing(true);
+        adminService.getBangumi.and.returnValue(of(targetBangumi));
+        adminService.listEpisode.and.returnValue(of([targetEpisode]));
+        adminService.listResourceGroups.and.returnValue(of([targetGroup]));
+        component.videoFileForm.patchValue({bangumiId: targetBangumi.id});
+        component.onDestinationBangumiChange();
+        expect(component.videoFileForm.get('episodeId').value).toBe('');
+        expect(component.destinationReady).toBeFalse();
+        component.loadOwnershipDestination();
+        component.videoFileForm.patchValue({episodeId: targetEpisode.id, resourceGroupId: targetGroup.id});
+
+        component.save();
+
+        expect(adminService.updateVideoFile.calls.mostRecent().args[0]).toEqual(jasmine.objectContaining({
+            id: videoFile.id, bangumiId: targetBangumi.id, episodeId: targetEpisode.id, resourceGroupId: targetGroup.id,
+            filePath: videoFile.filePath, blobStorageUrlV0: videoFile.blobStorageUrlV0
+        }));
+        expect(adminService.getEpisodeVideoFiles).toHaveBeenCalledWith(targetEpisode.id, targetGroup.id);
+        expect(dialogRef.close).toHaveBeenCalledWith({action: 'saved', videoFileId: videoFile.id, transferred: true});
+        expect(ruleService.deleteRule).not.toHaveBeenCalled();
+    });
+
+    it('restores original ownership when the transfer controls are locked again', () => {
+        component.ngOnInit();
+        component.setOwnershipEditing(true);
+        component.videoFileForm.patchValue({bangumiId: '40000000-0000-4000-8000-000000000004'});
+
+        component.setOwnershipEditing(false);
+
+        expect(component.ownershipChanged).toBeFalse();
+        expect(component.videoFileForm.get('bangumiId').disabled).toBeTrue();
+        expect(component.videoFileForm.get('episodeId').value).toBe(episode.id);
+    });
+
+    it('does not unlock ownership controls for Admin', () => {
+        user.next(new User('test-user', 'Test', User.ADMIN_ROLE, '', false));
+        component.ngOnInit();
+
+        component.setOwnershipEditing(true);
+
+        expect(component.ownershipEditing).toBeFalse();
+        expect(component.videoFileForm.get('bangumiId').disabled).toBeTrue();
+        expect(adminService.getBangumi).not.toHaveBeenCalled();
+    });
+
+    it('surfaces destination failures and keeps transfers unavailable', () => {
+        component.ngOnInit();
+        adminService.getBangumi.and.returnValue(throwError(() => new Error('Destination unavailable')));
+
+        component.setOwnershipEditing(true);
+
+        expect(component.destinationError).toContain('Destination unavailable');
+        expect(component.destinationReady).toBeFalse();
+        expect(component.destinationLoading).toBeFalse();
+        component.save();
+        expect(adminService.updateVideoFile).not.toHaveBeenCalled();
     });
 });

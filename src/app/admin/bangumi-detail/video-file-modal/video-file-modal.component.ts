@@ -1,313 +1,113 @@
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
-import { UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef, UIToggle, DARK_THEME, DarkThemeService } from '@irohalab/deneb-ui';
-import { forkJoin, of, Subscription } from 'rxjs';
-import { AdminService } from '../../admin.service';
-import { BaseError } from '../../../../helpers/error';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { VideoProcessRule } from '../../../entity/VideoProcessRule';
-import { VideoProcessRuleService } from '../video-processs-rule/video-process-rule.service';
-import { catchError, filter, switchMap } from 'rxjs/operators';
-import {
-    VideoProcessRuleEditorComponent
-} from '../video-processs-rule/video-process-rule-editor/video-process-rule-editor.component';
-import { ResourceGroup } from '../../../entity/ResourceGroup';
-import { VideoProcessRuleItemComponent } from '../video-processs-rule/video-process-rule-item/video-process-rule-item.component';
-import { ConfirmDialogDirective } from '../../../confirm-dialog/confirm-dialog.directive';
-import { ContrastColorPipe } from '../../../pipes/contrast-color.pipe';
 import { NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DARK_THEME, DarkThemeService, UIDialog, UIDialogRef, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
+import { forkJoin, Subscription } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { AdminService } from '../../admin.service';
 import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
-import { VideoFileAdminEntity, VideoFileAdminPayload } from '../../../entity/admin/VideoFileAdminEntity';
+import { VideoFileAdminEntity } from '../../../entity/admin/VideoFileAdminEntity';
+import { ResourceGroup } from '../../../entity/ResourceGroup';
+import { VideoFileDetailPanelComponent } from '../resource-group/video-file-detail-panel/video-file-detail-panel.component';
 
 @Component({
     selector: 'video-file-modal',
     templateUrl: './video-file-modal.html',
     styleUrls: ['./video-file-list.less'],
-    imports: [FormsModule, ReactiveFormsModule, VideoProcessRuleItemComponent, ConfirmDialogDirective, UIToggle, ContrastColorPipe, NgClass]
+    imports: [FormsModule, NgClass]
 })
 export class VideoFileModal implements OnInit, OnDestroy {
-    private _subscription = new Subscription();
-    private _toastRef: UIToastRef<UIToastComponent>;
-    private videoTempId = 0;
+    private subscription = new Subscription();
+    private toastRef: UIToastRef<UIToastComponent>;
 
     @HostBinding('class.dark-theme')
-    isDarkTheme: boolean;
+    isDarkTheme = false;
 
     @Input()
-    episode: EpisodeAdminEntity;
+    episode!: EpisodeAdminEntity;
 
     @Input()
-    resourceGroup: ResourceGroup;
+    resourceGroup?: ResourceGroup;
 
-    resourceGroupDict: { [rgId: string]: ResourceGroup } = {};
+    videoFiles: VideoFileAdminEntity[] = [];
+    resourceGroups: ResourceGroup[] = [];
+    selectedResourceGroupId = '';
+    loading = false;
+    loadError?: string;
 
-    videoFileList: FormGroup[];
-    ruleMap: { [videoId: string]: { isDirty: boolean, rule: VideoProcessRule } };
-    ruleCount = 0;
-
-    handlingConvert = false;
-
-    eVideoFileStatus = {
-        PENDING: VideoFileAdminEntity.STATUS_DOWNLOAD_PENDING,
-        DOWNLOADING: VideoFileAdminEntity.STATUS_DOWNLOADING,
-        DOWNLOADED: VideoFileAdminEntity.STATUS_DOWNLOADED
-    };
-
-    enableBlobStorageOptions = false;
-
-    constructor(private _dialogRef: UIDialogRef<VideoFileModal>,
-                private _adminService: AdminService,
-                private _fb: FormBuilder,
-                private _uiDialog: UIDialog,
-                private _videoProcessRuleService: VideoProcessRuleService,
-                private _darkThemeService: DarkThemeService,
+    constructor(private dialogRef: UIDialogRef<VideoFileModal>,
+                private adminService: AdminService,
+                private dialog: UIDialog,
+                private darkThemeService: DarkThemeService,
                 toast: UIToast) {
-        this._toastRef = toast.makeText();
-    }
-
-    saveVideoFile(videoFileGroup: FormGroup) {
-        let videoFile = videoFileGroup.value as VideoFileAdminPayload;
-        let videoFileId = videoFile.id;
-        if (!VideoFileModal.isTempVideoId(videoFileId)) {
-            if (videoFileGroup.dirty) {
-                this._subscription.add(
-                    this._adminService.updateVideoFile(videoFile)
-                        .subscribe({
-                            next: () => {
-                                this._toastRef.show('保存Video File成功');
-                                videoFileGroup.markAsPristine();
-                            },
-                            error: (error: BaseError) => {
-                                this._toastRef.show('保存失败, ' + error.message);
-                            }
-                        })
-                );
-            }
-            if (this.ruleMap[videoFileId] && this.ruleMap[videoFileId].isDirty) {
-                this.saveRule(this.ruleMap[videoFileId].rule);
-            }
-        } else {
-            this._subscription.add(
-                this._adminService.addVideoFile(videoFile)
-                    .subscribe({
-                        next: (id) => {
-                            videoFileGroup.patchValue({id: id});
-                            this._toastRef.show('保存成功');
-                            videoFileGroup.markAsPristine();
-                            if (this.ruleMap[videoFileId] && this.ruleMap[videoFileId].isDirty) {
-                                this.ruleMap[videoFileId].rule.videoFileId = id;
-                                this.ruleMap[id] = {isDirty: true, rule: this.ruleMap[videoFileId].rule};
-                                this.ruleMap[videoFileId] = undefined;
-                                this.saveRule(this.ruleMap[id].rule);
-                            }
-                        },
-                        error: (error: BaseError) => {
-                            this._toastRef.show('保存失败, ' + error.message);
-                        }
-                    })
-            )
-        }
-    }
-
-    deleteVideoFile(videoFileGroup: FormGroup) {
-        let videoFile = videoFileGroup.value as VideoFileAdminPayload;
-        if (VideoFileModal.isTempVideoId(videoFile.id)) {
-            if (this.ruleMap[videoFile.id]) {
-                this.deleteRule(videoFile.id);
-            }
-            this.videoFileList.splice(this.videoFileList.indexOf(videoFileGroup), 1);
-            return;
-        }
-        this._subscription.add(
-            this._adminService.deleteVideoFile(videoFile.id)
-                .subscribe({
-                    next: () => {
-                        this._toastRef.show('删除成功');
-                        this.videoFileList.splice(this.videoFileList.indexOf(videoFileGroup), 1);
-                        if (this.ruleMap[videoFile.id]) {
-                            this.deleteRule(videoFile.id);
-                        }
-                    },
-                    error: (error: BaseError) => {
-                        this._toastRef.show('删除失败, ' + error.message);
-                    }
-                })
-        );
-    }
-
-    addVideoFile() {
-        console.log(this.episode);
-        let videoFileFormGroup = this._fb.group({
-            id: `VIDEO_ID_${this.videoTempId}`,
-            bangumiId: this.episode.bangumi.id,
-            episodeId: this.episode.id,
-            downloadUrl: '',
-            torrentId: null,
-            status: VideoFileAdminEntity.STATUS_DOWNLOAD_PENDING,
-            filePath: null,
-            fileName: null,
-            resolutionW: null,
-            resolutionH: null,
-            duration: null,
-            label: null,
-            blobStorageUrlV0: '',
-            resourceGroupId: this.resourceGroup.id,
-        });
-        this.videoFileList.unshift(videoFileFormGroup);
-    }
-
-    close() {
-        this._dialogRef.close(null);
+        this.toastRef = toast.makeText();
     }
 
     ngOnInit(): void {
-        this._subscription.add(
-            this._darkThemeService.themeChange
-                .subscribe(theme => { this.isDarkTheme = theme === DARK_THEME; })
-        );
-        this._subscription.add(
-            forkJoin([
-                this._adminService.getEpisodeVideoFiles(this.episode.id, this.resourceGroup?.id),
-                this.resourceGroup ? of([this.resourceGroup]) : this._adminService.listResourceGroups(this.episode.bangumi.id, false)
-                    .pipe(catchError((err) => {
-                        this._toastRef.show(err.message);
-                        return of([] as ResourceGroup[]);
-                    }))
-            ])
-                .pipe(switchMap(([videoFileList, resourceGroupList]) => {
-                    for (const rg of resourceGroupList) {
-                        this.resourceGroupDict[rg.id] = rg;
-                    }
-                    this.ruleMap = {};
-                    this.videoFileList = [];
-                    for (const videoFile of videoFileList) {
-                        this.videoFileList.push(this._fb.group({
-                            id: videoFile.id,
-                            bangumiId: videoFile.bangumi.id,
-                            episodeId: videoFile.episode.id,
-                            downloadUrl: videoFile.downloadUrl,
-                            torrentId: videoFile.torrentId,
-                            status: videoFile.status,
-                            filePath: videoFile.filePath,
-                            fileName: videoFile.fileName,
-                            resolutionW: videoFile.resolutionW,
-                            resolutionH: videoFile.resolutionH,
-                            duration: videoFile.duration,
-                            label: videoFile.label,
-                            blobStorageUrlV0: videoFile.blobStorageUrlV0,
-                            resourceGroupId: videoFile.resourceGroup.id
-                        }));
-                    }
+        this.subscription.add(this.darkThemeService.themeChange.subscribe(theme => {
+            this.isDarkTheme = theme === DARK_THEME;
+        }));
+        this.selectedResourceGroupId = this.resourceGroup?.id ?? '';
+        this.load();
+    }
 
-                    return this._videoProcessRuleService.listRulesByBangumi(this.episode.bangumi.id)
-                        .pipe(
-                            catchError((error) => {
-                                this._toastRef.show(error.message);
-                                return of([] as VideoProcessRule[]);
-                            }));
-                }))
+    ngOnDestroy(): void {
+        this.subscription.unsubscribe();
+    }
+
+    load(): void {
+        this.loading = true;
+        this.loadError = undefined;
+        this.subscription.add(
+            forkJoin({
+                videoFiles: this.adminService.getEpisodeVideoFiles(this.episode.id, this.resourceGroup?.id),
+                resourceGroups: this.adminService.listResourceGroups(this.episode.bangumi.id, false)
+            }).pipe(finalize(() => { this.loading = false; }))
                 .subscribe({
-                    next: (ruleList: VideoProcessRule[]) => {
-                        this.ruleCount = ruleList.length;
-                        for (const rule of ruleList) {
-                            if (rule.videoFileId) {
-                                this.ruleMap[rule.videoFileId] = {isDirty: false, rule};
-                            }
-                        }
+                    next: ({videoFiles, resourceGroups}) => {
+                        this.videoFiles = videoFiles;
+                        this.resourceGroups = resourceGroups;
                     },
-                    error: (error: BaseError) => {
-                        this._toastRef.show(error.message);
-                        this.close();
+                    error: error => {
+                        this.loadError = error.message || String(error);
+                        this.toastRef.show(this.loadError);
                     }
                 })
         );
     }
 
-    ngOnDestroy(): void {
-        this._subscription.unsubscribe();
-    }
-
-    deleteRule(videoFileId: string): void {
-        const rule = this.ruleMap[videoFileId].rule;
-        if (!rule.id) {
-            this.ruleMap[videoFileId] = undefined;
-        } else {
-            this._subscription.add(
-                this._videoProcessRuleService.deleteRule(rule.id)
-                    .subscribe({
-                        next: () => {
-                            this.ruleCount--;
-                            this._toastRef.show("Delete Rule Successfully!");
-                        },
-                        error: (error) => {
-                            this._toastRef.show("Failed to delete rule " + error.message);
-                        }
-                    })
-            );
+    addVideoFile(): void {
+        const resourceGroup = this.resourceGroups.find(group => group.id === this.selectedResourceGroupId);
+        if (!resourceGroup) {
+            this.toastRef.show('Select a resourceGroupId before adding a VideoFile.');
+            return;
         }
+        this.openEditor(resourceGroup, undefined, true);
     }
 
-    onAddRule(videoFileGroup: FormGroup): void {
-        const videoFileId = videoFileGroup.value.id;
-        const editRuleDialogRef = this._uiDialog.open(VideoProcessRuleEditorComponent, {
-            stickyDialog: false, backdrop: true
-        });
-        editRuleDialogRef.componentInstance.bangumiId = this.episode.bangumi.id;
-        editRuleDialogRef.componentInstance.videoId = videoFileId;
-        editRuleDialogRef.componentInstance.saveOnClose = false;
-        editRuleDialogRef.afterClosed()
-            .pipe(filter(result => !!result))
-            .subscribe((rule: VideoProcessRule) => {
-                this.ruleMap[rule.videoFileId] = {isDirty: true, rule};
-            });
-    }
-
-    convertVideoFile(videoFileGroup: FormGroup): void {
-        this.handlingConvert = true;
-        const videoFileId = videoFileGroup.value.id;
-        if (this.ruleCount > 0 && videoFileGroup.value.status === VideoFileAdminEntity.STATUS_DOWNLOADED) {
-            this._subscription.add(
-                this._adminService.getEpisodeVideoFiles(this.episode.id)
-                    .pipe(switchMap((videoFileList) => {
-                        const videoFile = videoFileList.find(v => v.id === videoFileId);
-                        if (!videoFile) {
-                            throw new Error('VideoFile no longer exists.');
-                        }
-                        return this._videoProcessRuleService.createJobFromVideoFile(videoFile.id);
-                    }))
-                    .subscribe({
-                        next: () => {
-                            this.handlingConvert = false;
-                            this._toastRef.show('Convert operation started successfully!');
-                        },
-                        error: (error) => {
-                            this.handlingConvert = false;
-                            this._toastRef.show('Error when handling convert operation: ' + error?.message);
-                        }
-                    })
-            );
+    editVideoFile(videoFile: VideoFileAdminEntity): void {
+        const resourceGroup = this.resourceGroups.find(group => group.id === videoFile.resourceGroup.id);
+        if (!resourceGroup) {
+            this.toastRef.show('Unable to open VideoFile: its resource group was not found. Reload the list and try again.');
+            return;
         }
+        this.openEditor(resourceGroup, videoFile.id);
     }
 
-    private static isTempVideoId(videoId: string): boolean {
-        return videoId && videoId.startsWith("VIDEO_ID_");
+    resourceGroupName(id: string): string {
+        return this.resourceGroups.find(group => group.id === id)?.displayName || id;
     }
 
-    private saveRule(rule: VideoProcessRule): void {
-        if (!rule.id) {
-            this._subscription.add(
-                this._videoProcessRuleService.addRule(rule)
-                    .subscribe((ruleCreated: VideoProcessRule) => {
-                        this.ruleCount++;
-                        this.ruleMap[ruleCreated.videoFileId] = {isDirty: false, rule: ruleCreated};
-                    })
-            );
-        } else {
-            this._subscription.add(
-                this._videoProcessRuleService.editRule(rule)
-                    .subscribe((ruleUpdated: VideoProcessRule) => {
-                        this.ruleMap[ruleUpdated.videoFileId] = {isDirty: false, rule: ruleUpdated};
-                    })
-            );
-        }
+    close(): void {
+        this.dialogRef.close(null);
+    }
+
+    private openEditor(resourceGroup: ResourceGroup, videoFileId?: string, createNew = false): void {
+        const editorRef = this.dialog.open(VideoFileDetailPanelComponent, {stickyDialog: true, backdrop: true});
+        editorRef.componentInstance.episode = this.episode;
+        editorRef.componentInstance.resourceGroup = resourceGroup;
+        editorRef.componentInstance.videoFileId = videoFileId;
+        editorRef.componentInstance.createNew = createNew;
+        this.subscription.add(editorRef.afterClosed().subscribe(() => this.load()));
     }
 }

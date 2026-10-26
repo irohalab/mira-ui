@@ -1,14 +1,125 @@
 <div class="episode-detail-modal">
   <div class="content">
-    <form class="ui form" [formGroup]="episodeForm">
+    <h3>Episode</h3>
+    <form class="ui form" [ngClass]="{inverted: isDarkTheme}" [formGroup]="episodeForm" (ngSubmit)="saveEpisode()">
+      <div class="field">
+        <label for="episode-id">id</label>
+        <input id="episode-id" type="text" [value]="episode.id" readonly>
+      </div>
+      @if (isSuperAdmin) {
+        <div class="ui info message">
+          Edit database fields directly. Use NULL to clear nullable text fields;
+          a blank airdate or subItemId is saved as null.
+          Upstream fill only changes this form; it does not save, add, or delete episodes.
+        </div>
+        <div class="field">
+          <label for="episode-bangumi-id">bangumiId (bangumi_id)</label>
+          <input id="episode-bangumi-id" type="text" formControlName="bangumiId">
+        </div>
+        <div class="field">
+          <label for="episode-sub-item-id">subItemId (sub_item_id)</label>
+          <div class="ui action input">
+            <input id="episode-sub-item-id" type="text" formControlName="subItemId">
+            <button class="ui button" type="button" [disabled]="busy" (click)="fillFromUpstream()">Fill from upstream</button>
+          </div>
+        </div>
+        @if (upstreamWarnings.length) {
+          <div class="ui visible warning message" role="status">
+            <div class="header">Some upstream fields were skipped</div>
+            <ul class="list">
+              @for (warning of upstreamWarnings; track warning.field) {
+                <li><strong>{{warning.field}}</strong>: {{warning.message}}</li>
+              }
+            </ul>
+          </div>
+        }
+        <div class="two fields">
+          <div class="field">
+            <label for="episode-bgm-eps-id">bgmEpsId (bgm_eps_id)</label>
+            <input id="episode-bgm-eps-id" type="number" step="1" formControlName="bgmEpsId">
+          </div>
+          <div class="field">
+            <label for="episode-type">type</label>
+            <select id="episode-type" formControlName="type">
+              <option [ngValue]="null">null</option>
+              <option [ngValue]="0">0 - Episode</option>
+              <option [ngValue]="1">1 - Special</option>
+            </select>
+          </div>
+        </div>
+        <div class="two fields">
+          <div class="field">
+            <label for="episode-number">episodeNo (episode_no)</label>
+            <input id="episode-number" type="number" step="1" formControlName="episodeNo">
+          </div>
+          <div class="field">
+            <label for="episode-sort">sort</label>
+            <input id="episode-sort" type="number" step="any" formControlName="sort">
+          </div>
+        </div>
+        <div class="two fields">
+          <div class="field">
+            <label for="episode-name">name</label>
+            <div class="ui action input">
+              <input id="episode-name" type="text" formControlName="name">
+              <button class="ui button" type="button" title="Set name to null" [disabled]="episodeForm.controls.name.value === null" (click)="setTextFieldNull('name')">NULL</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="episode-name-cn">nameCn (name_cn)</label>
+            <div class="ui action input">
+              <input id="episode-name-cn" type="text" formControlName="nameCn">
+              <button class="ui button" type="button" title="Set nameCn to null" [disabled]="episodeForm.controls.nameCn.value === null" (click)="setTextFieldNull('nameCn')">NULL</button>
+            </div>
+          </div>
+        </div>
+        <div class="two fields">
+          <div class="field">
+            <label for="episode-duration">duration</label>
+            <div class="ui action input">
+              <input id="episode-duration" type="text" formControlName="duration">
+              <button class="ui button" type="button" title="Set duration to null" [disabled]="episodeForm.controls.duration.value === null" (click)="setTextFieldNull('duration')">NULL</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="episode-airdate">airdate</label>
+            <input id="episode-airdate" type="date" formControlName="airdate">
+            @if (episodeForm.controls.airdate.invalid) {
+              <div class="ui pointing red basic label">Use a valid YYYY-MM-DD date or leave blank for null.</div>
+            }
+          </div>
+        </div>
+        <div class="field" [ngClass]="{error: episodeForm.controls.properties.invalid}">
+          <label for="episode-properties">properties (JSON)</label>
+          <textarea id="episode-properties" rows="7" formControlName="properties"></textarea>
+          @if (episodeForm.controls.properties.invalid) {
+            <div class="ui pointing red basic label">Enter a JSON object with value and locked for each property.</div>
+          }
+        </div>
+        <div class="field">
+          <label for="episode-thumbnail-image-id">thumbnailImage.id (thumbnail_image_id, read-only)</label>
+          <input id="episode-thumbnail-image-id" type="text" [value]="episode.thumbnailImage?.id || ''" readonly>
+        </div>
+        <div class="field">
+          <label for="episode-create-time">createTime (create_time)</label>
+          <input id="episode-create-time" type="text" [value]="episode.createTime" readonly>
+        </div>
+        <div class="field">
+          <label for="episode-update-time">updateTime (update_time)</label>
+          <input id="episode-update-time" type="text" [value]="episode.updateTime || ''" readonly>
+        </div>
+      }
       <div class="inline fields">
-        <label>状态</label>
+        <label>status</label>
         <div class="field">
           <div class="ui radio checkbox">
             <input type="radio" name="status" formControlName="status" [value]="0">
             <label>未下载</label>
           </div>
         </div>
+        @if (isSuperAdmin && episodeForm.invalid) {
+          <div class="ui negative message" role="alert">Check UUIDs, numeric values, airdate, and properties before saving.</div>
+        }
         <div class="field">
           <div class="ui radio checkbox">
             <input type="radio" name="status" formControlName="status" [value]="1">
@@ -26,12 +137,12 @@
   </div>
   <div class="footer">
     @if (episode) {
-      <div class="ui label episode-status-label" [ngClass]="episodeStatus[episode.status].labelColor">
-        {{episodeStatus[episode.status].text}}
+      <div class="ui label episode-status-label" [ngClass]="episodeStatus[episode.status]?.labelColor">
+        {{episodeStatus[episode.status]?.text}}
       </div>
     }
-    <button class="ui button" (click)="cancel()">取消</button>
-    <button class="ui primary button" (click)="saveEpisode()">保存</button>
+    <button class="ui button" type="button" [disabled]="busy" (click)="cancel()">取消</button>
+    <button class="ui primary button" type="button" [disabled]="busy || (isSuperAdmin && episodeForm.invalid)" (click)="saveEpisode()">保存</button>
   </div>
   <div class="ui inverted dimmer" [ngClass]="{active: busy}">
     <div class="ui loader"></div>

@@ -31,3 +31,25 @@ export interface PropertyValue {
 export interface ItemProperties {
     [propertyKey: string]: PropertyValue;
 }
+
+export function isItemProperties(value: unknown): value is ItemProperties {
+    const isRecord = (entry: unknown): entry is Record<string, unknown> =>
+        !!entry && typeof entry === 'object' && !Array.isArray(entry);
+    if (!isRecord(value)) {
+        return false;
+    }
+    return Object.values(value).every(property => {
+        if (!isRecord(property) || typeof property['locked'] !== 'boolean') {
+            return false;
+        }
+        const propertyType = property['propertyType'];
+        if (propertyType !== undefined && !Object.values(PropertyType).some(type => type === propertyType)) {
+            return false;
+        }
+        const data = property['value'];
+        return typeof data === 'string' || Array.isArray(data) && (
+            data.every(item => typeof item === 'string') ||
+            data.every(item => isRecord(item) && Object.values(item).every(entry => typeof entry === 'string'))
+        );
+    });
+}
