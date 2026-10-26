@@ -3,6 +3,7 @@ import { DARK_THEME, DarkThemeService, UIDialog, UIToast } from '@irohalab/deneb
 import { of, throwError } from 'rxjs';
 import { DownloadJob } from '../../../entity/DownloadJob';
 import { VideoFileAdminEntity } from '../../../entity/admin/VideoFileAdminEntity';
+import { EpisodeAdminEntity } from '../../../entity/admin/EpisodeAdminEntity';
 import { ResourceGroup } from '../../../entity/ResourceGroup';
 import { VideoProcessJob } from '../../../entity/VideoProcessJob';
 import { DownloadManagerService } from '../../download-manager/download-manager.service';
@@ -45,7 +46,7 @@ describe('ResourceGroupComponent', () => {
       }]
     };
 
-    adminService = jasmine.createSpyObj<AdminService>('AdminService', ['getEpisodeVideoFiles']);
+    adminService = jasmine.createSpyObj<AdminService>('AdminService', ['getEpisodeVideoFiles', 'listResourceGroups']);
     adminService.getEpisodeVideoFiles.and.returnValue(of([videoFile]));
     dialog = jasmine.createSpyObj<UIDialog>('UIDialog', ['open']);
     dialogComponentInstance = {};
@@ -100,5 +101,31 @@ describe('ResourceGroupComponent', () => {
 
     expect(component.pauseRefreshRG).toBeFalse();
     expect(toastShow).toHaveBeenCalledWith('reload failed');
+  });
+
+  it('refreshes source and destination resource-group rows after a transfer', () => {
+    const destinationEpisode = Object.assign(new EpisodeAdminEntity(), {id: 'episode-2', bangumi: {id: 'bangumi-1'}});
+    const destinationGroup = Object.assign(new ResourceGroup(), {id: 'resource-group-2', videoFiles: []});
+    const transferredFile = {...videoFile, episode: {id: destinationEpisode.id}, resourceGroup: {id: destinationGroup.id}};
+    const destinationStatus: ResourceGroupComponent['episodeVideoFileStatus'][string][number] = {
+      episode: destinationEpisode, videoFiles: []
+    };
+    component.resourceGroupList = [resourceGroup, destinationGroup];
+    component.episodeVideoFileStatus[destinationGroup.id] = [destinationStatus];
+    adminService.listResourceGroups.and.returnValue(of([
+      {...resourceGroup, videoFiles: []},
+      {...destinationGroup, videoFiles: [transferredFile]}
+    ]));
+    dialogClosedResult = {action: 'saved', videoFileId: videoFile.id, transferred: true};
+
+    component.viewEpisode(resourceGroup, episodeStatus);
+
+    expect(adminService.listResourceGroups).toHaveBeenCalledWith(component.bangumi.id, true);
+    expect(adminService.getEpisodeVideoFiles).not.toHaveBeenCalled();
+    expect(resourceGroup.videoFiles).toEqual([]);
+    expect(episodeStatus.videoFiles).toEqual([]);
+    expect(destinationGroup.videoFiles).toEqual([transferredFile]);
+    expect(destinationStatus.videoFiles).toEqual([jasmine.objectContaining({id: videoFile.id, status: videoFile.status})]);
+    expect(component.pauseRefreshRG).toBeFalse();
   });
 });

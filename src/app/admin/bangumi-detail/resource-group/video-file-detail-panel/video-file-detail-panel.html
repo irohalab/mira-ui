@@ -54,15 +54,30 @@
         }
       }
       @if (!loading && !loadError && videoFileForm) {
-        <button
-          class="ui small primary labeled icon button"
-          type="button"
-          [ngClass]="{loading: saving}"
-          [disabled]="saving || videoFileForm.invalid || (!videoFileForm.dirty && isPersisted)"
-          (click)="save()">
-          <i class="save icon" aria-hidden="true"></i>
-          Save
-        </button>
+        @if (isPersisted && ownershipChanged) {
+          <button
+            class="ui small primary labeled icon button"
+            type="button"
+            [ngClass]="{loading: saving}"
+            [disabled]="saving || videoFileForm.invalid || !destinationReady"
+            confirmDialog
+            dialogTitle="Transfer VideoFile?"
+            dialogContent="Change this VideoFile's bangumi, episode, and resourceGroup. Storage paths, existing jobs, and processing rules will remain unchanged."
+            (onConfirm)="save()">
+            <i class="exchange icon" aria-hidden="true"></i>
+            Save &amp; transfer
+          </button>
+        } @else {
+          <button
+            class="ui small primary labeled icon button"
+            type="button"
+            [ngClass]="{loading: saving}"
+            [disabled]="saving || videoFileForm.invalid || !destinationReady || (!videoFileForm.dirty && isPersisted)"
+            (click)="save()">
+            <i class="save icon" aria-hidden="true"></i>
+            Save
+          </button>
+        }
       }
     </div>
   </header>
@@ -109,7 +124,7 @@
       @if (activeTab === 'details') {
         <section id="video-file-details-panel" role="tabpanel" aria-labelledby="video-file-details-tab">
           <div class="details-layout">
-            <form class="ui form video-file-form" [ngClass]="{inverted: isDarkTheme}" [formGroup]="videoFileForm" (ngSubmit)="save()">
+            <form class="ui form video-file-form" [ngClass]="{inverted: isDarkTheme, loading: saving}" [formGroup]="videoFileForm">
               <section class="form-section identity-section">
                 <div class="section-heading">
                   <h3>Identity</h3>
@@ -124,6 +139,58 @@
                   <div><dt>Resource Group ID</dt><dd>{{resourceGroup.id}}</dd></div>
                 </dl>
               </section>
+
+              @if (isSuperAdmin) {
+                <section class="form-section">
+                  <div class="section-heading">
+                    <h3>Ownership</h3>
+                    <ui-toggle
+                      text="Edit ownership"
+                      name="editOwnership"
+                      [ngModel]="ownershipEditing"
+                      [ngModelOptions]="{standalone: true}"
+                      (ngModelChange)="setOwnershipEditing($event)">
+                    </ui-toggle>
+                  </div>
+                  @if (ownershipEditing) {
+                    <div class="ui visible warning message">
+                      Database-only reassignment. Storage paths, existing jobs, and processing rules will not move.
+                      Review any local file paths and bangumi-specific rules separately.
+                    </div>
+                    <div class="field">
+                      <label for="video-file-bangumi-id">bangumiId</label>
+                      <div class="ui action input">
+                        <input id="video-file-bangumi-id" type="text" formControlName="bangumiId" (input)="onDestinationBangumiChange()">
+                        <button class="ui button" type="button" [ngClass]="{loading: destinationLoading}" [disabled]="saving || destinationLoading" (click)="loadOwnershipDestination()">Load destination</button>
+                      </div>
+                    </div>
+                    @if (destinationError) {
+                      <div class="ui negative message" role="alert">{{destinationError}}</div>
+                    }
+                    @if (destinationBangumiName) {
+                      <div class="ui info message">{{destinationBangumiName}}</div>
+                    }
+                    <div class="field">
+                      <label for="video-file-episode-id">episodeId</label>
+                      <select id="video-file-episode-id" formControlName="episodeId">
+                        <option value="">Select destination episode</option>
+                        @for (destinationEpisode of destinationEpisodes; track destinationEpisode.id) {
+                          <option [value]="destinationEpisode.id">#{{destinationEpisode.episodeNo}} {{destinationEpisode.nameCn || destinationEpisode.name}} ({{destinationEpisode.id}})</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for="video-file-resource-group-id">resourceGroupId</label>
+                      <select id="video-file-resource-group-id" formControlName="resourceGroupId">
+                        <option value="">Select destination resourceGroup</option>
+                        @for (group of destinationResourceGroups; track group.id) {
+                          <option [value]="group.id">{{group.displayName}} ({{group.id}})</option>
+                        }
+                      </select>
+                    </div>
+                  }
+                </section>
+              }
 
               <section class="form-section">
                 <div class="section-heading"><h3>Presentation</h3></div>

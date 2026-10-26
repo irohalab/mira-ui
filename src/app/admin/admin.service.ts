@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 import { ResourceGroup } from '../entity/ResourceGroup';
 import dayjs from 'dayjs';
 import { ScanStatusResponse } from '../entity/ScanStatusResponse';
-import { EpisodeAdminEntity } from '../entity/admin/EpisodeAdminEntity';
+import { EpisodeAdminEntity, EpisodeAdminPayload, EpisodeUpstreamFieldsResult } from '../entity/admin/EpisodeAdminEntity';
 import { VideoFileAdminEntity, VideoFileAdminPayload } from '../entity/admin/VideoFileAdminEntity';
 import { BangumiSearchResult } from '../entity/admin/BangumiSearchResult';
 
@@ -143,6 +143,16 @@ export class AdminService extends BaseService {
             params: {status}
         }).pipe(
             catchError(this.handleError),);
+    }
+
+    updateEpisodeFields(episodeId: string, payload: EpisodeAdminPayload): Observable<void> {
+        return this.http.put<void>(`${baseUrl}/episode/${episodeId}/fields`, payload);
+    }
+
+    getEpisodeUpstreamFields(episodeId: string, subItemId: string): Observable<EpisodeUpstreamFieldsResult> {
+        return this.http.get<EpisodeUpstreamFieldsResult>(`${baseUrl}/episode/${episodeId}/upstream`, {
+            params: {subItemId}
+        });
     }
 
     deleteEpisode(episode_id: string): Observable<any> {
