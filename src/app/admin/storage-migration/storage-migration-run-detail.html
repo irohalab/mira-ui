@@ -36,6 +36,14 @@
       @if (run.lastError) {
         <div class="ui negative message">{{run.lastError}}</div>
       }
+      @if (run.status === 'inventory') {
+        <div class="ui info message">
+          <i class="spinner loading icon"></i>{{inventoryProgress()}}
+          @if (run.requestedAction === 'cancel') {
+            <strong> · 取消请求已提交，正在等待工作进程到达检查点</strong>
+          }
+        </div>
+      }
       <div class="run-metrics">
         <div><span>已选择</span><strong>{{run.summary.selectedUnits}}</strong></div>
         <div><span>已验证</span><strong>{{run.summary.verifiedUnits}}</strong></div>

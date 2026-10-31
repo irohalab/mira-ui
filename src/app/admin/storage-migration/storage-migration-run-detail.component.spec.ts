@@ -76,4 +76,26 @@ describe('StorageMigrationRunDetailComponent', () => {
         expect(runCalls).toBe(2);
         component.ngOnDestroy();
     }));
+
+    it('describes live inventory progress', () => {
+        const component = new StorageMigrationRunDetailComponent(
+            {snapshot: {paramMap: {get: () => 'run-id'}}} as never,
+            {} as never,
+            {} as never,
+            {makeText: () => ({show: (): void => undefined})} as never,
+            {setTitle: (): void => undefined} as never,
+        );
+        component.run = {
+            ...run,
+            status: 'inventory',
+            summary: {
+                ...run.summary,
+                selectedUnits: 12,
+                selectedBytes: '1048576',
+                inventory: {phase: 'selecting', examinedRecords: 40, dispositionCounts: {}, lookupWarnings: []},
+            },
+        };
+
+        expect(component.inventoryProgress()).toBe('正在筛选本地文件 · 已检查 40 条，已选择 12 个单元（1 MiB）');
+    });
 });

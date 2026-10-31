@@ -11,6 +11,7 @@ import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.dire
 import { environment } from '../../../environments/environment';
 import {
     formatStorageBytes,
+    storageMigrationInventoryProgress,
     StorageMigrationAsset,
     StorageMigrationReviewDecision,
     StorageMigrationRun,
@@ -146,6 +147,10 @@ export class StorageMigrationRunDetailComponent implements OnInit, OnDestroy {
 
     formatBytes(value: string): string {
         return formatStorageBytes(value);
+    }
+
+    inventoryProgress(): string {
+        return this.run ? storageMigrationInventoryProgress(this.run.summary) : '';
     }
 
     statusLabel(status: string): string {

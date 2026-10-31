@@ -42,7 +42,10 @@
         <div>
           <span class="eyebrow">当前任务</span>
           <h2>{{overview.activeRun.mode}} · {{statusLabel(overview.activeRun.status)}}</h2>
-          <p>{{overview.activeRun.summary.completedUnits}} / {{overview.activeRun.summary.selectedUnits}} 单元完成</p>
+          <p>{{activeRunProgress()}}</p>
+          @if (overview.activeRun.requestedAction === 'cancel') {
+            <p class="active-run-guidance">取消请求已提交，正在等待工作进程到达检查点。</p>
+          }
           @if (overview.activeRun.status === 'cleanup-ready') {
             <p class="active-run-guidance">审核已完成。清理本地源或回滚后，才能创建下一批次。</p>
           }
