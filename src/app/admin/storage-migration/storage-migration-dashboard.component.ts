@@ -12,6 +12,7 @@ import {
     CreateStorageMigrationRun,
     formatStorageBytes,
     storageBudgetPercent,
+    storageMigrationInventoryProgress,
     StorageMigrationOverview,
     StorageMigrationRun,
 } from './storage-migration.models';
@@ -122,6 +123,14 @@ export class StorageMigrationDashboardComponent implements OnInit, OnDestroy {
         return this.overview?.activeRun?.status === 'cleanup-ready'
             ? '前往清理或回滚'
             : '查看任务';
+    }
+
+    activeRunProgress(): string {
+        const run = this.overview?.activeRun;
+        if (!run) return '';
+        return run.status === 'inventory'
+            ? storageMigrationInventoryProgress(run.summary)
+            : `${run.summary.completedUnits} / ${run.summary.selectedUnits} 单元完成`;
     }
 
     creationBlockedMessage(): string {

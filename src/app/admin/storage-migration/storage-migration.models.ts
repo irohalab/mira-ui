@@ -38,6 +38,7 @@ export interface StorageMigrationRunSummary {
         error?: string;
     };
     inventory?: {
+        phase?: 'selecting' | 'rechecking' | 'finalizing' | 'complete';
         examinedRecords: number;
         dispositionCounts: Record<string, number>;
         lookupWarnings: string[];
@@ -216,4 +217,18 @@ export function storageBudgetPercent(used: string, limit: string): number {
     } catch {
         return 0;
     }
+}
+
+export function storageMigrationInventoryProgress(summary: StorageMigrationRunSummary): string {
+    if (!summary.inventory) return '正在初始化清单';
+    const phaseLabels = {
+        selecting: '正在筛选本地文件',
+        rechecking: '正在复核迁移条件',
+        finalizing: '正在保存清单',
+        complete: '清单已完成',
+    };
+    const phase = summary.inventory.phase
+        ? phaseLabels[summary.inventory.phase]
+        : '正在生成清单';
+    return `${phase} · 已检查 ${summary.inventory.examinedRecords} 条，已选择 ${summary.selectedUnits} 个单元（${formatStorageBytes(summary.selectedBytes)}）`;
 }
