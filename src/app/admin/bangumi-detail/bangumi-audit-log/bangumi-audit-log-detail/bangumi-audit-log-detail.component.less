@@ -1,0 +1,40 @@
+@import '../../../../_dark-theme-helpers';
+
+:host {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  display: block;
+  width: min(760px, 90%);
+  height: min(720px, 90%);
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.audit-detail {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.detail-content {
+  flex: 1;
+  overflow: auto;
+  padding: 1.5rem;
+  td { overflow-wrap: anywhere; }
+  pre { white-space: pre-wrap; margin: 0; font-family: inherit; }
+}
+
+.detail-footer {
+  border-top: 1px solid #e2e2e2;
+  padding: 1rem 1.5rem;
+  text-align: right;
+}
+
+:host.dark-theme {
+  background-color: @darkPanelBg;
+  color: @darkForeground;
+  .detail-footer { border-color: @darkBorderColor; }
+}

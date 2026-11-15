@@ -11,6 +11,7 @@ import { ScanStatusResponse } from '../entity/ScanStatusResponse';
 import { EpisodeAdminEntity, EpisodeAdminPayload, EpisodeUpstreamFieldsResult } from '../entity/admin/EpisodeAdminEntity';
 import { VideoFileAdminEntity, VideoFileAdminPayload } from '../entity/admin/VideoFileAdminEntity';
 import { BangumiSearchResult } from '../entity/admin/BangumiSearchResult';
+import { AdminAuditLogDetail, AdminAuditLogPage } from '../entity/admin/AdminAuditLog';
 
 // This is the same with backend. It should be retrieved from backend, but we hardcode this for convenient.
 const DELETE_DELAY_MINUTES = 10;
@@ -82,8 +83,20 @@ export class AdminService extends BaseService {
                 if (deleteMarkDate && deleteMarkDate.isValid()) {
                     bangumi.deleteEta = dayjs().to(deleteMarkDate.add(DELETE_DELAY_MINUTES, 'm'));
                 }
+
             }),
             catchError(this.handleError),)
+    }
+
+    listBangumiAuditLogs(bangumiId: string, offset: number, limit: number): Observable<AdminAuditLogPage> {
+        return this.http.get<AdminAuditLogPage>(`${baseUrl}/audit`, {
+            params: {bangumiId, offset, limit, sort: 'desc', includeDetails: 'false'},
+        });
+    }
+
+    getAdminAuditLog(id: string): Observable<AdminAuditLogDetail> {
+        return this.http.get<{data: AdminAuditLogDetail}>(`${baseUrl}/audit/${id}`)
+            .pipe(map(response => response.data));
     }
 
     updateBangumi(bangumi: BangumiAdminEntity): Observable<any> {

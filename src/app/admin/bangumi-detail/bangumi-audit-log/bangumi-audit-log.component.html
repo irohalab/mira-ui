@@ -1,0 +1,59 @@
+<div class="bangumi-audit-log section-card">
+  <div class="audit-header">
+    <div>
+      <h4>操作日志</h4>
+      <p>显示最近一年与此番组相关的操作，按时间倒序排列。</p>
+    </div>
+    <button type="button" class="ui small button" [disabled]="isLoading" (click)="loadPage()">
+      <i class="refresh icon"></i>刷新
+    </button>
+  </div>
+  @if (errorMessage) {
+    <div class="ui negative message" role="alert">
+      <p>{{errorMessage}}</p>
+      <button type="button" class="ui small button" (click)="loadPage()">重试</button>
+    </div>
+  }
+  @if (isLoading) {
+    <div class="ui active inline centered loader" role="status" aria-label="加载操作日志"></div>
+  }
+  <div class="table-wrapper" role="region" aria-label="操作日志" tabindex="0" [attr.aria-busy]="isLoading">
+    <table class="ui celled padded unstackable table" [ngClass]="{inverted: isDarkTheme}">
+      <thead>
+        <tr>
+          <th scope="col">时间</th>
+          <th scope="col">操作人</th>
+          <th scope="col">操作类型</th>
+          <th scope="col">摘要</th>
+          <th scope="col">详情</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (log of auditLogs; track log.id) {
+          <tr>
+            <td>{{log.timestamp | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+            <td [title]="log.accountId">{{log.actor?.nickName || log.accountId}}</td>
+            <td [title]="log.action">{{actionLabels[log.action] || log.action}}</td>
+            <td class="audit-summary">{{log.summary}}</td>
+            <td>
+              <button type="button" class="ui small basic button" [ngClass]="{inverted: isDarkTheme}"
+                [attr.aria-label]="'查看详情：' + log.summary" (click)="showDetails(log)">查看详情</button>
+            </td>
+          </tr>
+        }
+        @if (!isLoading && !errorMessage && auditLogs.length === 0) {
+          <tr><td colspan="5" class="empty-state">暂无操作日志</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (!errorMessage) {
+    <div class="audit-pagination" [attr.inert]="isLoading ? '' : null">
+      <span>共 {{total}} 条</span>
+      @if (total > 0) {
+        <ui-pagination [currentPage]="currentPage" [total]="total" [countPerPage]="countPerPage"
+          [max]="6" (pageChange)="loadPage($event)"></ui-pagination>
+      }
+    </div>
+  }
+</div>

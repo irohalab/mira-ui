@@ -1,0 +1,47 @@
+<section role="dialog" aria-modal="true" aria-labelledby="audit-detail-title" class="audit-detail"
+  cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+  <div class="detail-content">
+    <h3 id="audit-detail-title">操作日志详情</h3>
+    <table class="ui definition table" [ngClass]="{inverted: isDarkTheme}">
+      <tbody>
+        <tr><td>时间</td><td>{{(detail || log).timestamp | date:'yyyy-MM-dd HH:mm:ss'}}</td></tr>
+        <tr><td>操作人</td><td>{{(detail || log).actor?.nickName || (detail || log).accountId}}</td></tr>
+        <tr><td>账号 ID</td><td>{{(detail || log).accountId}}</td></tr>
+        <tr><td>操作类型</td><td>{{actionLabels[log.action] || log.action}}</td></tr>
+        <tr><td>摘要</td><td>{{(detail || log).summary}}</td></tr>
+        <tr><td>日志 ID</td><td>{{log.id}}</td></tr>
+        @if (detail) {
+          <tr><td>资源类型</td><td>{{detail.resourceType}}</td></tr>
+          <tr><td>资源 ID</td><td>{{detail.resourceId || '—'}}</td></tr>
+          <tr><td>关联番组 ID</td><td>{{detail.bangumiIds.join(', ') || '—'}}</td></tr>
+        }
+      </tbody>
+    </table>
+    @if (isLoading) {
+      <div class="ui active inline centered loader" role="status" aria-label="加载日志详情"></div>
+    }
+    @if (errorMessage) {
+      <div class="ui negative message" role="alert">
+        <p>{{errorMessage}}</p>
+        <button type="button" class="ui small button" (click)="loadDetail()">重试</button>
+      </div>
+    }
+    @if (detail && !isLoading && !errorMessage) {
+      <h4>变更详情</h4>
+      @if (detailRows.length) {
+        <table class="ui definition table" [ngClass]="{inverted: isDarkTheme}">
+          <tbody>
+            @for (row of detailRows; track row.label) {
+              <tr><td>{{row.label}}</td><td><pre>{{row.value}}</pre></td></tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p>此操作没有附加详情，或详情因隐私保护未记录。</p>
+      }
+    }
+  </div>
+  <div class="detail-footer">
+    <button type="button" class="ui button" cdkFocusInitial (click)="close()">关闭</button>
+  </div>
+</section>

@@ -8,6 +8,7 @@
       <a class="item" [ngClass]="{active: activatedTab === 'Episode'}" (click)="activeTab('Episode')">Episode</a>
       <a class="item" [ngClass]="{active: activatedTab === 'ResourceGroup'}" (click)="activeTab('ResourceGroup')">Resource Group</a>
       <a class="item" [ngClass]="{active: activatedTab === 'VideoProcess'}" (click)="activeTab('VideoProcess')">Video Process</a>
+      <a class="item" [ngClass]="{active: activatedTab === 'AuditLog'}" (click)="activeTab('AuditLog')">操作日志</a>
     </div>
   }
   @if (!bangumi.deleteMark) {
@@ -54,6 +55,9 @@
     }
     @if (activatedTab === 'VideoProcess') {
       <video-process-rule [bangumi]="bangumi"></video-process-rule>
+    }
+    @if (activatedTab === 'AuditLog') {
+      <app-bangumi-audit-log [bangumiId]="bangumi.id"></app-bangumi-audit-log>
     }
   </div>
 }
