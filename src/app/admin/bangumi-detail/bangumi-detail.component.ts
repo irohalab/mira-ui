@@ -20,8 +20,9 @@ import { EpisodeListComponent } from './episode-list/episode-list.component';
 import { ResourceGroupComponent } from './resource-group/resource-group.component';
 import { VideoProcessRuleComponent } from './video-processs-rule/video-process-rule.component';
 import { BangumiAdminEntity } from '../../entity/admin/BangumiAdminEntity';
+import { BangumiAuditLogComponent } from './bangumi-audit-log/bangumi-audit-log.component';
 
-type TabName =  'Overview' | 'Episode' | 'ResourceGroup' | 'VideoProcess';
+type TabName =  'Overview' | 'Episode' | 'ResourceGroup' | 'VideoProcess' | 'AuditLog';
 
 export enum AnnounceStatus {
     NOT_SET, NOT_YET, ANNOUNCING, EXPIRED
@@ -31,7 +32,8 @@ export enum AnnounceStatus {
     selector: 'bangumi-detail',
     templateUrl: './bangumi-detail.html',
     styleUrls: ['./bangumi-detail.less'],
-    imports: [AdminNavbar, NgClass, ConfirmDialogDirective, BangumiOverviewComponent, EpisodeListComponent, ResourceGroupComponent, VideoProcessRuleComponent]
+    imports: [AdminNavbar, NgClass, ConfirmDialogDirective, BangumiOverviewComponent, EpisodeListComponent,
+        ResourceGroupComponent, VideoProcessRuleComponent, BangumiAuditLogComponent]
 })
 export class BangumiDetail implements OnInit, OnDestroy {
     private _subscription = new Subscription();

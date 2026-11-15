@@ -1,0 +1,36 @@
+@import '../common.less';
+@import '../../../_dark-theme-helpers';
+
+.section-card {
+  padding: 1.5rem;
+}
+
+.audit-header, .audit-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.audit-header {
+  margin-bottom: 1rem;
+  h4 { margin: 0 0 0.5rem; }
+  p { margin: 0; }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  .ui.table { min-width: 700px; }
+  td { overflow-wrap: anywhere; }
+  .audit-summary { min-width: 16rem; }
+  .empty-state { text-align: center; }
+}
+
+.audit-pagination {
+  margin-top: 1rem;
+}
+
+:host.dark-theme .section-card {
+  .dark-card();
+}
