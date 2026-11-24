@@ -45,6 +45,8 @@
           <p>{{activeRunProgress()}}</p>
           @if (overview.activeRun.requestedAction === 'cancel') {
             <p class="active-run-guidance">取消请求已提交，正在等待工作进程到达检查点。</p>
+          } @else if (overview.activeRun.requestedAction === 'pause') {
+            <p class="active-run-guidance">暂停请求已提交，正在等待工作进程到达检查点。</p>
           }
           @if (overview.activeRun.status === 'cleanup-ready') {
             <p class="active-run-guidance">审核已完成。清理本地源或回滚后，才能创建下一批次。</p>
@@ -57,9 +59,9 @@
       </section>
     }
 
-    <section class="create-band" [class.disabled-section]="!overview.enabled || !!overview.activeRun">
+    <section class="create-band" [class.disabled-section]="!overview.enabled || !!overview.activeRun || overview.eligibility.eligible <= 0">
       <div class="section-heading">
-        <div><span class="eyebrow">创建任务</span><h2>分批迁移</h2></div>
+        <div><span class="eyebrow">创建任务</span><h2>迁移模式</h2></div>
       </div>
       @if (creationBlockedMessage()) {
         <div class="creation-blocked"><i class="lock icon"></i>{{creationBlockedMessage()}}</div>
@@ -68,7 +70,7 @@
         <div class="create-option">
           <h3>Canary</h3>
           <p>{{overview.limits.canaryUnits}} 个最早可选视频，全部需要人工审核。</p>
-          <button class="ui primary button" [class.loading]="isCreating" [disabled]="isCreating || !overview.enabled || !!overview.activeRun" (click)="createCanary()">
+          <button class="ui primary button" [class.loading]="isCreating" [disabled]="!canCreateCanary()" (click)="createCanary()">
             <i class="shield alternate icon"></i>创建 Canary
           </button>
         </div>
@@ -95,6 +97,19 @@
             <i class="plus icon"></i>创建批次
           </button>
         </form>
+        <div class="create-option continuous-option">
+          <h3>连续迁移</h3>
+          <p>逐个单元迁移、验证切换并立即清理本地源文件，无需人工抽检，直至全部完成或出错停止。</p>
+          <button class="ui teal button" type="button"
+                  [class.loading]="isCreating"
+                  [disabled]="!canCreateContinuous()"
+                  confirmDialog
+                  dialogTitle="确认开始连续迁移"
+                  dialogContent="将立即开始逐个迁移所有可选视频，每个单元验证切换后立即删除本地源文件，直至全部完成或出错停止。确认继续？"
+                  (onConfirm)="createContinuous()">
+            <i class="forward icon"></i>开始连续迁移
+          </button>
+        </div>
       </div>
     </section>
   }

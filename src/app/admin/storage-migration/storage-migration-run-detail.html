@@ -43,6 +43,10 @@
             <strong> · 取消请求已提交，正在等待工作进程到达检查点</strong>
           }
         </div>
+      } @else if (run.requestedAction) {
+        <div class="ui info message">
+          <i class="spinner loading icon"></i>已提交 {{run.requestedAction}} 请求，正在等待 migration-worker 处理。
+        </div>
       }
       <div class="run-metrics">
         <div><span>已选择</span><strong>{{run.summary.selectedUnits}}</strong></div>

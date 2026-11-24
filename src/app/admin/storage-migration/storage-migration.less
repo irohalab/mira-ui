@@ -147,7 +147,7 @@
 
 .create-grid {
   display: grid;
-  grid-template-columns: minmax(16rem, 0.65fr) minmax(30rem, 1.35fr);
+  grid-template-columns: minmax(14rem, 0.55fr) minmax(24rem, 1.2fr) minmax(15rem, 0.75fr);
   gap: 1.5rem;
   margin-top: 1rem;
 }
@@ -163,6 +163,13 @@
   p {
     color: #66736f;
   }
+}
+
+.continuous-option {
+  padding-right: 0;
+  padding-left: 1.5rem;
+  border-right: 0;
+  border-left: 1px solid #d8dedc;
 }
 
 .batch-form .fields {
@@ -430,6 +437,7 @@
   .metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .create-grid { grid-template-columns: 1fr; }
   .create-option { padding: 0 0 1rem; border-right: 0; border-bottom: 1px solid #d8dedc; }
+  .continuous-option { padding: 1rem 0 0; border-left: 0; border-bottom: 0; border-top: 1px solid #d8dedc; }
   .run-header,
   .units-toolbar { align-items: flex-start; flex-direction: column; }
   .run-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }

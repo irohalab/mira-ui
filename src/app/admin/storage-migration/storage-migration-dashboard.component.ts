@@ -7,6 +7,7 @@ import { forkJoin, Subscription, timer } from 'rxjs';
 import { finalize, switchMap, takeWhile } from 'rxjs/operators';
 import { DARK_THEME, DarkThemeService, UIPagination, UIToast, UIToastComponent, UIToastRef } from '@irohalab/deneb-ui';
 import { AdminNavbar } from '../admin-navbar/admin-navbar.component';
+import { ConfirmDialogDirective } from '../../confirm-dialog/confirm-dialog.directive';
 import { environment } from '../../../environments/environment';
 import {
     CreateStorageMigrationRun,
@@ -22,7 +23,7 @@ import { StorageMigrationService } from './storage-migration.service';
     selector: 'storage-migration-dashboard',
     templateUrl: './storage-migration-dashboard.html',
     styleUrls: ['./storage-migration.less'],
-    imports: [AdminNavbar, DatePipe, DecimalPipe, FormsModule, NgClass, RouterLink, UIPagination],
+    imports: [AdminNavbar, ConfirmDialogDirective, DatePipe, DecimalPipe, FormsModule, NgClass, RouterLink, UIPagination],
 })
 export class StorageMigrationDashboardComponent implements OnInit, OnDestroy {
     private subscription = new Subscription();
@@ -73,6 +74,7 @@ export class StorageMigrationDashboardComponent implements OnInit, OnDestroy {
     }
 
     createCanary(): void {
+        if (!this.canCreateCanary()) return;
         this.createRun({mode: 'canary'});
     }
 
@@ -87,6 +89,11 @@ export class StorageMigrationDashboardComponent implements OnInit, OnDestroy {
         });
     }
 
+    createContinuous(): void {
+        if (!this.canCreateContinuous()) return;
+        this.createRun({mode: 'continuous'});
+    }
+
     formatBytes(value: string): string {
         return formatStorageBytes(value);
     }
@@ -97,9 +104,26 @@ export class StorageMigrationDashboardComponent implements OnInit, OnDestroy {
             : 0;
     }
 
+    canCreateCanary(): boolean {
+        return !!this.overview
+            && this.overview.enabled
+            && this.overview.eligibility.eligible > 0
+            && !this.overview.activeRun
+            && !this.isCreating;
+    }
+
+    canCreateContinuous(): boolean {
+        return !!this.overview
+            && this.overview.enabled
+            && this.overview.eligibility.eligible > 0
+            && this.overview.canaryGate.unlocked
+            && !this.overview.activeRun
+            && !this.isCreating;
+    }
+
     canCreateBatch(): boolean {
-        if (!this.overview || !this.overview.enabled || !this.overview.canaryGate.unlocked
-            || !!this.overview.activeRun || this.isCreating) return false;
+        if (!this.overview || !this.overview.enabled || this.overview.eligibility.eligible <= 0
+            || !this.overview.canaryGate.unlocked || !!this.overview.activeRun || this.isCreating) return false;
         const maxSourceGiB = this.maxBatchSourceGiB();
         return Number.isInteger(this.batchVideoFileLimit)
             && this.batchVideoFileLimit >= 1
@@ -128,6 +152,9 @@ export class StorageMigrationDashboardComponent implements OnInit, OnDestroy {
     activeRunProgress(): string {
         const run = this.overview?.activeRun;
         if (!run) return '';
+        if (run.mode === 'continuous') {
+            return `已清理 ${run.summary.cleanedUnits} 个单元（已选择 ${run.summary.selectedUnits} 个）`;
+        }
         return run.status === 'inventory'
             ? storageMigrationInventoryProgress(run.summary)
             : `${run.summary.completedUnits} / ${run.summary.selectedUnits} 单元完成`;
@@ -138,7 +165,9 @@ export class StorageMigrationDashboardComponent implements OnInit, OnDestroy {
         if (this.overview.activeRun?.status === 'cleanup-ready') {
             return '当前任务已通过审核。请先清理本地源或回滚全部，结束任务后再创建批次。';
         }
-        return this.overview.activeRun ? '当前任务结束后才能创建新任务。' : '';
+        if (this.overview.activeRun) return '当前任务结束后才能创建新任务。';
+        if (this.overview.eligibility.eligible <= 0) return '当前没有可迁移的本地资源，不能创建任务。';
+        return '';
     }
 
     statusLabel(status: string): string {
