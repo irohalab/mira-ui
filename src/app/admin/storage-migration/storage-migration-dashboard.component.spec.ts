@@ -27,7 +27,7 @@ describe('StorageMigrationDashboardComponent', () => {
         let createdMode = '';
         let navigatedTo: unknown[] = [];
         const service = {
-            getOverview: () => of(overview),
+            getOverview: () => of({...overview, activeRun: null}),
             listRuns: () => of({data: [run], total: 1}),
             createRun: (request: {mode: string}) => {
                 createdMode = request.mode;
@@ -125,6 +125,89 @@ describe('StorageMigrationDashboardComponent', () => {
         tick(5000);
 
         expect(overviewCalls).toBe(2);
+        component.ngOnDestroy();
+    }));
+
+    it('creates a continuous run only when the canary gate is unlocked and formats continuous progress', fakeAsync(() => {
+        let createdMode = '';
+        let navigatedTo: unknown[] = [];
+        const continuousRun: StorageMigrationRun = {
+            ...run,
+            id: 'continuous-run-id',
+            mode: 'continuous',
+            status: 'running',
+            stage: 'copying',
+            summary: {...run.summary, selectedUnits: 12, cleanedUnits: 11},
+        };
+        const component = new StorageMigrationDashboardComponent(
+            {
+                getOverview: () => of({...overview, activeRun: null}),
+                listRuns: () => of({data: [], total: 0}),
+                createRun: (request: {mode: string}) => {
+                    createdMode = request.mode;
+                    return of(continuousRun);
+                },
+            } as never,
+            {themeChange: of('light')} as never,
+            {navigate: (commands: unknown[]) => { navigatedTo = commands; }} as never,
+            {makeText: () => ({show: (): void => undefined})} as never,
+            {setTitle: (): void => undefined} as never,
+        );
+
+        component.ngOnInit();
+        tick(0);
+        component.createContinuous();
+        expect(component.canCreateContinuous()).toBeFalse();
+        expect(createdMode).toBe('');
+
+        component.overview = {
+            ...overview,
+            activeRun: null,
+            canaryGate: {...overview.canaryGate, unlocked: true},
+        };
+        expect(component.canCreateContinuous()).toBeTrue();
+        component.createContinuous();
+        tick(0);
+
+        expect(createdMode).toBe('continuous');
+        expect(navigatedTo).toEqual(['/admin/storage-migration/runs', 'continuous-run-id']);
+
+        component.overview = {...component.overview, activeRun: continuousRun};
+        expect(component.activeRunProgress()).toBe('已清理 11 个单元（已选择 12 个）');
+        component.ngOnDestroy();
+    }));
+
+    it('blocks creating any migration task when there are zero eligible assets', fakeAsync(() => {
+        let createCalls = 0;
+        const emptyOverview: StorageMigrationOverview = {
+            ...overview,
+            activeRun: null,
+            canaryGate: {...overview.canaryGate, unlocked: true},
+            eligibility: {...overview.eligibility, eligible: 0, requiresWorkerInspection: 0},
+        };
+        const component = new StorageMigrationDashboardComponent(
+            {
+                getOverview: () => of(emptyOverview),
+                listRuns: () => of({data: [], total: 0}),
+                createRun: () => { createCalls++; return of(run); },
+            } as never,
+            {themeChange: of('light')} as never,
+            {navigate: (): void => undefined} as never,
+            {makeText: () => ({show: (): void => undefined})} as never,
+            {setTitle: (): void => undefined} as never,
+        );
+
+        component.ngOnInit();
+        tick(0);
+        component.createCanary();
+        component.createBatch();
+        component.createContinuous();
+
+        expect(component.canCreateCanary()).toBeFalse();
+        expect(component.canCreateBatch()).toBeFalse();
+        expect(component.canCreateContinuous()).toBeFalse();
+        expect(component.creationBlockedMessage()).toBe('当前没有可迁移的本地资源，不能创建任务。');
+        expect(createCalls).toBe(0);
         component.ngOnDestroy();
     }));
 });

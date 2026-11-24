@@ -1,4 +1,4 @@
-export type StorageMigrationRunMode = 'canary' | 'batch';
+export type StorageMigrationRunMode = 'canary' | 'batch' | 'continuous';
 export type StorageMigrationRunStatus =
     | 'inventory'
     | 'ready'
@@ -42,6 +42,12 @@ export interface StorageMigrationRunSummary {
         examinedRecords: number;
         dispositionCounts: Record<string, number>;
         lookupWarnings: string[];
+        cursor?: {
+            episodeCreatedAt: string;
+            episodeNo: number;
+            episodeSort: number;
+            videoFileId: string;
+        };
     };
 }
 
