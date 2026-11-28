@@ -99,6 +99,12 @@ export class ActionEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             this.edges = [];
             this.nodes = Object.keys(this.actions).map(actionId => {
                 const action = this.actions[actionId];
+                if (action.type === ActionType.Convert && (action as ConvertAction).profile === ProfileType.ImageSubtitle) {
+                    const convertAction = action as ConvertAction;
+                    if (!convertAction.profileExtraData || typeof convertAction.profileExtraData !== 'object') {
+                        convertAction.profileExtraData = {};
+                    }
+                }
                 if (action.upstreamActionIds && action.upstreamActionIds.length > 0) {
                     for (const sourceId of action.upstreamActionIds)
                         this.edges.push({
@@ -270,7 +276,17 @@ export class ActionEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     updateActionProfile(profile: string): void {
-        (this.actions[this.selectedActionId] as ConvertAction).profile = profile;
+        const convertAction = this.actions[this.selectedActionId] as ConvertAction;
+        convertAction.profile = profile;
+        if (profile === ProfileType.ImageSubtitle) {
+            if (!convertAction.profileExtraData || typeof convertAction.profileExtraData !== 'object') {
+                convertAction.profileExtraData = {};
+            }
+        } else if (profile === ProfileType.SoundOnly) {
+            if (typeof convertAction.profileExtraData === 'object') {
+                convertAction.profileExtraData = '';
+            }
+        }
         this.updateNode();
     }
 

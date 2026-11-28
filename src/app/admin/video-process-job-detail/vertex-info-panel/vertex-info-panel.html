@@ -28,15 +28,31 @@
           <td>Finished time</td>
           <td>{{vertex.finishedTime || 'N/A'}}</td>
         </tr>
-        @if (vertex.actionType === eActionType.Convert) {
+        @if (vertex.actionType === eActionType.Convert && $any(vertex.action).profile === eProfileType.ImageSubtitle) {
+          <tr>
+            <td>profile</td>
+            <td colspan="3">{{$any(vertex.action).profile}}</td>
+          </tr>
+          @if ($any(vertex.action).profileExtraData) {
+            <tr>
+              <td>profileExtraData.propertyName</td>
+              <td>{{$any(vertex.action).profileExtraData.propertyName || 'N/A'}}</td>
+              <td>profileExtraData.propertyValueRegex</td>
+              <td>{{$any(vertex.action).profileExtraData.propertyValueRegex || 'N/A'}}</td>
+            </tr>
+            <tr>
+              <td>profileExtraData.selectDefault</td>
+              <td colspan="3">{{$any(vertex.action).profileExtraData.selectDefault}}</td>
+            </tr>
+          }
+        }
+        @if (vertex.actionType === eActionType.Convert && $any(vertex.action).profile !== eProfileType.ImageSubtitle) {
           <tr>
             <td>profile</td>
             <td>{{$any(vertex.action).profile}}</td>
             <td>profileExtraData</td>
             <td>{{$any(vertex.action).profileExtraData}}</td>
           </tr>
-        }
-        @if (vertex.actionType === eActionType.Convert) {
           <tr>
             <td>forceFontName</td>
             <td colspan="3">{{$any(vertex.action).forceFontName}}</td>

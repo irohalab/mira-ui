@@ -4,6 +4,8 @@ const profileTypeMapping: {[key: string]: string} = {
     'default': 'Default',
     'sound_only': 'Sound Only',
     'video_only': 'Video Only',
+    'container_only': 'Container Only',
+    'image_subtitle': 'Image Subtitle',
     'custom': 'Custom'
 };
 
