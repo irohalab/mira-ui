@@ -21,8 +21,20 @@
                   @if (node.data.type === eActionType.Convert) {
                     <xhtml:div class="action-properties">
                       <xhtml:div class="convert-profile"><xhtml:span class="property-name">profile:</xhtml:span>{{node.data.profile}}</xhtml:div>
-                        <xhtml:div class="font"><xhtml:span class="property-name">forceFontName:</xhtml:span>{{node.data.forceFontName}}</xhtml:div>
+                        @if (node.data.profile === eProfileType.ImageSubtitle) {
+                          @if (!!node.data.profileExtraData && !!node.data.profileExtraData.propertyName) {
+                            <xhtml:div class="profile-extra"><xhtml:span class="property-name">extra.propertyName:</xhtml:span>{{node.data.profileExtraData.propertyName}}</xhtml:div>
+                          }
+                          @if (!!node.data.profileExtraData && !!node.data.profileExtraData.propertyValueRegex) {
+                            <xhtml:div class="profile-extra"><xhtml:span class="property-name">extra.propertyValueRegex:</xhtml:span>{{node.data.profileExtraData.propertyValueRegex}}</xhtml:div>
+                          }
+                          @if (!!node.data.profileExtraData && node.data.profileExtraData.selectDefault !== undefined) {
+                            <xhtml:div class="profile-extra"><xhtml:span class="property-name">extra.selectDefault:</xhtml:span>{{node.data.profileExtraData.selectDefault}}</xhtml:div>
+                          }
+                        } @else {
+                          <xhtml:div class="font"><xhtml:span class="property-name">forceFontName:</xhtml:span>{{node.data.forceFontName}}</xhtml:div>
                           <xhtml:div class="profile-extra"><xhtml:span class="property-name">profileExtraData:</xhtml:span>{{node.data.profileExtraData}}</xhtml:div>
+                        }
                             </xhtml:div>
                           }
                           @if (node.data.type === eActionType.Extract) {
@@ -148,11 +160,12 @@
                                                                     <div class="item" (click)="updateActionProfile(eProfileType.SoundOnly)">Sound Only</div>
                                                                     <div class="item" (click)="updateActionProfile(eProfileType.VideoOnly)">Video Only</div>
                                                                     <div class="item" (click)="updateActionProfile(eProfileType.ContainerOnly)">Container Only</div>
+                                                                    <div class="item" (click)="updateActionProfile(eProfileType.ImageSubtitle)">Image Subtitle</div>
                                                                     <!--                            <div class="item" (click)="$any(action).profile = eProfileType.Custom">Custom</div>-->
                                                                   </div>
                                                                 </div>
                                                               </div>
-                                                              @if (fontList.length > 0) {
+                                                              @if (fontList.length > 0 && $any(actions[selectedActionId]).profile !== eProfileType.ImageSubtitle) {
                                                                 <div class="field">
                                                                   <label>Font Name</label>
                                                                   <div class="ui selection dropdown" uiDropdown="click">
@@ -179,6 +192,35 @@
                                                                     [ngModelOptions]="{updateOn: 'blur'}"
                                                                     name="preferredTrack"
                                                                     placeholder="Preferred Track"/>
+                                                                </div>
+                                                              }
+                                                              @if ($any(actions[selectedActionId]).profile === eProfileType.ImageSubtitle && $any(actions[selectedActionId]).profileExtraData) {
+                                                                <div class="field">
+                                                                  <label>profileExtraData.propertyName</label>
+                                                                  <input type="text"
+                                                                    [(ngModel)]="$any(actions[selectedActionId]).profileExtraData.propertyName"
+                                                                    (ngModelChange)="updateNode()"
+                                                                    [ngModelOptions]="{updateOn: 'blur'}"
+                                                                    name="profilePropertyName"
+                                                                    placeholder="property name of the subtitle stream info to match"/>
+                                                                </div>
+                                                                <div class="field">
+                                                                  <label>profileExtraData.propertyValueRegex</label>
+                                                                  <input type="text"
+                                                                    [(ngModel)]="$any(actions[selectedActionId]).profileExtraData.propertyValueRegex"
+                                                                    (ngModelChange)="updateNode()"
+                                                                    [ngModelOptions]="{updateOn: 'blur'}"
+                                                                    name="profilePropertyValueRegex"
+                                                                    placeholder="regular expression of the property of stream info"/>
+                                                                </div>
+                                                                <div class="field">
+                                                                  <div class="ui checkbox">
+                                                                    <input type="checkbox"
+                                                                      [(ngModel)]="$any(actions[selectedActionId]).profileExtraData.selectDefault"
+                                                                      (ngModelChange)="updateNode()"
+                                                                      name="profileSelectDefault"/>
+                                                                    <label>profileExtraData.selectDefault</label>
+                                                                  </div>
                                                                 </div>
                                                               }
                                                               <button class="ui icon button" (click)="removeSelectedNode()"><i class="trash alternate icon"></i></button>

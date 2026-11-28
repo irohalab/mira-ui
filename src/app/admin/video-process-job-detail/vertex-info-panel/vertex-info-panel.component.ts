@@ -8,6 +8,7 @@ import {
     processLineForStreamLogViewer
 } from '../stream-log-viewer/stream-log-helper';
 import { ActionType } from '../../../entity/action-type';
+import { ProfileType } from '../../../entity/ProfileType';
 import { DARK_THEME, DarkThemeService, UIDialogRef } from '@irohalab/deneb-ui';
 import { StreamLogViewerComponent } from '../stream-log-viewer/stream-log-viewer.component';
 import { NgClass } from '@angular/common';
@@ -23,6 +24,7 @@ export class VertexInfoPanelComponent implements OnInit, OnDestroy {
     private vertexLogContainerMaxCharacter: number;
 
     eActionType = ActionType;
+    eProfileType = ProfileType;
 
     vertexLogLines = new Subject<LogType>();
 
